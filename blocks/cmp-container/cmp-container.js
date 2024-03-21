@@ -1,3 +1,3 @@
-export default function decorate(html) {
-    
+export default function decorate() {
+
 }
