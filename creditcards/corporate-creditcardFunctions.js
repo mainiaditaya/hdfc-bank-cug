@@ -3,6 +3,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable max-len */
 /* eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
+/* eslint no-unused-vars: ["error", { "args": "none" }] */
 import createJourneyId from '../common/journey-utils.js';
 import {
   formUtil, maskNumber, urlPath, clearString, getTimeStamp, convertDateToMmmDdYyyy, setDataAttributeOnClosestAncestor,
@@ -112,7 +113,7 @@ const OTPGEN = {
     const dob = clearString(globals.form.loginPanel.identifierPanel.dateOfBirth.$value);
     const jsonObj = {};
     jsonObj.requestString = {};
-    jsonObj.requestString.mobileNumber = String(mobileNo) ?? '';
+    jsonObj.requestString.mobileNumber = String(mobileNo);
     jsonObj.requestString.dateOfBith = dob ?? '';
     jsonObj.requestString.panNumber = panNo ?? '';
     jsonObj.requestString.journeyID = currentFormContext.journeyID;
@@ -266,7 +267,7 @@ const OTPVAL = {
     const dob = clearString(globals.form.loginPanel.identifierPanel.dateOfBirth.$value);
     const jsonObj = {};
     jsonObj.requestString = {};
-    jsonObj.requestString.mobileNumber = String(mobileNo) ?? '';
+    jsonObj.requestString.mobileNumber = String(mobileNo);
     jsonObj.requestString.panNumber = String(panNo) ?? '';
     jsonObj.requestString.dateOfBirth = String(dob) ?? '';
     jsonObj.requestString.channelSource = '';
@@ -289,6 +290,69 @@ const OTPVAL = {
   path: urlPath('/content/hdfc_cc_unified/api/otpValFetchAssetDemog.json'),
   loadingText: 'Please wait while we are authenticating you',
 };
+
+/**
+ * Moves the corporate card wizard view from one step to the next step.
+ * @param {String} source - The name attribute of the source element (parent wizard panel).
+ * @param {String} target - The name attribute of the destination element.
+ */
+const moveCCWizardView = (source, target) => {
+  const navigateFrom = document.getElementsByName(source)?.[0];
+  const current = navigateFrom?.querySelector('.current-wizard-step');
+  const currentMenuItem = navigateFrom?.querySelector('.wizard-menu-active-item');
+  const navigateTo = document.getElementsByName(target)?.[0];
+  current?.classList?.remove('current-wizard-step');
+  navigateTo?.classList?.add('current-wizard-step');
+  // add/remove active class from menu item
+  const navigateToMenuItem = navigateFrom?.querySelector(`li[data-index="${navigateTo?.dataset?.index}"]`);
+  currentMenuItem?.classList?.remove('wizard-menu-active-item');
+  navigateToMenuItem?.classList?.add('wizard-menu-active-item');
+  const event = new CustomEvent('wizard:navigate', {
+    detail: {
+      prevStep: { id: current?.id, index: parseInt(current?.dataset?.index || 0, 10) },
+      currStep: { id: navigateTo?.id, index: parseInt(navigateTo?.dataset?.index || 0, 10) },
+    },
+    bubbles: false,
+  });
+  navigateFrom?.dispatchEvent(event);
+};
+
+/**
+ * Handles the success scenario on check offer.
+ * @param {any} res - The response object containing the check offer success response.
+ * @param {Object} globals - globals variables object containing form configurations.
+ */
+const checkOfferSuccess = (res, globals) => moveCCWizardView('corporateCardWizardView', 'confirmCardPanel');
+
+/**
+ * Handles the failure scenario on check offer.
+ * @param {any} err - The response object containing the check offer failure response.
+ * @param {Object} globals - globals variables object containing form configurations.
+ */
+const checkOfferFailure = (err, globals) => moveCCWizardView('corporateCardWizardView', 'confirmCardPanel');
+
+const CHECKOFFER = {
+  getPayload(globals) {
+    const mobileNo = globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value;
+    const jsonObj = {};
+    jsonObj.requestString = {};
+    jsonObj.requestString.mobileNumber = String(mobileNo);
+    return jsonObj;
+  },
+  successCallback(res, globals) {
+    return checkOfferSuccess(res, globals);
+  },
+  errorCallback(err, globals) {
+    return checkOfferFailure(err, globals);
+  },
+  path: urlPath('/content/hdfc_cc_unified/api/checkoffer.json'),
+  loadingText: 'Checking offers for you...',
+};
+
+/**
+ * Moves the wizard view to the "selectKycPaymentPanel" step.
+ */
+const getThisCard = () => moveCCWizardView('corporateCardWizardView', 'selectKycPaymentPanel');
 
 /**
  * Resends OTP success handler.
@@ -326,4 +390,7 @@ const RESENDOTP = {
   path: OTPGEN.path,
   loadingText: 'Please wait otp sending again...',
 };
-export { OTPGEN, OTPVAL, RESENDOTP };
+
+export {
+  OTPGEN, OTPVAL, CHECKOFFER, RESENDOTP, getThisCard,
+};
