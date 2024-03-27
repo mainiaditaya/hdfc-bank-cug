@@ -65,7 +65,7 @@ function onWizardInit() {
 }
 
 /**
- * Creates a modal pop up when triggered by a specified element.
+ * Creates a modal pop up when triggered by a specified element..
  * @param {HTMLElement} triggerElement - The element that triggers the modal when clicked.
  * @param {Object} payload - Configuration object containing content, action wrapper class, and consent requirement flag.
  * @param {HTMLElement} payload.content - The content to display in the modal.
