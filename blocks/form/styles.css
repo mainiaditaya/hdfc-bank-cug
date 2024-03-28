@@ -22,6 +22,10 @@ main {
 
 main .form form {
   padding: 40px;
+
+  .label-disabled {
+    background-color: var(--form-input-disable-color) !important;
+  }
 }
 
 main .form.block {
@@ -52,7 +56,7 @@ main .form {
     font-size: 14px;
   }
 
-  input[type="password"] {
+  input[type='password'] {
     font-size: 31px;
   }
 
