@@ -115,6 +115,7 @@ main .form form {
     margin-right: 21px;
   }
 
+
   .current-address-toggle__label {
     color: var(--color-interface-text-secondary);
     font-size: var(--body-sm-font-size);
@@ -124,7 +125,6 @@ main .form form {
 
   .field-prefilledcurrentadddress {
     margin-top: -18px !important;
-
     input[type='text'] {
       border: none;
       pointer-events: none;
