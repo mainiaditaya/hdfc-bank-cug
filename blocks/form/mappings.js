@@ -12,9 +12,5 @@ export default async function componentDecorator(fd) {
     const module = await import('./components/wizard.js');
     return module.default;
   }
-  if (fd.id.includes('accordion')) {
-    const module = await import('./components/accordion.js');
-    return module.default;
-  }
   return null;
 }
