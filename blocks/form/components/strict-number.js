@@ -4,7 +4,7 @@
 
 const allowedChars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'];
 
-const regex = new RegExp(`^[${allowedChars.join('')}]$`);
+const regex = new RegExp(`^[${allowedChars.join('')}]+$`);
 
 function containsInvalidCharacter(data) {
   return !regex.test(data);
