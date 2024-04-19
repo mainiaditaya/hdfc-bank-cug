@@ -1,19 +1,33 @@
 import {
-  OTPGEN, OTPVAL, RESENDOTP, CHECKOFFER, getThisCard, prefillForm, getAddressDetails,
+  OTPVAL, RESENDOTP, CHECKOFFER, getThisCard, prefillForm, getAddressDetails, currentFormContext,
 } from '../creditcards/corporate-creditcardFunctions.js';
 
-import { restAPICall } from './makeRestAPI.js';
-
+import { restAPICall, getJsonResponse } from './makeRestAPI.js';
+import { urlPath } from './formutils.js';
 /**
  * generates the otp
- *
- * @param {object} globals - The global object containing necessary globals form data.
+ * @param {object} mobileNumber
+ * @param {object} pan
+ * @param {object} dob
+ * @return {PROMISE}
  */
-function getOTP(mobileNumber, pan, dob, globals) {
-  const payload = OTPGEN.getPayload(mobileNumber, pan, dob);
-  restAPICall(globals, 'POST', payload, OTPGEN.path, OTPGEN.successCallback, OTPGEN.errorCallback, OTPGEN.loadingText);
-}
+function getOTP(mobileNumber, pan, dob) {
+  const jsonObj = {
+    requestString: {
+      mobileNumber: mobileNumber.$value,
+      dateOfBith: dob.$value || '',
+      panNumber: pan.$value || '',
+      journeyID: currentFormContext.journeyID,
+      journeyName: currentFormContext.journeyName,
+      userAgent: window.navigator.userAgent,
+      identifierValue: pan.$value || dob.$value,
+      identifierName: pan.$value ? 'PAN' : 'DOB',
+    },
+  };
 
+  const path = urlPath('/content/hdfc_ccforms/api/customeridentificationV4.json');
+  return getJsonResponse(path, jsonObj, 'POST');
+}
 /**
  * otp validation
  *

@@ -602,5 +602,5 @@ const prefillForm = (globals) => {
 };
 
 export {
-  OTPGEN, OTPVAL, CHECKOFFER, RESENDOTP, getThisCard, prefillForm, getAddressDetails,
+  OTPGEN, OTPVAL, CHECKOFFER, RESENDOTP, getThisCard, prefillForm, getAddressDetails, currentFormContext,
 };
