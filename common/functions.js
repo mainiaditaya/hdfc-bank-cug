@@ -9,8 +9,8 @@ import { restAPICall } from './makeRestAPI.js';
  *
  * @param {object} globals - The global object containing necessary globals form data.
  */
-function getOTP(globals) {
-  const payload = OTPGEN.getPayload(globals);
+function getOTP(mobileNumber, pan, dob, globals) {
+  const payload = OTPGEN.getPayload(mobileNumber, pan, dob);
   restAPICall(globals, 'POST', payload, OTPGEN.path, OTPGEN.successCallback, OTPGEN.errorCallback, OTPGEN.loadingText);
 }
 
