@@ -5,7 +5,7 @@ import {
 import { restAPICall, getJsonResponse } from './makeRestAPI.js';
 import { urlPath } from './formutils.js';
 /**
- * generates the otp
+ * generates the otp for the user
  * @param {object} mobileNumber
  * @param {object} pan
  * @param {object} dob
