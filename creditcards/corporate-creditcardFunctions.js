@@ -228,11 +228,15 @@ const splitName = (fullName) => {
   const name = { firstName: '', middleName: '', lastName: '' };
   if (fullName) {
     const parts = fullName.split(' ');
-    name.firstName = parts.shift() || '';
-    name.lastName = parts.pop() || '';
-    name.middleName = parts.length > 0 ? parts[0] : '';
+    name.firstName = sanitizeName(parts.shift()) || '';
+    name.lastName = sanitizeName(parts.pop()) || '';
+    name.middleName = sanitizeName(parts.length > 0 ? parts[0] : '');
   }
   return name;
+};
+
+const sanitizeName = (name) => {
+  return name.replace(/[^a-zA-Z]/g, '');
 };
 
 /* Automatically fills form fields based on response data.
