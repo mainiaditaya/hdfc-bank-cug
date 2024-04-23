@@ -191,15 +191,6 @@ const addDisableClass = (selectedPanel) => {
 };
 
 /**
- * Sanitizes name for special characters.
- * @param {Strng} name 
- * @returns {String} sanitized name.
- */
-const sanitizeName = (name) => {
-  return name.replace(/[^a-zA-Z]/g, '');
-};
-
-/**
  * Parses the given address into substrings, each containing up to 30 characters.
  * @param {string} address - The address to parse.
  * @returns {string[]} An array of substrings, each containing up to 30 characters.
@@ -242,6 +233,10 @@ const splitName = (fullName) => {
     name.middleName = sanitizeName(parts.length > 0 ? parts[0] : '');
   }
   return name;
+};
+
+const sanitizeName = (name) => {
+  return name.replace(/[^a-zA-Z]/g, '');
 };
 
 /* Automatically fills form fields based on response data.
