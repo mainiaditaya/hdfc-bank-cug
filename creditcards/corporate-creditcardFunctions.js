@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
-import createJourneyId from '../common/journey-utils.js';
+import { createJourneyId, currentFormContext } from '../common/journey-utils.js';
 import PANValidationAndNameMatchService from '../common/panvalidation.js';
 import executeCheck from '../common/panutils.js';
 import customerValidationHandler from '../common/executeinterfaceutils.js';
@@ -16,19 +16,20 @@ import {
   convertDateToMmmDdYyyy,
   setDataAttributeOnClosestAncestor,
   convertDateToDdMmYyyy,
+  moveWizardView,
 } from '../common/formutils.js';
 
 const journeyName = 'CORPORATE_CARD_JOURNEY';
-const currentFormContext = {
-  journeyID: createJourneyId('a', 'b', 'c'),
-  journeyName,
-};
+currentFormContext.journeyID = createJourneyId('a', 'b', 'c');
+currentFormContext.journeyName = journeyName;
+currentFormContext.journeyType = 'NTB';
 let PAN_VALIDATION_STATUS = false;
 let PAN_RETRY_COUNTER = 1;
 let resendOtpCount = 3;
 let IS_ETB_USER = false;
 const CUSTOMER_INPUT = { mobileNumber: '', pan: '', dob: '' };
 const CUSTOMER_DEMOG_DATA = {};
+let BRE_DEMOG_RESPONSE = {};
 /**
  * Appends a masked number to the specified container element if the masked number is not present.
  * @param {String} containerClass - The class name of the container element.
@@ -191,31 +192,6 @@ const addDisableClass = (selectedPanel) => {
 };
 
 /**
- * Parses the given address into substrings, each containing up to 30 characters.
- * @param {string} address - The address to parse.
- * @returns {string[]} An array of substrings, each containing up to 30 characters.
- */
-const parseCustomerAddress = (address) => {
-  const words = address.trim().split(' ');
-  const substrings = [];
-  let currentSubstring = '';
-
-  words.forEach((word) => {
-    if (substrings.length === 3) {
-      return; // Exit the loop if substrings length is equal to 3
-    }
-    if ((`${currentSubstring} ${word}`).length <= 30) {
-      currentSubstring += (currentSubstring === '' ? '' : ' ') + word;
-    } else {
-      substrings.push(currentSubstring);
-      currentSubstring = word;
-    }
-  });
-
-  return substrings;
-};
-
-/**
  * Sanitizes the name for special characters.
  * @param {String} name - The name token.
  * @returns {String} sanitized name.
@@ -259,7 +235,7 @@ const personalDetailsPreFillFromBRE = (res, globals) => {
   const breCheckAndFetchDemogResponse = res?.demogResponse?.BRECheckAndFetchDemogResponse;
 
   if (!breCheckAndFetchDemogResponse) return;
-
+  BRE_DEMOG_RESPONSE = breCheckAndFetchDemogResponse;
   // Extract gender from response
   const personalDetailsFields = {
     gender: 'VDCUSTGENDER',
@@ -310,10 +286,6 @@ const personalDetailsPreFillFromBRE = (res, globals) => {
   const personaldetails = document.querySelector('.field-personaldetails');
   personaldetails.classList.add('personaldetails-disabled');
   addDisableClass(personaldetails);
-  const customerFiller2 = breCheckAndFetchDemogResponse?.BREFILLER2?.toUpperCase();
-  if (customerFiller2 === 'D106') {
-    const customerValidAddress = parseCustomerAddress(`${breCheckAndFetchDemogResponse?.VDCUSTADD1} ${breCheckAndFetchDemogResponse?.VDCUSTADD2} ${breCheckAndFetchDemogResponse?.VDCUSTADD3}`);
-  }
 };
 
 /**
@@ -385,6 +357,8 @@ const otpValSuccess = (res, globals) => {
     resultPanel: globals.form.resultPanel,
   };
   currentFormContext.isCustomerIdentified = res?.customerIdentificationResponse?.CustomerIdentificationResponse?.errorCode === '0' ? 'Y' : 'N';
+  currentFormContext.productCode = globals.functions.exportData().data.CorporateCreditCard.productCode;
+  currentFormContext.promoCode = globals.functions.exportData().data.CorporateCreditCard.promoCode;
   const welcomeTxt = formUtil(globals, pannel.welcome);
   const otpPanel = formUtil(globals, pannel.otp);
   const otpBtn = formUtil(globals, pannel.otpButton);
@@ -399,9 +373,11 @@ const otpValSuccess = (res, globals) => {
   CUSTOMER_INPUT.mobileNumber = pannel.login.mobilePanel.registeredMobileNumber.$value;
   CUSTOMER_INPUT.dob = pannel.login.identifierPanel.dateOfBirth.$value;
   CUSTOMER_INPUT.pan = pannel.login.identifierPanel.pan.$value;
+  currentFormContext.jwtToken = res?.demogResponse?.Id_token_jwt;
   const existingCustomer = existingCustomerCheck(res);
   if (existingCustomer) {
     IS_ETB_USER = true;
+    currentFormContext.journeyType = 'ETB';
     personalDetailsPreFillFromBRE(res, globals);
   }
   (async () => {
@@ -517,44 +493,18 @@ const OTPVAL = {
 };
 
 /**
- * Moves the corporate card wizard view from one step to the next step.
- * @param {String} source - The name attribute of the source element (parent wizard panel).
- * @param {String} target - The name attribute of the destination element.
- */
-const moveCCWizardView = (source, target) => {
-  const navigateFrom = document.getElementsByName(source)?.[0];
-  const current = navigateFrom?.querySelector('.current-wizard-step');
-  const currentMenuItem = navigateFrom?.querySelector('.wizard-menu-active-item');
-  const navigateTo = document.getElementsByName(target)?.[0];
-  current?.classList?.remove('current-wizard-step');
-  navigateTo?.classList?.add('current-wizard-step');
-  // add/remove active class from menu item
-  const navigateToMenuItem = navigateFrom?.querySelector(`li[data-index="${navigateTo?.dataset?.index}"]`);
-  currentMenuItem?.classList?.remove('wizard-menu-active-item');
-  navigateToMenuItem?.classList?.add('wizard-menu-active-item');
-  const event = new CustomEvent('wizard:navigate', {
-    detail: {
-      prevStep: { id: current?.id, index: parseInt(current?.dataset?.index || 0, 10) },
-      currStep: { id: navigateTo?.id, index: parseInt(navigateTo?.dataset?.index || 0, 10) },
-    },
-    bubbles: false,
-  });
-  navigateFrom?.dispatchEvent(event);
-};
-
-/**
  * Handles the success scenario on check offer.
  * @param {any} res - The response object containing the check offer success response.
  * @param {Object} globals - globals variables object containing form configurations.
  */
-const checkOfferSuccess = (res, globals) => moveCCWizardView('corporateCardWizardView', 'confirmCardPanel');
+const checkOfferSuccess = (res, globals) => moveWizardView('corporateCardWizardView', 'confirmCardPanel');
 
 /**
  * Handles the failure scenario on check offer.
  * @param {any} err - The response object containing the check offer failure response.
  * @param {Object} globals - globals variables object containing form configurations.
  */
-const checkOfferFailure = (err, globals) => moveCCWizardView('corporateCardWizardView', 'confirmCardPanel');
+const checkOfferFailure = (err, globals) => moveWizardView('corporateCardWizardView', 'confirmCardPanel');
 
 const CHECKOFFER = {
   getPayload(globals) {
@@ -577,12 +527,12 @@ const CHECKOFFER = {
 /**
  * Moves the wizard view to the "selectKycPaymentPanel" step.
  */
-const getThisCard = () => moveCCWizardView('corporateCardWizardView', 'selectKycPaymentPanel');
+const getThisCard = () => moveWizardView('corporateCardWizardView', 'selectKycPaymentPanel');
 
 /**
  * Moves the wizard view to the "confirmAndSubmitPanel" step.
  */
-const getAddressDetails = () => moveCCWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
+const getAddressDetails = () => moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
 
 /**
  * Resends OTP success handler.
@@ -689,26 +639,24 @@ const checkUserProceedStatus = (panStatus, globals) => {
    */
   // Main logic to check user proceed status
 
-  let customerJourneyType = 'ETB';
   const terminationCheck = false;
   switch (IS_ETB_USER) {
     case true:
       if (CUSTOMER_INPUT.pan) {
-        executeCheck(customerJourneyType, panStatus, terminationCheck, customerValidationHandler);
+        executeCheck(panStatus, terminationCheck, customerValidationHandler, globals, BRE_DEMOG_RESPONSE);
       } else if (CUSTOMER_INPUT.dob) {
         if (!CUSTOMER_DEMOG_DATA.panNumberPersonalDetails || !CUSTOMER_DEMOG_DATA.lastName) {
           const result = demogDataCheck(panStatus);
           if (result.proceed) {
-            executeCheck(customerJourneyType, panStatus, result.terminationCheck, customerValidationHandler);
+            executeCheck(panStatus, result.terminationCheck, customerValidationHandler, globals, BRE_DEMOG_RESPONSE);
           }
         } else {
-          executeCheck(customerJourneyType, panStatus, terminationCheck, customerValidationHandler);
+          executeCheck(panStatus, terminationCheck, customerValidationHandler, globals, BRE_DEMOG_RESPONSE);
         }
       }
       break;
     case false:
-      customerJourneyType = 'NTB';
-      executeCheck(customerJourneyType, panStatus, terminationCheck, customerValidationHandler);
+      executeCheck(panStatus, terminationCheck, customerValidationHandler, globals, BRE_DEMOG_RESPONSE);
       break;
     default:
       break;
