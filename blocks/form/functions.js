@@ -119,7 +119,7 @@ function maskTelephoneInput(field) {
     const maskedPhoneNumber = phoneNumber.replace(/.(?=.{4,}$)/g, '*');
     return `+91 ${maskedPhoneNumber}`;
   }
-  return phoneNumber;
+  return phoneNumber || '';
 }
 
 // eslint-disable-next-line import/prefer-default-export
