@@ -16,6 +16,8 @@ import {
   convertDateToMmmDdYyyy,
   setDataAttributeOnClosestAncestor,
   convertDateToDdMmYyyy,
+  setSelectOptions,
+  composeNameOption,
   moveWizardView,
 } from '../common/formutils.js';
 
@@ -493,41 +495,12 @@ const OTPVAL = {
 };
 
 /**
- * Handles the success scenario on check offer.
- * @param {any} res - The response object containing the check offer success response.
- * @param {Object} globals - globals variables object containing form configurations.
- */
-const checkOfferSuccess = (res, globals) => moveWizardView('corporateCardWizardView', 'confirmCardPanel');
-
-/**
- * Handles the failure scenario on check offer.
- * @param {any} err - The response object containing the check offer failure response.
- * @param {Object} globals - globals variables object containing form configurations.
- */
-const checkOfferFailure = (err, globals) => moveWizardView('corporateCardWizardView', 'confirmCardPanel');
-
-const CHECKOFFER = {
-  getPayload(globals) {
-    const mobileNo = globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value;
-    const jsonObj = {};
-    jsonObj.requestString = {};
-    jsonObj.requestString.mobileNumber = String(mobileNo);
-    return jsonObj;
-  },
-  successCallback(res, globals) {
-    return checkOfferSuccess(res, globals);
-  },
-  errorCallback(err, globals) {
-    return checkOfferFailure(err, globals);
-  },
-  path: urlPath('/content/hdfc_cc_unified/api/checkoffer.json'),
-  loadingText: 'Checking offers for you...',
-};
-
-/**
  * Moves the wizard view to the "selectKycPaymentPanel" step.
  */
-const getThisCard = () => moveWizardView('corporateCardWizardView', 'selectKycPaymentPanel');
+const getThisCard = (globals) => {
+  const nameOnCardDropdown = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value;
+  moveWizardView('corporateCardWizardView', 'selectKycPaymentPanel');
+};
 
 /**
  * Moves the wizard view to the "confirmAndSubmitPanel" step.
@@ -665,10 +638,14 @@ const checkUserProceedStatus = (panStatus, globals) => {
 
 /**
  * Creates a PAN validation request object and handles success and failure callbacks.
+ * @param {string} firstName - The first name of the cardholder.
+ * @param {string} middleName - The last name of the cardholder.
+ * @param {string} lastName - The last name of the cardholder.
  * @param {Object} globals - The global object containing necessary data for PAN validation.
  * @returns {Object} - The PAN validation request object.
  */
 const createPanValidationRequest = (firstName, middleName, lastName, globals) => {
+  currentFormContext.customerName = { firstName, middleName, lastName }; // required for listNameOnCard function.
   const panValidation = {
     /**
      * Create pan validation request object.
@@ -785,7 +762,6 @@ const prefillForm = (globals) => {
 export {
   OTPGEN,
   OTPVAL,
-  CHECKOFFER,
   RESENDOTP,
   getThisCard,
   prefillForm,
