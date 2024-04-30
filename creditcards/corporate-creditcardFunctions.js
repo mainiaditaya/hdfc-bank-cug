@@ -6,7 +6,7 @@
 import { createJourneyId, currentFormContext } from '../common/journey-utils.js';
 import PANValidationAndNameMatchService from '../common/panvalidation.js';
 import executeCheck from '../common/panutils.js';
-import customerValidationHandler from '../common/executeinterfaceutils.js';
+import { customerValidationHandler, executeInterfaceApiFinal } from '../common/executeinterfaceutils.js';
 import {
   formUtil,
   maskNumber,
@@ -499,6 +499,7 @@ const OTPVAL = {
  */
 const getThisCard = (globals) => {
   const nameOnCardDropdown = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value;
+  executeInterfaceApiFinal(globals);
   moveWizardView('corporateCardWizardView', 'selectKycPaymentPanel');
 };
 

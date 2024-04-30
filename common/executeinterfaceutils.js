@@ -175,7 +175,7 @@ const createExecuteInterfaceRequestObj = (panCheckFlag, globals, breDemogRespons
       userAgent: navigator.userAgent,
       journeyID: currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
-      nameOnCard: fullName,
+      nameOnCard: fullName.length > 19 ? '' : fullName,
       dsaValue: '',
       cardsData: '',
       channelSource: '',
@@ -234,6 +234,7 @@ const sendIpaRequest = (ipaRequestObj, globals) => {
 const customerValidationHandler = {
   executeInterfaceApi: (APS_PAN_CHK_FLAG, globals, breDemogResponse) => {
     const requestObj = createExecuteInterfaceRequestObj(APS_PAN_CHK_FLAG, globals, breDemogResponse);
+    currentFormContext.executeInterfaceReqObj = requestObj;
     const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/executeinterface.json');
     const eventHandlers = {
       successCallBack: (response) => {
@@ -274,4 +275,22 @@ const customerValidationHandler = {
   },
 };
 
-export default customerValidationHandler;
+const executeInterfaceApiFinal = (globals) => {
+  const requestObj = currentFormContext.executeInterfaceReqObj;
+  currentFormContext.executeInterfaceReqObj.requestString.productCode = currentFormContext.productCode;
+  const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/executeinterface.json');
+  const eventHandlers = {
+    successCallBack: (response) => {
+      console.log(response, globals);
+    },
+    errorCallBack: (response) => {
+      console.log(response);
+    },
+  };
+  restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
+};
+
+export {
+  customerValidationHandler,
+  executeInterfaceApiFinal,
+};
