@@ -19,6 +19,7 @@ import {
   setSelectOptions,
   composeNameOption,
   moveWizardView,
+  parseCustomerAddress,
 } from '../common/formutils.js';
 
 const journeyName = 'CORPORATE_CARD_JOURNEY';
@@ -32,6 +33,7 @@ let IS_ETB_USER = false;
 const CUSTOMER_INPUT = { mobileNumber: '', pan: '', dob: '' };
 const CUSTOMER_DEMOG_DATA = {};
 let BRE_DEMOG_RESPONSE = {};
+const parsedCustomerAddress = [];
 /**
  * Appends a masked number to the specified container element if the masked number is not present.
  * @param {String} containerClass - The class name of the container element.
@@ -503,6 +505,10 @@ const getThisCard = (globals) => {
   moveWizardView('corporateCardWizardView', 'selectKycPaymentPanel');
 };
 
+const currentAddressToggleHandler = (globals) => {
+  console.log(globals);
+};
+
 /**
  * Moves the wizard view to the "confirmAndSubmitPanel" step.
  */
@@ -769,4 +775,5 @@ export {
   currentFormContext,
   createPanValidationRequest,
   getAddressDetails,
+  currentAddressToggleHandler,
 };
