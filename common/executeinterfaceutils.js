@@ -63,15 +63,16 @@ const createExecuteInterfaceRequestObj = (panCheckFlag, globals, breDemogRespons
     if (breDemogResponse.VDCUSTFULLNAME === fullName) {
       nameEditFlag = 'N';
     }
-    if (document.getElementsByName('currentAddressToggle')[0].checked) {
-      const { newcurentaddresspanel } = currentDetails.currentAddressETB;
-      currentAddress.address1 = newcurentaddresspanel.newCurentAddressLine1.$value;
-      currentAddress.address2 = newcurentaddresspanel.newCurentAddressLine2.$value;
-      currentAddress.address3 = newcurentaddresspanel.newCurentAddressLine3.$value;
-      currentAddress.city = newcurentaddresspanel.newCurentAddressCity.$value;
-      currentAddress.pincode = newcurentaddresspanel.newCurentAddressPin.$value;
-      currentAddress.state = newcurentaddresspanel.newCurentAddressState.$value;
+    if (currentDetails.currentAddressETB.currentAddressToggle.$value === 'on') {
+      const { newCurentAddressPanel } = currentDetails.currentAddressETB;
+      currentAddress.address1 = newCurentAddressPanel.newCurentAddressLine1.$value;
+      currentAddress.address2 = newCurentAddressPanel.newCurentAddressLine2.$value;
+      currentAddress.address3 = newCurentAddressPanel.newCurentAddressLine3.$value;
+      currentAddress.city = newCurentAddressPanel.newCurentAddressCity.$value;
+      currentAddress.pincode = newCurentAddressPanel.newCurentAddressPin.$value;
+      currentAddress.state = newCurentAddressPanel.newCurentAddressState.$value;
     } else {
+      isAddressEditFlag = 'N';
       const customerFiller2 = breDemogResponse?.BREFILLER2?.toUpperCase();
       if (customerFiller2 === 'D106') {
         const customerValidAddress = parseCustomerAddress(`${breDemogResponse?.VDCUSTADD1} ${breDemogResponse?.VDCUSTADD2} ${breDemogResponse?.VDCUSTADD3}`);
@@ -80,7 +81,6 @@ const createExecuteInterfaceRequestObj = (panCheckFlag, globals, breDemogRespons
         currentAddress.pincode = breDemogResponse.VDCUSTZIPCODE;
         currentAddress.state = breDemogResponse.VDCUSTSTATE;
       } else {
-        isAddressEditFlag = 'N';
         currentAddress.address1 = breDemogResponse?.VDCUSTADD1;
         currentAddress.address2 = breDemogResponse?.VDCUSTADD2;
         currentAddress.address3 = breDemogResponse?.VDCUSTADD3;

@@ -33,7 +33,7 @@ let IS_ETB_USER = false;
 const CUSTOMER_INPUT = { mobileNumber: '', pan: '', dob: '' };
 const CUSTOMER_DEMOG_DATA = {};
 let BRE_DEMOG_RESPONSE = {};
-const parsedCustomerAddress = [];
+let customerParsedAddress = [];
 /**
  * Appends a masked number to the specified container element if the masked number is not present.
  * @param {String} containerClass - The class name of the container element.
@@ -222,6 +222,40 @@ const splitName = (fullName) => {
   return name;
 };
 
+const currentAddressToggleHandler = (globals) => {
+  if (currentFormContext.journeyType === 'ETB' && globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.currentDetails.currentAddressETB.currentAddressToggle.$value === 'on') {
+    const { newCurentAddressPanel } = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.currentDetails.currentAddressETB;
+    const newCurentAddressLine1 = formUtil(globals, newCurentAddressPanel.newCurentAddressLine1);
+    const newCurentAddressLine2 = formUtil(globals, newCurentAddressPanel.newCurentAddressLine2);
+    const newCurentAddressLine3 = formUtil(globals, newCurentAddressPanel.newCurentAddressLine3);
+    const newCurentAddressCity = formUtil(globals, newCurentAddressPanel.newCurentAddressCity);
+    const newCurentAddressPin = formUtil(globals, newCurentAddressPanel.newCurentAddressPin);
+    const newCurentAddressState = formUtil(globals, newCurentAddressPanel.newCurentAddressState);
+
+    const setAddress = () => {
+      newCurentAddressLine1.setValue(customerParsedAddress[0], { attrChange: true, value: false });
+      newCurentAddressLine2.setValue(customerParsedAddress[1], { attrChange: true, value: false });
+      newCurentAddressLine3.setValue(customerParsedAddress[2], { attrChange: true, value: false });
+    };
+
+    if (BRE_DEMOG_RESPONSE?.BREFILLER2?.toUpperCase() === 'D106') {
+      if (customerParsedAddress) {
+        setAddress();
+      } else {
+        customerParsedAddress = parseCustomerAddress(`${BRE_DEMOG_RESPONSE?.VDCUSTADD1} ${BRE_DEMOG_RESPONSE?.VDCUSTADD2} ${BRE_DEMOG_RESPONSE?.VDCUSTADD3}`);
+        setAddress();
+      }
+    } else {
+      newCurentAddressLine1.setValue(BRE_DEMOG_RESPONSE?.VDCUSTADD1, { attrChange: true, value: false });
+      newCurentAddressLine2.setValue(BRE_DEMOG_RESPONSE?.VDCUSTADD2, { attrChange: true, value: false });
+      newCurentAddressLine3.setValue(BRE_DEMOG_RESPONSE?.VDCUSTADD3, { attrChange: true, value: false });
+    }
+    newCurentAddressCity.setValue(BRE_DEMOG_RESPONSE?.VDCUSTCITY, { attrChange: true, value: false });
+    newCurentAddressPin.setValue(BRE_DEMOG_RESPONSE?.VDCUSTZIPCODE, { attrChange: true, value: false });
+    newCurentAddressState.setValue(BRE_DEMOG_RESPONSE?.VDCUSTSTATE, { attrChange: true, value: false });
+  }
+};
+
 /* Automatically fills form fields based on response data.
  * @param {object} res - The response data object.
  * @param {object} globals - Global variables object.
@@ -287,6 +321,17 @@ const personalDetailsPreFillFromBRE = (res, globals) => {
   prefilledCurrentAdddress.setValue(completeAddress);
   const currentAddressETBUtil = formUtil(globals, currentAddressETB);
   currentAddressETBUtil.visible(true);
+  const fullAddress = [
+    breCheckAndFetchDemogResponse?.VDCUSTADD1,
+    breCheckAndFetchDemogResponse?.VDCUSTADD2,
+    breCheckAndFetchDemogResponse?.VDCUSTADD3,
+  ].filter(Boolean).join('');
+  if (fullAddress.length < 60) {
+    const currentAddressETBToggle = formUtil(globals, currentAddressETB.currentAddressToggle);
+    currentAddressETBToggle.setValue('on');
+    currentAddressETBToggle.enabled(false);
+    currentAddressToggleHandler(globals);
+  }
   const personaldetails = document.querySelector('.field-personaldetails');
   personaldetails.classList.add('personaldetails-disabled');
   addDisableClass(personaldetails);
@@ -503,10 +548,6 @@ const getThisCard = (globals) => {
   const nameOnCardDropdown = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value;
   executeInterfaceApiFinal(globals);
   moveWizardView('corporateCardWizardView', 'selectKycPaymentPanel');
-};
-
-const currentAddressToggleHandler = (globals) => {
-  console.log(globals);
 };
 
 /**
