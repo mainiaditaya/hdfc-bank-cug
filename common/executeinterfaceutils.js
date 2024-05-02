@@ -211,33 +211,33 @@ const terminateJourney = (globals) => {
   wizardPanel.visible(false);
   resultPanel.visible(true);
 };
-const resumeJourney = (globals) => listNameOnCard(globals);
+const resumeJourney = (globals, response) => {
+  currentFormContext.productDetails = response.productEligibility.productDetails?.[0];
+  const { cardBenefitsTextBox } = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.cardBenefitsFeaturesPanel;
+  const cardBenefitsTextField = formUtil(globals, cardBenefitsTextBox);
+  cardBenefitsTextField.setValue(response.productEligibility.productDetails[0].keyBenefits[0]);
+  listNameOnCard(globals);
+};
 
 const sendIpaRequest = (ipaRequestObj, globals) => {
   const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/ipa.json');
   const exceedTimeLimit = (TOTAL_TIME >= currentFormContext.ipaDuration * 1000);
-  if (exceedTimeLimit) {
-    resumeJourney(globals);
-    return;
-  }
   const eventHandlers = {
     successCallBack: (response) => {
       const ipaResult = response?.ipa?.ipaResult;
       const promoCode = currentFormContext?.promoCode;
       const ipaResNotPresent = (ipaResult === '' || ipaResult === 'null' || !ipaResult || ipaResult === 'undefined' || ipaResult === null);
+      if (exceedTimeLimit) {
+        resumeJourney(globals, response);
+        return;
+      }
       if (ipaResNotPresent) {
         setTimeout(() => sendIpaRequest(ipaRequestObj, globals), currentFormContext.ipaTimer * 1000);
         TOTAL_TIME += currentFormContext.ipaTimer * 1000;
+      } else if (promoCode === 'NA' && ipaResult === 'Y') {
+        terminateJourney(globals);
       } else {
-        currentFormContext.productDetails = response.productEligibility.productDetails?.[0];
-        const { cardBenefitsTextBox } = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.cardBenefitsFeaturesPanel;
-        const cardBenefitsTextField = formUtil(globals, cardBenefitsTextBox);
-        cardBenefitsTextField.setValue(response.productEligibility.productDetails[0].keyBenefits[0]);
-        if (promoCode === 'NA' && ipaResult === 'Y') {
-          terminateJourney(globals);
-        } else {
-          resumeJourney(globals);
-        }
+        resumeJourney(globals, response);
       }
     },
     errorCallBack: (response) => {
