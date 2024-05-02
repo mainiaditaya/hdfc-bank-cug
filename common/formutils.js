@@ -173,6 +173,7 @@ const composeNameOption = (fn, mn, ln) => {
   const initial = (str) => str?.charAt(0);
   const stringify = ([a, b]) => (a && b ? `${a} ${b}` : '');
   const toOption = (a) => ({ label: a, value: a });
+  const MAX_LENGTH = 19;
   const names = [
     [fn, initial(mn)],
     [fn, mn],
@@ -182,7 +183,7 @@ const composeNameOption = (fn, mn, ln) => {
     [fn, ln],
     [mn, ln],
     [initial(mn), ln],
-  ]?.map(stringify)?.filter((el) => el?.length);
+  ]?.map(stringify)?.filter((el) => el?.length <= MAX_LENGTH);
   return [...new Set(names)]?.map(toOption);
 };
 
