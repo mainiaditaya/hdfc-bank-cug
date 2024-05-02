@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 import {
-  parseCustomerAddress,
   urlPath,
   moveWizardView,
   formUtil,
@@ -75,8 +74,7 @@ const createExecuteInterfaceRequestObj = (panCheckFlag, globals, breDemogRespons
       isAddressEditFlag = 'N';
       const customerFiller2 = breDemogResponse?.BREFILLER2?.toUpperCase();
       if (customerFiller2 === 'D106') {
-        const customerValidAddress = parseCustomerAddress(`${breDemogResponse?.VDCUSTADD1} ${breDemogResponse?.VDCUSTADD2} ${breDemogResponse?.VDCUSTADD3}`);
-        [currentAddress.address1, currentAddress.address2, currentAddress.address3] = customerValidAddress;
+        [currentAddress.address1, currentAddress.address2, currentAddress.address3] = currentFormContext.customerParsedAddress;
         currentAddress.city = breDemogResponse.VDCUSTCITY;
         currentAddress.pincode = breDemogResponse.VDCUSTZIPCODE;
         currentAddress.state = breDemogResponse.VDCUSTSTATE;
@@ -121,7 +119,7 @@ const createExecuteInterfaceRequestObj = (panCheckFlag, globals, breDemogRespons
       selfConfirmation: 'N',
       addressEditFlag: isAddressEditFlag,
       communicationAddress1: currentAddress.address1,
-      communicationAddress2: currentAddress.address1,
+      communicationAddress2: currentAddress.address2,
       communicationCity: currentAddress.city,
       dateOfBirth: formatDate(personalDetails.dobPersonalDetails.$value),
       firstName: personalDetails.firstName.$value,
