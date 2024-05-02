@@ -205,23 +205,39 @@ const listNameOnCard = (globals) => {
   moveWizardView('corporateCardWizardView', 'confirmCardPanel');
 };
 
+const terminateJourney = (globals) => {
+  const resultPanel = formUtil(globals, globals.form.resultPanel);
+  const wizardPanel = formUtil(globals, globals.form.corporateCardWizardView);
+  wizardPanel.visible(false);
+  resultPanel.visible(true);
+};
+const resumeJourney = (globals, response) => {
+  currentFormContext.productDetails = response.productEligibility.productDetails?.[0];
+  const { cardBenefitsTextBox } = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.cardBenefitsFeaturesPanel;
+  const cardBenefitsTextField = formUtil(globals, cardBenefitsTextBox);
+  cardBenefitsTextField.setValue(response.productEligibility.productDetails[0].keyBenefits[0]);
+  listNameOnCard(globals);
+};
+
 const sendIpaRequest = (ipaRequestObj, globals) => {
   const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/ipa.json');
-  if (TOTAL_TIME >= currentFormContext.ipaDuration * 1000) {
-    console.log('terminate journey');
-    return;
-  }
+  const exceedTimeLimit = (TOTAL_TIME >= currentFormContext.ipaDuration * 1000);
   const eventHandlers = {
     successCallBack: (response) => {
-      if (response.ipa.ipaResult === '' || response.ipa.ipaResult === null) {
+      const ipaResult = response?.ipa?.ipaResult;
+      const promoCode = currentFormContext?.promoCode;
+      const ipaResNotPresent = (ipaResult === '' || ipaResult === 'null' || !ipaResult || ipaResult === 'undefined' || ipaResult === null);
+      if (exceedTimeLimit) {
+        resumeJourney(globals, response);
+        return;
+      }
+      if (ipaResNotPresent) {
         setTimeout(() => sendIpaRequest(ipaRequestObj, globals), currentFormContext.ipaTimer * 1000);
         TOTAL_TIME += currentFormContext.ipaTimer * 1000;
+      } else if (promoCode === 'NA' && ipaResult === 'Y') {
+        terminateJourney(globals);
       } else {
-        currentFormContext.productDetails = response.productEligibility.productDetails?.[0];
-        const { cardBenefitsTextBox } = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.cardBenefitsFeaturesPanel;
-        const cardBenefitsTextField = formUtil(globals, cardBenefitsTextBox);
-        cardBenefitsTextField.setValue(response.productEligibility.productDetails[0].keyBenefits[0]);
-        listNameOnCard(globals); // to display list of name on card in get this card screen
+        resumeJourney(globals, response);
       }
     },
     errorCallBack: (response) => {
@@ -266,8 +282,9 @@ const customerValidationHandler = {
     restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
   },
 
-  terminateJourney: (panStatus) => {
+  terminateJourney: (panStatus, globals) => {
     console.log(`pan Status: ${panStatus} and called terminateJourney()`);
+    terminateJourney(globals);
   },
 
   restartJourney: (panStatus) => {
