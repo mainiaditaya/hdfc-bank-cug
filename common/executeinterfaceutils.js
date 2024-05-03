@@ -62,32 +62,32 @@ const createExecuteInterfaceRequestObj = (panCheckFlag, globals, breDemogRespons
     if (breDemogResponse.VDCUSTFULLNAME === fullName) {
       nameEditFlag = 'N';
     }
+    const customerFiller2 = breDemogResponse?.BREFILLER2?.toUpperCase();
+    if (customerFiller2 === 'D106') {
+      [currentAddress.address1, currentAddress.address2, currentAddress.address3] = currentFormContext.customerParsedAddress;
+      currentAddress.city = breDemogResponse.VDCUSTCITY;
+      currentAddress.pincode = breDemogResponse.VDCUSTZIPCODE;
+      currentAddress.state = breDemogResponse.VDCUSTSTATE;
+    } else {
+      currentAddress.address1 = breDemogResponse?.VDCUSTADD1;
+      currentAddress.address2 = breDemogResponse?.VDCUSTADD2;
+      currentAddress.address3 = breDemogResponse?.VDCUSTADD3;
+      currentAddress.city = breDemogResponse.VDCUSTCITY;
+      currentAddress.pincode = breDemogResponse.VDCUSTZIPCODE;
+      currentAddress.state = breDemogResponse.VDCUSTSTATE;
+    }
     if (currentDetails.currentAddressETB.currentAddressToggle.$value === 'on') {
       const { newCurentAddressPanel } = currentDetails.currentAddressETB;
-      currentAddress.address1 = newCurentAddressPanel.newCurentAddressLine1.$value;
-      currentAddress.address2 = newCurentAddressPanel.newCurentAddressLine2.$value;
-      currentAddress.address3 = newCurentAddressPanel.newCurentAddressLine3.$value;
-      currentAddress.city = newCurentAddressPanel.newCurentAddressCity.$value;
-      currentAddress.pincode = newCurentAddressPanel.newCurentAddressPin.$value;
-      currentAddress.state = newCurentAddressPanel.newCurentAddressState.$value;
+      permanentAddress.address1 = newCurentAddressPanel.newCurentAddressLine1.$value;
+      permanentAddress.address2 = newCurentAddressPanel.newCurentAddressLine2.$value;
+      permanentAddress.address3 = newCurentAddressPanel.newCurentAddressLine3.$value;
+      permanentAddress.city = newCurentAddressPanel.newCurentAddressCity.$value;
+      permanentAddress.pincode = newCurentAddressPanel.newCurentAddressPin.$value;
+      permanentAddress.state = newCurentAddressPanel.newCurentAddressState.$value;
     } else {
       isAddressEditFlag = 'N';
-      const customerFiller2 = breDemogResponse?.BREFILLER2?.toUpperCase();
-      if (customerFiller2 === 'D106') {
-        [currentAddress.address1, currentAddress.address2, currentAddress.address3] = currentFormContext.customerParsedAddress;
-        currentAddress.city = breDemogResponse.VDCUSTCITY;
-        currentAddress.pincode = breDemogResponse.VDCUSTZIPCODE;
-        currentAddress.state = breDemogResponse.VDCUSTSTATE;
-      } else {
-        currentAddress.address1 = breDemogResponse?.VDCUSTADD1;
-        currentAddress.address2 = breDemogResponse?.VDCUSTADD2;
-        currentAddress.address3 = breDemogResponse?.VDCUSTADD3;
-        currentAddress.city = breDemogResponse.VDCUSTCITY;
-        currentAddress.pincode = breDemogResponse.VDCUSTZIPCODE;
-        currentAddress.state = breDemogResponse.VDCUSTSTATE;
-      }
+      permanentAddress = { ...currentAddress };
     }
-    permanentAddress = { ...currentAddress };
   } else {
     const { currentAddressNTB } = currentDetails;
     const { permanentAddressPanel } = currentAddressNTB.permanentAddress;
