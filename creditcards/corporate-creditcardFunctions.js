@@ -194,13 +194,6 @@ const addDisableClass = (selectedPanel) => {
 const sanitizeName = (name) => name.replace(/[^a-zA-Z]/g, '');
 
 /**
- * Sanitizes the name for special characters.
- * @param {String} name - The name token.
- * @returns {String} sanitized name.
- */
-const sanitizeName = (name) => name.replace(/[^a-zA-Z]/g, '');
-
-/**
  * Splits a full name into its components: first name, middle name, and last name.
  *
  * @param {string} fullName - The full name to split.
