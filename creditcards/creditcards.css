@@ -9,6 +9,7 @@ main {
           select[disabled] {
             background-color: inherit;
             color: var(--color-interface-text-primary) !important;
+            opacity: 1 !important;
           }
         }
       }
