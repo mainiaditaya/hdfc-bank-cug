@@ -86,26 +86,26 @@ const createExecuteInterfaceRequestObj = (panCheckFlag, globals, breDemogRespons
         currentAddress.pincode = breDemogResponse.VDCUSTZIPCODE;
         currentAddress.state = breDemogResponse.VDCUSTSTATE;
       }
-      permanentAddress = { ...currentAddress };
     }
+    permanentAddress = { ...currentAddress };
   } else {
     const { currentAddressNTB } = currentDetails;
-    const { permanentaddresspanel } = currentAddressNTB.permanentaddress;
+    const { permanentAddressPanel } = currentAddressNTB.permanentAddress;
     currentAddress.address1 = currentAddressNTB.addressLine1.$value;
     currentAddress.address2 = currentAddressNTB.addressLine2.$value;
     currentAddress.address3 = currentAddressNTB.addressLine3.$value;
     currentAddress.city = currentAddressNTB.city.$value;
-    currentAddress.pincode = currentAddressNTB.currentaddrespincodentb.$value;
+    currentAddress.pincode = currentAddressNTB.currentAddresPincodeNTB.$value;
     currentAddress.state = currentAddressNTB.state.$value;
-    if (document.getElementsByName('permanentAddressToggle')[0].checked) {
+    if (currentAddressNTB.permanentAddress.permanentAddressToggle.$value === 'on') {
       permanentAddress = { ...currentAddress };
     } else {
-      permanentAddress.address1 = permanentaddresspanel.permanentAddressLine1.$value;
-      permanentAddress.address2 = permanentaddresspanel.permanentAddressLine2.$value;
-      permanentAddress.address3 = permanentaddresspanel.permanentAddressLine3.$value;
-      permanentAddress.city = permanentaddresspanel.permanentAddressCity.$value;
-      permanentAddress.pincode = permanentaddresspanel.permanentAddressPincode.$value;
-      permanentAddress.state = permanentaddresspanel.permanentAddressState.$value;
+      permanentAddress.address1 = permanentAddressPanel.permanentAddressLine1.$value;
+      permanentAddress.address2 = permanentAddressPanel.permanentAddressLine2.$value;
+      permanentAddress.address3 = permanentAddressPanel.permanentAddressLine3.$value;
+      permanentAddress.city = permanentAddressPanel.permanentAddressCity.$value;
+      permanentAddress.pincode = permanentAddressPanel.permanentAddressPincode.$value;
+      permanentAddress.state = permanentAddressPanel.permanentAddressState.$value;
     }
   }
   const requestObj = {
