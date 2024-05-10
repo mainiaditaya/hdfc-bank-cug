@@ -8,6 +8,7 @@ import {
   pinCodeMaster,
   validateEmailID,
   currentAddressToggleHandler,
+  finalDap,
   currentFormContext,
 } from '../creditcards/corporate-creditcardFunctions.js';
 import { urlPath } from './formutils.js';
@@ -85,4 +86,5 @@ export {
   pinCodeMaster,
   validateEmailID,
   currentAddressToggleHandler,
+  finalDap,
 };

@@ -25,8 +25,12 @@ import {
   removeSpecialCharacters,
   santizedFormData,
   makeFieldInvalid,
+  dateFormat,
 } from '../common/formutils.js';
-import { getJsonResponse } from '../common/makeRestAPI.js';
+import {
+  getJsonResponse,
+  restAPICall,
+} from '../common/makeRestAPI.js';
 
 const journeyName = 'CORPORATE_CARD_JOURNEY';
 currentFormContext.journeyID = createJourneyId('a', 'b', 'c');
@@ -106,13 +110,13 @@ const otpGenSuccess = (res, globals) => {
     dobWizardField: globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.panNumberPersonalDetails,
   };
   currentFormContext.isCustomerIdentified =		res?.customerIdentificationResponse?.CustomerIdentificationResponse?.errorCode === '0' ? 'Y' : 'N';
-  const welcomeTxt = formUtil(globals, pannel.welcome);
+  // const welcomeTxt = formUtil(globals, pannel.welcome);
   const otpPanel = formUtil(globals, pannel.otp);
   const otpBtn = formUtil(globals, pannel.otpButton);
   const loginPanel = formUtil(globals, pannel.login);
   const regMobNo = pannel.login.mobilePanel.registeredMobileNumber.$value;
 
-  welcomeTxt.visible(false);
+  // welcomeTxt.visible(false);
   otpBtn.visible(false);
   loginPanel.visible(false);
   otpPanel.visible(true);
@@ -136,13 +140,13 @@ const otpGenFailure = (res, globals) => {
     resultPanel: globals.form.resultPanel,
   };
 
-  const welcomeTxt = formUtil(globals, pannel.welcome);
+  // const welcomeTxt = formUtil(globals, pannel.welcome);
   const otpPanel = formUtil(globals, pannel.otp);
   const loginPanel = formUtil(globals, pannel.login);
   const otpBtn = formUtil(globals, pannel.otpButton);
   const failurePanel = formUtil(globals, pannel.resultPanel);
 
-  welcomeTxt.visible(false);
+  // welcomeTxt.visible(false);
   otpPanel.visible(false);
   loginPanel.visible(false);
   otpBtn.visible(false);
@@ -444,7 +448,7 @@ const showErrorPanel = (panels, errorText) => {
 const otpValSuccess = (res, globals) => {
   const pannel = {
     // declare parent panel -- common name defining
-    welcome: globals.form.loginPanel.welcomeTextLabel,
+    // welcome: globals.form.loginPanel.welcomeTextLabel,
     login: globals.form.loginPanel,
     otp: globals.form.otpPanel,
     otpButton: globals.form.getOTPbutton,
@@ -454,13 +458,13 @@ const otpValSuccess = (res, globals) => {
   currentFormContext.isCustomerIdentified =		res?.customerIdentificationResponse?.CustomerIdentificationResponse?.errorCode === '0' ? 'Y' : 'N';
   currentFormContext.productCode = globals.functions.exportData().data.CorporateCreditCard.productCode;
   currentFormContext.promoCode = globals.functions.exportData().data.CorporateCreditCard.promoCode;
-  const welcomeTxt = formUtil(globals, pannel.welcome);
+  // const welcomeTxt = formUtil(globals, pannel.welcome);
   const otpPanel = formUtil(globals, pannel.otp);
   const otpBtn = formUtil(globals, pannel.otpButton);
   const loginPanel = formUtil(globals, pannel.login);
   const ccWizardPannel = formUtil(globals, pannel.ccWizardView);
 
-  welcomeTxt.visible(false);
+  // welcomeTxt.visible(false);
   otpBtn.visible(false);
   loginPanel.visible(false);
   otpPanel.visible(false);
@@ -499,7 +503,7 @@ const otpValFailure = (res, globals) => {
     errorPanelLabel: globals.form.resultPanel.errorResultPanel,
   };
   currentFormContext.isCustomerIdentified =		res?.customerIdentificationResponse?.CustomerIdentificationResponse?.errorCode === '0' ? 'Y' : 'N';
-  const welcomeTxt = formUtil(globals, pannel.welcome);
+  // const welcomeTxt = formUtil(globals, pannel.welcome);
   const otpPanel = formUtil(globals, pannel.otp);
   const otpBtn = formUtil(globals, pannel.otpButton);
   const loginPanel = formUtil(globals, pannel.login);
@@ -526,8 +530,12 @@ const otpValFailure = (res, globals) => {
     }
     case '04': {
       // incorrect otp attempt of 3 times.
+      // const panels = {
+      //   hidePanels: [incorectOtp, welcomeTxt, otpBtn, loginPanel, otpPanel, resultSetErrorText1, resultSetErrorText2],
+      //   showPanels: [resultPanel, tryAgainButtonErrorPanel],
+      // };
       const panels = {
-        hidePanels: [incorectOtp, welcomeTxt, otpBtn, loginPanel, otpPanel, resultSetErrorText1, resultSetErrorText2],
+        hidePanels: [incorectOtp, otpBtn, loginPanel, otpPanel, resultSetErrorText1, resultSetErrorText2],
         showPanels: [resultPanel, tryAgainButtonErrorPanel],
       };
       const errorText = 'You have entered invalid OTP for 3 consecutive attempts. Please try again later';
@@ -537,8 +545,12 @@ const otpValFailure = (res, globals) => {
       break;
     }
     case 'CZ_HTTP_0003': {
+      // const panels = {
+      //   hidePanels: [incorectOtp, welcomeTxt, otpBtn, loginPanel, otpPanel, resultSetErrorText1, resultSetErrorText2],
+      //   showPanels: [resultPanel],
+      // };
       const panels = {
-        hidePanels: [incorectOtp, welcomeTxt, otpBtn, loginPanel, otpPanel, resultSetErrorText1, resultSetErrorText2],
+        hidePanels: [incorectOtp, otpBtn, loginPanel, otpPanel, resultSetErrorText1, resultSetErrorText2],
         showPanels: [resultPanel],
       };
       const errorText = 'Unfortunately, we were unable to process your request';
@@ -547,7 +559,7 @@ const otpValFailure = (res, globals) => {
     }
     default: {
       incorectOtp.visible(false);
-      welcomeTxt.visible(false);
+      // welcomeTxt.visible(false);
       otpBtn.visible(false);
       loginPanel.visible(false);
       otpPanel.visible(false);
@@ -1038,6 +1050,158 @@ const validateEmailID = async (globals) => {
     console.error(error, 'NTB_email_error');
   }
 };
+
+/**
+ * Creates a DAP request object based on the provided global data.
+ * @param {Object} globals - The global object containing necessary data for DAP request.
+ * @returns {Object} - The DAP request object.
+ */
+const createDapRequestObj = (globals) => {
+  const genderMap = {
+    1: 'M',
+    2: 'F',
+    3: 'T',
+  };
+  const {
+    personalDetails,
+    employmentDetails,
+  } = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage;
+  const customerInfo = currentFormContext.executeInterfaceReqObj.requestString;
+  const { prefilledEmploymentDetails } = employmentDetails;
+  const dapRequestObj = {
+    requestString: {
+      APS_FIRST_NAME: personalDetails.firstName.$value,
+      APS_LAST_NAME: personalDetails.lastName.$value,
+      APS_MIDDLE_NAME: personalDetails.middleName.$value,
+      panNo: personalDetails.panNumberPersonalDetails.$value,
+      dateOfBirth: dateFormat(personalDetails.dobPersonalDetails.$value, 'YYYYMMDD'),
+      // duplicate
+      panNumber: personalDetails.panNumberPersonalDetails.$value,
+      mobileNo: globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
+      existingCustomer: currentFormContext.journeyType === 'ETB' ? 'Y' : 'N',
+      APS_NAME_AS_CARD: currentFormContext.executeInterfaceReqObj.requestString.nameOnCard,
+      emailAddress: prefilledEmploymentDetails.workEmailAddress.$value,
+      APS_PER_ADDRESS_1: customerInfo.permanentAddress1,
+      APS_PER_ADDRESS_2: customerInfo.permanentAddress2,
+      APS_PER_ADDRESS_3: customerInfo.permanentAddress3,
+      APS_COM_ADDRESS_1: customerInfo.communicationAddress1,
+      APS_COM_ADDRESS_2: customerInfo.communicationAddress2,
+      APS_COM_ADDRESS_3: customerInfo.communicationAddress3,
+      APS_OFF_ADDRESS_1: customerInfo.officeAddress1,
+      APS_OFF_ADDRESS_2: customerInfo.officeAddress2,
+      APS_OFF_ADDRESS_3: customerInfo.officeAddress3,
+      APS_COM_ZIP: customerInfo.comCityZip,
+      APS_COM_STATE: customerInfo.communicationState,
+      APS_PER_ZIP: customerInfo.permanentZipCode,
+      APS_OFF_ZIP: customerInfo.officeZipCode,
+      APS_PER_CITY: customerInfo.permanentCity,
+      APS_COM_CITY: customerInfo.communicationCity,
+      APS_OFF_CITY: customerInfo.officeCity,
+      APS_OFF_STATE: customerInfo.officeState,
+      APS_PER_STATE: customerInfo.permanentState,
+      // duplicate
+      APS_DATE_OF_BIRTH: dateFormat(personalDetails.dobPersonalDetails.$value, 'YYYYMMDDWithTime'),
+      APS_EDUCATION: '3',
+      APS_GENDER: genderMap[customerInfo.gender],
+      APS_OCCUPATION: '1',
+      APS_GROSS_MONTHLY_INCOME: '',
+      APS_COMPANY_NAME: customerInfo.companyName,
+      APS_PER_ADDR_TYPE: customerInfo.perAddressType,
+      APS_RESI_TYPE: '2',
+      APS_COM_ADDR_TYPE: '2',
+      APS_SELF_CONFIRMATION: customerInfo.selfConfirmation,
+      APS_MOBILE_EDIT_FLAG: currentFormContext.executeInterfaceReqObj.requestString.mobileEditFlag,
+      APS_EMAIL_EDIT_FLAG: currentFormContext.executeInterfaceReqObj.requestString.apsEmailEditFlag,
+      APS_PAN_EDIT_FLAG: currentFormContext.executeInterfaceReqObj.requestString.panEditFlag,
+      APS_ADDRESS_EDIT_FLAG: currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag,
+      APS_NAME_EDIT_FLAG: currentFormContext.executeInterfaceReqObj.requestString.nameEditFlag,
+      APS_RESPHONE_EDIT_FLAG: currentFormContext.executeInterfaceReqObj.requestString.resPhoneEditFlag,
+      APS_OFFPHONE_EDIT_FLAG: 'N',
+      APS_EMP_CODE: '',
+      APS_DESIGNATION: prefilledEmploymentDetails.designation.$value,
+      APS_DEPARTMENT: '',
+      APS_FILLER2: 'No',
+      APS_FILLER10: 'N',
+      APS_OFFER_5: '',
+      APS_CHANNEL: '',
+      APS_BRANCH_NAME: '',
+      APS_BRANCH_CITY: '',
+      APS_LEAD_GENERATER: '',
+      APS_LEAD_CLOSURES: '',
+      APS_APPLYING_BRANCH: '',
+      APS_FILLER6: '',
+      APS_SMCODE: '',
+      APS_DSE_CODE: '',
+      applicationERefNumber: currentFormContext.ipaResponse.ipa.eRefNumber,
+      SOA_REQUESTID: '0305245144',
+      nameOfDirector: '',
+      relationship: '',
+      product: currentFormContext.productDetails.product,
+      APS_TYPE_OF_INDUSTRY: '',
+      journeyID: currentFormContext.journeyID,
+      journeyName: currentFormContext.journeyName,
+      userAgent: navigator.userAgent,
+      timeInfo: new Date().toISOString(),
+      APS_OFF_EMAILID: prefilledEmploymentDetails.workEmailAddress.$value,
+      APS_DIRECT_DEBIT: '',
+      customerId: currentFormContext.executeInterfaceReqObj.requestString.customerID,
+      pricingDetails: '',
+      docUpload: '',
+      idcomEnabled: true,
+      APS_CAPTCHA: '',
+      applRefNo: currentFormContext.ipaResponse.ipa.applRefNumber,
+      txnRefNo: '',
+      pseudoID: '',
+      FILLER8: currentFormContext.ipaResponse.ipa.filler8,
+      Id_token_jwt: currentFormContext.jwtToken,
+      IDCOM_Token: '',
+      JSCPAYLOAD: '',
+      BROWSERFINGERPRINT: 'ef3036d9e4872df7e5a5eb2fe49bc8ae',
+      HDIMPAYLOAD: '',
+    },
+  };
+  return dapRequestObj;
+};
+
+const updatePanelVisibility = (response, globals) => {
+  const corporateCardWizardView = formUtil(globals, globals.form.corporateCardWizardView);
+  const confirmAndSubmitPanel = formUtil(globals, globals.form.corporateCardWizardView.confirmAndSubmitPanel);
+  const successResultPanel = formUtil(globals, globals.form.resultPanel.successResultPanel);
+  const errorResultPanel = formUtil(globals, globals.form.resultPanel.errorResultPanel);
+  const resultPanel = formUtil(globals, globals.form.resultPanel);
+  corporateCardWizardView.visible(false);
+  confirmAndSubmitPanel.visible(false);
+  resultPanel.visible(true);
+
+  if (response?.finalDap?.errorCode === '0000') {
+    successResultPanel.visible(true);
+    errorResultPanel.visible(false);
+  } else {
+    errorResultPanel.visible(true);
+  }
+};
+
+/**
+ * Initiates a final DAP process by making a REST API call.
+ * @param {Object} globals - The global object containing necessary data for DAP request.
+ * @returns {void}
+ */
+const finalDap = (globals) => {
+  const dapRequestObj = createDapRequestObj(globals);
+  const apiEndPoint = urlPath('/content/hdfc_ccforms/api/pacc/finaldapandpdfgen.json');
+  const eventHandlers = {
+    successCallBack: (response) => {
+      console.log(response);
+      updatePanelVisibility(response, globals);
+    },
+    errorCallBack: (response) => {
+      console.log(response);
+      updatePanelVisibility(response, globals);
+    },
+  };
+  restAPICall('', 'POST', dapRequestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
+};
+
 export {
   OTPGEN,
   OTPVAL,
@@ -1050,4 +1214,5 @@ export {
   pinCodeMaster,
   validateEmailID,
   currentAddressToggleHandler,
+  finalDap,
 };

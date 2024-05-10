@@ -10,6 +10,7 @@ import {
   pinCodeMaster,
   validateEmailID,
   currentAddressToggleHandler,
+  finalDap,
 } from '../../common/functions.js';
 
 import { invokeJourneyDropOff, journeyResponseHandler } from '../../common/journey-utils.js';
@@ -134,6 +135,7 @@ export {
   pinCodeMaster,
   validateEmailID,
   currentAddressToggleHandler,
+  finalDap,
   invokeJourneyDropOff,
   journeyResponseHandler,
 };
