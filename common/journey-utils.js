@@ -53,16 +53,27 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
   };
   const url = 'https://applyonlinedev.hdfcbank.com/content/hdfc_commonforms/api/journeydropoff.json';
   const method = 'POST';
-  try {
-    const jsonApiCall = await fetchJsonResponse(url, journeyJSONObj, method);
-    // success method proceed
-    // eslint-disable-next-line no-console
-    console.log(jsonApiCall, 'journeyapicall_response');
-  } catch (error) {
-    // error method proceed
-    // eslint-disable-next-line no-console
-    console.error(error);
-  }
+  return fetchJsonResponse(url, journeyJSONObj, method);
+};
+
+/**
+ * @name invokeJourneyDropOffParams to log on success and error call backs of api calls.
+ * @param {Object} globals - globals variables object containing form configurations.
+ */
+const invokeJourneyDropOffParams = async (globals) => {
+  const journeyJSONObj = {
+    RequestPayload: {
+        journeyInfo: {
+            journeyID: currentFormContext.journeyID
+        },
+        leadProfile: {
+            leadProfileId: currentFormContext.leadProfile
+        }
+    }
+}
+  const url = 'https://applyonlinedev.hdfcbank.com/content/hdfc_commonforms/api/journeydropoffparam.json';
+  const method = 'POST';
+  return fetchJsonResponse(url, journeyJSONObj, method);
 };
 
 /**
@@ -70,8 +81,10 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
  * @param {string} payload.
  */
 function journeyResponseHandler(payload) {
+  debugger;
   // eslint-disable-next-line no-console
-  console.log(payload, 'payload');
+  currentFormContext.leadProfile = String(payload.leadProfileId);
+  console.log('message from here', payload);
 }
 
 export {

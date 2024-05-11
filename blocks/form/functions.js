@@ -11,6 +11,7 @@ import {
   validateEmailID,
   currentAddressToggleHandler,
   finalDap,
+  aadharInit,
 } from '../../common/functions.js';
 
 import { invokeJourneyDropOff, journeyResponseHandler } from '../../common/journey-utils.js';
@@ -138,4 +139,5 @@ export {
   finalDap,
   invokeJourneyDropOff,
   journeyResponseHandler,
+  aadharInit,
 };
