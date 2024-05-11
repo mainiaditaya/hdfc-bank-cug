@@ -38,6 +38,35 @@ function getOTP(mobileNumber, pan, dob) {
   return fetchJsonResponse(path, jsonObj, 'POST');
 }
 
+
+
+
+/**
+ * aadharInit
+ * @param {object} mobileNumber
+ * @param {object} pan
+ * @param {object} dob
+ * @return {PROMISE}
+ */
+function aadharInit(mobileNumber, pan, dob) {
+  debugger;
+  const jsonObj = {
+    requestString: {
+      mobileNumber: mobileNumber.$value,
+      dateOfBith: dob.$value || '',
+      panNumber: pan.$value || '',
+      journeyID: currentFormContext.journeyID,
+      journeyName: currentFormContext.journeyName,
+      userAgent: window.navigator.userAgent,
+      identifierValue: pan.$value || dob.$value,
+      identifierName: pan.$value ? 'PAN' : 'DOB',
+    },
+  };
+  const path = urlPath('/content/hdfc_etb_wo_pacc/api/aadharInit.json');
+  return fetchJsonResponse(path, jsonObj, 'POST');
+}
+
+
 /**
  * otp validation
  * @param {object} globals - The global object containing necessary globals form data.
@@ -87,4 +116,5 @@ export {
   validateEmailID,
   currentAddressToggleHandler,
   finalDap,
+  aadharInit
 };
