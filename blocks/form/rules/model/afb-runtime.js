@@ -4077,7 +4077,7 @@ class Field extends Scriptable {
             'validationMessage': message,
             'validity': {
                 valid: false,
-                ...(constraint != null ? { [constraintKeys[constraint]]: true } : {})
+                ...(constraint != null ? { [constraintKeys[constraint]]: true } : { customConstraint: true })
             }
         };
         const updates = this._applyUpdates(['valid', 'errorMessage', 'validationMessage', 'validity'], changes);
