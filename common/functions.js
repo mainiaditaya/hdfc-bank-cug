@@ -49,13 +49,15 @@ function getOTP(mobileNumber, pan, dob) {
  * @param {object} globals - The global object containing necessary globals form data.
  * @return {PROMISE}
  */
-function aadharInit(mobileNumber, pan, dob, globals) {
+async function aadharInit(mobileNumber, pan, dob, globals) {
   debugger;
-  const jsonObj = {
+  //let dropOffParamRes = await callJourneyDropffparams(currentFormContext.journeyID, currentFormContext.leadProfile);
+  //console.log(dropOffParamRes);
+    const jsonObj = {
       requestString: {
         initParameters: {
           journeyId: currentFormContext.journeyID,
-          transactionId: "",
+          transactionId: currentFormContext.journeyID.replace(/-/g, '').replace(/_/g, ''),
           journeyName: "CORPORATE_CARD_JOURNEY",
           userAgent: window.navigator.userAgent,
           mobileNumber: mobileNumber.$value,
@@ -69,14 +71,14 @@ function aadharInit(mobileNumber, pan, dob, globals) {
           journey_key: currentFormContext.journeyID,
           service_code: "XX2571ER"
         },
-        existingCustomer: currentFormContext.journeyType,
+        existingCustomer: currentFormContext.journeyType === 'NTB' ? "N" : "Y",
         data_otp_gen: {
           UID_NO: ""
         },
         data_app: {
           journey_id: currentFormContext.journeyID,
           lead_profile_id: currentFormContext.leadProfile,
-          callback: "/content/hdfc_etb_wo_pacc/api/aadharCallback.json",
+          callback: "https://applyonlinedev.hdfcbank.com/content/hdfc_etb_wo_pacc/api/aadharCallback.json",
           lead_profile: {
             leadProfileId: currentFormContext.leadProfile,
             mobileNumber: mobileNumber.$value,
@@ -85,7 +87,7 @@ function aadharInit(mobileNumber, pan, dob, globals) {
           journeyStateInfo: {
             state: "CUSTOMER_AADHAR_VALIDATION",
             stateInfo: "CORPORATE_CARD_JOURNEY",
-            formData: JSON.stringify(santizedFormData(globals))
+            formData: santizedFormData(globals)
           },
           auditData: {
             action: "CUSTOMER_AADHAR_VALIDATION",
@@ -103,11 +105,7 @@ function aadharInit(mobileNumber, pan, dob, globals) {
           filler10: "filler10"
         },
         client_info: {
-          browser: {
-            name: "Chrome",
-            version: "124",
-            majver: ""
-          },
+          browser: get_browser(),
           cookie: {
             source: "AdobeForms",
             name: "NTBCC",
@@ -115,9 +113,9 @@ function aadharInit(mobileNumber, pan, dob, globals) {
           },
           "client_ip": "",
           device: {
-            type: "desktop",
+            type: get_device(),
             name: "Samsung G5",
-            os: "Windows",
+            os: get_OS(),
             os_ver: "637.38383"
           },
           isp: {
@@ -134,8 +132,98 @@ function aadharInit(mobileNumber, pan, dob, globals) {
         }
       }
     };
-  const path = urlPath('/content/hdfc_etb_wo_pacc/api/aadharInit.json');
-  return fetchJsonResponse(path, jsonObj, 'POST');
+  const path = 'https://applyonlinedev.hdfcbank.com/content/hdfc_etb_wo_pacc/api/aadharInit.json';
+  let response = fetchJsonResponse(path, jsonObj, 'POST');
+  response
+  .then((res) => {
+    console.log(res);
+    //var aadharValidationForm = "<form action=" + res.RedirectUrl + " method='post'></form>";
+    var aadharValidationForm = document.createElement('form');
+    aadharValidationForm.setAttribute('action', res.RedirectUrl);
+    aadharValidationForm.setAttribute('method','POST');
+    for (var key in res) {
+      updateFormElement(aadharValidationForm, key, res[key]);
+  }
+  document.querySelector('body').append(aadharValidationForm);
+  //aadharValidationForm.appendTo('body');
+  debugger;
+  aadharValidationForm.submit();
+  }).catch(err => console.log(err));
+  
+}
+
+function get_OS() {
+  var userAgent = window.navigator.userAgent,
+      platform = window.navigator.platform,
+      macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+      windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+      iosPlatforms = ['iPhone', 'iPad', 'iPod'],
+      os = null;
+
+  if (macosPlatforms.indexOf(platform) !== -1) {
+    os = 'Mac OS';
+  } else if (iosPlatforms.indexOf(platform) !== -1) {
+    os = 'iOS';
+  } else if (windowsPlatforms.indexOf(platform) !== -1) {
+    os = 'Windows';
+  } else if (/Android/.test(userAgent)) {
+    os = 'Android';
+  } else if (!os && /Linux/.test(platform)) {
+    os = 'Linux';
+  }
+
+  return os;
+}
+
+function get_device() {
+  if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      return "mobile";
+  } else {
+      return "desktop";
+  }
+}
+
+function get_browser() {
+  var ua=navigator.userAgent,tem,M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+  if(/trident/i.test(M[1])){
+      tem=/\brv[ :]+(\d+)/g.exec(ua) || [];
+      return {name:'IE',version:(tem[1]||'')};
+      }
+  if(M[1]==='Chrome'){
+      tem=ua.match(/\bOPR|Edge\/(\d+)/)
+      if(tem!=null)   {return {name:'Opera', version:tem[1]};}
+      }
+  M=M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
+  if((tem=ua.match(/version\/(\d+)/i))!=null) {M.splice(1,1,tem[1]);}
+  return {
+    name: M[0],
+    version: M[1],
+    majver: ""
+  };
+}
+
+function updateFormElement(form, key, value) {
+  var field = document.createElement("input");
+  field.setAttribute("type", "hidden");
+  field.setAttribute("name", key);
+  field.setAttribute("value", value);
+  form.appendChild(field);
+}
+
+async function callJourneyDropffparams(journey_id, lead_profile_id){
+ const payLoad = {
+  RequestPayload: {
+      journeyInfo: {
+          journeyID: journey_id
+      },
+      leadProfile: {
+          leadProfileId: lead_profile_id
+      }
+  }
+}
+const path = urlPath('/content/hdfc_commonforms/api/journeydropoffparam.json');
+return fetchJsonResponse(path, payLoad, 'POST');
+
 }
 
 
