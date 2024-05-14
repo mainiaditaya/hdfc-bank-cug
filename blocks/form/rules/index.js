@@ -44,7 +44,7 @@ async function fieldChanged(payload, form, generateFormRendition) {
       {
         const { validity } = payload.field;
         if (field.setCustomValidity
-            && (validity.expressionMismatch || validity.customConstraint)) {
+            && (validity?.expressionMismatch || validity?.customConstraint)) {
           field.setCustomValidity(currentValue);
           updateOrCreateInvalidMsg(field, currentValue);
         }
