@@ -15,6 +15,7 @@ import {
 } from '../../common/functions.js';
 
 import { invokeJourneyDropOff, journeyResponseHandler } from '../../common/journey-utils.js';
+import { moveWizardView } from '../../common/formutils.js';
 
 /**
  * Get Full Name
@@ -140,4 +141,5 @@ export {
   invokeJourneyDropOff,
   journeyResponseHandler,
   aadharInit,
+  moveWizardView,
 };
