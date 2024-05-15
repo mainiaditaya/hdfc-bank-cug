@@ -1,6 +1,6 @@
 /* eslint no-bitwise: ["error", { "allow": ["^", ">>", "&"] }] */
 
-import { santizedFormData } from './formutils.js';
+import { santizedFormData, santizedFormDataWithContext } from './formutils.js';
 import { fetchJsonResponse } from './makeRestAPI.js';
 
 function generateUUID() {
@@ -31,6 +31,7 @@ const currentFormContext = {};
  * @param {Object} globals - globals variables object containing form configurations.
  */
 const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
+  debugger;
   const journeyJSONObj = {
     RequestPayload: {
       userAgent: window.navigator.userAgent,
@@ -44,7 +45,7 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
         journeyStateInfo: [
           {
             state,
-            stateInfo: JSON.stringify(santizedFormData(globals)),
+            stateInfo: JSON.stringify(santizedFormDataWithContext(globals, currentFormContext)),
             timeinfo: new Date().toISOString(),
           },
         ],
@@ -52,6 +53,41 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
     },
   };
   const url = 'https://applyonlinedev.hdfcbank.com/content/hdfc_commonforms/api/journeydropoff.json';
+  const method = 'POST';
+  return fetchJsonResponse(url, journeyJSONObj, method);
+};
+
+/**
+ * @name invokeJourneyDropOffUpdate to log on success and error call backs of api calls.
+ * @param {string} state
+ * @param {string} mobileNumber
+ * @param {Object} globals - globals variables object containing form configurations.
+ * @returns {Promise}
+ */
+const invokeJourneyDropOffUpdate = async (state, mobileNumber, globals) => {
+  debugger;
+  const journeyJSONObj = {
+    RequestPayload: {
+      userAgent: window.navigator.userAgent,
+      leadProfile: {
+        mobileNumber,
+        leadProfileId: currentFormContext.leadProfile
+      },
+      formData: {
+        channel: 'ADOBE_WEBFORMS',
+        journeyName: currentFormContext.journeyName,
+        journeyID: currentFormContext.journeyID,
+        journeyStateInfo: [
+          {
+            state,
+            stateInfo: JSON.stringify(santizedFormDataWithContext(globals, currentFormContext)),
+            timeinfo: new Date().toISOString(),
+          },
+        ],
+      },
+    },
+  };
+  const url = 'https://applyonlinedev.hdfcbank.com/content/hdfc_commonforms/api/journeydropoffupdate.json';
   const method = 'POST';
   return fetchJsonResponse(url, journeyJSONObj, method);
 };
@@ -88,5 +124,5 @@ function journeyResponseHandler(payload) {
 }
 
 export {
-  createJourneyId, currentFormContext, invokeJourneyDropOff, journeyResponseHandler,
+  createJourneyId, currentFormContext, invokeJourneyDropOff, journeyResponseHandler,invokeJourneyDropOffUpdate,
 };

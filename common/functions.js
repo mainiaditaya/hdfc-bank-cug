@@ -22,6 +22,9 @@ function checkMode(globals) {
   debugger;
   const formData = globals.functions.exportData();
   if (formData.aadhaar_otp_val_data.result.Address1) {
+    currentFormContext.jwtToken = formData?.currentFormContext?.jwtToken
+    currentFormContext.productDetails = formData?.currentFormContext?.productDetails?.[0];
+    currentFormContext.executeInterfaceReqObj = formData?.currentFormContext?.executeInterfaceReqObj
     globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: true });
     globals.functions.setProperty(globals.form.otpPanel, { visible: false });
     globals.functions.setProperty(globals.form.loginPanel, { visible: false });
@@ -65,8 +68,7 @@ function getOTP(mobileNumber, pan, dob) {
  */
 async function aadharInit(mobileNumber, pan, dob, globals) {
   debugger;
-  // let dropOffParamRes = await callJourneyDropffparams(currentFormContext.journeyID, currentFormContext.leadProfile);
-  // console.log(dropOffParamRes);
+  
   const jsonObj = {
     requestString: {
       initParameters: {
@@ -101,7 +103,7 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
         journeyStateInfo: {
           state: 'CUSTOMER_AADHAR_VALIDATION',
           stateInfo: 'CORPORATE_CARD_JOURNEY',
-          formData: santizedFormData(globals),
+          formData: santizedFormData(globals)
         },
         auditData: {
           action: 'CUSTOMER_AADHAR_VALIDATION',

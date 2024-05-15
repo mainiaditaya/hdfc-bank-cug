@@ -15,7 +15,7 @@ import {
   checkMode
 } from '../../common/functions.js';
 
-import { invokeJourneyDropOff, journeyResponseHandler } from '../../common/journey-utils.js';
+import { invokeJourneyDropOff, journeyResponseHandler, invokeJourneyDropOffUpdate, } from '../../common/journey-utils.js';
 import { moveWizardView } from '../../common/formutils.js';
 
 /**
@@ -143,5 +143,6 @@ export {
   journeyResponseHandler,
   aadharInit,
   moveWizardView,
-  checkMode
+  checkMode,
+  invokeJourneyDropOffUpdate,
 };

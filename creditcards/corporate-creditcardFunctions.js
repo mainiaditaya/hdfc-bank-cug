@@ -456,8 +456,8 @@ const otpValSuccess = (res, globals) => {
     resultPanel: globals.form.resultPanel,
   };
   currentFormContext.isCustomerIdentified =		res?.customerIdentificationResponse?.CustomerIdentificationResponse?.errorCode === '0' ? 'Y' : 'N';
-  currentFormContext.productCode = globals.functions.exportData().data.CorporateCreditCard.productCode;
-  currentFormContext.promoCode = globals.functions.exportData().data.CorporateCreditCard.promoCode;
+  currentFormContext.productCode = globals.functions.exportData().form.productCode;
+  currentFormContext.promoCode = globals.functions.exportData().form.promoCode;
   // const welcomeTxt = formUtil(globals, pannel.welcome);
   const otpPanel = formUtil(globals, pannel.otp);
   const otpBtn = formUtil(globals, pannel.otpButton);
@@ -864,6 +864,7 @@ const createPanValidationRequest = (firstName, middleName, lastName, globals) =>
           const resultPanelBlock = formUtil(globals, resultPanel);
           const tryAgainButtonErrorPanelBlock = formUtil(globals, tryAgainButtonErrorPanel);
           if (responseObj?.statusCode === 'FC00') {
+            debugger;
             PAN_VALIDATION_STATUS = responseObj.panValidation.status.errorCode === '1';
             if (PAN_VALIDATION_STATUS) {
               const panStatus = responseObj.panValidation.panStatus;
@@ -1066,7 +1067,8 @@ const createDapRequestObj = (globals) => {
     personalDetails,
     employmentDetails,
   } = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage;
-  const customerInfo = currentFormContext.executeInterfaceReqObj.requestString;
+  const formContextCallbackData = globals.functions.exportData()?.currentFormContext 
+  const customerInfo = currentFormContext?.executeInterfaceReqObj?.requestString || formContextCallbackData?.executeInterfaceReqObj?.requestString;
   const { prefilledEmploymentDetails } = employmentDetails;
   const dapRequestObj = {
     requestString: {
@@ -1079,7 +1081,7 @@ const createDapRequestObj = (globals) => {
       panNumber: personalDetails.panNumberPersonalDetails.$value,
       mobileNo: globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
       existingCustomer: currentFormContext.journeyType === 'ETB' ? 'Y' : 'N',
-      APS_NAME_AS_CARD: currentFormContext.executeInterfaceReqObj.requestString.nameOnCard,
+      APS_NAME_AS_CARD: customerInfo.nameOnCard,
       emailAddress: prefilledEmploymentDetails.workEmailAddress.$value,
       APS_PER_ADDRESS_1: customerInfo.permanentAddress1,
       APS_PER_ADDRESS_2: customerInfo.permanentAddress2,
@@ -1110,12 +1112,12 @@ const createDapRequestObj = (globals) => {
       APS_RESI_TYPE: '2',
       APS_COM_ADDR_TYPE: '2',
       APS_SELF_CONFIRMATION: customerInfo.selfConfirmation,
-      APS_MOBILE_EDIT_FLAG: currentFormContext.executeInterfaceReqObj.requestString.mobileEditFlag,
-      APS_EMAIL_EDIT_FLAG: currentFormContext.executeInterfaceReqObj.requestString.apsEmailEditFlag,
-      APS_PAN_EDIT_FLAG: currentFormContext.executeInterfaceReqObj.requestString.panEditFlag,
-      APS_ADDRESS_EDIT_FLAG: currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag,
-      APS_NAME_EDIT_FLAG: currentFormContext.executeInterfaceReqObj.requestString.nameEditFlag,
-      APS_RESPHONE_EDIT_FLAG: currentFormContext.executeInterfaceReqObj.requestString.resPhoneEditFlag,
+      APS_MOBILE_EDIT_FLAG: customerInfo.mobileEditFlag,
+      APS_EMAIL_EDIT_FLAG: customerInfo.apsEmailEditFlag,
+      APS_PAN_EDIT_FLAG: customerInfo.panEditFlag,
+      APS_ADDRESS_EDIT_FLAG: customerInfo.addressEditFlag,
+      APS_NAME_EDIT_FLAG: customerInfo.nameEditFlag,
+      APS_RESPHONE_EDIT_FLAG: customerInfo.resPhoneEditFlag,
       APS_OFFPHONE_EDIT_FLAG: 'N',
       APS_EMP_CODE: '',
       APS_DESIGNATION: prefilledEmploymentDetails.designation.$value,
@@ -1132,11 +1134,11 @@ const createDapRequestObj = (globals) => {
       APS_FILLER6: '',
       APS_SMCODE: '',
       APS_DSE_CODE: '',
-      applicationERefNumber: currentFormContext.ipaResponse.ipa.eRefNumber,
+      applicationERefNumber: currentFormContext?.ipaResponse?.ipa?.eRefNumber || formContextCallbackData?.ipaResponse?.ipa?.eRefNumber,
       SOA_REQUESTID: '0305245144',
       nameOfDirector: '',
       relationship: '',
-      product: currentFormContext.productDetails.product,
+      product: currentFormContext?.productDetails?.product || formContextCallbackData?.productDetails?.product,
       APS_TYPE_OF_INDUSTRY: '',
       journeyID: currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
@@ -1144,16 +1146,16 @@ const createDapRequestObj = (globals) => {
       timeInfo: new Date().toISOString(),
       APS_OFF_EMAILID: prefilledEmploymentDetails.workEmailAddress.$value,
       APS_DIRECT_DEBIT: '',
-      customerId: currentFormContext.executeInterfaceReqObj.requestString.customerID,
+      customerId: customerInfo.customerID,
       pricingDetails: '',
       docUpload: '',
       idcomEnabled: true,
       APS_CAPTCHA: '',
-      applRefNo: currentFormContext.ipaResponse.ipa.applRefNumber,
+      applRefNo: currentFormContext?.ipaResponse?.ipa?.applRefNumber || formContextCallbackData?.ipaResponse?.ipa?.applRefNumber,
       txnRefNo: '',
       pseudoID: '',
-      FILLER8: currentFormContext.ipaResponse.ipa.filler8,
-      Id_token_jwt: currentFormContext.jwtToken,
+      FILLER8: currentFormContext?.ipaResponse?.ipa?.filler8 || formContextCallbackData?.ipaResponse?.ipa?.filler8,
+      Id_token_jwt: currentFormContext.jwtToken || formContextCallbackData.jwtToken,
       IDCOM_Token: '',
       JSCPAYLOAD: '',
       BROWSERFINGERPRINT: 'ef3036d9e4872df7e5a5eb2fe49bc8ae',
