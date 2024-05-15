@@ -12,6 +12,7 @@ import {
   currentAddressToggleHandler,
   finalDap,
   aadharInit,
+  checkMode
 } from '../../common/functions.js';
 
 import { invokeJourneyDropOff, journeyResponseHandler } from '../../common/journey-utils.js';
@@ -142,4 +143,5 @@ export {
   journeyResponseHandler,
   aadharInit,
   moveWizardView,
+  checkMode
 };

@@ -209,4 +209,31 @@ const viewAllBtnPannelConfig = {
 };
 linkModalFunction(viewAllBtnPannelConfig);
 
+const queryStrings = window.location.search.split('?')[1].split('&');
+for (const queryString of queryStrings) {
+  debugger
+  const [key, value] = queryString.split('=');
+  if (value === 'EKYC_AUTH') {
+    debugger
+    const navigateFrom = document.getElementsByName('corporateCardWizardView')?.[0];
+    const current = navigateFrom?.querySelector('.current-wizard-step');
+    const currentMenuItem = navigateFrom?.querySelector('.wizard-menu-active-item');
+    const navigateTo = document.getElementsByName('confirmAndSubmitPanel')?.[0];
+    current?.classList?.remove('current-wizard-step');
+    navigateTo?.classList?.add('current-wizard-step');
+    // add/remove active class from menu item
+    const navigateToMenuItem = navigateFrom?.querySelector(`li[data-index="${navigateTo?.dataset?.index}"]`);
+    currentMenuItem?.classList?.remove('wizard-menu-active-item');
+    navigateToMenuItem?.classList?.add('wizard-menu-active-item');
+    const event = new CustomEvent('wizard:navigate', {
+      detail: {
+        prevStep: { id: current?.id, index: parseInt(current?.dataset?.index || 0, 10) },
+        currStep: { id: navigateTo?.id, index: parseInt(navigateTo?.dataset?.index || 0, 10) },
+      },
+      bubbles: false,
+    });
+    navigateFrom?.dispatchEvent(event);
+  }
+}
+
 export { decorateStepper, onWizardInit };
