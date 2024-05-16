@@ -55,7 +55,7 @@ li.wizard-menu-item::before {
 }
 
 li.wizard-menu-active-item::before {
-  background-image: url('../../icons/current-step-indicator.svg');
+  background-image: url('../icons/current-step-indicator.svg');
   content: '';
   background-size: cover;
   background-color: unset;
@@ -190,6 +190,13 @@ fieldset fieldset {
       }
   }
 
+  .field-cardbenefitstextbox {
+    margin: -15px 0 0 !important;
+    font-size: var(--body-lg-font-size);
+    font-weight: var(--font-weight-regular);
+    padding-left: 32px;
+  }
+
   .field-joiningrenewalfee {
       display: flex;
       border: solid 3px var(--color-interface-background-quinary);
@@ -197,6 +204,10 @@ fieldset fieldset {
       padding: 0 15px;
       height: 50px;
       margin-top: -5px;
+      width: 94%;
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
 
       label {
           width: 90%;
@@ -307,6 +318,8 @@ fieldset fieldset {
 
 /* Confirm and Submit Panel */
 .field-confirmandsubmitpanel {
+  a { text-decoration: underline; }
+
   .field-addressdeclarationtext1 p {
     margin-bottom: 0;
     font-weight: var(--font-weight-bold);
@@ -320,12 +333,111 @@ fieldset fieldset {
     font-size: var(--body-sm-font-size);
     color: var(--color-interface-text-quaternary);
   }
+
+  .field-addressdeclarationaadhar, .field-currentaddressdeclaration, .field-currentaddressbiometric, .field-addressdeclarationoffice {
+    border: solid 1px #D2D5DB;
+    border-radius: 24px;
+    padding: 32px;
+  }
+
+ .field-aadharaddressckyc, .field-currentresidenceaddressckyc, .field-currentresidenceaddressbiometriclabel, .field-officeaddresslabelckyc {
+    display: flex;
+    font-weight: 600;
+    font-size: 20px;
+
+    p {
+      margin: 0 0 0 10px;
+      color: #111827;
+    }
+  }
+
+  .field-aadharaddressckyc::before { content: url('../icons/address-aadhar-icon.svg'); }
+  .field-currentresidenceaddressckyc::before, .field-currentresidenceaddressbiometriclabel::before { content: url('../icons/address-current-icon.svg'); }
+  .field-officeaddresslabelckyc::before { content: url('../icons/address-office-icon.svg'); }
+
+  .field-aadharaddressselectkyc, .field-currentresidenceaddress, .field-currentresidenceaddressbiometrictext, .field-officeaddressselectkyc {
+    margin: -25px 0 0 50px;
+  }
+
+  .radio-group-wrapper {
+    display: flex !important;
+
+    .radio-wrapper { 
+      margin-right: 15px !important;
+    }
+  }
+
+  .checkbox-wrapper label, .checkbox-wrapper label p, .radio-group-wrapper legend, .field-tccheckbox1, .field-tccheckbox2 {
+    font-weight: 400;
+    font-size: 18px;
+    color: #374151;
+  }
+
+  .field-tccheckbox1 {
+    p, ul {
+      margin: 0;
+    }
+  }
+
+  .field-carddeliveryntbflow, .field-carddeliveryaddresspanel {
+    .field-carddeliveryaddresslabelovd, .field-carddeliveryaddresslabel {
+      width: 100%;
+
+      p {
+        margin: 0;
+        font-weight: 600;
+        font-size: 20px;
+        color: var(--color-interface-background-quaternary);
+      }
+    }
+
+    .field-currentaddressovdaddress, .field-officeaddressovdaddress {
+      padding-left: 39px;
+      
+      p { 
+        margin: 0; 
+        font-size: 14px;
+      }
+    }
+
+    .radio-highlight-selected {
+      border: solid 1px #D2D5DB;
+      padding: 16px;
+      border-radius: 16px;
+
+      label { 
+        flex-basis: 100%; 
+        font-weight: 600;
+        color: #111827;
+        font-size: 16px !important;
+      }
+
+      input[type='radio'] {
+        position: absolute;
+        right: 15px;
+      }
+    }
+
+    .field-carddeliveryaddressoption1 label::before, .field-currentaddressovdoption label::before {
+      content: url('../icons/select-address-current.svg');
+      margin: 0 18px 0 4px;
+    }
+
+    .field-carddeliveryaddressoption2 label::before, .field-officeaddressovdoption label::before {
+      content: url('../icons/select-address-office.svg');
+      margin: 0 18px 0 4px;
+    }
+  }
+
+  .field-carddeliveryntbflow .radio-highlight-selected input[type='radio'] {
+    right: 0;
+  }
 }
 
 /* End of Confirm and Submit Panel */
 
 .hdfc-accordion-legend::after {
-  content: url('../../icons/accordion-expand-icon.svg');
+  content: url('../icons/accordion-expand-icon.svg');
   display: inline;
   position: absolute;
   right: 1vw;
@@ -384,15 +496,25 @@ main .form form .field-corporatecardwizardview.wizard {
     padding: 30px 0 0;
 
     .field-viewallcardbenefits { padding: 40px 0; }
-
-    img {
-      width: 253.44px;
-    }
+    img { width: 253.44px; }
   }
 
   .field-confirmandsubmitpanel {
-    .field-addressdeclarationtext2 p {
-      margin: var(--form-paragraph-margin);
+    fieldset {
+      display: grid !important;
+      margin-bottom: 0 !important;
+    }
+
+    .field-addressdeclarationtext2 p { margin: var(--form-paragraph-margin); }
+    .field-carddeliveryntbflow .radio-highlight-selected input[type='radio'] { right: 38px; }
+    .field-carddeliveryaddresslabelovd, .field-carddeliveryaddresslabel, .field-tandcpanelconfirmandsubmit legend { margin: 20px 0 10px; }
+
+    .field-carddeliveryntbflow, .field-carddeliveryaddresspanel { 
+      display: block !important; 
+
+      fieldset {
+        margin: 10px 0;
+      }
     }
   }
 }
