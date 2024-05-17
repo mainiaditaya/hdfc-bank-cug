@@ -5,7 +5,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
-import { createJourneyId, currentFormContext } from '../common/journey-utils.js';
+import {
+  createJourneyId, currentFormContext, invokeJourneyDropOff, journeyResponseHandler,
+} from '../common/journey-utils.js';
 import PANValidationAndNameMatchService from '../common/panvalidation.js';
 import executeCheck from '../common/panutils.js';
 import { customerValidationHandler, executeInterfaceApiFinal } from '../common/executeinterfaceutils.js';
@@ -901,27 +903,22 @@ const createPanValidationRequest = (firstName, middleName, lastName, globals) =>
  * @param {object} globals - The global object containing necessary globals form data.
  */
 const prefillForm = (globals) => {
-  const globalSchema = globals?.functions?.exportData();
-  const ccGlobals = globalSchema?.data?.CorporateCreditCard;
-  const ccData = {
-    companyName: ccGlobals?.companyName,
-    designation: ccGlobals?.designation,
-    employeeCode: ccGlobals?.employeeCode,
-    employmentType: ccGlobals?.employmentType,
-    maskedMobileNumber: ccGlobals?.maskedMobileNumber,
-    registeredMobileNumber: ccGlobals?.registeredMobileNumber,
-    relationshipNumber: ccGlobals?.relationshipNumber,
-    workEmailAddress: ccGlobals?.workEmailAddress,
-  };
-  const ccDetailsPresent = Object.values(ccData)?.every((el) => el);
+  const formData = globals?.functions?.exportData();
   const resultErrorPannel = formUtil(globals, globals.form.resultPanel);
   const loginPannel = formUtil(globals, globals.form.loginPanel);
   const otpButton = formUtil(globals, globals.form.getOTPbutton);
-  if (!ccDetailsPresent) {
+  if (!formData?.form?.login?.registeredMobileNumber) {
     // show error pannel if corporate credit card details not present
     resultErrorPannel.visible(true);
     loginPannel.visible(false);
     otpButton.visible(false);
+    const response = invokeJourneyDropOff('CRM_LEAD_FAILURE', '9999999999', globals);
+  } else {
+    invokeJourneyDropOff('CRM_Lead_SUCCESS', formData?.form?.login?.registeredMobileNumber, globals)
+      .then((res) => {
+        console.log(res);
+        journeyResponseHandler(res.lead_profile_info);
+      });
   }
 };
 

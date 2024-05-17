@@ -33,7 +33,7 @@ const currentFormContext = {};
 const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
   const journeyJSONObj = {
     RequestPayload: {
-      userAgent: window.navigator.userAgent,
+      userAgent: (typeof window !== 'undefined') ? window.navigator.userAgent : 'onLoad',
       leadProfile: {
         mobileNumber,
       },

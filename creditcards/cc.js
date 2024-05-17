@@ -1,6 +1,7 @@
 /* eslint-disable no-tabs */
 /* eslint no-console: ["error", { allow: ["warn", "error", "debug"] }] */
 import openModal from '../blocks/modal/modal.js';
+import { setPageDetails } from '../common/analytics.js';
 
 const createLabelInElement = (elementSelector, labelClass) => {
   /**
@@ -236,4 +237,5 @@ for (const queryString of queryStrings) {
   }
 }
 
+setPageDetails('aa');
 export { decorateStepper, onWizardInit };

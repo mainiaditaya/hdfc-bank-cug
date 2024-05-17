@@ -17,6 +17,7 @@ import {
 
 import { invokeJourneyDropOff, journeyResponseHandler, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
 import { moveWizardView } from '../../common/formutils.js';
+import { setPageDetails } from '../../common/analytics.js';
 
 /**
  * Get Full Name
@@ -145,4 +146,5 @@ export {
   moveWizardView,
   checkMode,
   invokeJourneyDropOffUpdate,
+  setPageDetails,
 };
