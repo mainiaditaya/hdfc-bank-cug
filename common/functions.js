@@ -34,15 +34,17 @@ function checkMode(globals) {
 /**
  * does the custom show hide of panel or screens .
  * @param {string} errorMessage
+ * @param {number} numRetries
  * @param {object} globals
  */
-function customSetFocus(errorMessage, globals) {
-  debugger
-  globals.functions.setProperty(globals.form.otpPanel, { visible: false });
-  globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
-  globals.functions.setProperty(globals.form.submitOTP, { visible: false });
-  globals.functions.setProperty(globals.form.resultPanel, { visible: true });
-  globals.functions.setProperty(globals.form.resultPanel.errorResultPanel.errorMessageText, { value: errorMessage });
+function customSetFocus(errorMessage, numRetries, globals) {
+  if (typeof numRetries === 'number' && numRetries < 1) {
+    globals.functions.setProperty(globals.form.otpPanel, { visible: false });
+    globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
+    globals.functions.setProperty(globals.form.submitOTP, { visible: false });
+    globals.functions.setProperty(globals.form.resultPanel, { visible: true });
+    globals.functions.setProperty(globals.form.resultPanel.errorResultPanel.errorMessageText, { value: errorMessage });
+  }
 }
 
 /**

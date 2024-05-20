@@ -898,7 +898,7 @@ const prefillForm = (globals) => {
     otpButton.visible(false);
     const response = invokeJourneyDropOff('CRM_LEAD_FAILURE', '9999999999', globals);
   } else {
-    invokeJourneyDropOff('CRM_Lead_SUCCESS', formData?.form?.login?.registeredMobileNumber, globals)
+    invokeJourneyDropOff('CRM_LEAD_SUCCESS', formData?.form?.login?.registeredMobileNumber, globals)
       .then((res) => {
         journeyResponseHandler(res.lead_profile_info);
       });
