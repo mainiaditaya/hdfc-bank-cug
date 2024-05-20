@@ -237,5 +237,5 @@ for (const queryString of queryStrings) {
   }
 }
 
-setPageDetails('aa');
+setPageDetails('some page name -ccc form');
 export { decorateStepper, onWizardInit };
