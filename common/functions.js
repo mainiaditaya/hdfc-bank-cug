@@ -42,6 +42,7 @@ function customSetFocus(errorMessage, numRetries, globals) {
     globals.functions.setProperty(globals.form.otpPanel, { visible: false });
     globals.functions.setProperty(globals.form.submitOTP, { visible: false });
     globals.functions.setProperty(globals.form.resultPanel, { visible: true });
+    globals.functions.setProperty(globals.form.errorResultPanel, { visible: true });
   }
 }
 
