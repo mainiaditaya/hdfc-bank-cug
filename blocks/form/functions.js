@@ -13,6 +13,8 @@ import {
   finalDap,
   aadharInit,
   checkMode,
+  otpValHandler,
+  customSetFocus,
 } from '../../common/functions.js';
 
 import { invokeJourneyDropOff, journeyResponseHandler, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
@@ -147,4 +149,6 @@ export {
   checkMode,
   invokeJourneyDropOffUpdate,
   setPageDetails,
+  otpValHandler,
+  customSetFocus,
 };

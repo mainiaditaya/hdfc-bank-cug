@@ -32,8 +32,10 @@ import {
 import {
   getJsonResponse,
   restAPICall,
+  displayLoader, hideLoader,
 } from '../common/makeRestAPI.js';
 
+// Initialize all Corporate Card Journey Context Variables.
 const journeyName = 'CORPORATE_CARD_JOURNEY';
 currentFormContext.journeyID = createJourneyId('a', 'b', 'c');
 currentFormContext.journeyName = journeyName;
@@ -42,6 +44,9 @@ currentFormContext.formName = 'CorporateCreditCard';
 currentFormContext.errorCode = '';
 currentFormContext.errorMessage = '';
 currentFormContext.eligibleOffers = '';
+currentFormContext.getOtpLoader = (typeof window !== 'undefined') ? displayLoader : false;
+currentFormContext.otpValLoader = (typeof window !== 'undefined') ? displayLoader : false;
+currentFormContext.hideLoader = (typeof window !== 'undefined') ? hideLoader : false;
 
 let PAN_VALIDATION_STATUS = false;
 let PAN_RETRY_COUNTER = 1;
@@ -443,51 +448,6 @@ const showErrorPanel = (panels, errorText) => {
 };
 
 /**
- * Handles the success scenario for OTP Validation.
- * @param {any} res  - The response object containing the OTP success generation response.
- * @param {Object} globals - globals variables object containing form configurations.
- */
-const otpValSuccess = (res, globals) => {
-  const pannel = {
-    // declare parent panel -- common name defining
-    // welcome: globals.form.loginPanel.welcomeTextLabel,
-    login: globals.form.loginPanel,
-    otp: globals.form.otpPanel,
-    otpButton: globals.form.getOTPbutton,
-    ccWizardView: globals.form.corporateCardWizardView,
-    resultPanel: globals.form.resultPanel,
-  };
-  currentFormContext.isCustomerIdentified =		res?.customerIdentificationResponse?.CustomerIdentificationResponse?.errorCode === '0' ? 'Y' : 'N';
-  currentFormContext.productCode = globals.functions.exportData().form.productCode;
-  currentFormContext.promoCode = globals.functions.exportData().form.promoCode;
-  // const welcomeTxt = formUtil(globals, pannel.welcome);
-  const otpPanel = formUtil(globals, pannel.otp);
-  const otpBtn = formUtil(globals, pannel.otpButton);
-  const loginPanel = formUtil(globals, pannel.login);
-  const ccWizardPannel = formUtil(globals, pannel.ccWizardView);
-
-  // welcomeTxt.visible(false);
-  otpBtn.visible(false);
-  loginPanel.visible(false);
-  otpPanel.visible(false);
-  ccWizardPannel.visible(true);
-  CUSTOMER_INPUT.mobileNumber = pannel.login.mobilePanel.registeredMobileNumber.$value;
-  CUSTOMER_INPUT.dob = pannel.login.identifierPanel.dateOfBirth.$value;
-  CUSTOMER_INPUT.pan = pannel.login.identifierPanel.pan.$value;
-  currentFormContext.jwtToken = res?.demogResponse?.Id_token_jwt;
-  const existingCustomer = existingCustomerCheck(res);
-  if (existingCustomer) {
-    IS_ETB_USER = true;
-    currentFormContext.journeyType = 'ETB';
-    personalDetailsPreFillFromBRE(res, globals);
-  }
-  (async () => {
-    const myImportedModule = await import('./cc.js');
-    myImportedModule.onWizardInit();
-  })();
-};
-
-/**
  * Handles the failure scenario for OTP Validation.
  * @param {any} res  - The response object containing the OTP success generation response.
  * @param {Object} globals - globals variables object containing form configurations.
@@ -602,6 +562,30 @@ const OTPVAL = {
   },
   path: urlPath('/content/hdfc_cc_unified/api/otpValFetchAssetDemog.json'),
   loadingText: 'Please wait while we are authenticating you',
+};
+
+/**
+ * Handles the success scenario for OTP Validation.
+ * @param {any} res  - The response object containing the OTP success generation response.
+ * @param {Object} globals - globals variables object containing form configurations.
+ */
+const otpValHandler = (response, globals) => {
+  const res = {};
+  res.demogResponse = response;
+  currentFormContext.isCustomerIdentified =		res?.demogResponse?.errorCode === '0' ? 'Y' : 'N';
+  currentFormContext.productCode = globals.functions.exportData().form.productCode;
+  currentFormContext.promoCode = globals.functions.exportData().form.promoCode;
+  currentFormContext.jwtToken = res?.demogResponse?.Id_token_jwt;
+  const existingCustomer = existingCustomerCheck(res);
+  if (existingCustomer) {
+    IS_ETB_USER = true;
+    currentFormContext.journeyType = 'ETB';
+    personalDetailsPreFillFromBRE(res, globals);
+  }
+  (async () => {
+    const myImportedModule = await import('./cc.js');
+    myImportedModule.onWizardInit();
+  })();
 };
 
 /**
@@ -916,7 +900,6 @@ const prefillForm = (globals) => {
   } else {
     invokeJourneyDropOff('CRM_Lead_SUCCESS', formData?.form?.login?.registeredMobileNumber, globals)
       .then((res) => {
-        console.log(res);
         journeyResponseHandler(res.lead_profile_info);
       });
   }
@@ -1204,4 +1187,5 @@ export {
   validateEmailID,
   currentAddressToggleHandler,
   finalDap,
+  otpValHandler,
 };

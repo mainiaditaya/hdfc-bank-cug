@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 import {
-  OTPVAL,
   RESENDOTP,
   getThisCard,
   prefillForm,
@@ -11,8 +10,9 @@ import {
   currentAddressToggleHandler,
   finalDap,
   currentFormContext,
+  otpValHandler,
 } from '../creditcards/corporate-creditcardFunctions.js';
-import { urlPath, santizedFormData } from './formutils.js';
+import { urlPath, santizedFormData, getTimeStamp } from './formutils.js';
 import { fetchJsonResponse, restAPICall } from './makeRestAPI.js';
 
 /**
@@ -29,6 +29,20 @@ function checkMode(globals) {
     globals.functions.setProperty(globals.form.consentFragment, { visible: false });
     globals.functions.setProperty(globals.form.welcomeText, { visible: false });
   }
+}
+
+/**
+ * does the custom show hide of panel or screens .
+ * @param {string} errorMessage
+ * @param {object} globals
+ */
+function customSetFocus(errorMessage, globals) {
+  debugger
+  globals.functions.setProperty(globals.form.otpPanel, { visible: false });
+  globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
+  globals.functions.setProperty(globals.form.submitOTP, { visible: false });
+  globals.functions.setProperty(globals.form.resultPanel, { visible: true });
+  globals.functions.setProperty(globals.form.resultPanel.errorResultPanel.errorMessageText, { value: errorMessage });
 }
 
 /**
@@ -52,7 +66,35 @@ function getOTP(mobileNumber, pan, dob) {
     },
   };
   const path = urlPath('/content/hdfc_ccforms/api/customeridentificationV4.json');
-  return fetchJsonResponse(path, jsonObj, 'POST');
+  currentFormContext?.getOtpLoader();
+  return fetchJsonResponse(path, jsonObj, 'POST', true);
+}
+
+/**
+ * validates the otp
+ * @param {object} mobileNumber
+ * @param {object} pan
+ * @param {object} dob
+ * @return {PROMISE}
+ */
+function otpValidation(mobileNumber, pan, dob, otpNumber) {
+  const jsonObj = {
+    requestString: {
+      mobileNumber: mobileNumber.$value,
+      passwordValue: otpNumber,
+      dateOfBith: dob.$value || '',
+      panNumber: pan.$value || '',
+      channelSource: '',
+      journeyID: currentFormContext.journeyID,
+      journeyName: currentFormContext.journeyName,
+      dedupeFlag: 'N',
+      userAgent: window.navigator.userAgent,
+      referenceNumber: `AD${getTimeStamp(new Date())}` ?? '',
+    },
+  };
+  const path = urlPath('/content/hdfc_cc_unified/api/otpValFetchAssetDemog.json');
+  currentFormContext?.otpValLoader();
+  return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 
 function getOS() {
@@ -221,15 +263,6 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
 }
 
 /**
- * otp validation
- * @param {object} globals - The global object containing necessary globals form data.
- */
-function otpValidation(globals) {
-  const payload = OTPVAL.getPayload(globals);
-  restAPICall(globals, 'POST', payload, OTPVAL.path, OTPVAL.successCallback, OTPVAL.errorCallback, OTPVAL.loadingText);
-}
-
-/**
  * check offer
  * @param {string} firstName - The first name of the cardholder.
  * @param {string} middleName - The last name of the cardholder.
@@ -271,4 +304,6 @@ export {
   finalDap,
   aadharInit,
   checkMode,
+  otpValHandler,
+  customSetFocus,
 };

@@ -2,6 +2,7 @@
  * Displays a loader with optional loading text.
  * @param {string} loadingText - The loading text to display (optional).
  */
+
 function displayLoader(loadingText) {
   const bodyContainer = document.querySelector('.appear');
   bodyContainer.classList.add('preloader');
@@ -29,7 +30,7 @@ function hideLoader() {
 * @param {object} payload - The data payload to send with the request.
 * @returns {*} - The JSON response from the server.
 */
-function fetchJsonResponse(url, payload, method) {
+function fetchJsonResponse(url, payload, method, loader = false) {
   // apiCall-fetch
   return fetch(url, {
     method,
@@ -40,7 +41,10 @@ function fetchJsonResponse(url, payload, method) {
       Accept: 'application/json',
     },
   })
-    .then((res) => res.json());
+    .then((res) => {
+      if (loader) hideLoader();
+      return res.json();
+    });
 }
 
 /**
