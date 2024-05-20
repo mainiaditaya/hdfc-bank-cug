@@ -888,14 +888,26 @@ const createPanValidationRequest = (firstName, middleName, lastName, globals) =>
  */
 const prefillForm = (globals) => {
   const formData = globals?.functions?.exportData();
-  const resultErrorPannel = formUtil(globals, globals.form.resultPanel);
-  const loginPannel = formUtil(globals, globals.form.loginPanel);
-  const otpButton = formUtil(globals, globals.form.getOTPbutton);
+  const {
+    welcomeText,
+    resultPanel,
+    loginPanel,
+    consentFragment,
+    getOTPbutton,
+    resultPanel: {
+      errorResultPanel: {
+        errorMessageText,
+        resultSetErrorText1,
+        resultSetErrorText2,
+      },
+    },
+  } = globals.form;
+  const showPanel = [resultPanel, errorMessageText, resultSetErrorText1, resultSetErrorText2]?.map((fieldName) => formUtil(globals, fieldName));
+  const hidePanel = [loginPanel, welcomeText, consentFragment, getOTPbutton]?.map((fieldName) => formUtil(globals, fieldName));
   if (!formData?.form?.login?.registeredMobileNumber) {
     // show error pannel if corporate credit card details not present
-    resultErrorPannel.visible(true);
-    loginPannel.visible(false);
-    otpButton.visible(false);
+    showPanel?.forEach((panel) => panel.visible(true));
+    hidePanel?.forEach((panel) => panel.visible(false));
     const response = invokeJourneyDropOff('CRM_LEAD_FAILURE', '9999999999', globals);
   } else {
     invokeJourneyDropOff('CRM_LEAD_SUCCESS', formData?.form?.login?.registeredMobileNumber, globals)
