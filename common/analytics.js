@@ -1,8 +1,10 @@
 /* eslint-disable no-undef */
-import { currentFormContext } from './journey-utils.js';
-
 // eslint-disable-next-line no-unused-vars
-let digitalData = {};
+const digitalData = {
+  form: {
+    'Journey Name': 'CORPORATE_CARD_JOURNEY',
+  },
+};
 
 /**
  * @name setPageDetails
@@ -10,22 +12,9 @@ let digitalData = {};
  * @param {object} globals - globals variables object containing form configurations.
  */
 
+// eslint-disable-next-line no-unused-vars
 function setPageDetails(pageName) {
   // eslint-disable-next-line no-unused-vars
-  digitalData = {
-    form: {
-      journeyName: 'CORPORATE_CARD_JOURNEY',
-    },
-    page: {
-      pageInfo: {
-        pageName,
-        errorMessage: currentFormContext.errorMsg,
-        errorCode: currentFormContext.errorcode,
-        errorAPI: currentFormContext.lastAPICalled,
-      },
-    },
-
-  };
   _satellite.track('pageload');
 }
 

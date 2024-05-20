@@ -40,10 +40,8 @@ function checkMode(globals) {
 function customSetFocus(errorMessage, numRetries, globals) {
   if (typeof numRetries === 'number' && numRetries < 1) {
     globals.functions.setProperty(globals.form.otpPanel, { visible: false });
-    globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
     globals.functions.setProperty(globals.form.submitOTP, { visible: false });
     globals.functions.setProperty(globals.form.resultPanel, { visible: true });
-    globals.functions.setProperty(globals.form.resultPanel.errorResultPanel.errorMessageText, { value: errorMessage });
   }
 }
 
