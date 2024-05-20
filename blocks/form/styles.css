@@ -360,7 +360,7 @@ main .field-incorrectotptext {
   }
 }
 
-main .form .field-errorresultpanel .field-errorresulttextlabel > p::before {
+main .form .field-errorresultpanel .field-errormessagetext > p::before {
   background-image: url('../../icons/hdfc-error-icon.svg');
 }
 
@@ -376,7 +376,7 @@ main .form .field-successresultpanel {
     border-radius: var(--form-border-radius) var(--form-border-radius) 0 0;
   }
 
-  .field-errorresulttextlabel,
+  .field-errormessagetext,
   .field-successresulttextlabel {
     background-color: var(--color-interface-background-quaternary);
     margin: -40px -40px 0;
@@ -557,7 +557,7 @@ main .form .field-resultpanel {
 
   main .form .field-errorresultpanel,
   main .form .field-successresultpanel {
-    > div:not(.field-errorresulttextlabel) {
+    > div:not(.field-errormessagetext) {
       max-width: 100%;
     }
 
