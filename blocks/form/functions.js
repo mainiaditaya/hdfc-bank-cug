@@ -15,6 +15,8 @@ import {
   customSetFocus,
   validatePan,
   panAPISuccesHandler,
+  executeInterfaceApi,
+  ipaRequestApi,
 } from '../../common/functions.js';
 
 import {
@@ -162,4 +164,6 @@ export {
   validatePan,
   getFormContext,
   panAPISuccesHandler,
+  executeInterfaceApi,
+  ipaRequestApi,
 };

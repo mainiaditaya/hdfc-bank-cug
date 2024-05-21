@@ -127,7 +127,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
       bankEmployee: 'N',
       mobileNumber: globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
       fullName,
-      panCheckFlag: currentFormContext.apsPanChkFlag,
+      panCheckFlag: 'Y',
       perAddressType: '2',
       personalEmailId: personalDetails.personalEmailAddress.$value,
       selfConfirmation: 'N',
@@ -444,25 +444,30 @@ const executeInterfaceApi = (globals) => {
   return fetchJsonResponse(apiEndPoint, executeInterfaceRequest, 'POST', true);
 };
 
-// const ipaRequestApi = (globals) => {
-//   const ipaRequestObj = {
-//     requestString: {
-//       mobileNumber: globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
-//       applRefNumber: respData.ExecuteInterfaceResponse.applicationRefNumber,
-//       eRefNumber: respData.ExecuteInterfaceResponse.eRefNumber,
-//       Id_token_jwt: respData.Id_token_jwt,
-//       userAgent: navigator.userAgent,
-//       journeyID: currentFormContext.journeyID,
-//       journeyName: currentFormContext.journeyName,
-//       productCode: currentFormContext.productCode,
-//     },
-//   };
-//   TOTAL_TIME = 0;
-//   sendIpaRequest(ipaRequestObj, globals);
-// };
+const ipaRequestApi = (eRefNumber, applicationRefNumber, idTokenJwt, ipaDuration, ipaTimer, globals) => {
+  currentFormContext.ipaDuration = ipaDuration;
+  currentFormContext.ipaTimer = ipaTimer;
+  currentFormContext.jwtToken = idTokenJwt;
+  const ipaRequestObj = {
+    requestString: {
+      mobileNumber: globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
+      applRefNumber: applicationRefNumber,
+      eRefNumber,
+      Id_token_jwt: idTokenJwt,
+      userAgent: navigator.userAgent,
+      journeyID: currentFormContext.journeyID,
+      journeyName: currentFormContext.journeyName,
+      productCode: currentFormContext.productCode,
+    },
+  };
+  TOTAL_TIME = 0;
+  const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/ipa.json');
+  return fetchJsonResponse(apiEndPoint, ipaRequestObj, 'POST', true);
+};
 
 export {
   customerValidationHandler,
   executeInterfaceApiFinal,
   executeInterfaceApi,
+  ipaRequestApi,
 };

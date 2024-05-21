@@ -16,6 +16,10 @@ import {
   validatePan,
   panAPISuccesHandler,
 } from './panvalidation.js';
+import {
+  executeInterfaceApi,
+  ipaRequestApi,
+} from './executeinterfaceutils.js';
 
 /**
  * @name checkMode - check the location
@@ -281,4 +285,6 @@ export {
   customSetFocus,
   validatePan,
   panAPISuccesHandler,
+  executeInterfaceApi,
+  ipaRequestApi,
 };
