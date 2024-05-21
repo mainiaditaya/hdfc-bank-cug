@@ -12,6 +12,7 @@ import {
   getJsonResponse,
   hideLoader,
   fetchJsonResponse,
+  fetchIPAResponse,
 } from './makeRestAPI.js';
 
 const GENDER_MAP = {
@@ -477,7 +478,7 @@ const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJw
   };
   TOTAL_TIME = 0;
   const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/ipa.json');
-  return fetchJsonResponse(apiEndPoint, ipaRequestObj, 'POST', true);
+  return fetchIPAResponse(apiEndPoint, ipaRequestObj, 'POST', ipaDuration, ipaTimer, true);
 };
 
 export {

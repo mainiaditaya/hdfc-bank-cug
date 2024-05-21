@@ -48,6 +48,42 @@ function fetchJsonResponse(url, payload, method, loader = false) {
 }
 
 /**
+* Initiates an http call with JSON payload to the specified URL using the specified method.
+*
+* @param {string} url - The URL to which the request is sent.
+* @param {string} [method='POST'] - The HTTP method to use for the request (default is 'POST').
+* @param {object} payload - The data payload to send with the request.
+* @returns {*} - The JSON response from the server.
+*/
+function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = false, startTime = Date.now()) {
+  // apiCall-fetch
+  return fetch(url, {
+    method,
+    body: payload ? JSON.stringify(payload) : null,
+    mode: 'cors',
+    headers: {
+      'Content-type': 'text/plain',
+      Accept: 'application/json',
+    },
+  })
+    .then((res) => {
+      const response = res.json();
+      const ipaResult = response?.ipa?.ipaResult;
+      if (ipaResult && ipaResult !== '' && ipaResult !== 'null' && ipaResult !== 'undefined') {
+        if (loader) hideLoader();
+        return response;
+      }
+      const elapsedTime = (Date.now() - startTime) / 1000;
+      if (elapsedTime < parseInt(ipaDuration, 10)) {
+        setTimeout(() => {
+          fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, true, startTime);
+        }, ipaTimer * 1000);
+      }
+      return response;
+    });
+}
+
+/**
  * Initiates an http call with JSON payload to the specified URL using the specified method.
  *
  * @param {string} url - The URL to which the request is sent.
@@ -100,5 +136,10 @@ function restAPICall(globals, method, payload, path, successCallback, errorCallb
 }
 
 export {
-  restAPICall, getJsonResponse, displayLoader, hideLoader, fetchJsonResponse,
+  restAPICall,
+  getJsonResponse,
+  displayLoader,
+  hideLoader,
+  fetchJsonResponse,
+  fetchIPAResponse,
 };
