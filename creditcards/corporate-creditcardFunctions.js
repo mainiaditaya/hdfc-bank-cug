@@ -232,6 +232,7 @@ const personalDetailsPreFillFromBRE = (res, globals) => {
 
   if (!breCheckAndFetchDemogResponse) return;
   BRE_DEMOG_RESPONSE = breCheckAndFetchDemogResponse;
+  currentFormContext.breDemogResponse = breCheckAndFetchDemogResponse;
   // Extract gender from response
   const personalDetailsFields = {
     gender: 'VDCUSTGENDER',
@@ -531,20 +532,20 @@ const checkUserProceedStatus = (panStatus, globals) => {
   switch (IS_ETB_USER) {
     case true:
       if (CUSTOMER_INPUT.pan) {
-        executeCheck(panStatus, terminationCheck, customerValidationHandler, globals, BRE_DEMOG_RESPONSE);
+        executeCheck(panStatus, terminationCheck, customerValidationHandler, globals);
       } else if (CUSTOMER_INPUT.dob) {
         if (!CUSTOMER_DEMOG_DATA.panNumberPersonalDetails || !CUSTOMER_DEMOG_DATA.lastName) {
           const result = demogDataCheck(panStatus);
           if (result.proceed) {
-            executeCheck(panStatus, result.terminationCheck, customerValidationHandler, globals, BRE_DEMOG_RESPONSE);
+            executeCheck(panStatus, result.terminationCheck, customerValidationHandler, globals);
           }
         } else {
-          executeCheck(panStatus, terminationCheck, customerValidationHandler, globals, BRE_DEMOG_RESPONSE);
+          executeCheck(panStatus, terminationCheck, customerValidationHandler, globals);
         }
       }
       break;
     case false:
-      executeCheck(panStatus, terminationCheck, customerValidationHandler, globals, BRE_DEMOG_RESPONSE);
+      executeCheck(panStatus, terminationCheck, customerValidationHandler, globals);
       break;
     default:
       break;
@@ -634,7 +635,7 @@ const createPanValidationRequest = (firstName, middleName, lastName, globals) =>
     },
   };
   // Call PANValidationAndNameMatchService with PAN validation request and event handlers
-  //PANValidationAndNameMatchService(panValidation.createRequestObj(), panValidation.eventHandlers);
+  // PANValidationAndNameMatchService(panValidation.createRequestObj(), panValidation.eventHandlers);
 };
 
 /**

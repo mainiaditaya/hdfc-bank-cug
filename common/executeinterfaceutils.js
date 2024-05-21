@@ -11,6 +11,7 @@ import {
   restAPICall,
   getJsonResponse,
   hideLoader,
+  fetchJsonResponse,
 } from './makeRestAPI.js';
 
 const GENDER_MAP = {
@@ -43,7 +44,8 @@ const formatDate = (inputDate) => {
  * @param {Object} globals - The global object containing necessary data for ExecuteInterface request.
  * @returns {Object} - The ExecuteInterface request object.
  */
-const createExecuteInterfaceRequestObj = (panCheckFlag, globals, breDemogResponse) => {
+const createExecuteInterfaceRequestObj = (globals) => {
+  const { breDemogResponse } = currentFormContext;
   const {
     personalDetails,
     currentDetails,
@@ -125,7 +127,7 @@ const createExecuteInterfaceRequestObj = (panCheckFlag, globals, breDemogRespons
       bankEmployee: 'N',
       mobileNumber: globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
       fullName,
-      panCheckFlag,
+      panCheckFlag: currentFormContext.apsPanChkFlag,
       perAddressType: '2',
       personalEmailId: personalDetails.personalEmailAddress.$value,
       selfConfirmation: 'N',
@@ -314,8 +316,8 @@ const sendIpaRequest = async (ipaRequestObj, globals) => {
 };
 
 const customerValidationHandler = {
-  executeInterfaceApi: async (APS_PAN_CHK_FLAG, globals, breDemogResponse) => {
-    const requestObj = createExecuteInterfaceRequestObj(APS_PAN_CHK_FLAG, globals, breDemogResponse);
+  executeInterfaceApi: async (globals) => {
+    const requestObj = createExecuteInterfaceRequestObj(globals);
     currentFormContext.executeInterfaceReqObj = { ...requestObj };
     const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/executeinterface.json');
     const method = 'POST';
@@ -435,7 +437,32 @@ const executeInterfaceApiFinal = (globals) => {
   restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
 };
 
+const executeInterfaceApi = (globals) => {
+  const executeInterfaceRequest = createExecuteInterfaceRequestObj(globals);
+  currentFormContext.executeInterfaceReqObj = { ...executeInterfaceRequest };
+  const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/executeinterface.json');
+  return fetchJsonResponse(apiEndPoint, executeInterfaceRequest, 'POST', true);
+};
+
+// const ipaRequestApi = (globals) => {
+//   const ipaRequestObj = {
+//     requestString: {
+//       mobileNumber: globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
+//       applRefNumber: respData.ExecuteInterfaceResponse.applicationRefNumber,
+//       eRefNumber: respData.ExecuteInterfaceResponse.eRefNumber,
+//       Id_token_jwt: respData.Id_token_jwt,
+//       userAgent: navigator.userAgent,
+//       journeyID: currentFormContext.journeyID,
+//       journeyName: currentFormContext.journeyName,
+//       productCode: currentFormContext.productCode,
+//     },
+//   };
+//   TOTAL_TIME = 0;
+//   sendIpaRequest(ipaRequestObj, globals);
+// };
+
 export {
   customerValidationHandler,
   executeInterfaceApiFinal,
+  executeInterfaceApi,
 };

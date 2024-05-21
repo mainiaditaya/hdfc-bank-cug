@@ -4,7 +4,6 @@ import {
   convertDateToDdMmYyyy,
 } from './formutils.js';
 import { currentFormContext } from './journey-utils.js';
-import { } from './formutils.js';
 
 /**
  * validatePan - creates PAN validation request and executes API.
@@ -14,7 +13,7 @@ import { } from './formutils.js';
  * @param {string} firstName
  * @returns {Promise} - pan validation response
  */
-function validatePan(mobileNumber, panNumber, dob, firstName) {
+const validatePan = (mobileNumber, panNumber, dob, firstName) => {
   const validatePanRequest = {
     journeyName: currentFormContext.journeyName,
     journeyID: currentFormContext.journeyID,
@@ -28,8 +27,6 @@ function validatePan(mobileNumber, panNumber, dob, firstName) {
   };
   const apiEndPoint = urlPath('/content/hdfc_forms_common_v2/api/panValNameMatch.json');
   return fetchJsonResponse(apiEndPoint, validatePanRequest, 'POST', true);
-}
-
-export {
-  validatePan,
 };
+
+export default validatePan;
