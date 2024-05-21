@@ -1,7 +1,8 @@
+/* eslint-disable no-multiple-empty-lines */
+/* eslint-disable space-before-blocks */
+/* eslint-disable no-unused-vars */
 function displayMobileNumber(){
-    // only numeric 10 digits
-    // will be already prefilled from some source . To get more details about this 
-    // will be shown with prefix +91 and * value for first 5 numeric values
+
 }
 
 function maskMobileNumber() {
@@ -116,15 +117,12 @@ function invokeJourneyDropOff(state, mobileNumber){
 function invokeJourneyDropOffUpdate(state, mobileNumber){
 }
 
-
-
 function pinCodeMaster(){
 }
 
-function validateEmailID(){
-}
 function currentAddressToggleHandler(){
 }
+
 /**
  * openModal
  * @param {object} arg1 - arg1 from data.

@@ -12,9 +12,9 @@ import {
 } from '../creditcards/corporate-creditcardFunctions.js';
 import { urlPath, santizedFormData, getTimeStamp } from './formutils.js';
 import { fetchJsonResponse } from './makeRestAPI.js';
-import { 
+import {
   validatePan,
-  panAPISuccesHandler, 
+  panAPISuccesHandler,
 } from './panvalidation.js';
 
 /**

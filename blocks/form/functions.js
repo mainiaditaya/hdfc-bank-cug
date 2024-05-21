@@ -17,7 +17,9 @@ import {
   panAPISuccesHandler,
 } from '../../common/functions.js';
 
-import { invokeJourneyDropOff, journeyResponseHandler, invokeJourneyDropOffUpdate, currentFormContext } from '../../common/journey-utils.js';
+import {
+  invokeJourneyDropOff, journeyResponseHandler, invokeJourneyDropOffUpdate, currentFormContext,
+} from '../../common/journey-utils.js';
 import { moveWizardView } from '../../common/formutils.js';
 import { setPageDetails } from '../../common/analytics.js';
 
@@ -130,8 +132,7 @@ function days(endDate, startDate) {
  * getFormContext - returns form context.
  * @returns {object} currentFormContext
  */
-function getFormContext(){
-  console.log(currentFormContext);
+function getFormContext() {
   return currentFormContext;
 }
 

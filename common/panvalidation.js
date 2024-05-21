@@ -4,7 +4,6 @@ import {
   convertDateToDdMmYyyy,
 } from './formutils.js';
 import { currentFormContext } from './journey-utils.js';
-import { } from './formutils.js';
 
 /**
  * validatePan - creates PAN validation request and executes API.
@@ -31,9 +30,9 @@ function validatePan(mobileNumber, panNumber, dob, firstName) {
 }
 
 /**
-* panAPISuccesHandler 
+* panAPISuccesHandler
 * @param {string} panStatus
-* @returns {Promise} panResponse 
+* @returns {Promise} panResponse
 */
 function panAPISuccesHandler(panStatus) {
   let panSuccess = false;
@@ -45,11 +44,9 @@ function panAPISuccesHandler(panStatus) {
     panSuccess = true;
   }
 
-  debugger;
-  let returnObj = {
+  const returnObj = {
     panSuccess,
-  }
-  console.log(JSON.stringify(returnObj));
+  };
   return returnObj;
 }
 
