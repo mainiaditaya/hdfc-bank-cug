@@ -2,7 +2,6 @@
 import {
   getOTP,
   otpValidation,
-  checkOffer,
   getThisCard,
   prefillForm,
   getAddressDetails,
@@ -132,7 +131,6 @@ export {
   getOTP,
   otpValidation,
   days,
-  checkOffer,
   getThisCard,
   prefillForm,
   getAddressDetails,

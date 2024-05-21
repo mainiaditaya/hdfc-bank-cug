@@ -262,21 +262,9 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
     }).catch((err) => console.log(err));
 }
 
-/**
- * check offer
- * @param {string} firstName - The first name of the cardholder.
- * @param {string} middleName - The last name of the cardholder.
- * @param {string} lastName - The last name of the cardholder.
- * @param {object} globals - The global object containing necessary globals form data.
- */
-function checkOffer(firstName, middleName, lastName, globals) {
-  createPanValidationRequest(firstName, middleName, lastName, globals);
-}
-
 export {
   getOTP,
   otpValidation,
-  checkOffer,
   getThisCard,
   prefillForm,
   getAddressDetails,
