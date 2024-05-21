@@ -8,7 +8,6 @@
 import {
   createJourneyId, currentFormContext, invokeJourneyDropOff, journeyResponseHandler,
 } from '../common/journey-utils.js';
-import PANValidationAndNameMatchService from '../common/panvalidation.js';
 import executeCheck from '../common/panutils.js';
 import { customerValidationHandler, executeInterfaceApiFinal } from '../common/executeinterfaceutils.js';
 import {
@@ -635,7 +634,7 @@ const createPanValidationRequest = (firstName, middleName, lastName, globals) =>
     },
   };
   // Call PANValidationAndNameMatchService with PAN validation request and event handlers
-  PANValidationAndNameMatchService(panValidation.createRequestObj(), panValidation.eventHandlers);
+  //PANValidationAndNameMatchService(panValidation.createRequestObj(), panValidation.eventHandlers);
 };
 
 /**

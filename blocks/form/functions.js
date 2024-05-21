@@ -13,6 +13,7 @@ import {
   checkMode,
   otpValHandler,
   customSetFocus,
+  validatePan,
 } from '../../common/functions.js';
 
 import { invokeJourneyDropOff, journeyResponseHandler, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
@@ -147,4 +148,5 @@ export {
   setPageDetails,
   otpValHandler,
   customSetFocus,
+  validatePan,
 };

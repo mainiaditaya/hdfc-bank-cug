@@ -2,7 +2,6 @@
 import {
   getThisCard,
   prefillForm,
-  createPanValidationRequest,
   getAddressDetails,
   pinCodeMaster,
   validateEmailID,
@@ -13,6 +12,7 @@ import {
 } from '../creditcards/corporate-creditcardFunctions.js';
 import { urlPath, santizedFormData, getTimeStamp } from './formutils.js';
 import { fetchJsonResponse } from './makeRestAPI.js';
+import { validatePan } from './panvalidation.js';
 
 /**
  * @name checkMode - check the location
@@ -276,4 +276,5 @@ export {
   checkMode,
   otpValHandler,
   customSetFocus,
+  validatePan,
 };
