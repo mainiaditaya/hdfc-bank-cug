@@ -369,6 +369,7 @@ const otpValHandler = (response, globals) => {
   currentFormContext.productCode = globals.functions.exportData().form.productCode;
   currentFormContext.promoCode = globals.functions.exportData().form.promoCode;
   currentFormContext.jwtToken = res?.demogResponse?.Id_token_jwt;
+  currentFormContext.panFromDemog = res?.demogResponse?.BRECheckAndFetchDemogResponse?.VDCUSTITNBR;
   const existingCustomer = existingCustomerCheck(res);
   if (existingCustomer) {
     IS_ETB_USER = true;
