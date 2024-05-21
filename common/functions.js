@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 import {
-  RESENDOTP,
   getThisCard,
   prefillForm,
   createPanValidationRequest,
@@ -13,7 +12,7 @@ import {
   otpValHandler,
 } from '../creditcards/corporate-creditcardFunctions.js';
 import { urlPath, santizedFormData, getTimeStamp } from './formutils.js';
-import { fetchJsonResponse, restAPICall } from './makeRestAPI.js';
+import { fetchJsonResponse } from './makeRestAPI.js';
 
 /**
  * @name checkMode - check the location
@@ -274,27 +273,9 @@ function checkOffer(firstName, middleName, lastName, globals) {
   createPanValidationRequest(firstName, middleName, lastName, globals);
 }
 
-/**
- * resend otp
- *
- * @param {object} globals - The global object containing necessary globals form data.
- */
-function resendOTP(globals) {
-  restAPICall(
-    globals,
-    'POST',
-    RESENDOTP.getPayload(globals),
-    RESENDOTP.path,
-    RESENDOTP.successCallback,
-    RESENDOTP.errorCallback,
-    RESENDOTP.loadingText,
-  );
-}
-
 export {
   getOTP,
   otpValidation,
-  resendOTP,
   checkOffer,
   getThisCard,
   prefillForm,

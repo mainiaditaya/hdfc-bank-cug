@@ -50,7 +50,7 @@ currentFormContext.hideLoader = (typeof window !== 'undefined') ? hideLoader : f
 
 let PAN_VALIDATION_STATUS = false;
 let PAN_RETRY_COUNTER = 1;
-let resendOtpCount = 3;
+const resendOtpCount = 3;
 let IS_ETB_USER = false;
 const CUSTOMER_INPUT = { mobileNumber: '', pan: '', dob: '' };
 const CUSTOMER_DEMOG_DATA = {};
@@ -97,96 +97,6 @@ const removeBanner = () => {
   if (banner) {
     banner.style.display = 'none';
   }
-};
-
-/**
- * Handles the success scenario for OTP generation.
- * @param {any} res  - The response object containing the OTP success generation response.
- * @param {Object} globals - globals variables object containing form configurations.
- */
-const otpGenSuccess = (res, globals) => {
-  const pannel = {
-    // declare parent panel -- common name defining
-    welcome: globals.form.loginPanel.welcomeTextLabel,
-    login: globals.form.loginPanel,
-    otp: globals.form.otpPanel,
-    otpButton: globals.form.getOTPbutton,
-    currentAddressNTB: globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.currentDetails.currentAddressNTB,
-    currentAddressETB: globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.currentDetails.currentAddressETB,
-    panWizardField: globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.dobPersonalDetails,
-    dobWizardField: globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.panNumberPersonalDetails,
-  };
-  currentFormContext.isCustomerIdentified =		res?.customerIdentificationResponse?.CustomerIdentificationResponse?.errorCode === '0' ? 'Y' : 'N';
-  // const welcomeTxt = formUtil(globals, pannel.welcome);
-  const otpPanel = formUtil(globals, pannel.otp);
-  const otpBtn = formUtil(globals, pannel.otpButton);
-  const loginPanel = formUtil(globals, pannel.login);
-  const regMobNo = pannel.login.mobilePanel.registeredMobileNumber.$value;
-
-  // welcomeTxt.visible(false);
-  otpBtn.visible(false);
-  loginPanel.visible(false);
-  otpPanel.visible(true);
-
-  appendMaskedNumber('field-otphelptext', regMobNo);
-  removeBanner();
-};
-
-/**
- * Handles the failure scenario for OTP generation.
- * @param {any} res  - The response object containing the OTP failure generation response.
- * @param {Object} globals - globals variables object containing form configurations.
- */
-const otpGenFailure = (res, globals) => {
-  const pannel = {
-    // declare parent panel -- common name defining
-    welcome: globals.form.loginPanel.welcomeTextLabel,
-    login: globals.form.loginPanel,
-    otp: globals.form.otpPanel,
-    otpButton: globals.form.getOTPbutton,
-    resultPanel: globals.form.resultPanel,
-  };
-
-  // const welcomeTxt = formUtil(globals, pannel.welcome);
-  const otpPanel = formUtil(globals, pannel.otp);
-  const loginPanel = formUtil(globals, pannel.login);
-  const otpBtn = formUtil(globals, pannel.otpButton);
-  const failurePanel = formUtil(globals, pannel.resultPanel);
-
-  // welcomeTxt.visible(false);
-  otpPanel.visible(false);
-  loginPanel.visible(false);
-  otpBtn.visible(false);
-  failurePanel.visible(true);
-  removeBanner();
-};
-
-const OTPGEN = {
-  getPayload(globals) {
-    const mobileNo = globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value;
-    const panNo = globals.form.loginPanel.identifierPanel.pan.$value;
-    const dob = clearString(globals.form.loginPanel.identifierPanel.dateOfBirth.$value);
-    const jsonObj = {};
-    jsonObj.requestString = {};
-    jsonObj.requestString.mobileNumber = String(mobileNo);
-    jsonObj.requestString.dateOfBith = dob ?? '';
-    jsonObj.requestString.panNumber = panNo ?? '';
-    jsonObj.requestString.journeyID = currentFormContext.journeyID;
-    jsonObj.requestString.journeyName = currentFormContext.journeyName;
-    jsonObj.requestString.userAgent = window.navigator.userAgent;
-    jsonObj.requestString.identifierValue = panNo || dob;
-    jsonObj.requestString.identifierName = panNo ? 'PAN' : 'DOB';
-    return jsonObj;
-  },
-  successCallback(res, globals) {
-    return res?.otpGenResponse?.status?.errorCode === '0' ? otpGenSuccess(res, globals) : otpGenFailure(res, globals);
-  },
-  errorCallback(err, globals) {
-    otpGenFailure(err, globals);
-    console.log(`I am in errorCallbackOtpGen ${globals}`);
-  },
-  path: urlPath('/content/hdfc_ccforms/api/customeridentificationV4.json'),
-  loadingText: 'Please wait while we are authenticating you',
 };
 
 /**
@@ -448,123 +358,6 @@ const showErrorPanel = (panels, errorText) => {
 };
 
 /**
- * Handles the failure scenario for OTP Validation.
- * @param {any} res  - The response object containing the OTP success generation response.
- * @param {Object} globals - globals variables object containing form configurations.
- */
-const otpValFailure = (res, globals) => {
-  const pannel = {
-    // declare parent panel -- common name defining
-    welcome: globals.form.loginPanel.welcomeTextLabel,
-    login: globals.form.loginPanel,
-    otp: globals.form.otpPanel,
-    otpButton: globals.form.getOTPbutton,
-    ccWizardView: globals.form.corporateCardWizardView,
-    resultPanel: globals.form.resultPanel,
-    incorrectOtpText: globals.form.incorrectOTPText,
-    errorPanelLabel: globals.form.resultPanel.errorResultPanel,
-  };
-  currentFormContext.isCustomerIdentified =		res?.customerIdentificationResponse?.CustomerIdentificationResponse?.errorCode === '0' ? 'Y' : 'N';
-  // const welcomeTxt = formUtil(globals, pannel.welcome);
-  const otpPanel = formUtil(globals, pannel.otp);
-  const otpBtn = formUtil(globals, pannel.otpButton);
-  const loginPanel = formUtil(globals, pannel.login);
-  const resultPanel = formUtil(globals, pannel.resultPanel);
-  const incorectOtp = formUtil(globals, pannel.incorrectOtpText);
-  const otpNumFormName = 'otpNumber'; // constantName-otpNumberfieldName
-  const otpFieldinp = formUtil(globals, pannel.otp?.[`${otpNumFormName}`]);
-  const resultSetErrorText1 = formUtil(globals, pannel.errorPanelLabel.resultSetErrorText1);
-  const resultSetErrorText2 = formUtil(globals, pannel.errorPanelLabel.resultSetErrorText2);
-  const tryAgainButtonErrorPanel = formUtil(globals, pannel.errorPanelLabel.tryAgainButtonErrorPanel);
-  /* startCode- switchCase otp-error-scenarios- */
-  switch (res?.otpValidationResponse?.errorCode) {
-    case '02': {
-      // incorrect otp
-      otpFieldinp.setValue('');
-      incorectOtp.visible(true);
-      const otpNumbrQry = document.getElementsByName(otpNumFormName)?.[0];
-      otpNumbrQry?.addEventListener('input', (e) => {
-        if (e.target.value) {
-          incorectOtp.visible(false);
-        }
-      });
-      break;
-    }
-    case '04': {
-      // incorrect otp attempt of 3 times.
-      // const panels = {
-      //   hidePanels: [incorectOtp, welcomeTxt, otpBtn, loginPanel, otpPanel, resultSetErrorText1, resultSetErrorText2],
-      //   showPanels: [resultPanel, tryAgainButtonErrorPanel],
-      // };
-      const panels = {
-        hidePanels: [incorectOtp, otpBtn, loginPanel, otpPanel, resultSetErrorText1, resultSetErrorText2],
-        showPanels: [resultPanel, tryAgainButtonErrorPanel],
-      };
-      const errorText = 'You have entered invalid OTP for 3 consecutive attempts. Please try again later';
-      showErrorPanel(panels, errorText);
-      const reloadBtn = document.getElementsByName('tryAgainButtonErrorPanel')?.[0];
-      reloadBtn.addEventListener('click', () => window.location.reload());
-      break;
-    }
-    case 'CZ_HTTP_0003': {
-      // const panels = {
-      //   hidePanels: [incorectOtp, welcomeTxt, otpBtn, loginPanel, otpPanel, resultSetErrorText1, resultSetErrorText2],
-      //   showPanels: [resultPanel],
-      // };
-      const panels = {
-        hidePanels: [incorectOtp, otpBtn, loginPanel, otpPanel, resultSetErrorText1, resultSetErrorText2],
-        showPanels: [resultPanel],
-      };
-      const errorText = 'Unfortunately, we were unable to process your request';
-      changeTextContent(panels, errorText);
-      break;
-    }
-    default: {
-      incorectOtp.visible(false);
-      // welcomeTxt.visible(false);
-      otpBtn.visible(false);
-      loginPanel.visible(false);
-      otpPanel.visible(false);
-      resultPanel.visible(true);
-    }
-  }
-  /* endCode- switchCase otp-error-scenarios- */
-};
-
-const OTPVAL = {
-  getPayload(globals) {
-    const mobileNo = globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value;
-    const panNo = globals.form.loginPanel.identifierPanel.pan.$value;
-    const passwordValue = globals.form.otpPanel.otpNumber.$value;
-    const dob = clearString(globals.form.loginPanel.identifierPanel.dateOfBirth.$value);
-    const jsonObj = {};
-    jsonObj.requestString = {};
-    jsonObj.requestString.mobileNumber = String(mobileNo);
-    jsonObj.requestString.panNumber = String(panNo) ?? '';
-    jsonObj.requestString.dateOfBirth = String(dob) ?? '';
-    jsonObj.requestString.channelSource = '';
-    jsonObj.requestString.dedupeFlag = 'N';
-    jsonObj.requestString.passwordValue = String(passwordValue) ?? '';
-    jsonObj.requestString.referenceNumber = `AD${getTimeStamp(new Date())}` ?? '';
-    jsonObj.requestString.journeyID = currentFormContext.journeyID;
-    jsonObj.requestString.journeyName = currentFormContext.journeyName;
-    jsonObj.requestString.userAgent = window.navigator.userAgent;
-    return jsonObj;
-  },
-  successCallback(res, globals) {
-    return res?.demogResponse?.errorCode === '0' && res?.otpValidationResponse?.errorCode === '0'
-      ? otpValSuccess(res, globals)
-      : otpValFailure(res, globals);
-  },
-  errorCallback(err, globals) {
-    otpValFailure(err, globals);
-    console.log(`I am in errorCallback_OtpFailure ${globals}`);
-  },
-  path: urlPath('/content/hdfc_cc_unified/api/otpValFetchAssetDemog.json'),
-  loadingText: 'Please wait while we are authenticating you',
-};
-
-/**
  * Handles the success scenario for OTP Validation.
  * @param {any} res  - The response object containing the OTP success generation response.
  * @param {Object} globals - globals variables object containing form configurations.
@@ -666,43 +459,6 @@ const getThisCard = (globals) => {
  * Moves the wizard view to the "confirmAndSubmitPanel" step.
  */
 const getAddressDetails = () => moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
-
-/**
- * Resends OTP success handler.
- * @param {any} res  - The response object containing the OTP success generation response.
- * @param {Object} globals - globals variables object containing form configurations.
- */
-const resendOtpSuccess = (res, globals) => {
-  const pannel = globals.form.otpPanel;
-  const resendBtn = formUtil(globals, pannel.otpResend);
-  const maxAttemptText = formUtil(globals, pannel.maxAttemptText);
-  OTPGEN.successCallback(res, globals);
-  resendOtpCount -= 1;
-  const existCountString = 3;
-  const attemptLeft = pannel.maxAttemptText.$value?.replace(/\d\/\d|\d/, `${resendOtpCount}/${existCountString}`);
-  maxAttemptText.setValue(attemptLeft);
-  if (!resendOtpCount) {
-    // resendBtn.enabled(false); // disabling functionality button willl exist in DOM
-    resendBtn.visible(false); // button will not exist in DOM
-    const errMsg = document.querySelector('.field-otpsubpanel');
-    errMsg.classList.remove('col-6');
-    errMsg.classList.add('col-12');
-  }
-};
-
-const RESENDOTP = {
-  getPayload(globals) {
-    return OTPGEN.getPayload(globals);
-  },
-  successCallback(res, globals) {
-    return resendOtpSuccess(res, globals);
-  },
-  errorCallback(err, globals) {
-    return OTPGEN.errorCallback(err, globals);
-  },
-  path: OTPGEN.path,
-  loadingText: 'Please wait otp sending again...',
-};
 
 /**
  * Enables a form field by removing the 'wrapper-disabled' class and adding the 'error-field' class.
@@ -1187,9 +943,6 @@ const finalDap = (globals) => {
 };
 
 export {
-  OTPGEN,
-  OTPVAL,
-  RESENDOTP,
   getThisCard,
   prefillForm,
   currentFormContext,
