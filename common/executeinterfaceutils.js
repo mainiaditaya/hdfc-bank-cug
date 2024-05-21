@@ -437,6 +437,11 @@ const executeInterfaceApiFinal = (globals) => {
   restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
 };
 
+/**
+ * @name executeInterfaceApi
+ * @param {object} globals
+ * @return {PROMISE}
+ */
 const executeInterfaceApi = (globals) => {
   const executeInterfaceRequest = createExecuteInterfaceRequestObj(globals);
   currentFormContext.executeInterfaceReqObj = { ...executeInterfaceRequest };
@@ -444,13 +449,23 @@ const executeInterfaceApi = (globals) => {
   return fetchJsonResponse(apiEndPoint, executeInterfaceRequest, 'POST', true);
 };
 
-const ipaRequestApi = (eRefNumber, applicationRefNumber, idTokenJwt, ipaDuration, ipaTimer, globals) => {
+/**
+ * @name ipaRequestApi ipaRequestApi
+ * @param {string} eRefNumber
+ * @param {string} mobileNumber
+ * @param {string} applicationRefNumber
+ * @param {string} idTokenJwt
+ * @param {string} ipaDuration
+ * @param {string} ipaTimer
+ * @return {PROMISE}
+ */
+const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJwt, ipaDuration, ipaTimer) => {
   currentFormContext.ipaDuration = ipaDuration;
   currentFormContext.ipaTimer = ipaTimer;
   currentFormContext.jwtToken = idTokenJwt;
   const ipaRequestObj = {
     requestString: {
-      mobileNumber: globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
+      mobileNumber,
       applRefNumber: applicationRefNumber,
       eRefNumber,
       Id_token_jwt: idTokenJwt,
