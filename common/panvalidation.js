@@ -30,6 +30,30 @@ function validatePan(mobileNumber, panNumber, dob, firstName) {
   return fetchJsonResponse(apiEndPoint, validatePanRequest, 'POST', true);
 }
 
+/**
+* panAPISuccesHandler 
+* @param {string} panStatus
+* @returns {Promise} panResponse 
+*/
+function panAPISuccesHandler(panStatus) {
+  let panSuccess = false;
+  const journeyType = currentFormContext?.journeyType;
+  const restrictedStatus = ['D', 'ED', 'X', 'F'];
+  if (panStatus === 'E') {
+    panSuccess = true;
+  } else if (journeyType === 'ETB' && !restrictedStatus.includes(panStatus)) {
+    panSuccess = true;
+  }
+
+  debugger;
+  let returnObj = {
+    panSuccess,
+  }
+  console.log(JSON.stringify(returnObj));
+  return returnObj;
+}
+
 export {
   validatePan,
+  panAPISuccesHandler,
 };

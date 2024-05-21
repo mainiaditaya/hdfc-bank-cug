@@ -12,7 +12,10 @@ import {
 } from '../creditcards/corporate-creditcardFunctions.js';
 import { urlPath, santizedFormData, getTimeStamp } from './formutils.js';
 import { fetchJsonResponse } from './makeRestAPI.js';
-import { validatePan } from './panvalidation.js';
+import { 
+  validatePan,
+  panAPISuccesHandler, 
+} from './panvalidation.js';
 
 /**
  * @name checkMode - check the location
@@ -277,4 +280,5 @@ export {
   otpValHandler,
   customSetFocus,
   validatePan,
+  panAPISuccesHandler,
 };

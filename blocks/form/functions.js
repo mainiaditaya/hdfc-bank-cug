@@ -14,9 +14,10 @@ import {
   otpValHandler,
   customSetFocus,
   validatePan,
+  panAPISuccesHandler,
 } from '../../common/functions.js';
 
-import { invokeJourneyDropOff, journeyResponseHandler, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
+import { invokeJourneyDropOff, journeyResponseHandler, invokeJourneyDropOffUpdate, currentFormContext } from '../../common/journey-utils.js';
 import { moveWizardView } from '../../common/formutils.js';
 import { setPageDetails } from '../../common/analytics.js';
 
@@ -125,6 +126,15 @@ function days(endDate, startDate) {
   return Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 }
 
+/**
+ * getFormContext - returns form context.
+ * @returns {object} currentFormContext
+ */
+function getFormContext(){
+  console.log(currentFormContext);
+  return currentFormContext;
+}
+
 // eslint-disable-next-line import/prefer-default-export
 export {
   getFullName,
@@ -149,4 +159,6 @@ export {
   otpValHandler,
   customSetFocus,
   validatePan,
+  getFormContext,
+  panAPISuccesHandler,
 };
