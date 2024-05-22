@@ -35,6 +35,7 @@ function sendGenericClickEvent(linkName, linkType, formContext) {
   };
   digitalData.user.journeyID = formContext.journeyID;
   digitalData.user.journeyState = formContext?.journeyState;
+  digitalData.event = {};
   window.digitalData = digitalData || {};
   _satellite.track('event');
 }
@@ -48,11 +49,13 @@ function sendGenericClickEvent(linkName, linkType, formContext) {
  * @param {object} formContext
  */
 function sendOtpClickEvent(phone, validationType, linkName, linkType, formContext) {
+  sendGenericClickEvent(linkName, linkType, formContext);
   digitalData.event = {
     phone,
     validationMethod: validationType === '0' ? 'DOB' : 'PAN',
   };
-  sendGenericClickEvent(linkName, linkType, formContext);
+  window.digitalData = digitalData || {};
+  _satellite.track('submit');
 }
 
 /**
