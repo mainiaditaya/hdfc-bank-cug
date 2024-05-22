@@ -23,8 +23,7 @@ import {
   invokeJourneyDropOff, journeyResponseHandler, invokeJourneyDropOffUpdate, currentFormContext,
 } from '../../common/journey-utils.js';
 import { moveWizardView } from '../../common/formutils.js';
-import { 
-  sendPageloadEvent,
+import {
   sendOtpClickEvent,
   sendGenericClickEvent,
 } from '../../common/analytics.js';
@@ -147,7 +146,6 @@ function getFormContext() {
  * @returns {Promise} currentFormContext
  */
 function getWrappedFormContext() {
-  debugger;
   const formContext = {
     formContext: currentFormContext,
   };

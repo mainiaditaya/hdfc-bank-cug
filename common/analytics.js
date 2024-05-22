@@ -19,7 +19,6 @@ const digitalData = {
   },
 };
 
-
 /**
  * send analytics call for click event
  * @name sendGenericEvent
