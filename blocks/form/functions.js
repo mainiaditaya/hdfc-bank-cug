@@ -28,7 +28,6 @@ import {
   sendSubmitClickEvent,
   sendGenericClickEvent,
 } from '../../common/analytics.js';
-import { setPageDetails } from '../../common/analytics.js';
 import { hideLoaderGif } from '../../common/makeRestAPI.js';
 
 /**
