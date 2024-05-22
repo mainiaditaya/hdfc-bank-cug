@@ -63,24 +63,25 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
  * @param {string} state
  * @param {string} mobileNumber
  * @param {string} linkName
+ * @param {Object} formContext
  * @param {Object} globals - globals variables object containing form configurations.
  * @returns {Promise}
  */
-const invokeJourneyDropOffUpdate = async (state, mobileNumber, linkName, globals) => {
-  currentFormContext.journeyState = state;
-  const sanitizedFormData = santizedFormDataWithContext(globals, currentFormContext);
+const invokeJourneyDropOffUpdate = async (state, mobileNumber, linkName, formContext, globals) => {
+  formContext.journeyState = state;
+  const sanitizedFormData = santizedFormDataWithContext(globals, formContext);
   sendSubmitClickEvent(mobileNumber, linkName, sanitizedFormData);
   const journeyJSONObj = {
     RequestPayload: {
       userAgent: window.navigator.userAgent,
       leadProfile: {
         mobileNumber,
-        leadProfileId: sanitizedFormData?.currentFormContext.leadProfile,
+        leadProfileId: formContext.leadProfile,
       },
       formData: {
         channel: 'ADOBE_WEBFORMS',
-        journeyName: currentFormContext.journeyName,
-        journeyID: currentFormContext.journeyID,
+        journeyName: formContext.journeyName,
+        journeyID: formContext.journeyID,
         journeyStateInfo: [
           {
             state,
