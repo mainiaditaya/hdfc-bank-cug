@@ -31,6 +31,7 @@ const currentFormContext = {};
  * @param {Object} globals - globals variables object containing form configurations.
  */
 const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
+  currentFormContext.journeyState = state;
   const journeyJSONObj = {
     RequestPayload: {
       userAgent: (typeof window !== 'undefined') ? window.navigator.userAgent : 'onLoad',
@@ -64,6 +65,7 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
  * @returns {Promise}
  */
 const invokeJourneyDropOffUpdate = async (state, mobileNumber, globals) => {
+  currentFormContext.journeyState = state;
   const journeyJSONObj = {
     RequestPayload: {
       userAgent: window.navigator.userAgent,
