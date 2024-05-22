@@ -13,8 +13,9 @@ function displayLoader(loadingText) {
 
 /**
  * Hides the loader.
+ * @return {PROMISE}
  */
-function hideLoader() {
+function hideLoaderGif() {
   const bodyContainer = document.querySelector('.appear');
   bodyContainer.classList.remove('preloader');
   if (bodyContainer.hasAttribute('loader-text')) {
@@ -42,7 +43,7 @@ function fetchJsonResponse(url, payload, method, loader = false) {
     },
   })
     .then((res) => {
-      if (loader) hideLoader();
+      if (loader) hideLoaderGif();
       return res.json();
     });
 }
@@ -70,7 +71,7 @@ function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = 
       const response = res.json();
       const ipaResult = response?.ipa?.ipaResult;
       if (ipaResult && ipaResult !== '' && ipaResult !== 'null' && ipaResult !== 'undefined') {
-        if (loader) hideLoader();
+        if (loader) hideLoaderGif();
         return response;
       }
       const elapsedTime = (Date.now() - startTime) / 1000;
@@ -78,8 +79,9 @@ function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = 
         setTimeout(() => {
           fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, true, startTime);
         }, ipaTimer * 1000);
+      } else {
+        return response;
       }
-      return response;
     });
 }
 
@@ -124,13 +126,13 @@ function restAPICall(globals, method, payload, path, successCallback, errorCallb
   getJsonResponse(path, payload, method)
     .then((res) => {
       if (res) {
-        hideLoader();
+        hideLoaderGif();
         successCallback(res, globals);
       }
     })
     .catch((err) => {
       // errorMethod
-      hideLoader();
+      hideLoaderGif();
       errorCallback(err, globals);
     });
 }
@@ -139,7 +141,7 @@ export {
   restAPICall,
   getJsonResponse,
   displayLoader,
-  hideLoader,
+  hideLoaderGif,
   fetchJsonResponse,
   fetchIPAResponse,
 };

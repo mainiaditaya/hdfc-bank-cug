@@ -10,9 +10,9 @@ import { currentFormContext } from './journey-utils.js';
 import {
   restAPICall,
   getJsonResponse,
-  hideLoader,
   fetchJsonResponse,
   fetchIPAResponse,
+  hideLoaderGif,
 } from './makeRestAPI.js';
 
 const GENDER_MAP = {
@@ -223,7 +223,7 @@ const listNameOnCard = (globals) => {
  * @param {object} globals - globals variables object containing form configurations.
  */
 const journeyTerminate = (globals) => {
-  hideLoader();
+  hideLoaderGif();
   const resultPanel = formUtil(globals, globals.form.resultPanel);
   const wizardPanel = formUtil(globals, globals.form.corporateCardWizardView);
   wizardPanel.visible(false);
@@ -252,7 +252,7 @@ const journeyResume = (globals, response) => {
   cardBenefitsTextField0.setValue(response.productEligibility.productDetails[0].keyBenefits[0]);
   cardBenefitsTextField1.setValue(response.productEligibility.productDetails[0].keyBenefits[1]);
   cardBenefitsTextField2.setValue(response.productEligibility.productDetails[0].keyBenefits[2]);
-  hideLoader();
+  hideLoaderGif();
   listNameOnCard(globals);
 };
 
@@ -261,7 +261,7 @@ const journeyResume = (globals, response) => {
  * @param {object} globals - globals variables object containing form configurations.
  */
 const journeyRestart = (globals) => {
-  hideLoader();
+  hideLoaderGif();
   const { resultPanel, corporateCardWizardView, resultPanel: { errorResultPanel } } = globals.form;
   const ccView = formUtil(globals, corporateCardWizardView);
   const resultScr = formUtil(globals, resultPanel);
@@ -440,14 +440,17 @@ const executeInterfaceApiFinal = (globals) => {
 
 /**
  * @name executeInterfaceApi
+ * @param {boolean} showLoader
+ * @param {boolean} hideLoader
  * @param {object} globals
  * @return {PROMISE}
  */
-const executeInterfaceApi = (globals) => {
+const executeInterfaceApi = (showLoader, hideLoader, globals) => {
   const executeInterfaceRequest = createExecuteInterfaceRequestObj(globals);
   currentFormContext.executeInterfaceReqObj = { ...executeInterfaceRequest };
   const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/executeinterface.json');
-  return fetchJsonResponse(apiEndPoint, executeInterfaceRequest, 'POST', true);
+  if (showLoader) currentFormContext.executeInterface();
+  return fetchJsonResponse(apiEndPoint, executeInterfaceRequest, 'POST', hideLoader);
 };
 
 /**
@@ -458,9 +461,11 @@ const executeInterfaceApi = (globals) => {
  * @param {string} idTokenJwt
  * @param {string} ipaDuration
  * @param {string} ipaTimer
+ * @param {boolean} showLoader
+ * @param {boolean} hideLoader
  * @return {PROMISE}
  */
-const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJwt, ipaDuration, ipaTimer) => {
+const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJwt, ipaDuration, ipaTimer, showLoader, hideLoader) => {
   currentFormContext.ipaDuration = ipaDuration;
   currentFormContext.ipaTimer = ipaTimer;
   currentFormContext.jwtToken = idTokenJwt;
@@ -478,7 +483,8 @@ const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJw
   };
   TOTAL_TIME = 0;
   const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/ipa.json');
-  return fetchIPAResponse(apiEndPoint, ipaRequestObj, 'POST', ipaDuration, ipaTimer, true);
+  if (showLoader) currentFormContext?.ipa.dispalyLoader();
+  return fetchIPAResponse(apiEndPoint, ipaRequestObj, 'POST', ipaDuration, ipaTimer, hideLoader);
 };
 
 export {
