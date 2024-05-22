@@ -31,33 +31,20 @@ function hideLoaderGif() {
 * @param {object} payload - The data payload to send with the request.
 * @returns {*} - The JSON response from the server.
 */
-function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = false, startTime = Date.now()) {
+function fetchJsonResponse(url, payload, method, loader = false) {
+  // apiCall-fetch
   return fetch(url, {
     method,
     body: payload ? JSON.stringify(payload) : null,
     mode: 'cors',
     headers: {
-      'Content-Type': 'text/plain',
+      'Content-type': 'text/plain',
       Accept: 'application/json',
     },
   })
-    .then((res) => res.json())
-    .then((response) => {
-      const ipaResult = response?.ipa?.ipaResult;
-      if (ipaResult && ipaResult !== '' && ipaResult !== 'null' && ipaResult !== 'undefined') {
-        if (loader) hideLoader();
-        return response;
-      }
-      const elapsedTime = (Date.now() - startTime) / 1000;
-      if (elapsedTime < parseInt(ipaDuration, 10)) {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve(fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, true, startTime));
-          }, ipaTimer * 1000);
-        });
-      } else {
-        return response;
-      }
+    .then((res) => {
+      if (loader) hideLoaderGif();
+      return res.json();
     });
 }
 
@@ -70,7 +57,6 @@ function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = 
 * @returns {*} - The JSON response from the server.
 */
 function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = false, startTime = Date.now()) {
-  // apiCall-fetch
   return fetch(url, {
     method,
     body: payload ? JSON.stringify(payload) : null,
@@ -95,6 +81,7 @@ function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = 
           }, ipaTimer * 1000);
         });
       }
+      return response;
     });
 }
 
