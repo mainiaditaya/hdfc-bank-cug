@@ -208,7 +208,10 @@ const createExecuteInterfaceRequestObj = (globals) => {
  */
 const listNameOnCard = (globals) => {
   const elementNameSelect = 'nameOnCardDropdown';
-  const { firstName, middleName, lastName } = currentFormContext.customerName;
+  const { personalDetails } = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage;
+  const firstName = personalDetails.firstName.$value;
+  const middleName = personalDetails.middleName.$value;
+  const lastName = personalDetails.lastName.$value;
   const dropDownSelectField = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown;
   const options = composeNameOption(firstName, middleName, lastName);
   const initialValue = options[0]?.value;
@@ -514,7 +517,7 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
     const benefitsTextField = formUtil(globals, benefitsPanel[key]);
     benefitsTextField.setValue(firstProductDetail.keyBenefits[index]);
   });
-
+  hideLoaderGif();
   listNameOnCard(globals);
 };
 
