@@ -24,7 +24,7 @@ import {
 } from '../../common/journey-utils.js';
 import { moveWizardView } from '../../common/formutils.js';
 import {
-  sendOtpClickEvent,
+  sendSubmitClickEvent,
   sendGenericClickEvent,
 } from '../../common/analytics.js';
 
@@ -180,6 +180,6 @@ export {
   executeInterfaceApi,
   ipaRequestApi,
   sendGenericClickEvent,
-  sendOtpClickEvent,
+  sendSubmitClickEvent,
   getWrappedFormContext,
 };

@@ -2,6 +2,7 @@
 
 import { santizedFormDataWithContext } from './formutils.js';
 import { fetchJsonResponse } from './makeRestAPI.js';
+import { sendSubmitClickEvent } from './analytics.js';
 
 function generateUUID() {
   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16));
@@ -61,17 +62,20 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
  * @name invokeJourneyDropOffUpdate to log on success and error call backs of api calls.
  * @param {string} state
  * @param {string} mobileNumber
+ * @param {string} linkName
  * @param {Object} globals - globals variables object containing form configurations.
  * @returns {Promise}
  */
-const invokeJourneyDropOffUpdate = async (state, mobileNumber, globals) => {
+const invokeJourneyDropOffUpdate = async (state, mobileNumber, linkName, globals) => {
   currentFormContext.journeyState = state;
+  const sanitizedFormData = santizedFormDataWithContext(globals, currentFormContext);
+  sendSubmitClickEvent(mobileNumber, linkName, sanitizedFormData);
   const journeyJSONObj = {
     RequestPayload: {
       userAgent: window.navigator.userAgent,
       leadProfile: {
         mobileNumber,
-        leadProfileId: currentFormContext.leadProfile,
+        leadProfileId: sanitizedFormData?.currentFormContext.leadProfile,
       },
       formData: {
         channel: 'ADOBE_WEBFORMS',
@@ -80,7 +84,7 @@ const invokeJourneyDropOffUpdate = async (state, mobileNumber, globals) => {
         journeyStateInfo: [
           {
             state,
-            stateInfo: JSON.stringify(santizedFormDataWithContext(globals, currentFormContext)),
+            stateInfo: JSON.stringify(sanitizedFormData),
             timeinfo: new Date().toISOString(),
           },
         ],
