@@ -62,12 +62,12 @@ function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = 
     body: payload ? JSON.stringify(payload) : null,
     mode: 'cors',
     headers: {
-      'Content-type': 'text/plain',
+      'Content-Type': 'text/plain',
       Accept: 'application/json',
     },
   })
-    .then((res) => {
-      const response = res.json();
+    .then((res) => res.json())
+    .then((response) => {
       const ipaResult = response?.ipa?.ipaResult;
       if (ipaResult && ipaResult !== '' && ipaResult !== 'null' && ipaResult !== 'undefined') {
         if (loader) hideLoader();
@@ -75,9 +75,11 @@ function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = 
       }
       const elapsedTime = (Date.now() - startTime) / 1000;
       if (elapsedTime < parseInt(ipaDuration, 10)) {
-        setTimeout(() => {
-          fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, true, startTime);
-        }, ipaTimer * 1000);
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, true, startTime));
+          }, ipaTimer * 1000);
+        });
       }
       return response;
     });
