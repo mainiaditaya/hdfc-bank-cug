@@ -34,6 +34,8 @@ import {
   displayLoader, hideLoaderGif,
 } from '../common/makeRestAPI.js';
 
+import { sendPageloadEvent } from '../common/analytics.js';
+
 // Initialize all Corporate Card Journey Context Variables.
 const journeyName = 'CORPORATE_CARD_JOURNEY';
 currentFormContext.journeyID = createJourneyId('a', 'b', 'c');
