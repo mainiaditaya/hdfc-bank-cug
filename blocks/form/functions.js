@@ -23,7 +23,10 @@ import {
   invokeJourneyDropOff, journeyResponseHandler, invokeJourneyDropOffUpdate, currentFormContext,
 } from '../../common/journey-utils.js';
 import { moveWizardView } from '../../common/formutils.js';
-import { setPageDetails } from '../../common/analytics.js';
+import {
+  sendOtpClickEvent,
+  sendGenericClickEvent,
+} from '../../common/analytics.js';
 
 /**
  * Get Full Name
@@ -132,10 +135,21 @@ function days(endDate, startDate) {
 
 /**
  * getFormContext - returns form context.
- * @returns {object} currentFormContext
+ * @returns {Promise} currentFormContext
  */
 function getFormContext() {
   return currentFormContext;
+}
+
+/**
+ * getWrappedFormContext - returns form context.
+ * @returns {Promise} currentFormContext
+ */
+function getWrappedFormContext() {
+  const formContext = {
+    formContext: currentFormContext,
+  };
+  return formContext;
 }
 
 // eslint-disable-next-line import/prefer-default-export
@@ -158,7 +172,6 @@ export {
   moveWizardView,
   checkMode,
   invokeJourneyDropOffUpdate,
-  setPageDetails,
   otpValHandler,
   customSetFocus,
   validatePan,
@@ -166,4 +179,7 @@ export {
   panAPISuccesHandler,
   executeInterfaceApi,
   ipaRequestApi,
+  sendGenericClickEvent,
+  sendOtpClickEvent,
+  getWrappedFormContext,
 };

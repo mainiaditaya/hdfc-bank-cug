@@ -15,15 +15,15 @@ function validateDob(){
 }
 
 function validationPan(){
-    // PAN logic for alphanumeric character with defined sequence of characters
+  // PAN logic for alphanumeric character with defined sequence of characters
 }
 
 /**
  * validatePan - creates PAN validation request and executes API.
- * @param {string} mobileNumber 
- * @param {string} panNumber 
- * @param {object} dob 
- * @param {string} firstName 
+ * @param {string} mobileNumber
+ * @param {string} panNumber
+ * @param {object} dob
+ * @param {string} firstName
  * @return {PROMISE} - pan validation response
  */
 function validatePan(mobileNumber, panNumber, dob, firstName){
@@ -31,32 +31,32 @@ function validatePan(mobileNumber, panNumber, dob, firstName){
 
 
 function resendOTP(){
-    // triggers OTP Generate call,
+  // triggers OTP Generate call,
 }
 
 
-function checkOffer(firstName,middleName,lastName){
+function checkOffer(firstName, middleName, lastName){
 
-    // triggers Offer check API 
+  // triggers Offer check API
 }
 function getAddressDetails(){
-    // based of the offer response and product codes recieved, 
-    // renders the specific card and card features
+  // based of the offer response and product codes recieved,
+  // renders the specific card and card features
 }
 
 function getThisCard(){
-    // Triggers card acquisition API 
+  // Triggers card acquisition API
 }
 
 function getJoiningFee(){
-    // Triggers joining fee API 
+  // Triggers joining fee API
 }
 
 /**
 * pre-fills form
 */
 function prefillForm(){
-    // Triggers form Prefill. 
+  // Triggers form Prefill.
 }
 
 
@@ -92,7 +92,7 @@ function getFormContext(){
 }
 
 /**
-* panAPISuccesHandler 
+* panAPISuccesHandler
 * @param {*} panStatus
 * @returns {PROMISE}
 */
