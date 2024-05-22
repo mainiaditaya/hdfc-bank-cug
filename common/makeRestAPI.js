@@ -13,8 +13,9 @@ function displayLoader(loadingText) {
 
 /**
  * Hides the loader.
+ * @return {PROMISE}
  */
-function hideLoader() {
+function hideLoaderGif() {
   const bodyContainer = document.querySelector('.appear');
   bodyContainer.classList.remove('preloader');
   if (bodyContainer.hasAttribute('loader-text')) {
@@ -30,20 +31,33 @@ function hideLoader() {
 * @param {object} payload - The data payload to send with the request.
 * @returns {*} - The JSON response from the server.
 */
-function fetchJsonResponse(url, payload, method, loader = false) {
-  // apiCall-fetch
+function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = false, startTime = Date.now()) {
   return fetch(url, {
     method,
     body: payload ? JSON.stringify(payload) : null,
     mode: 'cors',
     headers: {
-      'Content-type': 'text/plain',
+      'Content-Type': 'text/plain',
       Accept: 'application/json',
     },
   })
-    .then((res) => {
-      if (loader) hideLoader();
-      return res.json();
+    .then((res) => res.json())
+    .then((response) => {
+      const ipaResult = response?.ipa?.ipaResult;
+      if (ipaResult && ipaResult !== '' && ipaResult !== 'null' && ipaResult !== 'undefined') {
+        if (loader) hideLoader();
+        return response;
+      }
+      const elapsedTime = (Date.now() - startTime) / 1000;
+      if (elapsedTime < parseInt(ipaDuration, 10)) {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, true, startTime));
+          }, ipaTimer * 1000);
+        });
+      } else {
+        return response;
+      }
     });
 }
 
@@ -70,7 +84,7 @@ function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = 
     .then((response) => {
       const ipaResult = response?.ipa?.ipaResult;
       if (ipaResult && ipaResult !== '' && ipaResult !== 'null' && ipaResult !== 'undefined') {
-        if (loader) hideLoader();
+        if (loader) hideLoaderGif();
         return response;
       }
       const elapsedTime = (Date.now() - startTime) / 1000;
@@ -81,7 +95,6 @@ function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = 
           }, ipaTimer * 1000);
         });
       }
-      return response;
     });
 }
 
@@ -126,13 +139,13 @@ function restAPICall(globals, method, payload, path, successCallback, errorCallb
   getJsonResponse(path, payload, method)
     .then((res) => {
       if (res) {
-        hideLoader();
+        hideLoaderGif();
         successCallback(res, globals);
       }
     })
     .catch((err) => {
       // errorMethod
-      hideLoader();
+      hideLoaderGif();
       errorCallback(err, globals);
     });
 }
@@ -141,7 +154,7 @@ export {
   restAPICall,
   getJsonResponse,
   displayLoader,
-  hideLoader,
+  hideLoaderGif,
   fetchJsonResponse,
   fetchIPAResponse,
 };

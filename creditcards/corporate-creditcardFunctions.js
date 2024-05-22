@@ -31,7 +31,7 @@ import {
 import {
   getJsonResponse,
   restAPICall,
-  displayLoader, hideLoader,
+  displayLoader, hideLoaderGif,
 } from '../common/makeRestAPI.js';
 
 // Initialize all Corporate Card Journey Context Variables.
@@ -45,7 +45,11 @@ currentFormContext.errorMessage = '';
 currentFormContext.eligibleOffers = '';
 currentFormContext.getOtpLoader = (typeof window !== 'undefined') ? displayLoader : false;
 currentFormContext.otpValLoader = (typeof window !== 'undefined') ? displayLoader : false;
-currentFormContext.hideLoader = (typeof window !== 'undefined') ? hideLoader : false;
+currentFormContext.validatePanLoader = (typeof window !== 'undefined') ? displayLoader : false;
+currentFormContext.executeInterface = (typeof window !== 'undefined') ? displayLoader : false;
+currentFormContext.ipa = (typeof window !== 'undefined') ? displayLoader : false;
+currentFormContext.aadharInit = (typeof window !== 'undefined') ? displayLoader : false;
+currentFormContext.hideLoader = (typeof window !== 'undefined') ? hideLoaderGif : false;
 
 let PAN_VALIDATION_STATUS = false;
 let PAN_RETRY_COUNTER = 1;

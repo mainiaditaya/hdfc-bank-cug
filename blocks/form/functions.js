@@ -24,6 +24,7 @@ import {
 } from '../../common/journey-utils.js';
 import { moveWizardView } from '../../common/formutils.js';
 import { setPageDetails } from '../../common/analytics.js';
+import { hideLoaderGif } from '../../common/makeRestAPI.js';
 
 /**
  * Get Full Name
@@ -166,4 +167,5 @@ export {
   panAPISuccesHandler,
   executeInterfaceApi,
   ipaRequestApi,
+  hideLoaderGif,
 };
