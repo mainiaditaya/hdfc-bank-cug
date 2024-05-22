@@ -17,6 +17,7 @@ import {
   panAPISuccesHandler,
   executeInterfaceApi,
   ipaRequestApi,
+  ipaSuccessHandler,
 } from '../../common/functions.js';
 
 import {
@@ -168,4 +169,5 @@ export {
   executeInterfaceApi,
   ipaRequestApi,
   hideLoaderGif,
+  ipaSuccessHandler,
 };

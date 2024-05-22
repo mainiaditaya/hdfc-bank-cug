@@ -487,9 +487,41 @@ const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJw
   return fetchIPAResponse(apiEndPoint, ipaRequestObj, 'POST', ipaDuration, ipaTimer, hideLoader);
 };
 
+/**
+ * Handles the successful response for IPA.
+ *
+ * @param {Object} ipa - The ipa prop in response object.
+ * @param {Object} productEligibility - The product eligibility prop in response object.
+ * @param {Object} globals - The global context object containing form and view configurations.
+ */
+const ipaSuccessHandler = (ipa, productEligibility, globals) => {
+  const { productDetails } = productEligibility;
+  const [firstProductDetail] = productDetails;
+
+  currentFormContext.ipaResponse = { ipa, productEligibility };
+  currentFormContext.productDetails = firstProductDetail;
+
+  const imageEl = document.querySelector('.field-cardimage > picture');
+  const imagePath = `https://applyonlinedev.hdfcbank.com${firstProductDetail?.cardTypePath}?width=2000&optimize=medium`;
+
+  imageEl.childNodes[5].setAttribute('src', imagePath);
+  imageEl.childNodes[3].setAttribute('srcset', imagePath);
+  imageEl.childNodes[1].setAttribute('srcset', imagePath);
+
+  const benefitsPanel = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.cardBenefitsFeaturesPanel;
+
+  ['keyBenefitsText0', 'keyBenefitsText1', 'keyBenefitsText2'].forEach((key, index) => {
+    const benefitsTextField = formUtil(globals, benefitsPanel[key]);
+    benefitsTextField.setValue(firstProductDetail.keyBenefits[index]);
+  });
+
+  listNameOnCard(globals);
+};
+
 export {
   customerValidationHandler,
   executeInterfaceApiFinal,
   executeInterfaceApi,
   ipaRequestApi,
+  ipaSuccessHandler,
 };
