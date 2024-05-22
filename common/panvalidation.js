@@ -11,9 +11,11 @@ import { currentFormContext } from './journey-utils.js';
  * @param {string} panNumber
  * @param {object} dob
  * @param {string} firstName
+ * @param {boolean} showLoader
+ * @param {boolean} hideLoader
  * @returns {Promise} - pan validation response
  */
-const validatePan = (mobileNumber, panNumber, dob, firstName) => {
+const validatePan = (mobileNumber, panNumber, dob, firstName, showLoader, hideLoader) => {
   const validatePanRequest = {
     journeyName: currentFormContext.journeyName,
     journeyID: currentFormContext.journeyID,
@@ -25,8 +27,9 @@ const validatePan = (mobileNumber, panNumber, dob, firstName) => {
       name: firstName ? firstName.split(' ')[0] : '',
     },
   };
+  if (showLoader) currentFormContext?.validatePanLoader();
   const apiEndPoint = urlPath('/content/hdfc_forms_common_v2/api/panValNameMatch.json');
-  return fetchJsonResponse(apiEndPoint, validatePanRequest, 'POST', true);
+  return fetchJsonResponse(apiEndPoint, validatePanRequest, 'POST', hideLoader);
 };
 
 /**

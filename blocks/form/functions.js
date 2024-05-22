@@ -17,6 +17,7 @@ import {
   panAPISuccesHandler,
   executeInterfaceApi,
   ipaRequestApi,
+  ipaSuccessHandler,
 } from '../../common/functions.js';
 
 import {
@@ -27,6 +28,8 @@ import {
   sendSubmitClickEvent,
   sendGenericClickEvent,
 } from '../../common/analytics.js';
+import { setPageDetails } from '../../common/analytics.js';
+import { hideLoaderGif } from '../../common/makeRestAPI.js';
 
 /**
  * Get Full Name
@@ -182,4 +185,6 @@ export {
   sendGenericClickEvent,
   sendSubmitClickEvent,
   getWrappedFormContext,
+  hideLoaderGif,
+  ipaSuccessHandler,
 };

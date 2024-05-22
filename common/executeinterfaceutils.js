@@ -10,9 +10,9 @@ import { currentFormContext } from './journey-utils.js';
 import {
   restAPICall,
   getJsonResponse,
-  hideLoader,
   fetchJsonResponse,
   fetchIPAResponse,
+  hideLoaderGif,
 } from './makeRestAPI.js';
 
 const GENDER_MAP = {
@@ -208,7 +208,10 @@ const createExecuteInterfaceRequestObj = (globals) => {
  */
 const listNameOnCard = (globals) => {
   const elementNameSelect = 'nameOnCardDropdown';
-  const { firstName, middleName, lastName } = currentFormContext.customerName;
+  const { personalDetails } = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage;
+  const firstName = personalDetails.firstName.$value;
+  const middleName = personalDetails.middleName.$value;
+  const lastName = personalDetails.lastName.$value;
   const dropDownSelectField = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown;
   const options = composeNameOption(firstName, middleName, lastName);
   const initialValue = options[0]?.value;
@@ -223,7 +226,7 @@ const listNameOnCard = (globals) => {
  * @param {object} globals - globals variables object containing form configurations.
  */
 const journeyTerminate = (globals) => {
-  hideLoader();
+  hideLoaderGif();
   const resultPanel = formUtil(globals, globals.form.resultPanel);
   const wizardPanel = formUtil(globals, globals.form.corporateCardWizardView);
   wizardPanel.visible(false);
@@ -252,7 +255,7 @@ const journeyResume = (globals, response) => {
   cardBenefitsTextField0.setValue(response.productEligibility.productDetails[0].keyBenefits[0]);
   cardBenefitsTextField1.setValue(response.productEligibility.productDetails[0].keyBenefits[1]);
   cardBenefitsTextField2.setValue(response.productEligibility.productDetails[0].keyBenefits[2]);
-  hideLoader();
+  hideLoaderGif();
   listNameOnCard(globals);
 };
 
@@ -261,7 +264,7 @@ const journeyResume = (globals, response) => {
  * @param {object} globals - globals variables object containing form configurations.
  */
 const journeyRestart = (globals) => {
-  hideLoader();
+  hideLoaderGif();
   const { resultPanel, corporateCardWizardView, resultPanel: { errorResultPanel } } = globals.form;
   const ccView = formUtil(globals, corporateCardWizardView);
   const resultScr = formUtil(globals, resultPanel);
@@ -440,14 +443,17 @@ const executeInterfaceApiFinal = (globals) => {
 
 /**
  * @name executeInterfaceApi
+ * @param {boolean} showLoader
+ * @param {boolean} hideLoader
  * @param {object} globals
  * @return {PROMISE}
  */
-const executeInterfaceApi = (globals) => {
+const executeInterfaceApi = (showLoader, hideLoader, globals) => {
   const executeInterfaceRequest = createExecuteInterfaceRequestObj(globals);
   currentFormContext.executeInterfaceReqObj = { ...executeInterfaceRequest };
   const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/executeinterface.json');
-  return fetchJsonResponse(apiEndPoint, executeInterfaceRequest, 'POST', true);
+  if (showLoader) currentFormContext.executeInterface();
+  return fetchJsonResponse(apiEndPoint, executeInterfaceRequest, 'POST', hideLoader);
 };
 
 /**
@@ -458,9 +464,11 @@ const executeInterfaceApi = (globals) => {
  * @param {string} idTokenJwt
  * @param {string} ipaDuration
  * @param {string} ipaTimer
+ * @param {boolean} showLoader
+ * @param {boolean} hideLoader
  * @return {PROMISE}
  */
-const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJwt, ipaDuration, ipaTimer) => {
+const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJwt, ipaDuration, ipaTimer, showLoader, hideLoader) => {
   currentFormContext.ipaDuration = ipaDuration;
   currentFormContext.ipaTimer = ipaTimer;
   currentFormContext.jwtToken = idTokenJwt;
@@ -478,7 +486,39 @@ const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJw
   };
   TOTAL_TIME = 0;
   const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/ipa.json');
-  return fetchIPAResponse(apiEndPoint, ipaRequestObj, 'POST', ipaDuration, ipaTimer, true);
+  if (showLoader) currentFormContext?.ipa.dispalyLoader();
+  return fetchIPAResponse(apiEndPoint, ipaRequestObj, 'POST', ipaDuration, ipaTimer, hideLoader);
+};
+
+/**
+ * Handles the successful response for IPA.
+ *
+ * @param {Object} ipa - The ipa prop in response object.
+ * @param {Object} productEligibility - The product eligibility prop in response object.
+ * @param {Object} globals - The global context object containing form and view configurations.
+ */
+const ipaSuccessHandler = (ipa, productEligibility, globals) => {
+  const { productDetails } = productEligibility;
+  const [firstProductDetail] = productDetails;
+
+  currentFormContext.ipaResponse = { ipa, productEligibility };
+  currentFormContext.productDetails = firstProductDetail;
+
+  const imageEl = document.querySelector('.field-cardimage > picture');
+  const imagePath = `https://applyonlinedev.hdfcbank.com${firstProductDetail?.cardTypePath}?width=2000&optimize=medium`;
+
+  imageEl.childNodes[5].setAttribute('src', imagePath);
+  imageEl.childNodes[3].setAttribute('srcset', imagePath);
+  imageEl.childNodes[1].setAttribute('srcset', imagePath);
+
+  const benefitsPanel = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.cardBenefitsFeaturesPanel;
+
+  ['keyBenefitsText0', 'keyBenefitsText1', 'keyBenefitsText2'].forEach((key, index) => {
+    const benefitsTextField = formUtil(globals, benefitsPanel[key]);
+    benefitsTextField.setValue(firstProductDetail.keyBenefits[index]);
+  });
+  hideLoaderGif();
+  listNameOnCard(globals);
 };
 
 export {
@@ -486,4 +526,5 @@ export {
   executeInterfaceApiFinal,
   executeInterfaceApi,
   ipaRequestApi,
+  ipaSuccessHandler,
 };

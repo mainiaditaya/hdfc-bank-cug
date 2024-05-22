@@ -19,6 +19,7 @@ import {
 import {
   executeInterfaceApi,
   ipaRequestApi,
+  ipaSuccessHandler,
 } from './executeinterfaceutils.js';
 
 /**
@@ -287,4 +288,5 @@ export {
   panAPISuccesHandler,
   executeInterfaceApi,
   ipaRequestApi,
+  ipaSuccessHandler,
 };
