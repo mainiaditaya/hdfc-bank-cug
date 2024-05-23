@@ -58,10 +58,10 @@ main .form {
   input[type='number'] {
     appearance: textfield;
   }
+}
 
-  .date-wrapper .field-description {
-    display: none;
-  }
+.date-wrapper .field-description {
+  display: none;
 }
 
 .passwordField .field-description {

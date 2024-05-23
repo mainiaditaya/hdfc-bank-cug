@@ -26,6 +26,10 @@ footer {
             padding-left: 0;
             padding-right: 0;
         }
+
+        div:nth-child(2) {
+            display: none;
+        }
     }
 
     a {
