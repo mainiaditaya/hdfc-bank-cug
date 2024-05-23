@@ -13,16 +13,13 @@ import {
   checkMode,
   otpValHandler,
   customSetFocus,
-  validatePan,
-  panAPISuccesHandler,
-  executeInterfaceApi,
-  ipaRequestApi,
-  ipaSuccessHandler,
+  invokeJourneyDropOffCall,
+  journeyResponseHandler,
+  currentFormContext,
+  createJourneyId,
+  invokeJourneyDropOffA,
 } from '../../common/functions.js';
 
-import {
-  invokeJourneyDropOff, journeyResponseHandler, invokeJourneyDropOffUpdate, currentFormContext,
-} from '../../common/journey-utils.js';
 import { moveWizardView } from '../../common/formutils.js';
 import {
   sendSubmitClickEvent,
@@ -168,22 +165,18 @@ export {
   validateEmailID,
   currentAddressToggleHandler,
   finalDap,
-  invokeJourneyDropOff,
+  invokeJourneyDropOffCall,
   journeyResponseHandler,
   aadharInit,
   moveWizardView,
   checkMode,
-  invokeJourneyDropOffUpdate,
   otpValHandler,
   customSetFocus,
-  validatePan,
   getFormContext,
-  panAPISuccesHandler,
-  executeInterfaceApi,
-  ipaRequestApi,
   sendGenericClickEvent,
   sendSubmitClickEvent,
   getWrappedFormContext,
   hideLoaderGif,
-  ipaSuccessHandler,
+  createJourneyId,
+  invokeJourneyDropOffA,
 };
