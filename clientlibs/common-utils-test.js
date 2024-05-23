@@ -90,26 +90,38 @@ function panAPISuccesHandler(panStatus) {
 }
 
 /**
-* invokes the journey update call
-* @param {string} state
-* @param {string} mobileNumber
-* @return {PROMISE}
-*/
-function invokeJourneyDropOff(state, mobileNumber){
-}
-
-/**
-* invokes the journey update call
+* Invokes journey APIs
+* @name invokeJourneyDropOffCall
 * @param {string} state
 * @param {string} mobileNumber
 * @param {string} linkName
-* @param {object} formContext
-* @param {object} globals - The global object containing necessary globals form data.
+* @param {string} operation
+* @param {object} globals
 * @return {PROMISE}
 */
-function invokeJourneyDropOffUpdate(state, mobileNumber, linkName, formContext){
+function invokeJourneyDropOffCall(state, mobileNumber, linkName, operation){
 }
 
+/**
+* Invokes journey A
+* @name invokeJourneyDropOffA
+* @param {string} mobileNumber
+* @param {object} globals
+* @return {object}
+*/
+function invokeJourneyDropOffA(mobileNumber){
+}
+
+/**
+* generates the journeyId
+*
+* @param {string} visitMode - The visit mode (e.g., "online", "offline").
+* @param {string} journeyAbbreviation - The abbreviation for the journey.
+* @param {string} channel - The channel through which the journey is initiated.
+* @param {object} globals
+*/
+function createJourneyId(visitMode, journeyAbbreviation, channel) {
+}
 
 
 function pinCodeMaster(){
@@ -119,6 +131,7 @@ function validateEmailID(){
 }
 function currentAddressToggleHandler(){
 }
+
 /**
 * openModal
 * @param {object} arg1 - arg1 from data.
