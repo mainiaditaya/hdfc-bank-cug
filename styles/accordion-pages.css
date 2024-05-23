@@ -76,7 +76,7 @@ li.wizard-menu-active-item::before {
 .field-employmentdetails .field-officeaddresslabel {
   p { 
     margin: 0; 
-    h3 { margin: -20px 0 -10px; }
+    h3 { margin: -10px 0 -5px; }
   }
 }
 
@@ -482,7 +482,7 @@ main .form form .field-corporatecardwizardview.wizard {
       width: 90vw;
       display: block;
 
-      .field-employmentdetails .field-officeaddresslabel { h3 { margin: 0; } }
+      .field-employmentdetails .field-officeaddresslabel { h3 { margin: 15px 0; } }
 
       .panel-wrapper.field-prefilledemploymentdetails { gap: 20px; }
   }
