@@ -18,6 +18,11 @@ import {
   currentFormContext,
   createJourneyId,
   invokeJourneyDropOffA,
+  validatePan,
+  panAPISuccesHandler,
+  executeInterfaceApi,
+  ipaRequestApi,
+  ipaSuccessHandler,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -179,4 +184,9 @@ export {
   hideLoaderGif,
   createJourneyId,
   invokeJourneyDropOffA,
+  validatePan,
+  panAPISuccesHandler,
+  executeInterfaceApi,
+  ipaRequestApi,
+  ipaSuccessHandler,
 };
