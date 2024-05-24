@@ -1,3 +1,4 @@
+/* eslint-disable */
 const ERROR = 'input is invalid type';
 let WINDOW = typeof window === 'object';
 const root = WINDOW ? window : {};

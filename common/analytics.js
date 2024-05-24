@@ -1,5 +1,4 @@
 import data from './analyticsConstants.js';
-import { Sha256 } from './sha.js';
 
 const digitalDataEvent = {
   page: {
@@ -152,8 +151,8 @@ function populateResponse(payload, action) {
 
 /**
  * Send analytics events.
- * @param {object} payload 
- * @param {object} formData 
+ * @param {object} payload
+ * @param {object} formData
  */
 function sendAnalyticsEvent(payload, formData, currentFormContext) {
   debugger;

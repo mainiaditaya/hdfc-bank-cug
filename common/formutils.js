@@ -362,7 +362,7 @@ const santizedFormData = (globaObj) => JSON.parse(JSON.stringify(globaObj.functi
    */
 const santizedFormDataWithContext = (globaObj, currentFormContext) => {
   const formDataPayload = globaObj.functions.exportData()?.form;
-  // formDataPayload.currentFormContext = currentFormContext;
+  formDataPayload.currentFormContext = currentFormContext;
   return JSON.parse(JSON.stringify(formDataPayload));
 };
 

@@ -915,8 +915,6 @@ const finalDap = (globals) => {
   restAPICall('', 'POST', dapRequestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
 };
 
-
-
 /**
  * @name journeyResponseHandler
  * @param {string} payload.
@@ -962,10 +960,6 @@ const prefillForm = (globals) => {
 */
 // eslint-disable-next-line no-unused-vars
 function sendAnalytics(payload, globals) {
-  //const formData = santizedFormDataWithContext(globals);
-  //console.log(formData);
-  debugger;
-  console.log(payload.toString());
   sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
 }
 
