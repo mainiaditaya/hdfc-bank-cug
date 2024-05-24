@@ -27,12 +27,14 @@ import {
   santizedFormData,
   makeFieldInvalid,
   dateFormat,
+  santizedFormDataWithContext,
 } from '../common/formutils.js';
 import {
   getJsonResponse,
   restAPICall,
   displayLoader, hideLoaderGif,
 } from '../common/makeRestAPI.js';
+import { sendAnalyticsEvent } from '../common/analytics.js';
 
 // Initialize all Corporate Card Journey Context Variables.
 const journeyName = 'CORPORATE_CARD_JOURNEY';
@@ -953,6 +955,20 @@ const prefillForm = (globals) => {
   }
 };
 
+/**
+* sendAnalytics
+* @param {string} payload
+* @param {object} globals
+*/
+// eslint-disable-next-line no-unused-vars
+function sendAnalytics(payload, globals) {
+  //const formData = santizedFormDataWithContext(globals);
+  //console.log(formData);
+  debugger;
+  console.log(payload.toString());
+  sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
+}
+
 export {
   getThisCard,
   prefillForm,
@@ -966,4 +982,5 @@ export {
   otpValHandler,
   journeyResponseHandler,
   createJourneyId,
+  sendAnalytics,
 };

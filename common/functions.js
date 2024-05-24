@@ -11,6 +11,7 @@ import {
   otpValHandler,
   journeyResponseHandler,
   createJourneyId,
+  sendAnalytics,
 } from '../creditcards/corporate-creditcardFunctions.js';
 import {
   validatePan,
@@ -64,6 +65,7 @@ function customSetFocus(errorMessage, numRetries, globals) {
  * @return {PROMISE}
  */
 function getOTP(mobileNumber, pan, dob, globals) {
+  currentFormContext.action = 'getOTP';
   currentFormContext.journeyID = globals.form.runtime.journeyId.$value;
   console.log(currentFormContext);
   // currentFormContext.leadProfile = {};
@@ -298,4 +300,5 @@ export {
   executeInterfaceApi,
   ipaRequestApi,
   ipaSuccessHandler,
+  sendAnalytics,
 };

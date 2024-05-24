@@ -1,3 +1,6 @@
+import data from './analyticsConstants.js';
+import { Sha256 } from './sha.js';
+
 const digitalDataEvent = {
   page: {
     pageInfo: {
@@ -21,7 +24,7 @@ const digitalDataEvent = {
   link: {
     linkName: '',
     linkType: '',
-    linkPosition: '',
+    linkPosition: 'form',
   },
   event: {
     phone: '',
@@ -104,11 +107,8 @@ const getValidationMethod = (formContext) => {
  * @param {string} linkName
  * @param {object} formContext
  */
-function sendSubmitClickEvent(phone, linkName, formContext) {
-  const buttonMapping = {
-    getOTP: 'button',
-  };
-  sendGenericClickEvent(linkName, buttonMapping[linkName], formContext);
+function sendSubmitClickEvent(phone, linkName, linkType, formContext, currentFormContext) {
+  sendGenericClickEvent(linkName, linkType, currentFormContext);
   digitalDataEvent.event = {
     phone,
     validationMethod: getValidationMethod(formContext),
@@ -137,10 +137,38 @@ function sendPageloadEvent(formContext) {
   _satellite.track('pageload');
 }
 
+function populateResponse(payload, action) {
+  switch (action) {
+    case 'getOTP': {
+      digitalDataEvent.page.pageInfo.errorCode = '0';
+      digitalDataEvent.page.pageInfo.errorMessage = 'Success';
+      break;
+    }
+    default: {
+      /* empty */
+    }
+  }
+}
+
+/**
+ * Send analytics events.
+ * @param {object} payload 
+ * @param {object} formData 
+ */
+function sendAnalyticsEvent(payload, formData, currentFormContext) {
+  debugger;
+  const apiResponse = JSON.parse(payload || {});
+  const action = currentFormContext?.action;
+  const attributes = data[action];
+  populateResponse(apiResponse, action);
+  sendSubmitClickEvent(formData?.login?.registeredMobileNumber, action, attributes?.linkType, formData, currentFormContext);
+}
+
 export {
   digitalDataEvent,
   digitalDataPageLoad,
   sendPageloadEvent,
   sendSubmitClickEvent,
   sendGenericClickEvent,
+  sendAnalyticsEvent,
 };

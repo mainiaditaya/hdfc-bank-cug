@@ -21,6 +21,7 @@ import {
   executeInterfaceApi,
   ipaRequestApi,
   ipaSuccessHandler,
+  sendAnalytics,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -153,16 +154,6 @@ function getWrappedFormContext() {
     formContext: currentFormContext,
   };
   return formContext;
-}
-
-/**
-* sendAnalytics
-* @param {string} payload
-*/
-// eslint-disable-next-line no-unused-vars
-function sendAnalytics(payload){
-  debugger;
-  console.log(payload.toString());
 }
 
 // eslint-disable-next-line import/prefer-default-export
