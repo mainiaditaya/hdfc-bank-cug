@@ -405,8 +405,8 @@ const setConfirmScrAddressFields = (globalObj) => {
   const etb = currentDetails.currentAddressETB;
   const ntb = currentDetails.currentAddressNTB;
   const employeeDetails = yourDetails.employmentDetails;
-  const confirmAddress = ccWizard.confirmAndSubmitPanel.AddressDeclarationPanel;
-  const ovdNtb = confirmAddress.addressDeclarationOVD.cardDeliveryNTBFlow;
+  const confirmAddress = ccWizard.confirmAndSubmitPanel.addressDeclarationPanel;
+  const addressDeclaration = confirmAddress.addressDeclarationOVD;
   const etbPrefilledAddress = etb.prefilledCurrentAdddress.$value;
   const etbNewCurentAddress = concatObjVals({
     addressLine1: etb.newCurentAddressPanel.newCurentAddressLine1.$value,
@@ -435,9 +435,9 @@ const setConfirmScrAddressFields = (globalObj) => {
   });
   const userCurrentAddress = currentFormContext.journeyType === 'ETB' ? etbCurentAddress : ntbCurrentAddress;
 
-  const officeAddressFieldOVD = formUtil(globalObj, ovdNtb.officeAddressOVD.officeAddressOVDAddress);
+  const officeAddressFieldOVD = formUtil(globalObj, addressDeclaration.officeAddressOVD.officeAddressOVDAddress);
   const kycOfficeAddressField = formUtil(globalObj, confirmAddress.addressDeclarationOffice.officeAddressSelectKYC);
-  const currentAddressFieldOVD = formUtil(globalObj, ovdNtb.currentAddressOVD.currentAddressOVDAddress);
+  const currentAddressFieldOVD = formUtil(globalObj, addressDeclaration.currentAddressOVD.currentAddressOVDAddress);
   const residenceAddressField = formUtil(globalObj, confirmAddress.CurrentAddressDeclaration.currentResidenceAddress);
   const biometricAddressField = formUtil(globalObj, confirmAddress.currentAddressBiometric.currentResidenceAddressBiometricText);
 
@@ -457,9 +457,32 @@ const setConfirmScrAddressFields = (globalObj) => {
  */
 const getThisCard = (globals) => {
   const nameOnCardDropdown =		globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value;
+  const isAddressChanged = currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag === 'Y';
   executeInterfaceApiFinal(globals);
   setConfirmScrAddressFields(globals);
-  moveWizardView('corporateCardWizardView', 'selectKycPaymentPanel');
+  if (!isAddressChanged) {
+    moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
+    const { addressDeclarationPanel } = globals.form.corporateCardWizardView.confirmAndSubmitPanel;
+    const {
+      cardDeliveryAddressPanel,
+      AddressDeclarationAadhar,
+      addressDeclarationOffice,
+      addressDeclarationText1,
+      addressDeclarationText2,
+    } = addressDeclarationPanel;
+    const cardDeliveryAddressPanelUtil = formUtil(globals, cardDeliveryAddressPanel);
+    const AddressDeclarationAadharUtil = formUtil(globals, AddressDeclarationAadhar);
+    const addressDeclarationOfficeUtil = formUtil(globals, addressDeclarationOffice);
+    const addressDeclarationText1Util = formUtil(globals, addressDeclarationText1);
+    const addressDeclarationText2Util = formUtil(globals, addressDeclarationText2);
+    cardDeliveryAddressPanelUtil.visible(false);
+    AddressDeclarationAadharUtil.visible(false);
+    addressDeclarationOfficeUtil.visible(false);
+    addressDeclarationText1Util.visible(false);
+    addressDeclarationText2Util.visible(false);
+  } else {
+    moveWizardView('corporateCardWizardView', 'selectKycPanel');
+  }
 };
 
 /**
