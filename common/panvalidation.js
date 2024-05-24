@@ -57,5 +57,3 @@ export {
   validatePan,
   panAPISuccesHandler,
 };
-
-export default validatePan;

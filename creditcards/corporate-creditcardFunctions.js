@@ -8,8 +8,11 @@
 import {
   createJourneyId, currentFormContext, invokeJourneyDropOff, journeyResponseHandler,
 } from '../common/journey-utils.js';
-import executeCheck from '../common/panutils.js';
-import { customerValidationHandler, executeInterfaceApiFinal } from '../common/executeinterfaceutils.js';
+// import executeCheck from '../common/panutils.js';
+import {
+  // customerValidationHandler,
+  executeInterfaceApiFinal,
+} from '../common/executeinterfaceutils.js';
 import {
   formUtil,
   maskNumber,
@@ -53,11 +56,11 @@ currentFormContext.ipa = (typeof window !== 'undefined') ? displayLoader : false
 currentFormContext.aadharInit = (typeof window !== 'undefined') ? displayLoader : false;
 currentFormContext.hideLoader = (typeof window !== 'undefined') ? hideLoaderGif : false;
 
-let PAN_VALIDATION_STATUS = false;
-let PAN_RETRY_COUNTER = 1;
-const resendOtpCount = 3;
-let IS_ETB_USER = false;
-const CUSTOMER_INPUT = { mobileNumber: '', pan: '', dob: '' };
+// let PAN_VALIDATION_STATUS = false;
+// let PAN_RETRY_COUNTER = 1;
+// const resendOtpCount = 3;
+// let IS_ETB_USER = false;
+// const CUSTOMER_INPUT = { mobileNumber: '', pan: '', dob: '' };
 const CUSTOMER_DEMOG_DATA = {};
 let BRE_DEMOG_RESPONSE = {};
 const ALLOWED_CHARACTERS = '/ -,';
@@ -67,16 +70,16 @@ const ALLOWED_CHARACTERS = '/ -,';
  * @param {String} number - The number to be masked and appended to the container element.
  * @returns {void}
  */
-const appendMaskedNumber = (containerClass, number) => {
-  const otpHelpText = document.getElementsByClassName(containerClass)?.[0];
-  const pElement = otpHelpText?.querySelector('p');
-  const nestedPElement = pElement?.querySelector('p');
-  const maskedNo = `${maskNumber(number, 6)}.`;
-  const newText = document.createTextNode(maskedNo);
-  if (!nestedPElement?.textContent?.includes(maskedNo)) {
-    nestedPElement?.appendChild(newText);
-  }
-};
+// const appendMaskedNumber = (containerClass, number) => {
+//   const otpHelpText = document.getElementsByClassName(containerClass)?.[0];
+//   const pElement = otpHelpText?.querySelector('p');
+//   const nestedPElement = pElement?.querySelector('p');
+//   const maskedNo = `${maskNumber(number, 6)}.`;
+//   const newText = document.createTextNode(maskedNo);
+//   if (!nestedPElement?.textContent?.includes(maskedNo)) {
+//     nestedPElement?.appendChild(newText);
+//   }
+// };
 
 /**
  * Changes the text content of a <p> element inside a pannel with the specified name.
@@ -97,12 +100,12 @@ const changeTextContent = (pannelName, innerContent) => {
 /**
  * removebanner from the landing screen by settin the display property to 'none' to remove the banner
  */
-const removeBanner = () => {
-  const banner = document.querySelector('.cmp-container-container');
-  if (banner) {
-    banner.style.display = 'none';
-  }
-};
+// const removeBanner = () => {
+//   const banner = document.querySelector('.cmp-container-container');
+//   if (banner) {
+//     banner.style.display = 'none';
+//   }
+// };
 
 /**
  * Adds the 'wrapper-disabled' class to the parent elements of inputs or selects within the given panel
@@ -351,17 +354,17 @@ const existingCustomerCheck = (res) => {
   return null;
 };
 
-const showErrorPanel = (panels, errorText) => {
-  const errorTextPannelName = 'errorResultPanel';
-  changeTextContent(errorTextPannelName, errorText);
-  const { hidePanels, showPanels } = panels;
-  hidePanels.forEach((panel) => {
-    panel.visible(false);
-  });
-  showPanels.forEach((panel) => {
-    panel.visible(true);
-  });
-};
+// const showErrorPanel = (panels, errorText) => {
+//   const errorTextPannelName = 'errorResultPanel';
+//   changeTextContent(errorTextPannelName, errorText);
+//   const { hidePanels, showPanels } = panels;
+//   hidePanels.forEach((panel) => {
+//     panel.visible(false);
+//   });
+//   showPanels.forEach((panel) => {
+//     panel.visible(true);
+//   });
+// };
 
 /**
  * Handles the success scenario for OTP Validation.
@@ -378,7 +381,7 @@ const otpValHandler = (response, globals) => {
   currentFormContext.panFromDemog = res?.demogResponse?.BRECheckAndFetchDemogResponse?.VDCUSTITNBR;
   const existingCustomer = existingCustomerCheck(res);
   if (existingCustomer) {
-    IS_ETB_USER = true;
+    // IS_ETB_USER = true;
     currentFormContext.journeyType = 'ETB';
     personalDetailsPreFillFromBRE(res, globals);
   }
@@ -473,11 +476,11 @@ const getAddressDetails = () => moveWizardView('corporateCardWizardView', 'confi
  * @param {string} elementClassName - The class name of the form field element to enable.
  * @returns {void}
  */
-const enableFormField = (elementClassName) => {
-  const selectedElem = document.querySelector(`.${elementClassName}`);
-  selectedElem.classList.remove('wrapper-disabled');
-  selectedElem.classList.add('error-field');
-};
+// const enableFormField = (elementClassName) => {
+//   const selectedElem = document.querySelector(`.${elementClassName}`);
+//   selectedElem.classList.remove('wrapper-disabled');
+//   selectedElem.classList.add('error-field');
+// };
 
 /**
  * Checks the demog data of a customer for PAN details and last name.
@@ -487,32 +490,32 @@ const enableFormField = (elementClassName) => {
  * @property {boolean} proceed - Indicates whether the process can proceed.
  * @property {boolean} terminationCheck - Indicates if a termination check is required.
  */
-const demogDataCheck = (panStatus) => {
-  const result = { proceed: false, terminationCheck: false };
+// const demogDataCheck = (panStatus) => {
+//   const result = { proceed: false, terminationCheck: false };
 
-  // Check if PAN number or last name is missing
-  if (!CUSTOMER_DEMOG_DATA.panNumberPersonalDetails || !CUSTOMER_DEMOG_DATA.lastName) {
-    if (CUSTOMER_DEMOG_DATA.panNumberPersonalDetails) {
-      result.proceed = true;
-    } else if (panStatus === 'E' || panStatus === 'D' || panStatus === 'X' || panStatus === 'F' || panStatus === 'ED') {
-      result.terminationCheck = true;
-      result.proceed = true;
-    } else {
-      PAN_RETRY_COUNTER += 1;
-      if (PAN_RETRY_COUNTER > 3) {
-        result.terminationCheck = true;
-        result.proceed = true;
-      } else {
-        // Enable PAN form field and log retry
-        enableFormField('field-pannumberpersonaldetails');
-        console.log('retry');
-      }
-    }
-  } else {
-    result.proceed = true;
-  }
-  return result;
-};
+//   // Check if PAN number or last name is missing
+//   if (!CUSTOMER_DEMOG_DATA.panNumberPersonalDetails || !CUSTOMER_DEMOG_DATA.lastName) {
+//     if (CUSTOMER_DEMOG_DATA.panNumberPersonalDetails) {
+//       result.proceed = true;
+//     } else if (panStatus === 'E' || panStatus === 'D' || panStatus === 'X' || panStatus === 'F' || panStatus === 'ED') {
+//       result.terminationCheck = true;
+//       result.proceed = true;
+//     } else {
+//       PAN_RETRY_COUNTER += 1;
+//       if (PAN_RETRY_COUNTER > 3) {
+//         result.terminationCheck = true;
+//         result.proceed = true;
+//       } else {
+//         // Enable PAN form field and log retry
+//         enableFormField('field-pannumberpersonaldetails');
+//         console.log('retry');
+//       }
+//     }
+//   } else {
+//     result.proceed = true;
+//   }
+//   return result;
+// };
 
 /**
  * Checks the user's proceed status based on PAN status and other conditions.
@@ -520,44 +523,44 @@ const demogDataCheck = (panStatus) => {
  * @param {string} panStatus - The PAN status ('E', 'D', 'X', 'F', 'ED').
  * @param {Object} globals - The global object containing form and other data.
  */
-const checkUserProceedStatus = (panStatus, globals) => {
-  /**
-	 * Removes error classes from all error fields.
-	 */
-  const errorFields = document.querySelectorAll('.error-field');
-  errorFields.forEach((field) => {
-    field.classList.remove('error-field');
-    field.classList.add('wrapper-disabled');
-  });
+// const checkUserProceedStatus = (panStatus, globals) => {
+//   /**
+// 	 * Removes error classes from all error fields.
+// 	 */
+//   const errorFields = document.querySelectorAll('.error-field');
+//   errorFields.forEach((field) => {
+//     field.classList.remove('error-field');
+//     field.classList.add('wrapper-disabled');
+//   });
 
-  /**
-	 * Executes the check based on PAN status.
-	 */
-  // Main logic to check user proceed status
+//   /**
+// 	 * Executes the check based on PAN status.
+// 	 */
+//   // Main logic to check user proceed status
 
-  const terminationCheck = false;
-  switch (IS_ETB_USER) {
-    case true:
-      if (CUSTOMER_INPUT.pan) {
-        executeCheck(panStatus, terminationCheck, customerValidationHandler, globals);
-      } else if (CUSTOMER_INPUT.dob) {
-        if (!CUSTOMER_DEMOG_DATA.panNumberPersonalDetails || !CUSTOMER_DEMOG_DATA.lastName) {
-          const result = demogDataCheck(panStatus);
-          if (result.proceed) {
-            executeCheck(panStatus, result.terminationCheck, customerValidationHandler, globals);
-          }
-        } else {
-          executeCheck(panStatus, terminationCheck, customerValidationHandler, globals);
-        }
-      }
-      break;
-    case false:
-      executeCheck(panStatus, terminationCheck, customerValidationHandler, globals);
-      break;
-    default:
-      break;
-  }
-};
+//   const terminationCheck = false;
+//   switch (IS_ETB_USER) {
+//     case true:
+//       if (CUSTOMER_INPUT.pan) {
+//         executeCheck(panStatus, terminationCheck, customerValidationHandler, globals);
+//       } else if (CUSTOMER_INPUT.dob) {
+//         if (!CUSTOMER_DEMOG_DATA.panNumberPersonalDetails || !CUSTOMER_DEMOG_DATA.lastName) {
+//           const result = demogDataCheck(panStatus);
+//           if (result.proceed) {
+//             executeCheck(panStatus, result.terminationCheck, customerValidationHandler, globals);
+//           }
+//         } else {
+//           executeCheck(panStatus, terminationCheck, customerValidationHandler, globals);
+//         }
+//       }
+//       break;
+//     case false:
+//       executeCheck(panStatus, terminationCheck, customerValidationHandler, globals);
+//       break;
+//     default:
+//       break;
+//   }
+// };
 
 /**
  * Creates a PAN validation request object and handles success and failure callbacks.
@@ -567,83 +570,83 @@ const checkUserProceedStatus = (panStatus, globals) => {
  * @param {Object} globals - The global object containing necessary data for PAN validation.
  * @returns {Object} - The PAN validation request object.
  */
-const createPanValidationRequest = (firstName, middleName, lastName, globals) => {
-  currentFormContext.customerName = { firstName, middleName, lastName }; // required for listNameOnCard function.
-  const panValidation = {
-    /**
-		 * Create pan validation request object.
-		 * @returns {Object} - The PAN validation request object.
-		 */
-    createRequestObj: () => {
-      try {
-        const personalDetails = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails;
-        const reqObj = {
-          journeyName: currentFormContext.journeyName,
-          journeyID: currentFormContext.journeyID,
-          mobileNumber: globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
-          panInfo: {
-            panNumber:
-							personalDetails.panNumberPersonalDetails.$value !== null
-							  ? personalDetails.panNumberPersonalDetails.$value
-							  : globals.form.loginPanel.identifierPanel.pan.$value,
-            panType: 'P',
-            dob: convertDateToDdMmYyyy(new Date(personalDetails.dobPersonalDetails.$value)),
-            name: personalDetails.firstName.$value ? personalDetails.firstName.$value.split(' ')[0] : '',
-          },
-        };
-        return reqObj;
-      } catch (ex) {
-        return ex;
-      }
-    },
-    /**
-		 * Event handlers for PAN validation.
-		 */
-    eventHandlers: {
-      /**
-			 * Callback function for successful PAN validation response.
-			 * @param {Object} responseObj - The response object containing PAN validation result.
-			 */
-      successCallBack: (responseObj) => {
-        const errStack = {};
-        if (responseObj?.statusCode === 'FC00') {
-          PAN_VALIDATION_STATUS = responseObj.panValidation.status.errorCode === '1';
-          if (PAN_VALIDATION_STATUS) {
-            const panStatus = responseObj.panValidation.panStatus;
-            checkUserProceedStatus(panStatus, globals);
-          } else {
-            errStack.errorText = 'PAN validation unsuccessful.';
-            throw errStack;
-          }
-        } else {
-          errStack.errorText = 'PAN validation API error.';
-          throw errStack;
-        }
-      },
-      /**
-			 * Callback function for failed PAN validation response.
-			 * @param {Object} errorObj - The error object containing details of the failure.
-			 */
-      errorCallBack: (errorObj) => {
-        const ccWizardView = globals.form.corporateCardWizardView;
-        const resultPanel = globals.form.resultPanel;
-        const tryAgainButtonErrorPanel = globals.form.resultPanel.errorResultPanel.tryAgainButtonErrorPanel;
-        const ccWizardViewBlock = formUtil(globals, ccWizardView);
-        const resultPanelBlock = formUtil(globals, resultPanel);
-        const tryAgainButtonErrorPanelBlock = formUtil(globals, tryAgainButtonErrorPanel);
-        const panels = {
-          hidePanels: [ccWizardViewBlock],
-          showPanels: [resultPanelBlock, tryAgainButtonErrorPanelBlock],
-        };
-        showErrorPanel(panels, errorObj?.errorText);
-        const reloadBtn = document.getElementsByName('tryAgainButtonErrorPanel')?.[0];
-        reloadBtn.addEventListener('click', () => window.location.reload());
-      },
-    },
-  };
-  // Call PANValidationAndNameMatchService with PAN validation request and event handlers
-  // PANValidationAndNameMatchService(panValidation.createRequestObj(), panValidation.eventHandlers);
-};
+// const createPanValidationRequest = (firstName, middleName, lastName, globals) => {
+//   currentFormContext.customerName = { firstName, middleName, lastName }; // required for listNameOnCard function.
+//   const panValidation = {
+//     /**
+// 		 * Create pan validation request object.
+// 		 * @returns {Object} - The PAN validation request object.
+// 		 */
+//     createRequestObj: () => {
+//       try {
+//         const personalDetails = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails;
+//         const reqObj = {
+//           journeyName: currentFormContext.journeyName,
+//           journeyID: currentFormContext.journeyID,
+//           mobileNumber: globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
+//           panInfo: {
+//             panNumber:
+// 							personalDetails.panNumberPersonalDetails.$value !== null
+// 							  ? personalDetails.panNumberPersonalDetails.$value
+// 							  : globals.form.loginPanel.identifierPanel.pan.$value,
+//             panType: 'P',
+//             dob: convertDateToDdMmYyyy(new Date(personalDetails.dobPersonalDetails.$value)),
+//             name: personalDetails.firstName.$value ? personalDetails.firstName.$value.split(' ')[0] : '',
+//           },
+//         };
+//         return reqObj;
+//       } catch (ex) {
+//         return ex;
+//       }
+//     },
+//     /**
+// 		 * Event handlers for PAN validation.
+// 		 */
+//     eventHandlers: {
+//       /**
+// 			 * Callback function for successful PAN validation response.
+// 			 * @param {Object} responseObj - The response object containing PAN validation result.
+// 			 */
+//       successCallBack: (responseObj) => {
+//         const errStack = {};
+//         if (responseObj?.statusCode === 'FC00') {
+//           PAN_VALIDATION_STATUS = responseObj.panValidation.status.errorCode === '1';
+//           if (PAN_VALIDATION_STATUS) {
+//             const panStatus = responseObj.panValidation.panStatus;
+//             checkUserProceedStatus(panStatus, globals);
+//           } else {
+//             errStack.errorText = 'PAN validation unsuccessful.';
+//             throw errStack;
+//           }
+//         } else {
+//           errStack.errorText = 'PAN validation API error.';
+//           throw errStack;
+//         }
+//       },
+//       /**
+// 			 * Callback function for failed PAN validation response.
+// 			 * @param {Object} errorObj - The error object containing details of the failure.
+// 			 */
+//       errorCallBack: (errorObj) => {
+//         const ccWizardView = globals.form.corporateCardWizardView;
+//         const resultPanel = globals.form.resultPanel;
+//         const tryAgainButtonErrorPanel = globals.form.resultPanel.errorResultPanel.tryAgainButtonErrorPanel;
+//         const ccWizardViewBlock = formUtil(globals, ccWizardView);
+//         const resultPanelBlock = formUtil(globals, resultPanel);
+//         const tryAgainButtonErrorPanelBlock = formUtil(globals, tryAgainButtonErrorPanel);
+//         const panels = {
+//           hidePanels: [ccWizardViewBlock],
+//           showPanels: [resultPanelBlock, tryAgainButtonErrorPanelBlock],
+//         };
+//         showErrorPanel(panels, errorObj?.errorText);
+//         const reloadBtn = document.getElementsByName('tryAgainButtonErrorPanel')?.[0];
+//         reloadBtn.addEventListener('click', () => window.location.reload());
+//       },
+//     },
+//   };
+//   // Call PANValidationAndNameMatchService with PAN validation request and event handlers
+//   // PANValidationAndNameMatchService(panValidation.createRequestObj(), panValidation.eventHandlers);
+// };
 
 /**
  * logic hanlding during prefill of form.
@@ -953,7 +956,7 @@ export {
   getThisCard,
   prefillForm,
   currentFormContext,
-  createPanValidationRequest,
+  // createPanValidationRequest,
   getAddressDetails,
   pinCodeMaster,
   validateEmailID,
