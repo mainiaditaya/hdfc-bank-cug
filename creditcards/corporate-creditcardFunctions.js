@@ -6,7 +6,7 @@
 /* eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
 import {
-  invokeJourneyDropOff, invokeJourneyDropOffUpdate, journeyResponseHandlerUtil, invokeJourneyDropOffB, currentFormContext, createJourneyId,
+  invokeJourneyDropOff, invokeJourneyDropOffUpdate, journeyResponseHandlerUtil, currentFormContext, createJourneyId, invokeJourneyDropOffByParam,
 } from '../common/journey-utils.js';
 import executeCheck from '../common/panutils.js';
 import { customerValidationHandler, executeInterfaceApiFinal } from '../common/executeinterfaceutils.js';
@@ -361,9 +361,10 @@ const showErrorPanel = (panels, errorText) => {
 };
 
 /**
- * Handles the success scenario for OTP Validation.
- * @param {any} res  - The response object containing the OTP success generation response.
- * @param {Object} globals - globals variables object containing form configurations.
+ * @name otpValHandler
+ * @param {string} res
+ * @param {Object} globals
+ * @return {PROMISE}
  */
 const otpValHandler = (response, globals) => {
   const res = {};
@@ -382,6 +383,7 @@ const otpValHandler = (response, globals) => {
   (async () => {
     const myImportedModule = await import('./cc.js');
     myImportedModule.onWizardInit();
+    return true;
   })();
 };
 
@@ -911,32 +913,7 @@ const finalDap = (globals) => {
   restAPICall('', 'POST', dapRequestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
 };
 
-/**
- * Invokes journey APIs
- * @name invokeJourneyDropOffCall to log on success and error call backs of api calls.
- * @param {string} state
- * @param {string} mobileNumber
- * @param {string} linkName
- * @param {string} operation
- * @param {Object} globals - globals variables object containing form configurations.
- * @returns {Promise}
- */
-const invokeJourneyDropOffCall = async (state, mobileNumber, linkName, operation, globals) => {
-  if (state !== '') {
-    currentFormContext.journeyState = state;
-  }
-  switch (operation) {
-    case 'create': {
-      return invokeJourneyDropOff(mobileNumber, currentFormContext, globals);
-    }
-    case 'update': {
-      return invokeJourneyDropOffUpdate(mobileNumber, linkName, currentFormContext, globals);
-    }
-    default: {
-      return null;
-    }
-  }
-};
+
 
 /**
  * @name journeyResponseHandler
@@ -972,19 +949,9 @@ const prefillForm = (globals) => {
     // show error pannel if corporate credit card details not present
     showPanel?.forEach((panel) => panel.visible(true));
     hidePanel?.forEach((panel) => panel.visible(false));
-    const response = invokeJourneyDropOffCall('CRM_LEAD_FAILURE', '9999999999', '', 'create', globals);
+    const response = invokeJourneyDropOff('CRM_LEAD_FAILURE', '9999999999', '', 'create', globals);
   }
 };
-
-/**
- * @name invokeJourneyDropOff to log on success and error call backs of api calls
- * @param {string} mobileNumber
- * @param {object} currentFormContext
- * @param {object} globals - globals variables object containing form configurations.
- */
-function invokeJourneyDropOffA(mobileNumber, globals) {
-  return invokeJourneyDropOffB(mobileNumber, globals);
-}
 
 export {
   getThisCard,
@@ -998,7 +965,5 @@ export {
   finalDap,
   otpValHandler,
   journeyResponseHandler,
-  invokeJourneyDropOffCall,
   createJourneyId,
-  invokeJourneyDropOffA,
 };

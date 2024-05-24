@@ -9,10 +9,8 @@ import {
   finalDap,
   currentFormContext,
   otpValHandler,
-  invokeJourneyDropOffCall,
   journeyResponseHandler,
   createJourneyId,
-  invokeJourneyDropOffA,
 } from '../creditcards/corporate-creditcardFunctions.js';
 import {
   validatePan,
@@ -292,11 +290,9 @@ export {
   checkMode,
   otpValHandler,
   customSetFocus,
-  invokeJourneyDropOffCall,
   journeyResponseHandler,
   currentFormContext,
   createJourneyId,
-  invokeJourneyDropOffA,
   validatePan,
   panAPISuccesHandler,
   executeInterfaceApi,

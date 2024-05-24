@@ -13,11 +13,9 @@ import {
   checkMode,
   otpValHandler,
   customSetFocus,
-  invokeJourneyDropOffCall,
   journeyResponseHandler,
   currentFormContext,
   createJourneyId,
-  invokeJourneyDropOffA,
   validatePan,
   panAPISuccesHandler,
   executeInterfaceApi,
@@ -31,6 +29,7 @@ import {
   sendGenericClickEvent,
 } from '../../common/analytics.js';
 import { hideLoaderGif } from '../../common/makeRestAPI.js';
+import { invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
 
 /**
  * Get Full Name
@@ -156,6 +155,16 @@ function getWrappedFormContext() {
   return formContext;
 }
 
+/**
+* sendAnalytics
+* @param {string} payload
+*/
+// eslint-disable-next-line no-unused-vars
+function sendAnalytics(payload){
+  debugger;
+  console.log(payload.toString());
+}
+
 // eslint-disable-next-line import/prefer-default-export
 export {
   getFullName,
@@ -170,7 +179,6 @@ export {
   validateEmailID,
   currentAddressToggleHandler,
   finalDap,
-  invokeJourneyDropOffCall,
   journeyResponseHandler,
   aadharInit,
   moveWizardView,
@@ -183,10 +191,13 @@ export {
   getWrappedFormContext,
   hideLoaderGif,
   createJourneyId,
-  invokeJourneyDropOffA,
   validatePan,
   panAPISuccesHandler,
   executeInterfaceApi,
   ipaRequestApi,
   ipaSuccessHandler,
+  invokeJourneyDropOff,
+  invokeJourneyDropOffByParam,
+  invokeJourneyDropOffUpdate,
+  sendAnalytics,
 };
