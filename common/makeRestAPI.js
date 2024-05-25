@@ -1,3 +1,4 @@
+import { getDataEncRequestHeaders, encryptData } from './restAPIDataSecurity.js';
 /**
  * Displays a loader with optional loading text.
  * @param {string} loadingText - The loading text to display (optional).
@@ -32,6 +33,11 @@ function hideLoaderGif() {
 * @returns {*} - The JSON response from the server.
 */
 function fetchJsonResponse(url, payload, method, loader = false) {
+  debugger;
+  encryptData(JSON.stringify(payload), (encDataPack) => {
+    // Build headers
+    let requestHeaders = getDataEncRequestHeaders(encDataPack);
+  });
   // apiCall-fetch
   return fetch(url, {
     method,
