@@ -227,11 +227,12 @@ const aadharConsentConfig = {
       const kycPannel = document.querySelector(`[name=${selecKycDomName}]`);
       kycPannel.setAttribute('data-visible', true);
     }
-    // if (receivedData.aadharConsentAgree) {
-    //   const agreeBtnDomName = 'aadharConsentAgree';
-    //   const agree = document.querySelector(`[name=${agreeBtnDomName}]`);
-    //   // agree.dispatchEvent(new Event('click', { bubbles: false }));
-    // }
+    if (receivedData.aadharConsentAgree) {
+      const aadharCheck = 'aadharConsentCheckbox';
+      const agree = document.querySelector(`[name=${aadharCheck}]`);
+      agree.checked = true;
+      agree.dispatchEvent(new Event('change', { bubbles: true }));
+    }
   },
 };
 linkModalFunction(aadharConsentConfig);
