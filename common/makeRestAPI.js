@@ -1,4 +1,4 @@
-import { getDataEncRequestHeaders, encryptData } from './restAPIDataSecurity.js';
+import { invokeRestAPIWithDataSecurity } from './apiDataSecurity.js';
 /**
  * Displays a loader with optional loading text.
  * @param {string} loadingText - The loading text to display (optional).
@@ -32,26 +32,23 @@ function hideLoaderGif() {
 * @param {object} payload - The data payload to send with the request.
 * @returns {*} - The JSON response from the server.
 */
-function fetchJsonResponse(url, payload, method, loader = false) {
-  debugger;
-  encryptData(JSON.stringify(payload), (encDataPack) => {
-    // Build headers
-    let requestHeaders = getDataEncRequestHeaders(encDataPack);
-  });
-  // apiCall-fetch
-  return fetch(url, {
-    method,
-    body: payload ? JSON.stringify(payload) : null,
-    mode: 'cors',
-    headers: {
-      'Content-type': 'text/plain',
-      Accept: 'application/json',
-    },
+function fetchJsonResponse(url, payload, method) {
+  return invokeRestAPIWithDataSecurity(payload, (responseObj) => {
+    fetch(url, {
+      method,
+      body: responseObj.dataEnc,
+      mode: 'cors',
+      headers: {
+        'Content-type': 'text/plain',
+        Accept: 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .catch((err) => {
+        throw err;
+      });
   })
-    .then((res) => {
-      if (loader) hideLoaderGif();
-      return res.json();
-    });
+    .then((res) => res.json());
 }
 
 /**

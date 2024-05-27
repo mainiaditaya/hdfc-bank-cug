@@ -82,8 +82,8 @@ function getOTP(mobileNumber, pan, dob, globals) {
     },
   };
   const path = urlPath('/content/hdfc_ccforms/api/customeridentificationV4.json');
-  currentFormContext?.getOtpLoader();
-  return fetchJsonResponse(path, jsonObj, 'POST', true);
+
+  return fetchJsonResponse(path, jsonObj, 'POST');
 }
 
 /**
@@ -110,7 +110,7 @@ function otpValidation(mobileNumber, pan, dob, otpNumber) {
   };
   const path = urlPath('/content/hdfc_cc_unified/api/otpValFetchAssetDemog.json');
   currentFormContext?.otpValLoader();
-  return fetchJsonResponse(path, jsonObj, 'POST', true);
+  return fetchJsonResponse(path, jsonObj, 'POST');
 }
 
 function getOS() {

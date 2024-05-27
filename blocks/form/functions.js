@@ -24,7 +24,9 @@ import {
   sendAnalytics,
 } from '../../common/functions.js';
 
-import { moveWizardView } from '../../common/formutils.js';
+import { moveWizardView } from '../../common/formutils.js';  
+import { initRestAPIDataSecurityServiceES6 } from '../../common/apiDataSecurity.js';
+
 import {
   sendSubmitClickEvent,
   sendGenericClickEvent,
@@ -191,4 +193,5 @@ export {
   invokeJourneyDropOffByParam,
   invokeJourneyDropOffUpdate,
   sendAnalytics,
+  initRestAPIDataSecurityServiceES6,
 };
