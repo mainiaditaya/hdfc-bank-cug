@@ -220,6 +220,7 @@ export async function loadRuleEngine(formDef, htmlForm, captcha, genFormRenditio
 }
 
 async function fetchData({ id }) {
+  debugger;
   try {
     const { search = '' } = window.location;
     const url = externalize(`/adobe/forms/af/data/${id}${search}`);

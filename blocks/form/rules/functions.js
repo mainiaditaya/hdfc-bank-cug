@@ -19,6 +19,7 @@ export function toObject(str) {
  * @returns {string} - The externalized URL.
  */
 export function externalize(url) {
+  debugger;
   const submitBaseUrl = getSubmitBaseUrl();
   if (submitBaseUrl) {
     return `${submitBaseUrl}${url}`;
