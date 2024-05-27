@@ -469,17 +469,23 @@ const getThisCard = (globals) => {
       addressDeclarationOffice,
       addressDeclarationText1,
       addressDeclarationText2,
+      addressDeclarationOVD,
     } = addressDeclarationPanel;
+    const { confirmAndSubmitTC2 } = addressDeclarationPanel.tandCPanelConfirmAndSubmit;
     const cardDeliveryAddressPanelUtil = formUtil(globals, cardDeliveryAddressPanel);
     const AddressDeclarationAadharUtil = formUtil(globals, AddressDeclarationAadhar);
     const addressDeclarationOfficeUtil = formUtil(globals, addressDeclarationOffice);
     const addressDeclarationText1Util = formUtil(globals, addressDeclarationText1);
     const addressDeclarationText2Util = formUtil(globals, addressDeclarationText2);
+    const addressDeclarationOVDUtil = formUtil(globals, addressDeclarationOVD);
+    const confirmAndSubmitTC2Util = formUtil(globals, confirmAndSubmitTC2);
     cardDeliveryAddressPanelUtil.visible(false);
     AddressDeclarationAadharUtil.visible(false);
     addressDeclarationOfficeUtil.visible(false);
     addressDeclarationText1Util.visible(false);
     addressDeclarationText2Util.visible(false);
+    addressDeclarationOVDUtil.visible(true);
+    confirmAndSubmitTC2Util.visible(false);
   } else {
     moveWizardView('corporateCardWizardView', 'selectKycPanel');
   }
