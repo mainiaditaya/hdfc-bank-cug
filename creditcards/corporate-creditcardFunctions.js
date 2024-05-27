@@ -945,16 +945,37 @@ const finalDap = (globals) => {
 };
 
 /**
- * @name aadharConsent
+ * @name aadharConsent123
  * @param {Object} globals - The global object containing necessary data for DAP request.
- * @returns {PROMISE}
  */
-const aadharConsent = (globals) =>{
+const aadharConsent123 = (globals) => {
+ debugger;
+  let aadharConsentConfig = {};
+  console.log('called ..');
+  if (typeof window !== 'undefined') {
+    aadharConsentConfig = {
+      triggerElement: document.getElementsByName('ckycDetailsContinueETB')?.[0],
+      content: document.getElementsByName('aadharConsentPopup')?.[0],
+      actionWrapClass: 'button-wrapper',
+      reqConsentAgree: false,
+      updateUI(receivedData) {
+        const selecKycDomName = 'selectKYCOptionsPanel';
+        if (receivedData?.closeIcon) {
+          const kycPannel = document.querySelector(`[name=${selecKycDomName}]`);
+          kycPannel.setAttribute('data-visible', true);
+        }
+        if (receivedData.aadharConsentAgree) {
+          const aadharCheck = 'aadharConsentCheckbox';
+          const agree = document.querySelector(`[name=${aadharCheck}]`);
+          agree.checked = true;
+          agree.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      },
+    };
+  }
   (async () => {
     const myImportedModule = await import('./cc.js');
-    const payload = {};
-    payload.config = myImportedModule.aadharConsentConfig();
-    return payload;
+    return myImportedModule.linkModalFunction(aadharConsentConfig, globals);
   })();
 };
 
@@ -965,10 +986,6 @@ const aadharConsent = (globals) =>{
  * @returns {PROMISE}
  */
 const linkModalFunction = (config, globals) =>{
-  (async () => {
-    const myImportedModule = await import('./cc.js');
-    return myImportedModule.linkModalFunction();
-  })();
 };
 
 /**
@@ -1019,7 +1036,6 @@ function sendAnalytics(payload, globals) {
   sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
 }
 
-
 export {
   getThisCard,
   prefillForm,
@@ -1034,6 +1050,6 @@ export {
   journeyResponseHandler,
   createJourneyId,
   sendAnalytics,
-  aadharConsent,
+  aadharConsent123,
   linkModalFunction,
 };

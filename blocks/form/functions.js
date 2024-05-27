@@ -22,7 +22,7 @@ import {
   ipaRequestApi,
   ipaSuccessHandler,
   sendAnalytics,
-  aadharConsent,
+  aadharConsent123,
   linkModalFunction,
 } from '../../common/functions.js';
 
@@ -193,6 +193,6 @@ export {
   invokeJourneyDropOffByParam,
   invokeJourneyDropOffUpdate,
   sendAnalytics,
-  aadharConsent,
+  aadharConsent123,
   linkModalFunction,
 };

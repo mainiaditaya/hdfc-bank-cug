@@ -12,7 +12,7 @@ import {
   journeyResponseHandler,
   createJourneyId,
   sendAnalytics,
-  aadharConsent,
+  aadharConsent123,
   linkModalFunction,
 } from '../creditcards/corporate-creditcardFunctions.js';
 import {
@@ -303,6 +303,6 @@ export {
   ipaRequestApi,
   ipaSuccessHandler,
   sendAnalytics,
-  aadharConsent,
+  aadharConsent123,
   linkModalFunction,
 };

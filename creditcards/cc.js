@@ -79,6 +79,7 @@ function onWizardInit() {
  */
 
 const linkModalFunction = (config, globals) => {
+  debugger;
   config?.triggerElement?.addEventListener('click', async (e) => {
     const { checked, type } = e.target;
     const checkBoxElement = (type === 'checkbox') && checked;
@@ -216,6 +217,7 @@ const viewAllBtnPannelConfig = {
 linkModalFunction(viewAllBtnPannelConfig);
 
 // 6.Aadhar consent popup - ckycDetailsPanel
+
 const aadharConsentConfig = {
   triggerElement: document.getElementsByName('ckycDetailsContinueETB')?.[0],
   content: document.getElementsByName('aadharConsentPopup')?.[0],
@@ -235,7 +237,7 @@ const aadharConsentConfig = {
     }
   },
 };
-linkModalFunction(aadharConsentConfig);
+//linkModalFunction(aadharConsentConfig);
 
 const queryStrings = window.location.search.split('?')[1].split('&');
 // eslint-disable-next-line no-restricted-syntax
