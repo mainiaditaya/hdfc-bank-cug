@@ -97,7 +97,7 @@ function otpValidation(mobileNumber, pan, dob, otpNumber) {
   const jsonObj = {
     requestString: {
       mobileNumber: mobileNumber.$value,
-      passwordValue: otpNumber,
+      passwordValue: otpNumber.$value,
       dateOfBith: dob.$value || '',
       panNumber: pan.$value || '',
       channelSource: '',
