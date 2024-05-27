@@ -138,7 +138,7 @@ function sendPageloadEvent(formContext) {
   _satellite.track('pageload');
 }
 
-function populateResponse(payload = {}, action, digitalDataEvent) {
+function populateResponse(action, digitalDataEvent, payload = {}) {
   switch (action) {
     case 'getOTP': {
       digitalDataEvent.page.pageInfo.errorCode = payload?.status?.errorCode;
