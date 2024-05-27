@@ -115,7 +115,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
     if (currentAddressNTB.permanentAddress.permanentAddressToggle.$value === 'on') {
       permanentAddress = { ...currentAddress };
     } else {
-      permanentAddress.address1 = permanentAddressPanel.permanentAddressLine1.$value;
+      permanentAddress.address1 = permanentAddressPanel.permanentAddressAddress1.$value;
       permanentAddress.address2 = permanentAddressPanel.permanentAddressLine2.$value;
       permanentAddress.address3 = permanentAddressPanel.permanentAddressLine3.$value;
       permanentAddress.city = permanentAddressPanel.permanentAddressCity.$value;
@@ -148,7 +148,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
       permanentAddress2: permanentAddress.address2,
       permanentCity: permanentAddress.city,
       permanentZipCode: String(permanentAddress.pincode),
-      eReferenceNumber: breDemogResponse?.BREFILLER3,
+      eReferenceNumber: breDemogResponse?.BREFILLER3 || currentFormContext.referenceNumber,
       nameEditFlag,
       mobileEditFlag: currentFormContext.journeyType === 'ETB' ? 'N' : 'Y',
       resPhoneEditFlag: 'N',
@@ -197,6 +197,8 @@ const createExecuteInterfaceRequestObj = (globals) => {
       apsDobEditFlag: 'N',
       apsEmailEditFlag: 'N',
       journeyFlag: currentFormContext.journeyType,
+      annualIncomeOrItrAmount: '100000',
+      comResidenceType: '2',
     },
   };
   return requestObj;

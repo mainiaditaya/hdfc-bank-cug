@@ -94,6 +94,8 @@ function getOTP(mobileNumber, pan, dob, globals) {
  * @return {PROMISE}
  */
 function otpValidation(mobileNumber, pan, dob, otpNumber) {
+  const referenceNumber = `AD${getTimeStamp(new Date())}` ?? '';
+  currentFormContext.referenceNumber = referenceNumber; 
   const jsonObj = {
     requestString: {
       mobileNumber: mobileNumber.$value,
@@ -105,7 +107,7 @@ function otpValidation(mobileNumber, pan, dob, otpNumber) {
       journeyName: currentFormContext.journeyName,
       dedupeFlag: 'N',
       userAgent: window.navigator.userAgent,
-      referenceNumber: `AD${getTimeStamp(new Date())}` ?? '',
+      referenceNumber: referenceNumber ?? '',
     },
   };
   const path = urlPath('/content/hdfc_cc_unified/api/otpValFetchAssetDemog.json');
