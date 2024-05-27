@@ -227,6 +227,11 @@ const aadharConsentConfig = {
       const kycPannel = document.querySelector(`[name=${selecKycDomName}]`);
       kycPannel.setAttribute('data-visible', true);
     }
+    // if (receivedData.aadharConsentAgree) {
+    //   const agreeBtnDomName = 'aadharConsentAgree';
+    //   const agree = document.querySelector(`[name=${agreeBtnDomName}]`);
+    //   // agree.dispatchEvent(new Event('click', { bubbles: false }));
+    // }
   },
 };
 linkModalFunction(aadharConsentConfig);
