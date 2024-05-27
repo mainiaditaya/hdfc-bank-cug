@@ -78,7 +78,7 @@ function onWizardInit() {
  * @param {Function} [config.updateUI] - Function for DOM manipulation upon receiving data.
  */
 
-const linkModalFunction = (config) => {
+const linkModalFunction = (config, globals) => {
   config?.triggerElement?.addEventListener('click', async (e) => {
     const { checked, type } = e.target;
     const checkBoxElement = (type === 'checkbox') && checked;
@@ -86,7 +86,7 @@ const linkModalFunction = (config) => {
     const elementType = (type === 'checkbox') ? checkBoxElement : otherElement;
     if (elementType) {
       e.preventDefault();
-      await openModal(config);
+      await openModal(config, globals);
       config?.content?.addEventListener('modalTriggerValue', (event) => {
         const receivedData = event.detail;
         if (config?.updateUI) {
@@ -264,4 +264,9 @@ for (const queryString of queryStrings) {
   }
 }
 
-export { decorateStepper, onWizardInit };
+export {
+  decorateStepper,
+  onWizardInit,
+  aadharConsentConfig,
+  linkModalFunction,
+};

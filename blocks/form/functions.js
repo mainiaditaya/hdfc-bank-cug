@@ -22,6 +22,8 @@ import {
   ipaRequestApi,
   ipaSuccessHandler,
   sendAnalytics,
+  aadharConsent,
+  linkModalFunction,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -191,4 +193,6 @@ export {
   invokeJourneyDropOffByParam,
   invokeJourneyDropOffUpdate,
   sendAnalytics,
+  aadharConsent,
+  linkModalFunction,
 };

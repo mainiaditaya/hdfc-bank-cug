@@ -3,7 +3,9 @@ import {
   buildBlock, decorateBlock, loadBlock,
 } from '../../scripts/aem.js';
 
-async function createMainModal(content, actionWrapClass, reqConsentAgree) {
+// eslint-disable-next-line no-unused-vars
+async function createMainModal(content, actionWrapClass, reqConsentAgree, globals) {
+  debugger;
   if (!content) {
     return null;
   }
@@ -78,8 +80,8 @@ async function createMainModal(content, actionWrapClass, reqConsentAgree) {
  * @param {boolean} reqConsentAgree - Whether consent agreement is required to close the modal.
  * @returns {Promise<void>} - A promise that resolves when the modal is opened.
  */
-function openModal({ content, actionWrapClass, reqConsentAgree }) {
-  createMainModal(content, actionWrapClass, reqConsentAgree)
+function openModal({ content, actionWrapClass, reqConsentAgree }, globals) {
+  createMainModal(content, actionWrapClass, reqConsentAgree, globals)
     .then((res) => {
       if (res?.showModal) {
         res?.showModal();

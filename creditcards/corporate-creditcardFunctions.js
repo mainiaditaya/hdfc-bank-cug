@@ -945,6 +945,33 @@ const finalDap = (globals) => {
 };
 
 /**
+ * @name aadharConsent
+ * @param {Object} globals - The global object containing necessary data for DAP request.
+ * @returns {PROMISE}
+ */
+const aadharConsent = (globals) =>{
+  (async () => {
+    const myImportedModule = await import('./cc.js');
+    const payload = {};
+    payload.config = myImportedModule.aadharConsentConfig();
+    return payload;
+  })();
+};
+
+/**
+ * @name linkModalFunction
+ * @param {Object} config - The global object containing necessary data for DAP request.
+ * @param {Object} globals - The global object containing necessary data for DAP request.
+ * @returns {PROMISE}
+ */
+const linkModalFunction = (config, globals) =>{
+  (async () => {
+    const myImportedModule = await import('./cc.js');
+    return myImportedModule.linkModalFunction();
+  })();
+};
+
+/**
  * @name journeyResponseHandler
  * @param {string} payload.
  */
@@ -992,6 +1019,7 @@ function sendAnalytics(payload, globals) {
   sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
 }
 
+
 export {
   getThisCard,
   prefillForm,
@@ -1006,4 +1034,6 @@ export {
   journeyResponseHandler,
   createJourneyId,
   sendAnalytics,
+  aadharConsent,
+  linkModalFunction,
 };

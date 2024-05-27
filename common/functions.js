@@ -12,6 +12,8 @@ import {
   journeyResponseHandler,
   createJourneyId,
   sendAnalytics,
+  aadharConsent,
+  linkModalFunction,
 } from '../creditcards/corporate-creditcardFunctions.js';
 import {
   validatePan,
@@ -301,4 +303,6 @@ export {
   ipaRequestApi,
   ipaSuccessHandler,
   sendAnalytics,
+  aadharConsent,
+  linkModalFunction,
 };
