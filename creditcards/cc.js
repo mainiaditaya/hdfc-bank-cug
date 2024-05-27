@@ -215,6 +215,22 @@ const viewAllBtnPannelConfig = {
 };
 linkModalFunction(viewAllBtnPannelConfig);
 
+// 6.Aadhar consent popup - ckycDetailsPanel
+const aadharConsentConfig = {
+  triggerElement: document.getElementsByName('ckycDetailsContinueETB')?.[0],
+  content: document.getElementsByName('aadharConsentPopup')?.[0],
+  actionWrapClass: 'button-wrapper',
+  reqConsentAgree: false,
+  updateUI(receivedData) {
+    const selecKycDomName = 'selectKYCOptionsPanel';
+    if (receivedData?.closeIcon) {
+      const kycPannel = document.querySelector(`[name=${selecKycDomName}]`);
+      kycPannel.setAttribute('data-visible', true);
+    }
+  },
+};
+linkModalFunction(aadharConsentConfig);
+
 const queryStrings = window.location.search.split('?')[1].split('&');
 // eslint-disable-next-line no-restricted-syntax
 for (const queryString of queryStrings) {
