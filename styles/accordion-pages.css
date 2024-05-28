@@ -385,7 +385,7 @@ fieldset fieldset {
     }
   }
 
-  .field-carddeliveryntbflow, .field-carddeliveryaddresspanel {
+  .field-addressdeclarationovd, .field-carddeliveryaddresspanel {
     .field-carddeliveryaddresslabelovd, .field-carddeliveryaddresslabel {
       width: 100%;
 
@@ -399,11 +399,8 @@ fieldset fieldset {
 
     .field-currentaddressovdaddress, .field-officeaddressovdaddress {
       padding-left: 39px;
-      
-      p { 
-        margin: 0; 
-        font-size: 14px;
-      }
+      margin-top: -15px;
+      font-size: 14px;
     }
 
     .radio-highlight-selected {

@@ -242,4 +242,7 @@ for (const queryString of queryStrings) {
   }
 }
 
-export { decorateStepper, onWizardInit };
+export {
+  decorateStepper,
+  onWizardInit,
+};

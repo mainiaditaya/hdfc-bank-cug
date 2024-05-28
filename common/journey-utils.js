@@ -75,7 +75,7 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
  * @return {PROMISE}
  */
 const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, journeyId, globals) => {
-  const sanitizedFormData = santizedFormDataWithContext(globals);
+  const sanitizedFormData = santizedFormDataWithContext(globals, currentFormContext);
   const journeyJSONObj = {
     RequestPayload: {
       userAgent: window.navigator.userAgent,

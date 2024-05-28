@@ -51,6 +51,7 @@ currentFormContext.executeInterface = (typeof window !== 'undefined') ? displayL
 currentFormContext.ipa = (typeof window !== 'undefined') ? displayLoader : false;
 currentFormContext.aadharInit = (typeof window !== 'undefined') ? displayLoader : false;
 currentFormContext.hideLoader = (typeof window !== 'undefined') ? hideLoaderGif : false;
+const formInitailzeData = {};
 
 let PAN_VALIDATION_STATUS = false;
 let PAN_RETRY_COUNTER = 1;
@@ -949,6 +950,40 @@ const finalDap = (globals) => {
 };
 
 /**
+ * @name aadharConsent123
+ * @param {Object} globals - The global object containing necessary data for DAP request.
+ */
+const aadharConsent123 = async (globals) => {
+  try {
+    if (typeof window !== 'undefined') {
+      const openModal = (await import('../blocks/modal/modal.js')).default;
+      const contentDomName = 'aadharConsentPopup';
+      const btnWrapClassName = 'button-wrapper';
+      const config = {
+        content: document.querySelector(`[name = ${contentDomName}]`),
+        actionWrapClass: btnWrapClassName,
+        reqConsentAgree: false,
+      };
+      if (typeof formInitailzeData.aadharConfig === 'undefined') {
+        formInitailzeData.aadharConfig = config;
+      }
+      await openModal(formInitailzeData.aadharConfig);
+      config?.content?.addEventListener('modalTriggerValue', (event) => {
+        const receivedData = event.detail;
+        if (receivedData?.aadharConsentAgree) {
+          globals.functions.setProperty(globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel.triggerAadharAPI, { value: 1 });
+        }
+        if (receivedData?.closeIcon) {
+          globals.functions.setProperty(globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel.triggerAadharAPI, { value: null });
+        }
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+/**
  * @name journeyResponseHandler
  * @param {string} payload.
  */
@@ -1010,4 +1045,5 @@ export {
   journeyResponseHandler,
   createJourneyId,
   sendAnalytics,
+  aadharConsent123,
 };
