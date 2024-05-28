@@ -950,7 +950,6 @@ const finalDap = (globals) => {
  * @param {Object} globals - The global object containing necessary data for DAP request.
  */
 const aadharConsent123 = async (globals) => {
-  console.log('called ..');
   try {
     if (typeof window !== 'undefined') {
       const openModal = (await import('../blocks/modal/modal.js')).default;
@@ -978,15 +977,6 @@ const aadharConsent123 = async (globals) => {
   } catch (error) {
     console.log(error);
   }
-};
-
-/**
- * @name linkModalFunction
- * @param {Object} config - The global object containing necessary data for DAP request.
- * @param {Object} globals - The global object containing necessary data for DAP request.
- * @returns {PROMISE}
- */
-const linkModalFunction = (config, globals) => {
 };
 
 /**
@@ -1052,5 +1042,4 @@ export {
   createJourneyId,
   sendAnalytics,
   aadharConsent123,
-  linkModalFunction,
 };

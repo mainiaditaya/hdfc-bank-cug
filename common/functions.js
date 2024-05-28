@@ -13,7 +13,6 @@ import {
   createJourneyId,
   sendAnalytics,
   aadharConsent123,
-  linkModalFunction,
 } from '../creditcards/corporate-creditcardFunctions.js';
 import {
   validatePan,
@@ -33,13 +32,20 @@ import { fetchJsonResponse } from './makeRestAPI.js';
  */
 function checkMode(globals) {
   const formData = globals.functions.exportData();
-  if (formData?.form?.aadhaar_otp_val_data?.result?.Address1) {
+  if (formData?.aadhaar_otp_val_data?.result?.Address1) {
     globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: true });
     globals.functions.setProperty(globals.form.otpPanel, { visible: false });
     globals.functions.setProperty(globals.form.loginPanel, { visible: false });
     globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
     globals.functions.setProperty(globals.form.consentFragment, { visible: false });
     globals.functions.setProperty(globals.form.welcomeText, { visible: false });
+    const {
+      result: {
+        Address1, Address2, Address3, City, State, Zipcode,
+      },
+    } = formData.aadhaar_otp_val_data;
+    const aadharAddress = [Address1, Address2, Address3, City, State, Zipcode]?.filter(Boolean)?.join(', ');
+    globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.AddressDeclarationAadhar.aadharAddressSelectKYC, { value: aadharAddress });
   }
 }
 
@@ -190,7 +196,7 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
         journeyName: 'CORPORATE_CARD_JOURNEY',
         userAgent: window.navigator.userAgent,
         mobileNumber: mobileNumber.$value,
-        leadProfileId: currentFormContext.leadProfile,
+        leadProfileId: globals?.form.runtime.leadProifileId.$value,
         additionalParam1: '',
         additionalParam2: '',
         identifierValue: pan.$value || dob.$value,
@@ -206,17 +212,17 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
       },
       data_app: {
         journey_id: currentFormContext.journeyID,
-        lead_profile_id: currentFormContext.leadProfile,
+        lead_profile_id: globals?.form.runtime.leadProifileId.$value,
         callback: 'https://applyonlinedev.hdfcbank.com/content/hdfc_etb_wo_pacc/api/aadharCallback.json',
         lead_profile: {
-          leadProfileId: currentFormContext.leadProfile,
+          leadProfileId: globals?.form.runtime.leadProifileId.$value,
           mobileNumber: mobileNumber.$value,
           Addresses: '',
         },
         journeyStateInfo: {
           state: 'CUSTOMER_AADHAR_VALIDATION',
           stateInfo: 'CORPORATE_CARD_JOURNEY',
-          formData: santizedFormData(globals),
+          formData: santizedFormData(globals)?.form,
         },
         auditData: {
           action: 'CUSTOMER_AADHAR_VALIDATION',
@@ -304,5 +310,4 @@ export {
   ipaSuccessHandler,
   sendAnalytics,
   aadharConsent123,
-  linkModalFunction,
 };

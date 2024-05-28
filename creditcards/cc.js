@@ -245,5 +245,4 @@ for (const queryString of queryStrings) {
 export {
   decorateStepper,
   onWizardInit,
-  linkModalFunction,
 };
