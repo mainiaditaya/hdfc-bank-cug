@@ -4,8 +4,7 @@ import {
 } from '../../scripts/aem.js';
 
 // eslint-disable-next-line no-unused-vars
-async function createMainModal(content, actionWrapClass, reqConsentAgree, globals) {
-  debugger;
+async function createMainModal(content, actionWrapClass, reqConsentAgree) {
   if (!content) {
     return null;
   }
@@ -23,7 +22,7 @@ async function createMainModal(content, actionWrapClass, reqConsentAgree, global
     const resultScope = {};
     resultScope[`${'closeIcon'}`] = true;
     dialog.close();
-    const customEvent = new CustomEvent('modalTriggerValue', { detail: resultScope });
+    const customEvent = new CustomEvent('modalTriggerValue', { detail: resultScope, bubbles: false });
     content?.dispatchEvent(customEvent);
   });
   if (!reqConsentAgree) {
@@ -41,7 +40,7 @@ async function createMainModal(content, actionWrapClass, reqConsentAgree, global
         const resultScope = {};
         resultScope[`${nameOfBtn}`] = true;
         dialog.close();
-        const customEvent = new CustomEvent('modalTriggerValue', { detail: resultScope });
+        const customEvent = new CustomEvent('modalTriggerValue', { detail: resultScope, bubbles: false });
         content?.dispatchEvent(customEvent);
       });
     });
@@ -80,8 +79,8 @@ async function createMainModal(content, actionWrapClass, reqConsentAgree, global
  * @param {boolean} reqConsentAgree - Whether consent agreement is required to close the modal.
  * @returns {Promise<void>} - A promise that resolves when the modal is opened.
  */
-function openModal({ content, actionWrapClass, reqConsentAgree }, globals) {
-  createMainModal(content, actionWrapClass, reqConsentAgree, globals)
+function openModal({ content, actionWrapClass, reqConsentAgree }) {
+  createMainModal(content, actionWrapClass, reqConsentAgree)
     .then((res) => {
       if (res?.showModal) {
         res?.showModal();

@@ -78,8 +78,7 @@ function onWizardInit() {
  * @param {Function} [config.updateUI] - Function for DOM manipulation upon receiving data.
  */
 
-const linkModalFunction = (config, globals) => {
-  debugger;
+const linkModalFunction = (config) => {
   config?.triggerElement?.addEventListener('click', async (e) => {
     const { checked, type } = e.target;
     const checkBoxElement = (type === 'checkbox') && checked;
@@ -87,7 +86,7 @@ const linkModalFunction = (config, globals) => {
     const elementType = (type === 'checkbox') ? checkBoxElement : otherElement;
     if (elementType) {
       e.preventDefault();
-      await openModal(config, globals);
+      await openModal(config);
       config?.content?.addEventListener('modalTriggerValue', (event) => {
         const receivedData = event.detail;
         if (config?.updateUI) {
@@ -124,7 +123,7 @@ const consent2Config = {
     }
   },
 };
-linkModalFunction(consent2Config);
+// linkModalFunction(consent2Config);
 // 2.consent-2 otherProduct-text - modal
 const consent2OtherProduct = document?.querySelector('.field-checkboxconsent2label')?.querySelector('b');
 const linkClass = 'link';
@@ -151,7 +150,7 @@ const consent2OtherProductTxtConfig = {
     }
   },
 };
-linkModalFunction(consent2OtherProductTxtConfig);
+// linkModalFunction(consent2OtherProductTxtConfig);
 
 // 3.conset-1 checbox - modal
 const consent1Config = {
@@ -237,7 +236,7 @@ const aadharConsentConfig = {
     }
   },
 };
-//linkModalFunction(aadharConsentConfig);
+// linkModalFunction(aadharConsentConfig);
 
 const queryStrings = window.location.search.split('?')[1].split('&');
 // eslint-disable-next-line no-restricted-syntax

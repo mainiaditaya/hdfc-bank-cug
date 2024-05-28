@@ -948,35 +948,57 @@ const finalDap = (globals) => {
  * @name aadharConsent123
  * @param {Object} globals - The global object containing necessary data for DAP request.
  */
-const aadharConsent123 = (globals) => {
- debugger;
-  let aadharConsentConfig = {};
+const aadharConsent123 = async (globals) => {
   console.log('called ..');
-  if (typeof window !== 'undefined') {
-    aadharConsentConfig = {
-      triggerElement: document.getElementsByName('ckycDetailsContinueETB')?.[0],
-      content: document.getElementsByName('aadharConsentPopup')?.[0],
-      actionWrapClass: 'button-wrapper',
-      reqConsentAgree: false,
-      updateUI(receivedData) {
-        const selecKycDomName = 'selectKYCOptionsPanel';
+  try {
+    if (typeof window !== 'undefined') {
+      const openModal = (await import('../blocks/modal/modal.js')).default;
+      const contentDomName = 'consentPanel2';
+      const btnWrapClassName = 'button-wrapper';
+      const config = {
+        content: document.querySelector(`[name = ${contentDomName}]`),
+        actionWrapClass: btnWrapClassName,
+        reqConsentAgree: false,
+      };
+      await openModal(config);
+      config?.content?.addEventListener('modalTriggerValue', (event) => {
+        const receivedData = event.detail;
+        if (receivedData?.checkboxConsent2CTA) {
+          globals.functions.setProperty(globals.form.consentFragment.checkboxConsent1Label, { value: 'on' });
+        }
         if (receivedData?.closeIcon) {
-          const kycPannel = document.querySelector(`[name=${selecKycDomName}]`);
-          kycPannel.setAttribute('data-visible', true);
+          globals.functions.setProperty(globals.form.consentFragment.checkboxConsent1Label, { value: null });
         }
-        if (receivedData.aadharConsentAgree) {
-          const aadharCheck = 'aadharConsentCheckbox';
-          const agree = document.querySelector(`[name=${aadharCheck}]`);
-          agree.checked = true;
-          agree.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-      },
-    };
+      });
+    }
+  } catch (error) {
+    console.log(error);
   }
-  (async () => {
-    const myImportedModule = await import('./cc.js');
-    return myImportedModule.linkModalFunction(aadharConsentConfig, globals);
-  })();
+
+  //   aadharConsentConfig = {
+  //     triggerElement: document.getElementsByName('ckycDetailsContinueETB')?.[0],
+  //     content: document.getElementsByName('aadharConsentPopup')?.[0],
+  //     actionWrapClass: 'button-wrapper',
+  //     reqConsentAgree: false,
+  //     updateUI(receivedData) {
+  //       const selecKycDomName = 'selectKYCOptionsPanel';
+  //       if (receivedData?.closeIcon) {
+  //         const kycPannel = document.querySelector(`[name=${selecKycDomName}]`);
+  //         kycPannel.setAttribute('data-visible', true);
+  //       }
+  //       if (receivedData.aadharConsentAgree) {
+  //         const aadharCheck = 'aadharConsentCheckbox';
+  //         const agree = document.querySelector(`[name=${aadharCheck}]`);
+  //         agree.checked = true;
+  //         agree.dispatchEvent(new Event('change', { bubbles: true }));
+  //       }
+  //     },
+  //   };
+  // }
+  // (async () => {
+  //   const myImportedModule = await import('./cc.js');
+  //   return myImportedModule.linkModalFunction(aadharConsentConfig, globals);
+  // })();
 };
 
 /**
@@ -985,7 +1007,7 @@ const aadharConsent123 = (globals) => {
  * @param {Object} globals - The global object containing necessary data for DAP request.
  * @returns {PROMISE}
  */
-const linkModalFunction = (config, globals) =>{
+const linkModalFunction = (config, globals) => {
 };
 
 /**
