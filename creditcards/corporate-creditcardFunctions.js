@@ -455,7 +455,7 @@ const setConfirmScrAddressFields = (globalObj) => {
 };
 
 /**
- * Moves the wizard view to the "selectKycPaymentPanel" step.
+ * Moves the wizard view to the "selectKycPanel" step.
  */
 const getThisCard = (globals) => {
   const nameOnCardDropdown =		globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value;
@@ -473,7 +473,7 @@ const getThisCard = (globals) => {
       addressDeclarationText2,
       addressDeclarationOVD,
     } = addressDeclarationPanel;
-    const { confirmAndSubmitTC2 } = addressDeclarationPanel.tandCPanelConfirmAndSubmit;
+    const { confirmAndSubmitTC2, continueToIDCOM, confirmAndSubmitButton } = addressDeclarationPanel.tandCPanelConfirmAndSubmit;
     const cardDeliveryAddressPanelUtil = formUtil(globals, cardDeliveryAddressPanel);
     const AddressDeclarationAadharUtil = formUtil(globals, AddressDeclarationAadhar);
     const addressDeclarationOfficeUtil = formUtil(globals, addressDeclarationOffice);
@@ -481,6 +481,8 @@ const getThisCard = (globals) => {
     const addressDeclarationText2Util = formUtil(globals, addressDeclarationText2);
     const addressDeclarationOVDUtil = formUtil(globals, addressDeclarationOVD);
     const confirmAndSubmitTC2Util = formUtil(globals, confirmAndSubmitTC2);
+    const continueToIDCOMUtil = formUtil(globals, continueToIDCOM);
+    const confirmAndSubmitButtonUtil = formUtil(globals, confirmAndSubmitButton);
     cardDeliveryAddressPanelUtil.visible(false);
     AddressDeclarationAadharUtil.visible(false);
     addressDeclarationOfficeUtil.visible(false);
@@ -488,6 +490,8 @@ const getThisCard = (globals) => {
     addressDeclarationText2Util.visible(false);
     addressDeclarationOVDUtil.visible(true);
     confirmAndSubmitTC2Util.visible(false);
+    continueToIDCOMUtil.visible(true);
+    confirmAndSubmitButtonUtil.visible(false);
   } else {
     moveWizardView('corporateCardWizardView', 'selectKycPanel');
   }
