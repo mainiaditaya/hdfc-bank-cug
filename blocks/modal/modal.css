@@ -25,12 +25,15 @@ body.modal-open {
     content: url('../../icons/aadhar-icon.svg'); 
     padding-right: 10px;
   }
+  
   .field-selectlanguage { display: inline-grid; 
+    
     label {
       padding-top: 7px;
       font-size: var(--body-sm-font-size);
       text-align: justify;
     }
+    
     select {
       height: 42px;
       width: 178px;
@@ -170,7 +173,6 @@ body.modal-open {
   .field-backlinkcardbenefits{
     text-align: left;
 
-    /* stylelint-disable-next-line no-descending-specificity */
     button{
       max-width: 100%;
       border-radius: 6px;
