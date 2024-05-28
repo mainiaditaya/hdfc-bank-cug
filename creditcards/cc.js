@@ -123,7 +123,7 @@ const consent2Config = {
     }
   },
 };
-// linkModalFunction(consent2Config);
+linkModalFunction(consent2Config);
 // 2.consent-2 otherProduct-text - modal
 const consent2OtherProduct = document?.querySelector('.field-checkboxconsent2label')?.querySelector('b');
 const linkClass = 'link';
@@ -150,7 +150,7 @@ const consent2OtherProductTxtConfig = {
     }
   },
 };
-// linkModalFunction(consent2OtherProductTxtConfig);
+linkModalFunction(consent2OtherProductTxtConfig);
 
 // 3.conset-1 checbox - modal
 const consent1Config = {
@@ -215,29 +215,6 @@ const viewAllBtnPannelConfig = {
 };
 linkModalFunction(viewAllBtnPannelConfig);
 
-// 6.Aadhar consent popup - ckycDetailsPanel
-
-const aadharConsentConfig = {
-  triggerElement: document.getElementsByName('ckycDetailsContinueETB')?.[0],
-  content: document.getElementsByName('aadharConsentPopup')?.[0],
-  actionWrapClass: 'button-wrapper',
-  reqConsentAgree: false,
-  updateUI(receivedData) {
-    const selecKycDomName = 'selectKYCOptionsPanel';
-    if (receivedData?.closeIcon) {
-      const kycPannel = document.querySelector(`[name=${selecKycDomName}]`);
-      kycPannel.setAttribute('data-visible', true);
-    }
-    if (receivedData.aadharConsentAgree) {
-      const aadharCheck = 'aadharConsentCheckbox';
-      const agree = document.querySelector(`[name=${aadharCheck}]`);
-      agree.checked = true;
-      agree.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-  },
-};
-// linkModalFunction(aadharConsentConfig);
-
 const queryStrings = window.location.search.split('?')[1].split('&');
 // eslint-disable-next-line no-restricted-syntax
 for (const queryString of queryStrings) {
@@ -268,6 +245,5 @@ for (const queryString of queryStrings) {
 export {
   decorateStepper,
   onWizardInit,
-  aadharConsentConfig,
   linkModalFunction,
 };

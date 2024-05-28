@@ -954,7 +954,7 @@ const aadharConsent123 = async (globals) => {
   try {
     if (typeof window !== 'undefined') {
       const openModal = (await import('../blocks/modal/modal.js')).default;
-      const contentDomName = 'consentPanel2';
+      const contentDomName = 'aadharConsentPopup';
       const btnWrapClassName = 'button-wrapper';
       const config = {
         content: document.querySelector(`[name = ${contentDomName}]`),
@@ -967,42 +967,17 @@ const aadharConsent123 = async (globals) => {
       await openModal(formInitailzeData.aadharConfig);
       config?.content?.addEventListener('modalTriggerValue', (event) => {
         const receivedData = event.detail;
-        if (receivedData?.checkboxConsent2CTA) {
-          globals.functions.setProperty(globals.form.consentFragment.checkboxConsent1Label, { value: 'on' });
+        if (receivedData?.aadharConsentAgree) {
+          globals.functions.setProperty(globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel.triggerAadharAPI, { value: 1 });
         }
         if (receivedData?.closeIcon) {
-          globals.functions.setProperty(globals.form.consentFragment.checkboxConsent1Label, { value: null });
+          globals.functions.setProperty(globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel.triggerAadharAPI, { value: null });
         }
       });
     }
   } catch (error) {
     console.log(error);
   }
-
-  //   aadharConsentConfig = {
-  //     triggerElement: document.getElementsByName('ckycDetailsContinueETB')?.[0],
-  //     content: document.getElementsByName('aadharConsentPopup')?.[0],
-  //     actionWrapClass: 'button-wrapper',
-  //     reqConsentAgree: false,
-  //     updateUI(receivedData) {
-  //       const selecKycDomName = 'selectKYCOptionsPanel';
-  //       if (receivedData?.closeIcon) {
-  //         const kycPannel = document.querySelector(`[name=${selecKycDomName}]`);
-  //         kycPannel.setAttribute('data-visible', true);
-  //       }
-  //       if (receivedData.aadharConsentAgree) {
-  //         const aadharCheck = 'aadharConsentCheckbox';
-  //         const agree = document.querySelector(`[name=${aadharCheck}]`);
-  //         agree.checked = true;
-  //         agree.dispatchEvent(new Event('change', { bubbles: true }));
-  //       }
-  //     },
-  //   };
-  // }
-  // (async () => {
-  //   const myImportedModule = await import('./cc.js');
-  //   return myImportedModule.linkModalFunction(aadharConsentConfig, globals);
-  // })();
 };
 
 /**
