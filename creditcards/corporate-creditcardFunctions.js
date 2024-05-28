@@ -51,6 +51,7 @@ currentFormContext.executeInterface = (typeof window !== 'undefined') ? displayL
 currentFormContext.ipa = (typeof window !== 'undefined') ? displayLoader : false;
 currentFormContext.aadharInit = (typeof window !== 'undefined') ? displayLoader : false;
 currentFormContext.hideLoader = (typeof window !== 'undefined') ? hideLoaderGif : false;
+const formInitailzeData = {};
 
 let PAN_VALIDATION_STATUS = false;
 let PAN_RETRY_COUNTER = 1;
@@ -960,7 +961,10 @@ const aadharConsent123 = async (globals) => {
         actionWrapClass: btnWrapClassName,
         reqConsentAgree: false,
       };
-      await openModal(config);
+      if (typeof formInitailzeData.aadharConfig === 'undefined') {
+        formInitailzeData.aadharConfig = config;
+      }
+      await openModal(formInitailzeData.aadharConfig);
       config?.content?.addEventListener('modalTriggerValue', (event) => {
         const receivedData = event.detail;
         if (receivedData?.checkboxConsent2CTA) {
