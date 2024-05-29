@@ -212,6 +212,18 @@ export async function analyticsTrackLinkClicks(element, linkType = 'other', addi
   });
 }
 
+export async function analyticsTrackOtpClicks(element, linkType = 'other', additionalXdmFields = {}) {
+  return alloy('sendEvent', {
+    documentUnloading: true,
+    xdm: {
+      eventType: 'web.webinteraction.linkClicks',
+      [CUSTOM_SCHEMA_NAMESPACE]: {
+        ...additionalXdmFields,
+      },
+    },
+  });
+}
+
 /**
  * Basic tracking for CWV events with alloy
  * @param cwv

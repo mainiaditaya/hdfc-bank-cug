@@ -22,6 +22,13 @@ import {
   ipaSuccessHandler,
 } from './executeinterfaceutils.js';
 
+import {
+  sampleRUM,
+} from '../scripts/aem.js';
+import {
+  analyticsTrackOtpClicks,
+} from '../scripts/lib-analytics.js';
+
 /**
  * @name checkMode - check the location
  * @param {object} globals -
@@ -75,6 +82,9 @@ function getOTP(mobileNumber, pan, dob) {
   };
   const path = urlPath('/content/hdfc_ccforms/api/customeridentificationV4.json');
   currentFormContext?.getOtpLoader();
+  // send rum data
+  // sampleRUM('otp');
+  analyticsTrackOtpClicks('getOTP', 'button');
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 
