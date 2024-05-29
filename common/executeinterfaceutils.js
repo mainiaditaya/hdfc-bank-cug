@@ -497,9 +497,11 @@ const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJw
  *
  * @param {Object} ipa - The ipa prop in response object.
  * @param {Object} productEligibility - The product eligibility prop in response object.
+ * @param {string} errorCode
+ * @param {string} errorMessage
  * @param {Object} globals - The global context object containing form and view configurations.
  */
-const ipaSuccessHandler = (ipa, productEligibility, globals) => {
+const ipaSuccessHandler = (ipa, productEligibility, errorCode, errorMessage, globals) => {
   const { productDetails } = productEligibility;
   const [firstProductDetail] = productDetails;
 
@@ -526,6 +528,11 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
   }
   hideLoaderGif();
   listNameOnCard(globals);
+  const payload = {
+    errorCode,
+    errorMessage,
+  };
+  globals.functions.setProperty(globals.form.runtime.analytics, { value: JSON.stringify(payload) });
 };
 
 export {
