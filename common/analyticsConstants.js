@@ -1,10 +1,13 @@
 const data = {
   getOTP: {
     linkType: 'button',
-    StepName: 'Identify Yourself',
+    stepName: 'Identify Yourself',
   },
   submittOTP: {
     error: '',
+  },
+  checkOffers: {
+    linkType: 'button',
   },
 };
 

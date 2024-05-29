@@ -37,7 +37,6 @@ function sendGenericClickEvent(linkName, linkType, formContext, digitalData) {
   };
   digitalDataEvent.user.journeyID = formContext?.currentFormContext?.journeyID;
   digitalDataEvent.user.journeyState = formContext?.currentFormContext?.journeyState;
-  digitalDataEvent.event = {};
   window.digitalData = digitalDataEvent || {};
   // eslint-disable-next-line no-undef
   _satellite.track('event');
@@ -113,9 +112,6 @@ function sendSubmitClickEvent(phone, linkName, linkType, formContext, currentFor
   digitalDataEvent.event = {
     phone,
     validationMethod: getValidationMethod(formContext),
-  };
-  digitalDataEvent.formDetails = {
-
   };
   window.digitalData = digitalDataEvent || {};
   // eslint-disable-next-line no-undef
