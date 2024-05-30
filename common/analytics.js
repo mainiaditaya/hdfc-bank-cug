@@ -18,6 +18,10 @@ const digitalDataPageLoad = {
   form: {
     name: 'Corporate credit card',
   },
+  card: {
+    selectedCard: '',
+    eligibleCard: '',
+  },
 };
 
 /**
@@ -148,11 +152,11 @@ function sendSubmitClickEvent(phone, link, formContext, currentFormContext, digi
 
     case 'getThisCard': {
       digitalDataEvent.card = {
-        selectedCard: '',
-        annualFee: '',
+        selectedCard: formContext.form.productCode,
+        annualFee: formContext.form.joiningRenewalFee,
       };
       digitalDataEvent.event = {
-        status: '',
+        status: formContext.cardBenefitsAgreeCheckbox,
       };
       break;
     }
