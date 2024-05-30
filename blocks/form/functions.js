@@ -18,6 +18,7 @@ import {
   executeInterfaceApi,
   ipaRequestApi,
   ipaSuccessHandler,
+  sendDataToRum,
 } from '../../common/functions.js';
 
 import {
@@ -186,4 +187,5 @@ export {
   getWrappedFormContext,
   hideLoaderGif,
   ipaSuccessHandler,
+  sendDataToRum,
 };

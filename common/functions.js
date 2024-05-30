@@ -9,6 +9,7 @@ import {
   finalDap,
   currentFormContext,
   otpValHandler,
+  sendDataToRum,
 } from '../creditcards/corporate-creditcardFunctions.js';
 import { urlPath, santizedFormData, getTimeStamp } from './formutils.js';
 import { fetchJsonResponse } from './makeRestAPI.js';
@@ -292,4 +293,5 @@ export {
   executeInterfaceApi,
   ipaRequestApi,
   ipaSuccessHandler,
+  sendDataToRum,
 };
