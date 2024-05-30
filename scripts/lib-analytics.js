@@ -213,6 +213,55 @@ export async function analyticsTrackLinkClicks(element, linkType = 'other', addi
 }
 
 /**
+ * Sends an analytics event to alloy
+ * @param xdmData - the xdm data object
+ * @returns {Promise<*>}
+ */
+async function sendAnalyticsEvent(xdmData) {
+  // eslint-disable-next-line no-undef
+  if (!alloy) {
+    console.warn('alloy not initialized, cannot send analytics event');
+    return Promise.resolve();
+  }
+  // eslint-disable-next-line no-undef
+  return alloy('sendEvent', {
+    documentUnloading: true,
+    xdm: xdmData,
+  });
+}
+
+export async function analyticsTrackOtpClicks(payload, linkType = 'button', additionalXdmFields = {}) {
+  const jsonString = JSON.stringify(payload || {});
+  const apiResponse = JSON.parse(jsonString);
+  // sendSubmitClickEvent(formData?.login?.registeredMobileNumber, action, attributes?.linkType, formData, currentFormContext, digitalDataEvent);
+  // const action = currentFormContext?.action;
+  // const attributes = data[action];
+  return alloy('sendEvent', {
+    documentUnloading: true,
+    xdm: {
+      eventType: 'web.webinteraction.linkClicks',
+      web: {
+        webInteraction: {
+          // eslint-disable-next-line no-nested-ternary
+          name: 'getOtp',
+          linkClicks: {
+            value: 1,
+          },
+          type: linkType,
+        },
+      },
+      [CUSTOM_SCHEMA_NAMESPACE]: {
+        error: {
+          errorMessage: apiResponse?.target?.otpGenResponse?.status?.errorMsg,
+          errorCode: apiResponse?.target?.otpGenResponse?.status?.errorCode,
+        },
+        ...additionalXdmFields,
+      },
+    },
+  });
+}
+
+/**
  * Basic tracking for CWV events with alloy
  * @param cwv
  * @returns {Promise<*>}
@@ -235,7 +284,6 @@ export async function analyticsTrackCWV(cwv) {
  * @returns {Promise<*>}
  */
 export async function analyticsTrackFormSubmission(element, additionalXdmFields = {}) {
-
   /*
   return alloy('sendEvent', {
     documentUnloading: true,
@@ -265,24 +313,6 @@ export async function analyticsTrackFormSubmission(element, additionalXdmFields 
   };
 
   return sendAnalyticsEvent(xdmData);
-}
-
-/**
- * Sends an analytics event to alloy
- * @param xdmData - the xdm data object
- * @returns {Promise<*>}
- */
-async function sendAnalyticsEvent(xdmData) {
-  // eslint-disable-next-line no-undef
-  if (!alloy) {
-    console.warn('alloy not initialized, cannot send analytics event');
-    return Promise.resolve();
-  }
-  // eslint-disable-next-line no-undef
-  return alloy('sendEvent', {
-    documentUnloading: true,
-    xdm: xdmData,
-  });
 }
 
 export async function analyticsTrackConversion(data, additionalXdmFields = {}) {
@@ -328,4 +358,3 @@ export async function analyticsTrackConversion(data, additionalXdmFields = {}) {
 
   return sendAnalyticsEvent(xdmData);
 }
-

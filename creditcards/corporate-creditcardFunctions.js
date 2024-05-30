@@ -39,6 +39,8 @@ import corpCreditCard from '../common/constants.js';
 
 const { endpoints } = corpCreditCard;
 
+import { sampleRUM } from '../scripts/aem.js';
+
 // Initialize all Corporate Card Journey Context Variables.
 currentFormContext.journeyName = corpCreditCard.journeyName;
 currentFormContext.journeyType = 'NTB';
@@ -1087,6 +1089,15 @@ const resendOTP = (globals) => {
   }
 };
 
+/**
+ * sends data to rum server.
+ * @param {object} payload
+ */
+const sendDataToRum = (payload) => {
+  console.log('Event Payload: ', payload);
+  sampleRUM('getOtp', { source: 'otp', target: payload });
+};
+
 export {
   getThisCard,
   prefillForm,
@@ -1104,4 +1115,5 @@ export {
   sendAnalytics,
   aadharConsent123,
   resendOTP,
+  sendDataToRum,
 };
