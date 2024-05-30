@@ -55,7 +55,7 @@ const formInitailzeData = {};
 
 let PAN_VALIDATION_STATUS = false;
 let PAN_RETRY_COUNTER = 1;
-const resendOtpCount = 3;
+let RESEND_OTP_COUNT = 3;
 let IS_ETB_USER = false;
 const CUSTOMER_INPUT = { mobileNumber: '', pan: '', dob: '' };
 const CUSTOMER_DEMOG_DATA = {};
@@ -957,22 +957,21 @@ const aadharConsent123 = async (globals) => {
   try {
     if (typeof window !== 'undefined') {
       const openModal = (await import('../blocks/modal/modal.js')).default;
+      const { aadharLangChange } = await import('./cc.js');
       const contentDomName = 'aadharConsentPopup';
       const btnWrapClassName = 'button-wrapper';
       const config = {
         content: document.querySelector(`[name = ${contentDomName}]`),
         actionWrapClass: btnWrapClassName,
-        reqConsentAgree: false,
+        reqConsentAgree: true,
       };
       if (typeof formInitailzeData.aadharConfig === 'undefined') {
         formInitailzeData.aadharConfig = config;
       }
       await openModal(formInitailzeData.aadharConfig);
+      aadharLangChange(formInitailzeData.aadharConfig?.content, 'english');
       config?.content?.addEventListener('modalTriggerValue', (event) => {
         const receivedData = event.detail;
-        if (receivedData?.aadharConsentAgree) {
-          globals.functions.setProperty(globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel.triggerAadharAPI, { value: 1 });
-        }
         if (receivedData?.aadharConsentAgree) {
           globals.functions.setProperty(globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel.ckycDetailsContinueETBPanel.triggerAadharAPI, { value: 1 });
         }
@@ -1031,6 +1030,57 @@ function sendAnalytics(payload, globals) {
   sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
 }
 
+/**
+ * @name resendOTP
+ * @param {Object} globals - The global object containing necessary data for DAP request.
+ */
+const resendOTP = (globals) => {
+  const { mobilePanel: { registeredMobileNumber }, identifierPanel: { pan, dateOfBirth } } = globals.form.loginPanel;
+  const mobileNo = registeredMobileNumber.$value;
+  const panNo = pan.$value;
+  const dob = clearString(dateOfBirth.$value);
+
+  const errorResendOtp = (err, objectGlobals) => {
+    const {
+      otpPanel, submitOTP, resultPanel,
+    } = objectGlobals.form;
+
+    const hidePanel = [otpPanel, submitOTP]?.map((panel) => formUtil(objectGlobals, panel));
+    const showPanel = [resultPanel]?.map((panel) => formUtil(objectGlobals, panel));
+    hidePanel.forEach((item) => item.visible(false));
+    showPanel.forEach((item) => item.visible(true));
+  };
+
+  const successResendOtp = (res, objectGlobals) => {
+    RESEND_OTP_COUNT -= 1;
+    invokeJourneyDropOffUpdate('ResendOtp', mobileNo, globals?.form.runtime.leadProifileId.$value, currentFormContext.journeyID, globals);
+    if (!RESEND_OTP_COUNT) errorResendOtp(res, objectGlobals);
+  };
+
+  const payload = {
+    requestString: {
+      mobileNumber: String(mobileNo),
+      dateOfBith: dob || '',
+      panNumber: panNo || '',
+      journeyID: globals.form.runtime.journeyId.$value,
+      journeyName: 'CORPORATE_CARD_JOURNEY',
+      userAgent: window.navigator.userAgent,
+      identifierValue: panNo || dob.$value,
+      identifierName: panNo ? 'PAN' : 'DOB',
+    },
+  };
+  const successCallback = (res, globalObj) => ((res?.otpGenResponse?.status?.errorCode === '0') ? successResendOtp(res, globalObj) : errorResendOtp(res, globalObj));
+  const errorCallback = (err, globalObj) => errorResendOtp(err, globalObj);
+  const loadingText = 'Please wait otp sending again...';
+  const method = 'POST';
+  const path = urlPath('/content/hdfc_ccforms/api/customeridentificationV4.json');
+  try {
+    restAPICall(globals, method, payload, path, successCallback, errorCallback, loadingText);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export {
   getThisCard,
   prefillForm,
@@ -1046,4 +1096,5 @@ export {
   createJourneyId,
   sendAnalytics,
   aadharConsent123,
+  resendOTP,
 };

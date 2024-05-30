@@ -13,6 +13,7 @@ import {
   createJourneyId,
   sendAnalytics,
   aadharConsent123,
+  resendOTP,
 } from '../creditcards/corporate-creditcardFunctions.js';
 import {
   validatePan,
@@ -23,7 +24,9 @@ import {
   ipaRequestApi,
   ipaSuccessHandler,
 } from './executeinterfaceutils.js';
-import { urlPath, santizedFormData, getTimeStamp } from './formutils.js';
+import {
+  urlPath, santizedFormData, getTimeStamp,
+} from './formutils.js';
 import { fetchJsonResponse } from './makeRestAPI.js';
 
 /**
@@ -60,7 +63,7 @@ function customSetFocus(errorMessage, numRetries, globals) {
     globals.functions.setProperty(globals.form.otpPanel, { visible: false });
     globals.functions.setProperty(globals.form.submitOTP, { visible: false });
     globals.functions.setProperty(globals.form.resultPanel, { visible: true });
-    globals.functions.setProperty(globals.form.errorResultPanel, { visible: true });
+    globals.functions.setProperty(globals.form.resultPanel.errorMessageText, { value: errorMessage });
   }
 }
 
@@ -312,4 +315,5 @@ export {
   ipaSuccessHandler,
   sendAnalytics,
   aadharConsent123,
+  resendOTP,
 };
