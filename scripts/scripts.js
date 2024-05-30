@@ -9,17 +9,16 @@ import {
   waitForLCP,
   loadBlocks,
   loadCSS,
-  toClassName,
-  getMetadata,
 } from './aem.js';
 
 import {
   // analyticsSetConsent,
-  analyticsTrackConversion,
+  // analyticsTrackConversion,
   createInlineScript,
   getAlloyInitScript,
   setupAnalyticsTrackingWithAlloy,
   analyticsTrackCWV,
+  analyticsTrackOtpClicks,
 } from './lib-analytics.js';
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
@@ -103,8 +102,8 @@ async function loadEager(doc) {
   }
 }
 
+/*
 async function initializeConversionTracking() {
-  /*
   const context = {
     getMetadata,
     toClassName,
@@ -112,10 +111,8 @@ async function initializeConversionTracking() {
   // eslint-disable-next-line import/no-relative-packages
   const { initConversionTracking } = await import('../plugins/rum-conversion/src/index.js');
   await initConversionTracking.call(context, document);
-  */
 
   // call upon conversion events, sends them to alloy
-  /*
   sampleRUM.always.on('convert', async (data) => {
     const { element } = data;
     if (!element || !alloy) {
@@ -125,8 +122,8 @@ async function initializeConversionTracking() {
     // see https://github.com/adobe/franklin-rum-conversion#integration-with-analytics-solutions
     analyticsTrackConversion({ ...data });
   });
-  */
 }
+*/
 
 /**
  * Loads everything that doesn't need to be delayed.
@@ -184,6 +181,11 @@ window.addEventListener('beforeunload', () => {
 sampleRUM.always.on('cwv', async (data) => {
   if (!data.cwv) return;
   Object.assign(cwv, data.cwv);
+});
+
+sampleRUM.always.on('getOtp', async (data) => {
+  // if (!data.cwv) return;
+  analyticsTrackOtpClicks(data);
 });
 
 /*

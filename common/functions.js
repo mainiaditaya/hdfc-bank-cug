@@ -22,13 +22,6 @@ import {
   ipaSuccessHandler,
 } from './executeinterfaceutils.js';
 
-import {
-  sampleRUM,
-} from '../scripts/aem.js';
-import {
-  analyticsTrackOtpClicks,
-} from '../scripts/lib-analytics.js';
-
 /**
  * @name checkMode - check the location
  * @param {object} globals -

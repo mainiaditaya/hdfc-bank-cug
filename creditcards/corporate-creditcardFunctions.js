@@ -35,10 +35,7 @@ import {
 } from '../common/makeRestAPI.js';
 
 import { sendPageloadEvent } from '../common/analytics.js';
-
-import {
-  analyticsTrackOtpClicks,
-} from '../scripts/lib-analytics.js';
+import { sampleRUM } from '../scripts/aem.js';
 
 // Initialize all Corporate Card Journey Context Variables.
 const journeyName = 'CORPORATE_CARD_JOURNEY';
@@ -954,28 +951,13 @@ const finalDap = (globals) => {
 };
 
 /**
-* sendAnalytics
-* @param {string} payload
-* @param {object} globals
-*/
-// eslint-disable-next-line no-unused-vars
-function sendDataToAnalytics(payload, globals) {
-  analyticsTrackOtpClicks(payload, santizedFormDataWithContext(globals), currentFormContext);
-}
-
-/**
  * sends data to rum server.
  * @param {object} payload
  */
-function sendDataToRum(payload) {
-  console.log("Event Payload: ", payload);
-  /*if (typeof numRetries === 'number' && numRetries < 1) {
-    globals.functions.setProperty(globals.form.otpPanel, { visible: false });
-    globals.functions.setProperty(globals.form.submitOTP, { visible: false });
-    globals.functions.setProperty(globals.form.resultPanel, { visible: true });
-    globals.functions.setProperty(globals.form.errorResultPanel, { visible: true });
-  }*/
-}
+const sendDataToRum = (payload) => {
+  console.log('Event Payload: ', payload);
+  sampleRUM('getOtp', { source: 'otp', target: payload });
+};
 
 export {
   getThisCard,
@@ -988,6 +970,5 @@ export {
   currentAddressToggleHandler,
   finalDap,
   otpValHandler,
-  sendDataToAnalytics,
   sendDataToRum,
 };
