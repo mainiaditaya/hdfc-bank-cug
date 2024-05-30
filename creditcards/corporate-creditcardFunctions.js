@@ -455,15 +455,17 @@ const setConfirmScrAddressFields = (globalObj) => {
 };
 
 /**
- * Moves the wizard view to the "selectKycPanel" step.
+ * Handles the confirmation of card details and navigates kyc page.
+ *
+ * @param {string} errorCode - The error code to be logged in the analytics.
+ * @param {string} errorMessage - The error message to be logged in the analytics.
+ * @param {Object} globals - The global object containing the form and related utilities.
  */
-const getThisCard = (globals) => {
+const getThisCard = (errorCode, errorMessage, globals) => {
   const nameOnCardDropdown =		globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value;
   const isAddressChanged = currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag === 'Y';
-  executeInterfaceApiFinal(globals);
   setConfirmScrAddressFields(globals);
   if (!isAddressChanged) {
-    moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
     const { addressDeclarationPanel } = globals.form.corporateCardWizardView.confirmAndSubmitPanel;
     const {
       cardDeliveryAddressPanel,
@@ -492,9 +494,16 @@ const getThisCard = (globals) => {
     confirmAndSubmitTC2Util.visible(false);
     continueToIDCOMUtil.visible(true);
     confirmAndSubmitButtonUtil.visible(false);
+    moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
   } else {
     moveWizardView('corporateCardWizardView', 'selectKycPanel');
   }
+  currentFormContext.action = 'getThisCard';
+  const payload = {
+    errorCode,
+    errorMessage,
+  };
+  globals.functions.setProperty(globals.form.runtime.analytics, { value: JSON.stringify(payload) });
 };
 
 /**

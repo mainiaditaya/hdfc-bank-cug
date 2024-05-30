@@ -57,7 +57,8 @@ const getValidationMethod = (formContext) => {
  * @param {object} formContext
  * @param {object} digitalData
  */
-function sendSubmitClickEvent(phone, linkName, linkType, formContext, currentFormContext, digitalData) {
+function sendSubmitClickEvent(phone, link, formContext, currentFormContext, digitalData) {
+  const linkInfo = data[link];
   const digitalDataEvent = digitalData || {
     page: {
       pageInfo: {
@@ -108,11 +109,57 @@ function sendSubmitClickEvent(phone, linkName, linkType, formContext, currentFor
       annualFee: '',
     },
   };
-  sendGenericClickEvent(linkName, linkType, currentFormContext, digitalDataEvent);
-  digitalDataEvent.event = {
-    phone,
-    validationMethod: getValidationMethod(formContext),
-  };
+  sendGenericClickEvent(linkInfo.linkName, linkInfo.linkType, currentFormContext, digitalDataEvent);
+  switch (link) {
+    case 'getOTP': {
+      digitalDataEvent.event = {
+        phone,
+        validationMethod: getValidationMethod(formContext),
+      };
+      break;
+    }
+    case 'checkOffers': {
+      digitalDataEvent.user = {
+        gender: 'Male',
+        email: 'hardcodedMailId@gmail.com',
+      };
+      if (formContext.form.currentAddressToggle === 'off') {
+        digitalDataEvent.formDetails = {
+          pincode: currentFormContext.breDemogResponse.VDCUSTZIPCODE,
+          city: currentFormContext.breDemogResponse.VDCUSTCITY,
+          state: currentFormContext.breDemogResponse.VDCUSTSTATE,
+        };
+      } else {
+        const isETB = currentFormContext.journeyType === 'ETB';
+        digitalDataEvent.formDetails = {
+          pincode: isETB ? formContext.form.newCurentAddressPin : formContext.form.currentAddresPincodeNTB,
+          city: isETB ? 'hardcodedETBCity' : 'hardcodedNTBCity',
+          state: isETB ? 'hardcodedETBState' : 'hardcodedNTBState',
+        };
+      }
+      Object.assign(digitalDataEvent.formDetails, {
+        employmentType: formContext.form.employmentType,
+        companyName: formContext.form.companyName,
+        designation: formContext.form.designation,
+        relationshipNumber: formContext.form.relationshipNumber,
+      });
+      break;
+    }
+
+    case 'getThisCard': {
+      digitalDataEvent.card = {
+        selectedCard: '',
+        annualFee: '',
+      };
+      digitalDataEvent.event = {
+        status: '',
+      };
+      break;
+    }
+    default: {
+      /* empty */
+    }
+  }
   window.digitalData = digitalDataEvent || {};
   // eslint-disable-next-line no-undef
   _satellite.track('submit');
@@ -138,7 +185,13 @@ function populateResponse(payload, action, digitalDataEvent) {
   switch (action) {
     case 'getOTP': {
       digitalDataEvent.page.pageInfo.errorCode = payload?.status?.errorCode;
-      digitalDataEvent.page.pageInfo.errorMessage = payload?.status?.errorMsg;
+      digitalDataEvent.page.pageInfo.errorMessage = payload?.status?.errorMessage;
+      break;
+    }
+    case 'checkOffers':
+    case 'getThisCard': {
+      digitalDataEvent.page.pageInfo.errorCode = payload?.errorCode;
+      digitalDataEvent.page.pageInfo.errorMessage = payload?.errorMessage;
       break;
     }
     default: {
@@ -153,6 +206,7 @@ function populateResponse(payload, action, digitalDataEvent) {
  * @param {object} formData
  */
 function sendAnalyticsEvent(payload, formData, currentFormContext) {
+  const action = currentFormContext?.action;
   const digitalDataEvent = {
     page: {
       pageInfo: {
@@ -204,10 +258,13 @@ function sendAnalyticsEvent(payload, formData, currentFormContext) {
     },
   };
   const apiResponse = JSON.parse(payload || {});
-  const action = currentFormContext?.action;
-  const attributes = data[action];
   populateResponse(apiResponse, action, digitalDataEvent);
-  sendSubmitClickEvent(formData?.login?.registeredMobileNumber, action, attributes?.linkType, formData, currentFormContext, digitalDataEvent);
+  sendSubmitClickEvent(formData?.login?.registeredMobileNumber, action, formData, currentFormContext, digitalDataEvent);
+  if (action === 'checkOffers') {
+    digitalDataPageLoad.card.selectedCard = currentFormContext.productCode;
+    digitalDataPageLoad.card.eligibleCard = currentFormContext.productCode;
+    sendPageloadEvent();
+  }
 }
 
 export {

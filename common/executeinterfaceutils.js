@@ -201,6 +201,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
       comResidenceType: '2',
     },
   };
+  currentFormContext.callExecuteInterface = true;
   return requestObj;
 };
 
@@ -452,6 +453,10 @@ const executeInterfaceApiFinal = (globals) => {
  */
 const executeInterfaceApi = (showLoader, hideLoader, globals) => {
   const executeInterfaceRequest = createExecuteInterfaceRequestObj(globals);
+  if (currentFormContext.callExecuteInterface) {
+    currentFormContext.callExecuteInterface = false;
+    executeInterfaceRequest.requestString.nameOnCard = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value;
+  }
   currentFormContext.executeInterfaceReqObj = { ...executeInterfaceRequest };
   const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/executeinterface.json');
   if (showLoader) currentFormContext.executeInterface();
@@ -502,6 +507,7 @@ const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJw
  * @param {Object} globals - The global context object containing form and view configurations.
  */
 const ipaSuccessHandler = (ipa, productEligibility, errorCode, errorMessage, globals) => {
+  currentFormContext.action = 'checkOffers';
   const { productDetails } = productEligibility;
   const [firstProductDetail] = productDetails;
 
