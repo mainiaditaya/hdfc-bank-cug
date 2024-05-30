@@ -231,7 +231,8 @@ async function sendAnalyticsEvent(xdmData) {
 }
 
 export async function analyticsTrackOtpClicks(payload, linkType = 'button', additionalXdmFields = {}) {
-  const apiResponse = JSON.parse(payload || {});
+  const jsonString = JSON.stringify(payload || {});
+  const apiResponse = JSON.parse(jsonString);
   // sendSubmitClickEvent(formData?.login?.registeredMobileNumber, action, attributes?.linkType, formData, currentFormContext, digitalDataEvent);
   // const action = currentFormContext?.action;
   // const attributes = data[action];
@@ -251,8 +252,8 @@ export async function analyticsTrackOtpClicks(payload, linkType = 'button', addi
       },
       [CUSTOM_SCHEMA_NAMESPACE]: {
         error: {
-          errorMessage: apiResponse?.status?.errorMsg,
-          errorCode: apiResponse?.status?.errorCode,
+          errorMessage: apiResponse?.target?.otpGenResponse?.status?.errorMsg,
+          errorCode: apiResponse?.target?.otpGenResponse?.status?.errorCode,
         },
         ...additionalXdmFields,
       },
