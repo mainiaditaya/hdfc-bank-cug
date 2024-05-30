@@ -84,7 +84,7 @@ function getOTP(mobileNumber, pan, dob) {
   currentFormContext?.getOtpLoader();
   // send rum data
   // sampleRUM('otp');
-  analyticsTrackOtpClicks('getOTP', 'button');
+  // analyticsTrackOtpClicks('getOTP', 'button');
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 

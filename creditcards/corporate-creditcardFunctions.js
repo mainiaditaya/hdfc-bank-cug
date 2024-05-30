@@ -36,6 +36,10 @@ import {
 
 import { sendPageloadEvent } from '../common/analytics.js';
 
+import {
+  analyticsTrackOtpClicks,
+} from '../scripts/lib-analytics.js';
+
 // Initialize all Corporate Card Journey Context Variables.
 const journeyName = 'CORPORATE_CARD_JOURNEY';
 currentFormContext.journeyID = createJourneyId('a', 'b', 'c');
@@ -949,6 +953,30 @@ const finalDap = (globals) => {
   restAPICall('', 'POST', dapRequestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
 };
 
+/**
+* sendAnalytics
+* @param {string} payload
+* @param {object} globals
+*/
+// eslint-disable-next-line no-unused-vars
+function sendDataToAnalytics(payload, globals) {
+  analyticsTrackOtpClicks(payload, santizedFormDataWithContext(globals), currentFormContext);
+}
+
+/**
+ * sends data to rum server.
+ * @param {object} payload
+ */
+function sendDataToRum(payload) {
+  console.log("Event Payload: ", payload);
+  /*if (typeof numRetries === 'number' && numRetries < 1) {
+    globals.functions.setProperty(globals.form.otpPanel, { visible: false });
+    globals.functions.setProperty(globals.form.submitOTP, { visible: false });
+    globals.functions.setProperty(globals.form.resultPanel, { visible: true });
+    globals.functions.setProperty(globals.form.errorResultPanel, { visible: true });
+  }*/
+}
+
 export {
   getThisCard,
   prefillForm,
@@ -960,4 +988,6 @@ export {
   currentAddressToggleHandler,
   finalDap,
   otpValHandler,
+  sendDataToAnalytics,
+  sendDataToRum,
 };

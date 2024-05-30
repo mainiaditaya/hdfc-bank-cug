@@ -212,12 +212,31 @@ export async function analyticsTrackLinkClicks(element, linkType = 'other', addi
   });
 }
 
-export async function analyticsTrackOtpClicks(element, linkType = 'other', additionalXdmFields = {}) {
+export async function analyticsTrackOtpClicks(payload, formData, currentFormContext, linkType = 'other', additionalXdmFields = {}) {
+  const apiResponse = JSON.parse(payload || {});
+  // sendSubmitClickEvent(formData?.login?.registeredMobileNumber, action, attributes?.linkType, formData, currentFormContext, digitalDataEvent);
+  const action = currentFormContext?.action;
+  const attributes = data[action];
   return alloy('sendEvent', {
     documentUnloading: true,
     xdm: {
       eventType: 'web.webinteraction.linkClicks',
+      web: {
+        webInteraction: {
+          URL: `${element.href}`,
+          // eslint-disable-next-line no-nested-ternary
+          name: action,
+          linkClicks: {
+            value: 1,
+          },
+          type: attributes?.linkType,
+        },
+      },
       [CUSTOM_SCHEMA_NAMESPACE]: {
+        error: {
+          errorMessage: payload?.status?.errorMsg,
+          errorCode: payload?.status?.errorCode,
+        },
         ...additionalXdmFields,
       },
     },
