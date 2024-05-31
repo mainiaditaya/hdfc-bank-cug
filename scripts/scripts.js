@@ -19,6 +19,14 @@ import {
   analyticsTrackOtpClicks,
 } from './lib-analytics.js';
 
+import {
+  currentFormContext,
+} from '../common/journey-utils.js';
+
+import {
+  santizedFormDataWithContext,
+} from '../common/formutils.js';
+
 const LCP_BLOCKS = []; // add your LCP blocks to the list
 
 /**
@@ -158,7 +166,7 @@ sampleRUM.always.on('cwv', async (data) => {
 
 sampleRUM.always.on('getOtp', async (data) => {
   // if (!data.cwv) return;
-  analyticsTrackOtpClicks(data);
+  analyticsTrackOtpClicks(data.target.payload, santizedFormDataWithContext(data.target.globals), currentFormContext);
 });
 
 /*
