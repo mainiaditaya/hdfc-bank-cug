@@ -230,7 +230,14 @@ async function sendAnalyticsEvent(xdmData) {
   });
 }
 
-export async function analyticsTrackOtpClicks(payload, linkType = 'button', additionalXdmFields = {}) {
+const getValidationMethod = (formContext) => {
+  if (formContext && formContext?.login && formContext.login.panDobSelection) {
+    return formContext.login.panDobSelection === '0' ? 'DOB' : 'PAN';
+  }
+  return '';
+};
+
+export async function analyticsTrackOtpClicks(payload, formData, formContext, linkType = 'button', additionalXdmFields = {}) {
   const jsonString = JSON.stringify(payload || {});
   const apiResponse = JSON.parse(jsonString);
   // sendSubmitClickEvent(formData?.login?.registeredMobileNumber, action, attributes?.linkType, formData, currentFormContext, digitalDataEvent);
@@ -243,7 +250,7 @@ export async function analyticsTrackOtpClicks(payload, linkType = 'button', addi
       web: {
         webInteraction: {
           // eslint-disable-next-line no-nested-ternary
-          name: 'getOtp',
+          name: formContext?.action,
           linkClicks: {
             value: 1,
           },
@@ -252,8 +259,23 @@ export async function analyticsTrackOtpClicks(payload, linkType = 'button', addi
       },
       [CUSTOM_SCHEMA_NAMESPACE]: {
         error: {
-          errorMessage: apiResponse?.target?.otpGenResponse?.status?.errorMsg,
-          errorCode: apiResponse?.target?.otpGenResponse?.status?.errorCode,
+          errorMessage: apiResponse?.otpGenResponse?.status?.errorMsg,
+          errorCode: apiResponse?.otpGenResponse?.status?.errorCode,
+        },
+        form: {
+          name: 'Corporate credit card',
+        },
+        page: {
+          pageName: 'CORPORATE_CARD_JOURNEY',
+        },
+        journey: {
+          journeyID: formContext?.journeyID,
+          journeyName: 'CORPORATE_CARD_JOURNEY',
+          journeyState: formContext?.journeyState,
+          formloginverificationmethod: getValidationMethod(formData),
+        },
+        identifier: {
+          mobileHash: formData?.login?.registeredMobileNumber,
         },
         ...additionalXdmFields,
       },

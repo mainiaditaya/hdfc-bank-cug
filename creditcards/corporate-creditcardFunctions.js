@@ -953,10 +953,11 @@ const finalDap = (globals) => {
 /**
  * sends data to rum server.
  * @param {object} payload
+ * @param {object} globals
  */
-const sendDataToRum = (payload) => {
+const sendDataToRum = (payload, globals) => {
   console.log('Event Payload: ', payload);
-  sampleRUM('getOtp', { source: 'otp', target: payload });
+  sampleRUM('getOtp', { source: 'otp', target: { payload, globals } });
 };
 
 export {
