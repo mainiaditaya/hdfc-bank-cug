@@ -52,12 +52,12 @@ export function getAlloyInitScript() {
  */
 function getDatastreamConfiguration() {
   const { hostname } = window.location;
-  let edgeConfigId = 'e05f92f2-1ed5-49ae-9dda-42c0dbdaa927'; // HDFC(DEV)
+  let edgeConfigId = 'bcc54d12-a918-4471-b671-5af1141b5a55'; // 'e05f92f2-1ed5-49ae-9dda-42c0dbdaa927'; // HDFC(DEV)
   if (hostname?.endsWith('hdfc.com')) {
-    edgeConfigId = 'e05f92f2-1ed5-49ae-9dda-42c0dbdaa927'; // HDFC(PROD)
+    edgeConfigId = 'bcc54d12-a918-4471-b671-5af1141b5a55'; // 'e05f92f2-1ed5-49ae-9dda-42c0dbdaa927'; // HDFC(PROD)
   }
   if (hostname?.endsWith('hlx.page') || hostname?.endsWith('hlx.live')) {
-    edgeConfigId = 'e05f92f2-1ed5-49ae-9dda-42c0dbdaa927'; // HDFC(STAGE)
+    edgeConfigId = 'bcc54d12-a918-4471-b671-5af1141b5a55'; // 'e05f92f2-1ed5-49ae-9dda-42c0dbdaa927'; // HDFC(STAGE)
   }
 
   return {
