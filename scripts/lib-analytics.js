@@ -156,7 +156,7 @@ export async function analyticsTrackPageViews(document, additionalXdmFields = {}
             value: 1,
           },
           name: `${document.title}`,
-          URL: 'https://www.google.com/', // update with actual URL
+          URL: `${document.URL}`,
         },
       },
       [CUSTOM_SCHEMA_NAMESPACE]: {
