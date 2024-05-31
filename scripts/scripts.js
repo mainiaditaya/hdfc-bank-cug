@@ -15,7 +15,6 @@ import {
   createInlineScript,
   getAlloyInitScript,
   setupAnalyticsTrackingWithAlloy,
-  analyticsTrackCWV,
   analyticsTrackOtpClicks,
 } from './lib-analytics.js';
 
@@ -130,6 +129,7 @@ async function loadLazy(doc) {
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
   sampleRUM.observe(main.querySelectorAll('picture > img'));
 
+  // initialize analytics
   await setupAnalyticsTrackingWithAlloy(document);
 }
 
@@ -150,48 +150,10 @@ async function loadPage() {
   loadDelayed();
 }
 
-const cwv = {};
-
-// Forward the RUM CWV cached measurements to edge using WebSDK before the page unloads
-window.addEventListener('beforeunload', () => {
-  if (!Object.keys(cwv).length) return;
-  analyticsTrackCWV(cwv);
-});
-
-// Callback to RUM CWV checkpoint in order to cache the measurements
-sampleRUM.always.on('cwv', async (data) => {
-  if (!data.cwv) return;
-  Object.assign(cwv, data.cwv);
-});
-
+// Callback to RUM getOtp checkpoint
 sampleRUM.always.on('getOtp', async (data) => {
-  // if (!data.cwv) return;
+  if (!data.target.payload) return;
   analyticsTrackOtpClicks(data.target.payload, santizedFormDataWithContext(data.target.globals), currentFormContext);
 });
-
-/*
-let cwv = {};
-sampleRUM.always.on('cwv', async (data) => {
-  if (data.cwv) {
-    cwv = {
-      ...cwv,
-      ...data.cwv
-    };
-  }
-});
-
-export async function analyticsTrackCWV(cwv) {
-  // eslint-disable-next-line no-undef
-  return alloy('sendEvent', {
-    documentUnloading: true,
-    xdm: {
-      eventType: 'web.performance.measurements',
-      [CUSTOM_SCHEMA_NAMESPACE]: {
-        cwv,
-      }
-    },
-  });
-}
-*/
 
 loadPage();
