@@ -92,7 +92,7 @@ function getOTP(mobileNumber, pan, dob, globals) {
       identifierName: pan.$value ? 'PAN' : 'DOB',
     },
   };
-  const path = urlPath('/content/hdfc_ccforms/api/customeridentificationV4.json');
+  const path = urlPath('/content/hdfc_haf/api/otpgenerationccV4.json');
   currentFormContext?.getOtpLoader();
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }

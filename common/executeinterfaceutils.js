@@ -427,7 +427,7 @@ const executeInterfaceApiFinal = (globals) => {
   requestObj.requestString.resPhoneEditFlag = 'N';
   requestObj.requestString.apsDobEditFlag = 'N';
   requestObj.requestString.apsEmailEditFlag = 'N';
-  const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/executeinterface.json');
+  const apiEndPoint = urlPath('/content/hdfc_haf/api/executeinterface.json');
   const eventHandlers = {
     successCallBack: (response) => {
       console.log(response);
@@ -452,7 +452,7 @@ const executeInterfaceApiFinal = (globals) => {
 const executeInterfaceApi = (showLoader, hideLoader, globals) => {
   const executeInterfaceRequest = createExecuteInterfaceRequestObj(globals);
   currentFormContext.executeInterfaceReqObj = { ...executeInterfaceRequest };
-  const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/executeinterface.json');
+  const apiEndPoint = urlPath('/content/hdfc_haf/api/executeinterface.json');
   if (showLoader) currentFormContext.executeInterface();
   return fetchJsonResponse(apiEndPoint, executeInterfaceRequest, 'POST', hideLoader);
 };
