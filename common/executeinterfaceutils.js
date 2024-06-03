@@ -14,7 +14,9 @@ import {
   fetchIPAResponse,
   hideLoaderGif,
 } from './makeRestAPI.js';
+import corpCreditCard from './constants.js';
 
+const { endpoints, baseUrl } = corpCreditCard;
 const GENDER_MAP = {
   M: '1',
   F: '2',
@@ -243,7 +245,7 @@ const journeyResume = (globals, response) => {
   currentFormContext.productDetails = response.productEligibility.productDetails?.[0];
   currentFormContext.ipaResponse = response;
   const imageEl = document.querySelector('.field-cardimage > picture');
-  const imagePath = `https://applyonlinedev.hdfcbank.com${response.productEligibility.productDetails[0]?.cardTypePath}?width=2000&optimize=medium`;
+  const imagePath = `${baseUrl}${response.productEligibility.productDetails[0]?.cardTypePath}?width=2000&optimize=medium`;
   imageEl.childNodes[5].setAttribute('src', imagePath);
   imageEl.childNodes[3].setAttribute('srcset', imagePath);
   imageEl.childNodes[1].setAttribute('srcset', imagePath);
@@ -288,7 +290,7 @@ const journeyRestart = (globals) => {
  * @returns {void}
  */
 const sendIpaRequest = async (ipaRequestObj, globals) => {
-  const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/ipa.json');
+  const apiEndPoint = urlPath(endpoints.ipa);
   const exceedTimeLimit = (TOTAL_TIME >= currentFormContext.ipaDuration * 1000);
   const method = 'POST';
   const successMethod = (respData) => {
@@ -324,7 +326,7 @@ const customerValidationHandler = {
   executeInterfaceApi: async (globals) => {
     const requestObj = createExecuteInterfaceRequestObj(globals);
     currentFormContext.executeInterfaceReqObj = { ...requestObj };
-    const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/executeinterface.json');
+    const apiEndPoint = urlPath(endpoints.executeInterface);
     const method = 'POST';
     const successMethod = (respData) => {
       if (respData.errorCode === '0000') {
@@ -397,7 +399,7 @@ const createIdComRequestObj = () => {
  */
 const fetchAuthCode = () => {
   const idComObj = createIdComRequestObj();
-  const apiEndPoint = urlPath('/content/hdfc_commonforms/api/fetchauthcode.json');
+  const apiEndPoint = urlPath(endpoints.fetchAuthCode);
   const eventHandlers = {
     successCallBack: (response) => {
       console.log(response);
@@ -427,7 +429,7 @@ const executeInterfaceApiFinal = (globals) => {
   requestObj.requestString.resPhoneEditFlag = 'N';
   requestObj.requestString.apsDobEditFlag = 'N';
   requestObj.requestString.apsEmailEditFlag = 'N';
-  const apiEndPoint = urlPath('/content/hdfc_haf/api/executeinterface.json');
+  const apiEndPoint = urlPath(endpoints.executeInterface);
   const eventHandlers = {
     successCallBack: (response) => {
       console.log(response);
@@ -452,7 +454,7 @@ const executeInterfaceApiFinal = (globals) => {
 const executeInterfaceApi = (showLoader, hideLoader, globals) => {
   const executeInterfaceRequest = createExecuteInterfaceRequestObj(globals);
   currentFormContext.executeInterfaceReqObj = { ...executeInterfaceRequest };
-  const apiEndPoint = urlPath('/content/hdfc_haf/api/executeinterface.json');
+  const apiEndPoint = urlPath(endpoints.executeInterface);
   if (showLoader) currentFormContext.executeInterface();
   return fetchJsonResponse(apiEndPoint, executeInterfaceRequest, 'POST', hideLoader);
 };
@@ -486,7 +488,7 @@ const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJw
     },
   };
   TOTAL_TIME = 0;
-  const apiEndPoint = urlPath('/content/hdfc_etb_wo_pacc/api/ipa.json');
+  const apiEndPoint = urlPath(endpoints.ipa);
   if (showLoader) currentFormContext?.ipa.dispalyLoader();
   return fetchIPAResponse(apiEndPoint, ipaRequestObj, 'POST', ipaDuration, ipaTimer, hideLoader);
 };
@@ -506,7 +508,7 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
   currentFormContext.productDetails = firstProductDetail;
 
   const imageEl = document.querySelector('.field-cardimage > picture');
-  const imagePath = `https://applyonlinedev.hdfcbank.com${firstProductDetail?.cardTypePath}?width=2000&optimize=medium`;
+  const imagePath = `${baseUrl}${firstProductDetail?.cardTypePath}?width=2000&optimize=medium`;
 
   imageEl.childNodes[5].setAttribute('src', imagePath);
   imageEl.childNodes[3].setAttribute('srcset', imagePath);
