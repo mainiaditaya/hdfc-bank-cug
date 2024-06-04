@@ -1,6 +1,8 @@
 /* eslint-disable no-underscore-dangle */
+
+import corpCreditCard from './constants.js';
+
 // declare-CONSTANTS
-const DEFAULT_BASE_PATH = 'https://applyonlinedev.hdfcbank.com'; // baseApiUrl for default
 const DATA_ATTRIBUTE_EMPTY = 'data-empty';
 const ANCESTOR_CLASS_NAME = 'field-wrapper';
 
@@ -10,7 +12,7 @@ const ANCESTOR_CLASS_NAME = 'field-wrapper';
  * @returns {string} - The complete API URL including the base URL and the provided endpoint.
  */
 
-const urlPath = (path) => `${DEFAULT_BASE_PATH}${path}`;
+const urlPath = (path) => `${corpCreditCard.baseUrl}${path}`;
 
 /**
  * Masks a number by replacing the specified number of leading digits with asterisks.

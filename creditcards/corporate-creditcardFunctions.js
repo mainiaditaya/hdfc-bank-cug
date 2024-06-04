@@ -35,10 +35,12 @@ import {
   displayLoader, hideLoaderGif,
 } from '../common/makeRestAPI.js';
 import { sendAnalyticsEvent } from '../common/analytics.js';
+import corpCreditCard from '../common/constants.js';
+
+const { endpoints } = corpCreditCard;
 
 // Initialize all Corporate Card Journey Context Variables.
-const journeyName = 'CORPORATE_CARD_JOURNEY';
-currentFormContext.journeyName = journeyName;
+currentFormContext.journeyName = corpCreditCard.journeyName;
 currentFormContext.journeyType = 'NTB';
 currentFormContext.formName = 'CorporateCreditCard';
 currentFormContext.errorCode = '';
@@ -782,7 +784,7 @@ const pinCodeMaster = async (globals) => {
  */
 const validateEmailID = async (email, globals) => {
   const emailField = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.personalEmailAddress;
-  const url = urlPath('/content/hdfc_commonforms/api/emailid.json');
+  const url = urlPath(endpoints.emailId);
   const setEmailField = formUtil(globals, emailField);
   const invalidMsg = 'Please enter valid email id.';
   const payload = {
@@ -939,7 +941,7 @@ const updatePanelVisibility = (response, globals) => {
  */
 const finalDap = (globals) => {
   const dapRequestObj = createDapRequestObj(globals);
-  const apiEndPoint = urlPath('/content/hdfc_ccforms/api/pacc/finaldapandpdfgen.json');
+  const apiEndPoint = urlPath(endpoints.finalDapAndPdfGen);
   const eventHandlers = {
     successCallBack: (response) => {
       console.log(response);
@@ -1067,7 +1069,7 @@ const resendOTP = (globals) => {
       dateOfBith: dob || '',
       panNumber: panNo || '',
       journeyID: globals.form.runtime.journeyId.$value,
-      journeyName: 'CORPORATE_CARD_JOURNEY',
+      journeyName: corpCreditCard.journeyName,
       userAgent: window.navigator.userAgent,
       identifierValue: panNo || dob.$value,
       identifierName: panNo ? 'PAN' : 'DOB',
@@ -1077,7 +1079,7 @@ const resendOTP = (globals) => {
   const errorCallback = (err, globalObj) => errorResendOtp(err, globalObj);
   const loadingText = 'Please wait otp sending again...';
   const method = 'POST';
-  const path = urlPath('/content/hdfc_ccforms/api/customeridentificationV4.json');
+  const path = urlPath(endpoints.otpGen);
   try {
     restAPICall(globals, method, payload, path, successCallback, errorCallback, loadingText);
   } catch (error) {
