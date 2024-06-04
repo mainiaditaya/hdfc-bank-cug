@@ -4,7 +4,7 @@ const corpCreditCard = {
     aadharInit: '/content/hdfc_etb_wo_pacc/api/aadharInit.json',
     authCode: '/content/hdfc_commonforms/api/fetchauthcode.json',
     emailId: '/content/hdfc_commonforms/api/emailid.json',
-    executeInterface: '/content/hdfc_etb_wo_pacc/api/executeinterface.json',
+    executeInterface: '/content/hdfc_haf/api/executeinterface.json',
     finalDapAndPdfGen: '/content/hdfc_ccforms/api/pacc/finaldapandpdfgen.json',
     ipa: '/content/hdfc_etb_wo_pacc/api/ipa.json',
     journeyDropOff: '/content/hdfc_commonforms/api/journeydropoff.json',
