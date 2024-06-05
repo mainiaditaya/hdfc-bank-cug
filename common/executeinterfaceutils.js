@@ -168,7 +168,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
       officeState: employmentDetails.officeAddressState.$value,
       productCode: '',
       leadClosures: globals.functions.exportData().form.leadClosures,
-      leadGenerateor: globals.functions.exportData().form.leadGenerator,
+      leadGenerater: globals.functions.exportData().form.leadGenerator,
       applyingBranch: 'N',
       smCode: '',
       dseCode: '',
