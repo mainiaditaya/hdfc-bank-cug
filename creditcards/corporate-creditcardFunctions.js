@@ -377,7 +377,7 @@ const otpValHandler = (response, globals) => {
   const res = {};
   res.demogResponse = response;
   currentFormContext.isCustomerIdentified = res?.demogResponse?.errorCode === '0' ? 'Y' : 'N';
-  currentFormContext.productCode = globals.functions.exportData().form.productCode;
+  formRuntime.productCode = globals.functions.exportData().form.productCode;
   currentFormContext.promoCode = globals.functions.exportData().form.promoCode;
   currentFormContext.jwtToken = res?.demogResponse?.Id_token_jwt;
   currentFormContext.panFromDemog = res?.demogResponse?.BRECheckAndFetchDemogResponse?.VDCUSTITNBR;
@@ -885,11 +885,11 @@ const createDapRequestObj = (globals) => {
       APS_FILLER6: '',
       APS_SMCODE: '',
       APS_DSE_CODE: '',
-      applicationERefNumber: currentFormContext?.ipaResponse?.ipa?.eRefNumber || formContextCallbackData?.ipaResponse?.ipa?.eRefNumber,
+      applicationERefNumber: formRuntime?.eRefNumber || formContextCallbackData?.eRefNumber,
       SOA_REQUESTID: '0305245144',
       nameOfDirector: '',
       relationship: '',
-      product: currentFormContext?.productDetails?.product || formContextCallbackData?.productDetails?.product,
+      product: formRuntime?.productCode || formContextCallbackData?.productCode,
       APS_TYPE_OF_INDUSTRY: '',
       journeyID: currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
@@ -902,10 +902,10 @@ const createDapRequestObj = (globals) => {
       docUpload: '',
       idcomEnabled: true,
       APS_CAPTCHA: '',
-      applRefNo: currentFormContext?.ipaResponse?.ipa?.applRefNumber || formContextCallbackData?.ipaResponse?.ipa?.applRefNumber,
+      applRefNo: formRuntime?.applRefNumber || formContextCallbackData?.applRefNumber,
       txnRefNo: '',
       pseudoID: '',
-      FILLER8: currentFormContext?.ipaResponse?.ipa?.filler8 || formContextCallbackData?.ipaResponse?.ipa?.filler8,
+      FILLER8: formRuntime?.filler8 || formContextCallbackData?.filler8,
       Id_token_jwt: currentFormContext.jwtToken || formContextCallbackData.jwtToken,
       IDCOM_Token: '',
       JSCPAYLOAD: '',
