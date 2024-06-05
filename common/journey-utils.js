@@ -28,6 +28,7 @@ function createJourneyId(visitMode, journeyAbbreviation, channel, globals) {
 }
 
 const currentFormContext = {};
+const formRuntime = {};
 
 const getCurrentContext = () => currentFormContext;
 
@@ -145,5 +146,5 @@ const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyI
 };
 
 export {
-  invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate, journeyResponseHandlerUtil, currentFormContext, getCurrentContext, setCurrentContext, createJourneyId,
+  invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate, journeyResponseHandlerUtil, currentFormContext, getCurrentContext, setCurrentContext, createJourneyId, formRuntime,
 };

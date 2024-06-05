@@ -14,6 +14,7 @@ import {
   sendAnalytics,
   aadharConsent123,
   resendOTP,
+  formRuntime,
 } from '../creditcards/corporate-creditcardFunctions.js';
 import {
   validatePan,
@@ -96,7 +97,7 @@ function getOTP(mobileNumber, pan, dob, globals) {
     },
   };
   const path = urlPath(endpoints.otpGen);
-  currentFormContext?.getOtpLoader();
+  formRuntime?.getOtpLoader();
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 
@@ -125,7 +126,7 @@ function otpValidation(mobileNumber, pan, dob, otpNumber) {
     },
   };
   const path = urlPath(endpoints.otpValFetchAssetDemog);
-  currentFormContext?.otpValLoader();
+  formRuntime?.otpValLoader();
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 

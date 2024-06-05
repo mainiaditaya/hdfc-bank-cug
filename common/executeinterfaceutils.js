@@ -6,7 +6,7 @@ import {
   composeNameOption,
   setSelectOptions,
 } from './formutils.js';
-import { currentFormContext } from './journey-utils.js';
+import { currentFormContext, formRuntime } from './journey-utils.js';
 import {
   restAPICall,
   getJsonResponse,
@@ -229,6 +229,7 @@ const listNameOnCard = (globals) => {
  * @param {object} globals - globals variables object containing form configurations.
  */
 const journeyTerminate = (globals) => {
+  debugger;
   hideLoaderGif();
   const resultPanel = formUtil(globals, globals.form.resultPanel);
   const wizardPanel = formUtil(globals, globals.form.corporateCardWizardView);
@@ -242,10 +243,13 @@ const journeyTerminate = (globals) => {
  * @param {object} response - object containing response from the previosu api call
  */
 const journeyResume = (globals, response) => {
+  debugger;
   currentFormContext.productDetails = response.productEligibility.productDetails?.[0];
   currentFormContext.ipaResponse = response;
+  //currentFormContext.applicationRefNum = response;
   const imageEl = document.querySelector('.field-cardimage > picture');
   const imagePath = `${baseUrl}${response.productEligibility.productDetails[0]?.cardTypePath}?width=2000&optimize=medium`;
+  debugger;
   imageEl.childNodes[5].setAttribute('src', imagePath);
   imageEl.childNodes[3].setAttribute('srcset', imagePath);
   imageEl.childNodes[1].setAttribute('srcset', imagePath);
@@ -290,6 +294,7 @@ const journeyRestart = (globals) => {
  * @returns {void}
  */
 const sendIpaRequest = async (ipaRequestObj, globals) => {
+  debugger;
   const apiEndPoint = urlPath(endpoints.ipa);
   const exceedTimeLimit = (TOTAL_TIME >= currentFormContext.ipaDuration * 1000);
   const method = 'POST';
@@ -302,6 +307,7 @@ const sendIpaRequest = async (ipaRequestObj, globals) => {
       return;
     }
     if (ipaResNotPresent) {
+      debugger;
       setTimeout(() => sendIpaRequest(ipaRequestObj, globals), currentFormContext.ipaTimer * 1000);
       TOTAL_TIME += currentFormContext.ipaTimer * 1000;
     } else if (promoCode === 'NA' && ipaResult === 'Y') {
@@ -455,7 +461,7 @@ const executeInterfaceApi = (showLoader, hideLoader, globals) => {
   const executeInterfaceRequest = createExecuteInterfaceRequestObj(globals);
   currentFormContext.executeInterfaceReqObj = { ...executeInterfaceRequest };
   const apiEndPoint = urlPath(endpoints.executeInterface);
-  if (showLoader) currentFormContext.executeInterface();
+  if (showLoader) formRuntime.executeInterface();
   return fetchJsonResponse(apiEndPoint, executeInterfaceRequest, 'POST', hideLoader);
 };
 
@@ -472,6 +478,7 @@ const executeInterfaceApi = (showLoader, hideLoader, globals) => {
  * @return {PROMISE}
  */
 const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJwt, ipaDuration, ipaTimer, showLoader, hideLoader) => {
+  debugger;
   currentFormContext.ipaDuration = ipaDuration;
   currentFormContext.ipaTimer = ipaTimer;
   currentFormContext.jwtToken = idTokenJwt;
@@ -489,7 +496,7 @@ const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJw
   };
   TOTAL_TIME = 0;
   const apiEndPoint = urlPath(endpoints.ipa);
-  if (showLoader) currentFormContext?.ipa.dispalyLoader();
+  if (showLoader) formRuntime?.ipa.dispalyLoader();
   return fetchIPAResponse(apiEndPoint, ipaRequestObj, 'POST', ipaDuration, ipaTimer, hideLoader);
 };
 

@@ -3,7 +3,7 @@ import {
   urlPath,
   convertDateToDdMmYyyy,
 } from './formutils.js';
-import { currentFormContext } from './journey-utils.js';
+import { currentFormContext, formRuntime } from './journey-utils.js';
 import corpCreditCard from './constants.js';
 
 const { endpoints, deadPanStatus } = corpCreditCard;
@@ -30,7 +30,7 @@ const validatePan = (mobileNumber, panNumber, dob, firstName, showLoader, hideLo
       name: firstName ? firstName.split(' ')[0] : '',
     },
   };
-  if (showLoader) currentFormContext?.validatePanLoader();
+  if (showLoader) formRuntime?.validatePanLoader();
   const apiEndPoint = urlPath(endpoints.panValNameMatch);
   return fetchJsonResponse(apiEndPoint, validatePanRequest, 'POST', hideLoader);
 };

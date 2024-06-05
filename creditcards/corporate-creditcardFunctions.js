@@ -6,7 +6,7 @@
 /* eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
 import {
-  invokeJourneyDropOff, invokeJourneyDropOffUpdate, journeyResponseHandlerUtil, currentFormContext, createJourneyId, invokeJourneyDropOffByParam,
+  invokeJourneyDropOff, invokeJourneyDropOffUpdate, journeyResponseHandlerUtil, currentFormContext, createJourneyId, invokeJourneyDropOffByParam, formRuntime,
 } from '../common/journey-utils.js';
 import executeCheck from '../common/panutils.js';
 import { customerValidationHandler, executeInterfaceApiFinal } from '../common/executeinterfaceutils.js';
@@ -46,14 +46,14 @@ currentFormContext.formName = 'CorporateCreditCard';
 currentFormContext.errorCode = '';
 currentFormContext.errorMessage = '';
 currentFormContext.eligibleOffers = '';
-currentFormContext.getOtpLoader = currentFormContext.getOtpLoader || (typeof window !== 'undefined') ? displayLoader : false;
-currentFormContext.otpValLoader = currentFormContext.otpValLoader || (typeof window !== 'undefined') ? displayLoader : false;
-currentFormContext.validatePanLoader = (typeof window !== 'undefined') ? displayLoader : false;
-currentFormContext.executeInterface = (typeof window !== 'undefined') ? displayLoader : false;
-currentFormContext.ipa = (typeof window !== 'undefined') ? displayLoader : false;
-currentFormContext.aadharInit = (typeof window !== 'undefined') ? displayLoader : false;
-currentFormContext.hideLoader = (typeof window !== 'undefined') ? hideLoaderGif : false;
-const formInitailzeData = {};
+
+formRuntime.getOtpLoader = currentFormContext.getOtpLoader || (typeof window !== 'undefined') ? displayLoader : false;
+formRuntime.otpValLoader = currentFormContext.otpValLoader || (typeof window !== 'undefined') ? displayLoader : false;
+formRuntime.validatePanLoader = (typeof window !== 'undefined') ? displayLoader : false;
+formRuntime.executeInterface = (typeof window !== 'undefined') ? displayLoader : false;
+formRuntime.ipa = (typeof window !== 'undefined') ? displayLoader : false;
+formRuntime.aadharInit = (typeof window !== 'undefined') ? displayLoader : false;
+formRuntime.hideLoader = (typeof window !== 'undefined') ? hideLoaderGif : false;
 
 let PAN_VALIDATION_STATUS = false;
 let PAN_RETRY_COUNTER = 1;
@@ -971,11 +971,11 @@ const aadharConsent123 = async (globals) => {
         actionWrapClass: btnWrapClassName,
         reqConsentAgree: true,
       };
-      if (typeof formInitailzeData.aadharConfig === 'undefined') {
-        formInitailzeData.aadharConfig = config;
+      if (typeof formRuntime.aadharConfig === 'undefined') {
+        formRuntime.aadharConfig = config;
       }
-      await openModal(formInitailzeData.aadharConfig);
-      aadharLangChange(formInitailzeData.aadharConfig?.content, 'English');
+      await openModal(formRuntime.aadharConfig);
+      aadharLangChange(formRuntime.aadharConfig?.content, 'English');
       config?.content?.addEventListener('modalTriggerValue', (event) => {
         const receivedData = event.detail;
         if (receivedData?.aadharConsentAgree) {
@@ -1091,6 +1091,7 @@ export {
   getThisCard,
   prefillForm,
   currentFormContext,
+  formRuntime,
   createPanValidationRequest,
   getAddressDetails,
   pinCodeMaster,
