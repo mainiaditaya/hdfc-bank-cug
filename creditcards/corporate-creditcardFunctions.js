@@ -6,7 +6,7 @@
 /* eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
 import {
-  invokeJourneyDropOff, invokeJourneyDropOffUpdate, journeyResponseHandlerUtil, currentFormContext, createJourneyId, invokeJourneyDropOffByParam,
+  invokeJourneyDropOff, invokeJourneyDropOffUpdate, journeyResponseHandlerUtil, currentFormContext, createJourneyId, invokeJourneyDropOffByParam, formRuntime,
 } from '../common/journey-utils.js';
 import executeCheck from '../common/panutils.js';
 import { customerValidationHandler, executeInterfaceApiFinal } from '../common/executeinterfaceutils.js';
@@ -46,14 +46,14 @@ currentFormContext.formName = 'CorporateCreditCard';
 currentFormContext.errorCode = '';
 currentFormContext.errorMessage = '';
 currentFormContext.eligibleOffers = '';
-currentFormContext.getOtpLoader = currentFormContext.getOtpLoader || (typeof window !== 'undefined') ? displayLoader : false;
-currentFormContext.otpValLoader = currentFormContext.otpValLoader || (typeof window !== 'undefined') ? displayLoader : false;
-currentFormContext.validatePanLoader = (typeof window !== 'undefined') ? displayLoader : false;
-currentFormContext.executeInterface = (typeof window !== 'undefined') ? displayLoader : false;
-currentFormContext.ipa = (typeof window !== 'undefined') ? displayLoader : false;
-currentFormContext.aadharInit = (typeof window !== 'undefined') ? displayLoader : false;
-currentFormContext.hideLoader = (typeof window !== 'undefined') ? hideLoaderGif : false;
-const formInitailzeData = {};
+
+formRuntime.getOtpLoader = currentFormContext.getOtpLoader || (typeof window !== 'undefined') ? displayLoader : false;
+formRuntime.otpValLoader = currentFormContext.otpValLoader || (typeof window !== 'undefined') ? displayLoader : false;
+formRuntime.validatePanLoader = (typeof window !== 'undefined') ? displayLoader : false;
+formRuntime.executeInterface = (typeof window !== 'undefined') ? displayLoader : false;
+formRuntime.ipa = (typeof window !== 'undefined') ? displayLoader : false;
+formRuntime.aadharInit = (typeof window !== 'undefined') ? displayLoader : false;
+formRuntime.hideLoader = (typeof window !== 'undefined') ? hideLoaderGif : false;
 
 let PAN_VALIDATION_STATUS = false;
 let PAN_RETRY_COUNTER = 1;
@@ -377,7 +377,7 @@ const otpValHandler = (response, globals) => {
   const res = {};
   res.demogResponse = response;
   currentFormContext.isCustomerIdentified = res?.demogResponse?.errorCode === '0' ? 'Y' : 'N';
-  currentFormContext.productCode = globals.functions.exportData().form.productCode;
+  formRuntime.productCode = globals.functions.exportData().form.productCode;
   currentFormContext.promoCode = globals.functions.exportData().form.promoCode;
   currentFormContext.jwtToken = res?.demogResponse?.Id_token_jwt;
   currentFormContext.panFromDemog = res?.demogResponse?.BRECheckAndFetchDemogResponse?.VDCUSTITNBR;
@@ -885,11 +885,11 @@ const createDapRequestObj = (globals) => {
       APS_FILLER6: '',
       APS_SMCODE: '',
       APS_DSE_CODE: '',
-      applicationERefNumber: currentFormContext?.ipaResponse?.ipa?.eRefNumber || formContextCallbackData?.ipaResponse?.ipa?.eRefNumber,
+      applicationERefNumber: formRuntime?.eRefNumber || formContextCallbackData?.eRefNumber,
       SOA_REQUESTID: '0305245144',
       nameOfDirector: '',
       relationship: '',
-      product: currentFormContext?.productDetails?.product || formContextCallbackData?.productDetails?.product,
+      product: formRuntime?.productCode || formContextCallbackData?.productCode,
       APS_TYPE_OF_INDUSTRY: '',
       journeyID: currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
@@ -902,10 +902,10 @@ const createDapRequestObj = (globals) => {
       docUpload: '',
       idcomEnabled: true,
       APS_CAPTCHA: '',
-      applRefNo: currentFormContext?.ipaResponse?.ipa?.applRefNumber || formContextCallbackData?.ipaResponse?.ipa?.applRefNumber,
+      applRefNo: formRuntime?.applRefNumber || formContextCallbackData?.applRefNumber,
       txnRefNo: '',
       pseudoID: '',
-      FILLER8: currentFormContext?.ipaResponse?.ipa?.filler8 || formContextCallbackData?.ipaResponse?.ipa?.filler8,
+      FILLER8: formRuntime?.filler8 || formContextCallbackData?.filler8,
       Id_token_jwt: currentFormContext.jwtToken || formContextCallbackData.jwtToken,
       IDCOM_Token: '',
       JSCPAYLOAD: '',
@@ -971,11 +971,11 @@ const aadharConsent123 = async (globals) => {
         actionWrapClass: btnWrapClassName,
         reqConsentAgree: true,
       };
-      if (typeof formInitailzeData.aadharConfig === 'undefined') {
-        formInitailzeData.aadharConfig = config;
+      if (typeof formRuntime.aadharConfig === 'undefined') {
+        formRuntime.aadharConfig = config;
       }
-      await openModal(formInitailzeData.aadharConfig);
-      aadharLangChange(formInitailzeData.aadharConfig?.content, 'English');
+      await openModal(formRuntime.aadharConfig);
+      aadharLangChange(formRuntime.aadharConfig?.content, 'English');
       config?.content?.addEventListener('modalTriggerValue', (event) => {
         const receivedData = event.detail;
         if (receivedData?.aadharConsentAgree) {
@@ -1091,6 +1091,7 @@ export {
   getThisCard,
   prefillForm,
   currentFormContext,
+  formRuntime,
   createPanValidationRequest,
   getAddressDetails,
   pinCodeMaster,

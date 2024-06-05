@@ -6,7 +6,7 @@ import {
   composeNameOption,
   setSelectOptions,
 } from './formutils.js';
-import { currentFormContext } from './journey-utils.js';
+import { currentFormContext, formRuntime } from './journey-utils.js';
 import {
   restAPICall,
   getJsonResponse,
@@ -242,8 +242,10 @@ const journeyTerminate = (globals) => {
  * @param {object} response - object containing response from the previosu api call
  */
 const journeyResume = (globals, response) => {
-  currentFormContext.productDetails = response.productEligibility.productDetails?.[0];
-  currentFormContext.ipaResponse = response;
+  formRuntime.productDetails = response.productEligibility.productDetails?.[0];
+  formRuntime.eRefNumber = response.ipa.eRefNumber;
+  formRuntime.applRefNumber = response.ipa.applRefNumber;
+  formRuntime.filler8 = response.ipa.filler8;
   const imageEl = document.querySelector('.field-cardimage > picture');
   const imagePath = `${baseUrl}${response.productEligibility.productDetails[0]?.cardTypePath}?width=2000&optimize=medium`;
   imageEl.childNodes[5].setAttribute('src', imagePath);
@@ -291,7 +293,7 @@ const journeyRestart = (globals) => {
  */
 const sendIpaRequest = async (ipaRequestObj, globals) => {
   const apiEndPoint = urlPath(endpoints.ipa);
-  const exceedTimeLimit = (TOTAL_TIME >= currentFormContext.ipaDuration * 1000);
+  const exceedTimeLimit = (TOTAL_TIME >= formRuntime.ipaDuration * 1000);
   const method = 'POST';
   const successMethod = (respData) => {
     const ipaResult = respData?.ipa?.ipaResult;
@@ -302,8 +304,8 @@ const sendIpaRequest = async (ipaRequestObj, globals) => {
       return;
     }
     if (ipaResNotPresent) {
-      setTimeout(() => sendIpaRequest(ipaRequestObj, globals), currentFormContext.ipaTimer * 1000);
-      TOTAL_TIME += currentFormContext.ipaTimer * 1000;
+      setTimeout(() => sendIpaRequest(ipaRequestObj, globals), formRuntime.ipaTimer * 1000);
+      TOTAL_TIME += formRuntime.ipaTimer * 1000;
     } else if (promoCode === 'NA' && ipaResult === 'Y') {
       journeyTerminate(globals);
     } else {
@@ -330,8 +332,8 @@ const customerValidationHandler = {
     const method = 'POST';
     const successMethod = (respData) => {
       if (respData.errorCode === '0000') {
-        currentFormContext.ipaDuration = respData.ExecuteInterfaceResponse.ipaDuration;
-        currentFormContext.ipaTimer = respData.ExecuteInterfaceResponse.ipaTimer;
+        formRuntime.ipaDuration = respData.ExecuteInterfaceResponse.ipaDuration;
+        formRuntime.ipaTimer = respData.ExecuteInterfaceResponse.ipaTimer;
         currentFormContext.jwtToken = respData.Id_token_jwt;
         const ipaRequestObj = {
           requestString: {
@@ -342,7 +344,7 @@ const customerValidationHandler = {
             userAgent: navigator.userAgent,
             journeyID: currentFormContext.journeyID,
             journeyName: currentFormContext.journeyName,
-            productCode: currentFormContext.productCode,
+            productCode: formRuntime.productCode,
           },
         };
         TOTAL_TIME = 0;
@@ -381,7 +383,7 @@ const createIdComRequestObj = () => {
   const idComObj = {
     requestString: {
       mobileNumber: currentFormContext.executeInterfaceReqObj.requestString.mobileNumber,
-      ProductCode: currentFormContext.productCode,
+      ProductCode: formRuntime.productCode,
       PANNo: currentFormContext.executeInterfaceReqObj.requestString.panNumber,
       userAgent: navigator.userAgent,
       journeyID: currentFormContext.journeyID,
@@ -421,7 +423,7 @@ const executeInterfaceApiFinal = (globals) => {
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
   requestObj.requestString.nameOnCard = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value;
   // requestObj.requestString.Id_token_jwt = currentFormContext.jwtToken || formCallBackContext?.currentFormContext?.jwtToken;
-  requestObj.requestString.productCode = currentFormContext.productDetails.cardProductCode || formCallBackContext?.currentFormContext?.productDetails?.cardProductCode;
+  requestObj.requestString.productCode = formRuntime.productCode || formCallBackContext?.formRuntime?.productCode;
   requestObj.requestString.addressEditFlag = 'N';
   requestObj.requestString.panEditFlag = 'N';
   requestObj.requestString.nameEditFlag = 'N';
@@ -455,7 +457,7 @@ const executeInterfaceApi = (showLoader, hideLoader, globals) => {
   const executeInterfaceRequest = createExecuteInterfaceRequestObj(globals);
   currentFormContext.executeInterfaceReqObj = { ...executeInterfaceRequest };
   const apiEndPoint = urlPath(endpoints.executeInterface);
-  if (showLoader) currentFormContext.executeInterface();
+  if (showLoader) formRuntime.executeInterface();
   return fetchJsonResponse(apiEndPoint, executeInterfaceRequest, 'POST', hideLoader);
 };
 
@@ -472,8 +474,6 @@ const executeInterfaceApi = (showLoader, hideLoader, globals) => {
  * @return {PROMISE}
  */
 const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJwt, ipaDuration, ipaTimer, showLoader, hideLoader) => {
-  currentFormContext.ipaDuration = ipaDuration;
-  currentFormContext.ipaTimer = ipaTimer;
   currentFormContext.jwtToken = idTokenJwt;
   const ipaRequestObj = {
     requestString: {
@@ -484,12 +484,12 @@ const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJw
       userAgent: navigator.userAgent,
       journeyID: currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
-      productCode: currentFormContext.productCode,
+      productCode: formRuntime.productCode,
     },
   };
   TOTAL_TIME = 0;
   const apiEndPoint = urlPath(endpoints.ipa);
-  if (showLoader) currentFormContext?.ipa.dispalyLoader();
+  if (showLoader) formRuntime?.ipa.dispalyLoader();
   return fetchIPAResponse(apiEndPoint, ipaRequestObj, 'POST', ipaDuration, ipaTimer, hideLoader);
 };
 
@@ -504,8 +504,10 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
   const { productDetails } = productEligibility;
   const [firstProductDetail] = productDetails;
 
-  currentFormContext.ipaResponse = { ipa, productEligibility };
-  currentFormContext.productDetails = firstProductDetail;
+  formRuntime.productCode = firstProductDetail.cardProductCode;
+  formRuntime.eRefNumber = ipa.eRefNumber;
+  formRuntime.applRefNumber = ipa.applRefNumber;
+  formRuntime.filler8 = ipa.filler8;
 
   const imageEl = document.querySelector('.field-cardimage > picture');
   const imagePath = `${baseUrl}${firstProductDetail?.cardTypePath}?width=2000&optimize=medium`;
