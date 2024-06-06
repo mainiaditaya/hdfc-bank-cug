@@ -123,6 +123,25 @@ function days(endDate, startDate) {
   return Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 }
 
+/**
+ * localise kyc consent content
+ * @param {object} globals - The global object containing necessary globals form data.
+ * @return {PROMISE}
+ */
+function localiseKycContent(globals) {
+  const locale = globals.form.locale.$value;
+  const url = `/content/experience-fragments/consent/aadhar/${locale}/ekyc/master.plain.html`;
+
+  fetch(url)
+    .then((response) => response.text())
+    .then((content) => {
+      globals.functions.setProperty(globals.form.text, { value: content });
+    })
+    .catch((error) => {
+      console.error('Error fetching content:', error);
+    });
+}
+
 // eslint-disable-next-line import/prefer-default-export
 export {
   getFullName,
@@ -145,4 +164,5 @@ export {
   moveWizardView,
   checkMode,
   invokeJourneyDropOffUpdate,
+  localiseKycContent,
 };
