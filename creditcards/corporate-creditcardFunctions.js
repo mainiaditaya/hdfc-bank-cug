@@ -6,6 +6,10 @@
 /* eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
 import {
+  analyticsTrackOtpClicks,
+} from '../scripts/lib-analytics.js';
+
+import {
   invokeJourneyDropOff, invokeJourneyDropOffUpdate, journeyResponseHandlerUtil, currentFormContext, createJourneyId, invokeJourneyDropOffByParam, formRuntime,
 } from '../common/journey-utils.js';
 import executeCheck from '../common/panutils.js';
@@ -39,7 +43,7 @@ import corpCreditCard from '../common/constants.js';
 
 const { endpoints } = corpCreditCard;
 
-import { sampleRUM } from '../scripts/aem.js';
+// import { sampleRUM } from '../scripts/aem.js';
 
 // Initialize all Corporate Card Journey Context Variables.
 currentFormContext.journeyName = corpCreditCard.journeyName;
@@ -1094,9 +1098,10 @@ const resendOTP = (globals) => {
  * @param {object} payload
  * @param {object} globals
  */
-const sendDataToRum = (payload, globals) => {
-  console.log('Event Payload: ', payload);
-  sampleRUM('getOtp', { source: 'otp', target: { payload, globals } });
+const sendDataToRum = (data, globals) => {
+  console.log('Event Payload: ', data);
+  // sampleRUM('getOtp', { source: 'otp', target: { payload, globals } });
+  analyticsTrackOtpClicks(data.target.payload, santizedFormDataWithContext(data.target.globals), currentFormContext);
 };
 
 export {
