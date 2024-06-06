@@ -243,22 +243,17 @@ const createIdComRequestObj = () => {
 };
 
 /**
- * Fetches an authentication code and initiates the final DAP process upon success.
- * @param {Object} globals - The global object containing necessary data for the request.
- * @returns {void}
+ * Fetches an authentication code from the API.
+ *
+ * This function creates an idcomm request object, constructs the API endpoint URL,
+ * and then sends a POST request to the endpoint to fetch the authentication code.
+ *
+ * @returns {Promise<Object>} A promise that resolves to the JSON response from the API.
  */
 const fetchAuthCode = () => {
-  const idComObj = createIdComRequestObj();
+  const idComRequest = createIdComRequestObj();
   const apiEndPoint = urlPath(endpoints.fetchAuthCode);
-  const eventHandlers = {
-    successCallBack: (response) => {
-      console.log(response);
-    },
-    errorCallBack: (response) => {
-      console.log(response);
-    },
-  };
-  restAPICall('', 'POST', idComObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
+  return fetchJsonResponse(apiEndPoint, idComRequest, 'POST');
 };
 
 /**
@@ -282,9 +277,6 @@ const executeInterfaceApiFinal = (globals) => {
   const eventHandlers = {
     successCallBack: (response) => {
       console.log(response);
-      if (currentFormContext.journeyType === 'ETB') {
-        fetchAuthCode();
-      }
     },
     errorCallBack: (response) => {
       console.log(response);
@@ -382,4 +374,5 @@ export {
   executeInterfaceApi,
   ipaRequestApi,
   ipaSuccessHandler,
+  fetchAuthCode,
 };

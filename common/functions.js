@@ -24,6 +24,7 @@ import {
   executeInterfaceApi,
   ipaRequestApi,
   ipaSuccessHandler,
+  fetchAuthCode,
 } from './executeinterfaceutils.js';
 import {
   urlPath, santizedFormData, getTimeStamp,
@@ -320,4 +321,5 @@ export {
   sendAnalytics,
   aadharConsent123,
   resendOTP,
+  fetchAuthCode,
 };
