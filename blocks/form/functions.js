@@ -25,6 +25,7 @@ import {
   aadharConsent123,
   resendOTP,
   fetchAuthCode,
+  redirect,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -208,4 +209,5 @@ export {
   resendOTP,
   showElement,
   fetchAuthCode,
+  redirect,
 };

@@ -15,7 +15,7 @@ import {
 } from './makeRestAPI.js';
 import corpCreditCard from './constants.js';
 
-const { endpoints, baseUrl } = corpCreditCard;
+const { endpoints, baseUrl, idCom } = corpCreditCard;
 const GENDER_MAP = {
   M: '1',
   F: '2',
@@ -130,7 +130,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
       panCheckFlag: 'Y',
       perAddressType: '2',
       personalEmailId: personalDetails.personalEmailAddress.$value,
-      selfConfirmation: 'N',
+      selfConfirmation: 'Y',
       addressEditFlag,
       communicationAddress1: currentAddress.address1,
       communicationAddress2: currentAddress.address2,
@@ -231,12 +231,12 @@ const createIdComRequestObj = () => {
   const idComObj = {
     requestString: {
       mobileNumber: currentFormContext.executeInterfaceReqObj.requestString.mobileNumber,
-      ProductCode: formRuntime.productCode,
+      ProductCode: idCom.productCode,
       PANNo: currentFormContext.executeInterfaceReqObj.requestString.panNumber,
       userAgent: navigator.userAgent,
       journeyID: currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
-      scope: 'ADOBE_PACC',
+      scope: idCom.scope,
     },
   };
   return idComObj;
@@ -247,7 +247,7 @@ const createIdComRequestObj = () => {
  *
  * This function creates an idcomm request object, constructs the API endpoint URL,
  * and then sends a POST request to the endpoint to fetch the authentication code.
- *
+ * @name fetchAuthCode
  * @returns {Promise<Object>} A promise that resolves to the JSON response from the API.
  */
 const fetchAuthCode = () => {

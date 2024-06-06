@@ -2,7 +2,7 @@ const corpCreditCard = {
   endpoints: {
     aadharCallback: '/content/hdfc_etb_wo_pacc/api/aadharCallback.json',
     aadharInit: '/content/hdfc_etb_wo_pacc/api/aadharInit.json',
-    authCode: '/content/hdfc_commonforms/api/fetchauthcode.json',
+    fetchAuthCode: '/content/hdfc_commonforms/api/fetchauthcode.json',
     emailId: '/content/hdfc_commonforms/api/emailid.json',
     executeInterface: '/content/hdfc_haf/api/executeinterface.json',
     finalDapAndPdfGen: '/content/hdfc_ccforms/api/pacc/finaldapandpdfgen.json',
@@ -13,6 +13,10 @@ const corpCreditCard = {
     otpGen: '/content/hdfc_haf/api/otpgenerationccV4.json',
     otpValFetchAssetDemog: '/content/hdfc_cc_unified/api/otpValFetchAssetDemog.json',
     panValNameMatch: '/content/hdfc_forms_common_v2/api/panValNameMatch.json',
+  },
+  idCom: {
+    productCode: 'CORPCC',
+    scope: 'ADOBE_PACC',
   },
   baseUrl: 'https://applyonlinedev.hdfcbank.com',
   journeyName: 'CORPORATE_CARD_JOURNEY',
