@@ -16,7 +16,18 @@ const corpCreditCard = {
   },
   idCom: {
     productCode: 'CORPCC',
-    scope: 'ADOBE_PACC',
+    scopeMap: {
+      only_casa: {
+        no: 'AACC',
+        yes: 'ADOBE_PACC',
+      },
+      casa_asset: {
+        no: 'AACC',
+        yes: 'ADOBE_PACC',
+      },
+      casa_cc: 'PADC',
+      only_cc: 'OYCC',
+    },
   },
   baseUrl: 'https://applyonlinedev.hdfcbank.com',
   journeyName: 'CORPORATE_CARD_JOURNEY',

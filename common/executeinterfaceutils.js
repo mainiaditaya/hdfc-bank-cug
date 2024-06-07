@@ -122,6 +122,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
       permanentAddress.state = permanentAddressPanel.permanentAddressState.$value;
     }
   }
+  formRuntime.isAddressChanged = addressEditFlag === 'Y';
   const requestObj = {
     requestString: {
       bankEmployee: 'N',
@@ -228,6 +229,15 @@ const listNameOnCard = (globals) => {
  * @returns {Object} - The IdCom request object.
  */
 const createIdComRequestObj = () => {
+  const isAddressEdited = formRuntime.isAddressChanged ? 'yes' : 'no';
+  let scope = '';
+  if (formRuntime?.segment in idCom.scopeMap) {
+    if (typeof idCom.scopeMap[formRuntime?.segment] === 'object') {
+      scope = idCom.scopeMap[formRuntime?.segment][isAddressEdited];
+    } else {
+      scope = idCom.scopeMap[formRuntime?.segment];
+    }
+  }
   const idComObj = {
     requestString: {
       mobileNumber: currentFormContext.executeInterfaceReqObj.requestString.mobileNumber,
@@ -236,7 +246,7 @@ const createIdComRequestObj = () => {
       userAgent: navigator.userAgent,
       journeyID: currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
-      scope: idCom.scope,
+      scope,
     },
   };
   return idComObj;
