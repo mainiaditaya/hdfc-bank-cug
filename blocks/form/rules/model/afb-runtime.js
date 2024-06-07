@@ -600,6 +600,10 @@ class FileObject {
     get type() {
         return this.mediaType;
     }
+    set type(type) {
+        this.mediaType = type;
+    }
+
     toJSON() {
         return {
             'name': this.name,
@@ -4214,7 +4218,7 @@ class FileUpload extends Field {
         }
         return dataNodeValue;
     }
-    async _serialize() {
+    async serialize() {
         const val = this._jsonModel.value;
         if (val === undefined) {
             return null;
