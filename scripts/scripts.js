@@ -15,16 +15,7 @@ import {
   createInlineScript,
   getAlloyInitScript,
   setupAnalyticsTrackingWithAlloy,
-  analyticsTrackOtpClicks,
 } from './lib-analytics.js';
-
-import {
-  currentFormContext,
-} from '../common/journey-utils.js';
-
-import {
-  santizedFormDataWithContext,
-} from '../common/formutils.js';
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
 
@@ -149,11 +140,5 @@ async function loadPage() {
   await loadLazy(document);
   loadDelayed();
 }
-
-// Callback to RUM getOtp checkpoint
-sampleRUM.always.on('getOtp', async (data) => {
-  if (!data.target.payload) return;
-  analyticsTrackOtpClicks(data.target.payload, santizedFormDataWithContext(data.target.globals), currentFormContext);
-});
 
 loadPage();

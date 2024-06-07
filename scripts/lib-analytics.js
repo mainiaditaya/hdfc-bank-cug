@@ -112,7 +112,7 @@ async function sendAnalyticsEvent(xdmData) {
   }
   // eslint-disable-next-line no-undef
   return alloy('sendEvent', {
-    documentUnloading: true,
+    documentUnloading: false,
     xdm: xdmData,
   });
 }
@@ -165,7 +165,7 @@ const getValidationMethod = (formContext) => {
   return '';
 };
 
-export async function analyticsTrackOtpClicks(payload, formData, formContext, linkType = 'button', additionalXdmFields = {}) {
+export async function analyticsTrackOtpClicks(eventName, payload, formData, formContext, linkType = 'button', additionalXdmFields = {}) {
   const jsonString = JSON.stringify(payload || {});
   const apiResponse = JSON.parse(jsonString);
 
@@ -174,7 +174,7 @@ export async function analyticsTrackOtpClicks(payload, formData, formContext, li
     web: {
       webInteraction: {
         // eslint-disable-next-line no-nested-ternary
-        name: formContext?.action,
+        name: eventName,
         linkClicks: {
           value: 1,
         },

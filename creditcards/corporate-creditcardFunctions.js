@@ -43,8 +43,6 @@ import corpCreditCard from '../common/constants.js';
 
 const { endpoints } = corpCreditCard;
 
-// import { sampleRUM } from '../scripts/aem.js';
-
 // Initialize all Corporate Card Journey Context Variables.
 currentFormContext.journeyName = corpCreditCard.journeyName;
 currentFormContext.journeyType = 'NTB';
@@ -1098,10 +1096,9 @@ const resendOTP = (globals) => {
  * @param {object} payload
  * @param {object} globals
  */
-const sendDataToRum = (data, globals) => {
+const sendDataToRum = (eventName, data, globals) => {
   console.log('Event Payload: ', data);
-  // sampleRUM('getOtp', { source: 'otp', target: { payload, globals } });
-  analyticsTrackOtpClicks(data.target.payload, santizedFormDataWithContext(data.target.globals), currentFormContext);
+  analyticsTrackOtpClicks(eventName, data, santizedFormDataWithContext(globals), currentFormContext);
 };
 
 export {
