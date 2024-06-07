@@ -15,7 +15,13 @@
  * Customer's XDM schema namespace
  * @type {string}
  */
-const CUSTOM_SCHEMA_NAMESPACE = '_hdfcbank';
+const CUSTOM_SCHEMA_NAMESPACE = '_hdfcbank'; /* your XDM schema here */
+const DEV_DATA_STREAM_ID = 'bcc54d12-a918-4471-b671-5af1141b5a55'; /* your dev datastream id here */
+const STAGE_DATA_STREAM_ID = 'bcc54d12-a918-4471-b671-5af1141b5a55'; /* your stage datastream id here */
+const PROD_DATA_STREAM_ID = 'bcc54d12-a918-4471-b671-5af1141b5a55'; /* your prod datastream id here */
+const CUSTOMER_ADOBE_ORGID = '3817033753EE89720A490D4D@AdobeOrg'; /* your ims org id here */
+const CUSTOMER_DOMAIN_NAME = 'hdfc.com'; /* your domain name here */
+const EDGE_DELIVERY_URL = 'corpuat--hdfc-bank--aemsites.hlx.page';
 
 /**
  * Returns script that initializes a queue for each alloy instance,
@@ -33,21 +39,21 @@ export function getAlloyInitScript() {
  * Returns datastream id to use as edge configuration id
  * Custom logic can be inserted here in order to support
  * different datastream ids for different environments (non-prod/prod)
- * @returns {{edgeConfigId: string, orgId: string}}
+ * @returns {{datastreamId: string, orgId: string}}
  */
 function getDatastreamConfiguration() {
   const { hostname } = window.location;
-  let edgeConfigId = 'bcc54d12-a918-4471-b671-5af1141b5a55'; // 'e05f92f2-1ed5-49ae-9dda-42c0dbdaa927'; // HDFC(DEV)
-  if (hostname?.endsWith('hdfc.com')) {
-    edgeConfigId = 'bcc54d12-a918-4471-b671-5af1141b5a55'; // 'e05f92f2-1ed5-49ae-9dda-42c0dbdaa927'; // HDFC(PROD)
+  let datastreamId = DEV_DATA_STREAM_ID;
+  if (hostname?.endsWith(CUSTOMER_DOMAIN_NAME)) {
+    datastreamId = PROD_DATA_STREAM_ID;
   }
   if (hostname?.endsWith('hlx.page') || hostname?.endsWith('hlx.live')) {
-    edgeConfigId = 'bcc54d12-a918-4471-b671-5af1141b5a55'; // 'e05f92f2-1ed5-49ae-9dda-42c0dbdaa927'; // HDFC(STAGE)
+    datastreamId = STAGE_DATA_STREAM_ID;
   }
 
   return {
-    edgeConfigId,
-    orgId: '3817033753EE89720A490D4D@AdobeOrg', // ORG id for HDFC
+    datastreamId,
+    orgId: CUSTOMER_ADOBE_ORGID,
   };
 }
 
@@ -59,7 +65,7 @@ function getDatastreamConfiguration() {
 function enhanceAnalyticsEvent(options) {
   options.xdm.web = options.xdm.web || {};
   options.xdm.web.webPageDetails = options.xdm.web.webPageDetails || {};
-  options.xdm.web.webPageDetails.server = 'Franklin';
+  options.xdm.web.webPageDetails.server = EDGE_DELIVERY_URL;
 
   console.debug(`enhanceAnalyticsEvent complete: ${JSON.stringify(options)}`);
 }
@@ -112,7 +118,7 @@ async function sendAnalyticsEvent(xdmData) {
   }
   // eslint-disable-next-line no-undef
   return alloy('sendEvent', {
-    documentUnloading: false,
+    documentUnloading: false, // set 'true' if you want to use the Javascript's sendBeacon method to send data to Adobe.
     xdm: xdmData,
   });
 }
@@ -159,8 +165,8 @@ export async function setupAnalyticsTrackingWithAlloy(document) {
 }
 
 const getValidationMethod = (formContext) => {
-  if (formContext && formContext?.login && formContext.login.panDobSelection) {
-    return formContext.login.panDobSelection === '0' ? 'DOB' : 'PAN';
+  if (formContext && formContext?.form?.login && formContext?.form?.login?.panDobSelection) {
+    return formContext.form.login.panDobSelection === '0' ? 'DOB' : 'PAN';
   }
   return '';
 };
