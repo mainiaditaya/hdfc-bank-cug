@@ -1,4 +1,4 @@
-/* eslint-disable no-tabs */
+/* eslint no-console: ["error", { allow: ["warn", "error"] }] */
 import {
   invokeJourneyDropOff,
   invokeJourneyDropOffUpdate,
@@ -331,10 +331,10 @@ const otpValHandler = (response, globals) => {
  */
 const setConfirmScrAddressFields = (globalObj) => {
   /**
-	 * Concatenates the values of an object into a single string separated by commas.
-	 * @param {Object} obj - The object whose values are to be concatenated.
-	 * @returns {string} A string containing the concatenated values separated by commas.
-	 */
+ * Concatenates the values of an object into a single string separated by commas.
+ * @param {Object} obj - The object whose values are to be concatenated.
+ * @returns {string} A string containing the concatenated values separated by commas.
+ */
   const concatObjVals = (obj) => Object.values(obj)?.join(', ');
   const ccWizard = globalObj.form.corporateCardWizardView;
   const yourDetails = ccWizard.yourDetailsPanel.yourDetailsPage;
@@ -761,12 +761,10 @@ const prefillForm = (globals) => {
     resultPanel: {
       errorResultPanel: {
         errorMessageText,
-        resultSetErrorText1,
-        resultSetErrorText2,
       },
     },
   } = globals.form;
-  const showPanel = [resultPanel, errorMessageText, resultSetErrorText1, resultSetErrorText2]?.map((fieldName) => formUtil(globals, fieldName));
+  const showPanel = [resultPanel, errorMessageText]?.map((fieldName) => formUtil(globals, fieldName));
   const hidePanel = [loginPanel, welcomeText, consentFragment, getOTPbutton]?.map((fieldName) => formUtil(globals, fieldName));
   if (!formData?.form?.login?.registeredMobileNumber) {
     // show error pannel if corporate credit card details not present
@@ -800,7 +798,6 @@ const resendOTP = (globals) => {
     const {
       otpPanel, submitOTP, resultPanel,
     } = objectGlobals.form;
-
     const hidePanel = [otpPanel, submitOTP]?.map((panel) => formUtil(objectGlobals, panel));
     const showPanel = [resultPanel]?.map((panel) => formUtil(objectGlobals, panel));
     hidePanel.forEach((item) => item.visible(false));
