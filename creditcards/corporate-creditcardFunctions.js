@@ -560,7 +560,7 @@ const validateEmailID = async (email, globals) => {
  * @param {Object} globals - The global object containing necessary data for DAP request.
  * @returns {Object} - The DAP request object.
  */
-const createDapRequestObj = (globals) => {
+export const createDapRequestObj = (globals) => {
   const genderMap = {
     1: 'M',
     2: 'F',
@@ -668,7 +668,7 @@ const createDapRequestObj = (globals) => {
   return dapRequestObj;
 };
 
-const updatePanelVisibility = (response, globals) => {
+export const updatePanelVisibility = (response, globals) => {
   const corporateCardWizardView = formUtil(globals, globals.form.corporateCardWizardView);
   const confirmAndSubmitPanel = formUtil(globals, globals.form.corporateCardWizardView.confirmAndSubmitPanel);
   const successResultPanel = formUtil(globals, globals.form.resultPanel.successResultPanel);

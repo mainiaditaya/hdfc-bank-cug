@@ -15,6 +15,8 @@ import {
   aadharConsent123,
   resendOTP,
   formRuntime,
+  createDapRequestObj,
+  updatePanelVisibility,
 } from '../creditcards/corporate-creditcardFunctions.js';
 import {
   validatePan,
@@ -29,7 +31,9 @@ import {
 import {
   urlPath, santizedFormDataWithContext, getTimeStamp,
 } from './formutils.js';
-import { fetchJsonResponse, hideLoaderGif } from './makeRestAPI.js';
+import {
+  fetchJsonResponse, getJsonResponse, hideLoaderGif,
+} from './makeRestAPI.js';
 import corpCreditCard from './constants.js';
 
 const { endpoints } = corpCreditCard;
@@ -38,11 +42,10 @@ const { endpoints } = corpCreditCard;
  * @name checkMode - check the location
  * @param {object} globals -
  */
-function checkMode(globals) {
-  debugger;
+async function checkMode(globals) {
   const formData = globals.functions.exportData();
   // temporarly added referenceNumber check for IDCOMM redirection to land on submit screen.
-  if (formData?.companyName?.result?.Address1 || formData?.currentFormContext?.referenceNumber) {
+  if (formData?.aadhaar_otp_val_data?.message === 'Aadhaar OTP Validate success') {
     globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: true });
     globals.functions.setProperty(globals.form.otpPanel, { visible: false });
     globals.functions.setProperty(globals.form.loginPanel, { visible: false });
@@ -56,6 +59,19 @@ function checkMode(globals) {
     } = formData.aadhaar_otp_val_data;
     const aadharAddress = [Address1, Address2, Address3, City, State, Zipcode]?.filter(Boolean)?.join(', ');
     globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.AddressDeclarationAadhar.aadharAddressSelectKYC, { value: aadharAddress });
+  } else {
+    // final dap api call
+    const payload = createDapRequestObj(globals);
+    const apiEndPoint = urlPath(endpoints.finalDapAndPdfGen);
+    const errorSuccessMethod = (res, global) => {
+      updatePanelVisibility(res, global);
+    };
+    try {
+      const response = await getJsonResponse(apiEndPoint, payload, 'POST');
+      errorSuccessMethod(response, globals);
+    } catch (error) {
+      errorSuccessMethod(error, globals);
+    }
   }
 }
 
