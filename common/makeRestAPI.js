@@ -144,5 +144,4 @@ export {
   hideLoaderGif,
   fetchJsonResponse,
   fetchIPAResponse,
-  hideLoaderGif,
 };
