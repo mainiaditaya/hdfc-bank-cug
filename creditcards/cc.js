@@ -220,7 +220,7 @@ const queryStrings = window.location.search.split('?')[1].split('&');
 for (const queryString of queryStrings) {
   // eslint-disable-next-line no-unused-vars
   const [key, value] = queryString.split('=');
-  if (value === 'EKYC_AUTH') {
+  if (value === 'EKYC_AUTH' || key === 'authcode') {
     const navigateFrom = document.getElementsByName('corporateCardWizardView')?.[0];
     const current = navigateFrom?.querySelector('.current-wizard-step');
     const currentMenuItem = navigateFrom?.querySelector('.wizard-menu-active-item');

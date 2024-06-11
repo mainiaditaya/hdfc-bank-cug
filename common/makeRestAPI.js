@@ -13,6 +13,7 @@ function displayLoader(loadingText) {
 
 /**
  * Hides the loader.
+ * @name hideLoaderGif
  * @return {PROMISE}
  */
 function hideLoaderGif() {

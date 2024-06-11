@@ -39,6 +39,7 @@ const { endpoints } = corpCreditCard;
  * @param {object} globals -
  */
 function checkMode(globals) {
+  debugger;
   const formData = globals.functions.exportData();
   if (formData?.aadhaar_otp_val_data?.result?.Address1) {
     globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: true });
@@ -303,6 +304,7 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
  * @param {string} redirectUrl - The URL to redirect the browser to.
  */
 function redirect(redirectUrl) {
+  debugger;
   window.location.href = redirectUrl;
 }
 
