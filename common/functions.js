@@ -32,6 +32,7 @@ import { fetchJsonResponse } from './makeRestAPI.js';
 import corpCreditCard from './constants.js';
 
 const { endpoints } = corpCreditCard;
+let defaultDragDropText;
 
 /**
  * @name checkMode - check the location
@@ -295,6 +296,20 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
     }).catch((err) => console.log(err));
 }
 
+/**
+* @name updateDragDropText
+* @param {object} fileInput
+* @param {object} dropdownValue
+* @param {object} globals
+*/
+function updateDragDropText(fileInput, dropdownValue, globals) {
+  if (defaultDragDropText === undefined) {
+    defaultDragDropText = fileInput.$properties.dragDropText;
+  }
+  const updatedText = `${dropdownValue.$value} ${defaultDragDropText}`;
+  globals.functions.setProperty(fileInput, { properties: { dragDropText: updatedText } });
+}
+
 export {
   getOTP,
   otpValidation,
@@ -320,4 +335,5 @@ export {
   sendAnalytics,
   aadharConsent123,
   resendOTP,
+  updateDragDropText,
 };

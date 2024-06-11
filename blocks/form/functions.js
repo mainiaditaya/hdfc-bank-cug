@@ -24,6 +24,7 @@ import {
   sendAnalytics,
   aadharConsent123,
   resendOTP,
+  updateDragDropText,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -168,6 +169,7 @@ function showElement(elementName) {
     elm.style.display = 'block';
   }
 }
+
 // eslint-disable-next-line import/prefer-default-export
 export {
   getFullName,
@@ -206,4 +208,5 @@ export {
   aadharConsent123,
   resendOTP,
   showElement,
+  updateDragDropText,
 };
