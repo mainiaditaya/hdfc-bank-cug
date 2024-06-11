@@ -34,7 +34,6 @@ import {
   sendSubmitClickEvent,
   sendGenericClickEvent,
 } from '../../common/analytics.js';
-import { hideLoaderGif } from '../../common/makeRestAPI.js';
 import { invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
 
 /**
@@ -211,5 +210,4 @@ export {
   showElement,
   fetchAuthCode,
   redirect,
-  hideLoaderGif,
 };
