@@ -39,7 +39,6 @@ const { endpoints } = corpCreditCard;
  * @param {object} globals -
  */
 function checkMode(globals) {
-  debugger;
   const formData = globals.functions.exportData();
   if (formData?.form?.companyName) {
     globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: true });
