@@ -26,6 +26,7 @@ import {
   resendOTP,
   fetchAuthCode,
   redirect,
+  hideLoaderGif,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -210,4 +211,5 @@ export {
   showElement,
   fetchAuthCode,
   redirect,
+  hideLoaderGif,
 };

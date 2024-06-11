@@ -29,7 +29,7 @@ import {
 import {
   urlPath, santizedFormData, getTimeStamp,
 } from './formutils.js';
-import { fetchJsonResponse } from './makeRestAPI.js';
+import { fetchJsonResponse, hideLoaderGif } from './makeRestAPI.js';
 import corpCreditCard from './constants.js';
 
 const { endpoints } = corpCreditCard;
@@ -334,4 +334,5 @@ export {
   resendOTP,
   fetchAuthCode,
   redirect,
+  hideLoaderGif,
 };
