@@ -49,8 +49,13 @@ function checkMode(globals) {
     globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
     globals.functions.setProperty(globals.form.consentFragment, { visible: false });
     globals.functions.setProperty(globals.form.welcomeText, { visible: false });
-    if (formData?.currentFormContext?.journeyType === 'ETB' && !formData?.companyName?.result?.Address1) {
+
+    // user coming from IDCOMM directly
+    // continue button should be false.  there is no aadhar flow.
+    if (formData?.currentFormContext?.journeyType === 'ETB' && formData?.currentFormContext?.VISIT_TYPE === 'IDCOMM') {
       globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.tandCPanelConfirmAndSubmit.continueToIDCOM, { visible: false });
+    } else {
+      globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.tandCPanelConfirmAndSubmit.continueToIDCOM, { visible: true });
     }
     const {
       result: {
@@ -283,6 +288,7 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
       },
     },
   };
+  currentFormContext.VISIT_TYPE = 'AADHAR';
   const path = urlPath(endpoints.aadharInit);
   const response = fetchJsonResponse(path, jsonObj, 'POST');
   response
