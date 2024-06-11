@@ -262,6 +262,7 @@ const createIdComRequestObj = () => {
  * @returns {Promise<Object>} A promise that resolves to the JSON response from the API.
  */
 const fetchAuthCode = () => {
+  debugger;
   currentFormContext.VISIT_TYPE = 'IDCOMM';
   const idComRequest = createIdComRequestObj();
   const apiEndPoint = urlPath(endpoints.fetchAuthCode);

@@ -27,7 +27,7 @@ import {
   fetchAuthCode,
 } from './executeinterfaceutils.js';
 import {
-  urlPath, santizedFormData, getTimeStamp,
+  urlPath, santizedFormDataWithContext, getTimeStamp,
 } from './formutils.js';
 import { fetchJsonResponse, hideLoaderGif } from './makeRestAPI.js';
 import corpCreditCard from './constants.js';
@@ -52,10 +52,15 @@ function checkMode(globals) {
 
     // user coming from IDCOMM directly
     // continue button should be false.  there is no aadhar flow.
-    if (formData?.currentFormContext?.journeyType === 'ETB' && formData?.currentFormContext?.VISIT_TYPE === 'IDCOMM') {
-      globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.tandCPanelConfirmAndSubmit.continueToIDCOM, { visible: false });
-    } else {
+    if (formData?.currentFormContext?.journeyType === 'ETB' && formData?.currentFormContext?.VISIT_TYPE === 'AADAHR') {
       globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.tandCPanelConfirmAndSubmit.continueToIDCOM, { visible: true });
+      // IDCOM button does not work in this case becase of currenforcontext redirection ... 
+      // submit should be false... 
+      globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.tandCPanelConfirmAndSubmit.confirmAndSubmitButton, { visible: false });
+    } else {
+      // coming from IDCOMM
+      globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.tandCPanelConfirmAndSubmit.continueToIDCOM, { visible: false });
+      // submit should be false... -- WHICH IS ALREADY TRUE..
     }
     const {
       result: {
@@ -209,6 +214,7 @@ function updateFormElement(form, key, value) {
  * @return {PROMISE}
  */
 async function aadharInit(mobileNumber, pan, dob, globals) {
+  currentFormContext.VISIT_TYPE = 'AADHAR';
   const jsonObj = {
     requestString: {
       initParameters: {
@@ -243,7 +249,7 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
         journeyStateInfo: {
           state: 'CUSTOMER_AADHAR_VALIDATION',
           stateInfo: corpCreditCard.journeyName,
-          formData: santizedFormData(globals)?.form,
+          formData: santizedFormDataWithContext(globals, currentFormContext),
         },
         auditData: {
           action: 'CUSTOMER_AADHAR_VALIDATION',
@@ -288,7 +294,8 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
       },
     },
   };
-  currentFormContext.VISIT_TYPE = 'AADHAR';
+  debugger;
+
   const path = urlPath(endpoints.aadharInit);
   const response = fetchJsonResponse(path, jsonObj, 'POST');
   response
