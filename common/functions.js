@@ -41,13 +41,17 @@ const { endpoints } = corpCreditCard;
 function checkMode(globals) {
   debugger;
   const formData = globals.functions.exportData();
-  if (formData?.companyName?.result?.Address1) {
+  // temporarly added referenceNumber check for IDCOMM redirection to land on submit screen.
+  if (formData?.companyName?.result?.Address1 || formData?.currentFormContext?.referenceNumber) {
     globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: true });
     globals.functions.setProperty(globals.form.otpPanel, { visible: false });
     globals.functions.setProperty(globals.form.loginPanel, { visible: false });
     globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
     globals.functions.setProperty(globals.form.consentFragment, { visible: false });
     globals.functions.setProperty(globals.form.welcomeText, { visible: false });
+    if (formData?.currentFormContext?.journeyType === 'ETB' && !formData?.companyName?.result?.Address1) {
+      globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.tandCPanelConfirmAndSubmit.continueToIDCOM, { visible: false });
+    }
     const {
       result: {
         Address1, Address2, Address3, City, State, Zipcode,
