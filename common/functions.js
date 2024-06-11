@@ -56,10 +56,10 @@ function checkMode(globals) {
       globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.tandCPanelConfirmAndSubmit.continueToIDCOM, { visible: true });
       // IDCOM button does not work in this case becase of currenforcontext redirection ... 
       // submit should be false... 
-      globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.tandCPanelConfirmAndSubmit.confirmAndSubmitButton, { visible: false });
+      globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.tandCPanelConfirmAndSubmit.confirmAndSubmitButton, { visible: true });
     } else {
       // coming from IDCOMM
-      globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.tandCPanelConfirmAndSubmit.continueToIDCOM, { visible: false });
+      globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.tandCPanelConfirmAndSubmit.continueToIDCOM, { visible: true });
       // submit should be false... -- WHICH IS ALREADY TRUE..
     }
     const {
