@@ -49,19 +49,6 @@ function checkMode(globals) {
     globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
     globals.functions.setProperty(globals.form.consentFragment, { visible: false });
     globals.functions.setProperty(globals.form.welcomeText, { visible: false });
-
-    // user coming from IDCOMM directly
-    // continue button should be false.  there is no aadhar flow.
-    if (formData?.currentFormContext?.journeyType === 'ETB' && formData?.currentFormContext?.VISIT_TYPE === 'AADAHR') {
-      globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.tandCPanelConfirmAndSubmit.continueToIDCOM, { visible: true });
-      // IDCOM button does not work in this case becase of currenforcontext redirection ... 
-      // submit should be false... 
-      globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.tandCPanelConfirmAndSubmit.confirmAndSubmitButton, { visible: true });
-    } else {
-      // coming from IDCOMM
-      globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.tandCPanelConfirmAndSubmit.continueToIDCOM, { visible: true });
-      // submit should be false... -- WHICH IS ALREADY TRUE..
-    }
     const {
       result: {
         Address1, Address2, Address3, City, State, Zipcode,

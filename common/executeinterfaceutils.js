@@ -230,24 +230,24 @@ const listNameOnCard = (globals) => {
  * @returns {Object} - The IdCom request object.
  */
 const createIdComRequestObj = (globals) => {
-  const isAddressEdited = formRuntime.isAddressChanged ? 'yes' : 'no';
+  const segment = formRuntime?.segment || globals.functions.exportData().currentFormContext.breDemogResponse.SEGMENT.toLowerCase();
+  const isAddressEdited = globals.functions.exportData().form.currentAddressToggle === 'on' ? 'yes' : 'no';
   let scope = '';
-  if (formRuntime?.segment in idCom.scopeMap) {
-    if (typeof idCom.scopeMap[formRuntime?.segment] === 'object') {
-      scope = idCom.scopeMap[formRuntime?.segment][isAddressEdited];
+
+  if (segment in idCom.scopeMap) {
+    if (typeof idCom.scopeMap[segment] === 'object') {
+      scope = idCom.scopeMap[segment][isAddressEdited];
     } else {
-      scope = idCom.scopeMap[formRuntime?.segment];
+      scope = idCom.scopeMap[segment];
     }
   }
   const idComObj = {
     requestString: {
-     // mobileNumber: currentFormContext.executeInterfaceReqObj.requestString.mobileNumber,
-     mobileNumber: globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.panNumberPersonalDetails.$value,
+      mobileNumber: globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
       ProductCode: idCom.productCode,
-     // PANNo: currentFormContext.executeInterfaceReqObj.requestString.panNumber,
-     PANNo: globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.dobPersonalDetails.$value,
+      PANNo: globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.panNumberPersonalDetails.$value,
       userAgent: navigator.userAgent,
-      journeyID: currentFormContext.journeyID,
+      journeyID: currentFormContext?.journeyID || globals.functions.exportData().currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
       scope,
     },
@@ -265,7 +265,6 @@ const createIdComRequestObj = (globals) => {
  * @returns {Promise<Object>} A promise that resolves to the JSON response from the API.
  */
 const fetchAuthCode = (globals) => {
-  debugger;
   currentFormContext.VISIT_TYPE = 'IDCOMM';
   const idComRequest = createIdComRequestObj(globals);
   const apiEndPoint = urlPath(endpoints.fetchAuthCode);
