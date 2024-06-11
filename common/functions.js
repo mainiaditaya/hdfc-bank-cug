@@ -214,6 +214,7 @@ function updateFormElement(form, key, value) {
  * @return {PROMISE}
  */
 async function aadharInit(mobileNumber, pan, dob, globals) {
+  debugger;
   currentFormContext.VISIT_TYPE = 'AADHAR';
   const jsonObj = {
     requestString: {
