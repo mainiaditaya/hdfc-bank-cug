@@ -15,7 +15,7 @@ import {
 } from './makeRestAPI.js';
 import corpCreditCard from './constants.js';
 
-const { endpoints, baseUrl } = corpCreditCard;
+const { endpoints, baseUrl, idCom } = corpCreditCard;
 const GENDER_MAP = {
   M: '1',
   F: '2',
@@ -122,6 +122,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
       permanentAddress.state = permanentAddressPanel.permanentAddressState.$value;
     }
   }
+  formRuntime.isAddressChanged = addressEditFlag === 'Y';
   const requestObj = {
     requestString: {
       bankEmployee: 'N',
@@ -130,7 +131,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
       panCheckFlag: 'Y',
       perAddressType: '2',
       personalEmailId: personalDetails.personalEmailAddress.$value,
-      selfConfirmation: 'N',
+      selfConfirmation: 'Y',
       addressEditFlag,
       communicationAddress1: currentAddress.address1,
       communicationAddress2: currentAddress.address2,
@@ -228,37 +229,41 @@ const listNameOnCard = (globals) => {
  * @returns {Object} - The IdCom request object.
  */
 const createIdComRequestObj = () => {
+  const isAddressEdited = formRuntime.isAddressChanged ? 'yes' : 'no';
+  let scope = '';
+  if (formRuntime?.segment in idCom.scopeMap) {
+    if (typeof idCom.scopeMap[formRuntime?.segment] === 'object') {
+      scope = idCom.scopeMap[formRuntime?.segment][isAddressEdited];
+    } else {
+      scope = idCom.scopeMap[formRuntime?.segment];
+    }
+  }
   const idComObj = {
     requestString: {
       mobileNumber: currentFormContext.executeInterfaceReqObj.requestString.mobileNumber,
-      ProductCode: formRuntime.productCode,
+      ProductCode: idCom.productCode,
       PANNo: currentFormContext.executeInterfaceReqObj.requestString.panNumber,
       userAgent: navigator.userAgent,
       journeyID: currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
-      scope: 'ADOBE_PACC',
+      scope,
     },
   };
   return idComObj;
 };
 
 /**
- * Fetches an authentication code and initiates the final DAP process upon success.
- * @param {Object} globals - The global object containing necessary data for the request.
- * @returns {void}
+ * Fetches an authentication code from the API.
+ *
+ * This function creates an idcomm request object, constructs the API endpoint URL,
+ * and then sends a POST request to the endpoint to fetch the authentication code.
+ * @name fetchAuthCode
+ * @returns {Promise<Object>} A promise that resolves to the JSON response from the API.
  */
 const fetchAuthCode = () => {
-  const idComObj = createIdComRequestObj();
+  const idComRequest = createIdComRequestObj();
   const apiEndPoint = urlPath(endpoints.fetchAuthCode);
-  const eventHandlers = {
-    successCallBack: (response) => {
-      console.log(response);
-    },
-    errorCallBack: (response) => {
-      console.log(response);
-    },
-  };
-  restAPICall('', 'POST', idComObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
+  return fetchJsonResponse(apiEndPoint, idComRequest, 'POST');
 };
 
 /**
@@ -282,9 +287,6 @@ const executeInterfaceApiFinal = (globals) => {
   const eventHandlers = {
     successCallBack: (response) => {
       console.log(response);
-      if (currentFormContext.journeyType === 'ETB') {
-        fetchAuthCode();
-      }
     },
     errorCallBack: (response) => {
       console.log(response);
@@ -382,4 +384,5 @@ export {
   executeInterfaceApi,
   ipaRequestApi,
   ipaSuccessHandler,
+  fetchAuthCode,
 };

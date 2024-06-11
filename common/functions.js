@@ -24,6 +24,7 @@ import {
   executeInterfaceApi,
   ipaRequestApi,
   ipaSuccessHandler,
+  fetchAuthCode,
 } from './executeinterfaceutils.js';
 import {
   urlPath, santizedFormData, getTimeStamp,
@@ -296,6 +297,16 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
     }).catch((err) => console.log(err));
 }
 
+/**
+ * Redirects the browser to the specified URL.
+ *
+ * @name redirect
+ * @param {string} redirectUrl - The URL to redirect the browser to.
+ */
+function redirect(redirectUrl) {
+  window.location.href = redirectUrl;
+}
+
 export {
   getOTP,
   otpValidation,
@@ -321,4 +332,6 @@ export {
   sendAnalytics,
   aadharConsent123,
   resendOTP,
+  fetchAuthCode,
+  redirect,
 };
