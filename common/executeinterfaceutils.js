@@ -229,7 +229,7 @@ const listNameOnCard = (globals) => {
  * @param {Object} globals - The global object containing necessary data for IdCom request.
  * @returns {Object} - The IdCom request object.
  */
-const createIdComRequestObj = () => {
+const createIdComRequestObj = (globals) => {
   const isAddressEdited = formRuntime.isAddressChanged ? 'yes' : 'no';
   let scope = '';
   if (formRuntime?.segment in idCom.scopeMap) {
@@ -241,9 +241,11 @@ const createIdComRequestObj = () => {
   }
   const idComObj = {
     requestString: {
-      mobileNumber: currentFormContext.executeInterfaceReqObj.requestString.mobileNumber,
+     // mobileNumber: currentFormContext.executeInterfaceReqObj.requestString.mobileNumber,
+     mobileNumber: globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.panNumberPersonalDetails.$value,
       ProductCode: idCom.productCode,
-      PANNo: currentFormContext.executeInterfaceReqObj.requestString.panNumber,
+     // PANNo: currentFormContext.executeInterfaceReqObj.requestString.panNumber,
+     PANNo: globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.dobPersonalDetails.$value,
       userAgent: navigator.userAgent,
       journeyID: currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
@@ -259,12 +261,13 @@ const createIdComRequestObj = () => {
  * This function creates an idcomm request object, constructs the API endpoint URL,
  * and then sends a POST request to the endpoint to fetch the authentication code.
  * @name fetchAuthCode
+ * @params {object} globals
  * @returns {Promise<Object>} A promise that resolves to the JSON response from the API.
  */
-const fetchAuthCode = () => {
+const fetchAuthCode = (globals) => {
   debugger;
   currentFormContext.VISIT_TYPE = 'IDCOMM';
-  const idComRequest = createIdComRequestObj();
+  const idComRequest = createIdComRequestObj(globals);
   const apiEndPoint = urlPath(endpoints.fetchAuthCode);
   return fetchJsonResponse(apiEndPoint, idComRequest, 'POST');
 };
