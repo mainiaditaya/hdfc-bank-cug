@@ -24,8 +24,8 @@ import {
   executeInterfaceApi,
   ipaRequestApi,
   ipaSuccessHandler,
-  fetchAuthCode,
 } from './executeinterfaceutils.js';
+import fetchAuthCode from './idcomutil.js';
 import {
   urlPath, santizedFormDataWithContext, getTimeStamp,
 } from './formutils.js';
@@ -39,7 +39,6 @@ const { endpoints } = corpCreditCard;
  * @param {object} globals -
  */
 function checkMode(globals) {
-  debugger;
   const formData = globals.functions.exportData();
   // temporarly added referenceNumber check for IDCOMM redirection to land on submit screen.
   if (formData?.companyName?.result?.Address1 || formData?.currentFormContext?.referenceNumber) {
@@ -201,7 +200,6 @@ function updateFormElement(form, key, value) {
  * @return {PROMISE}
  */
 async function aadharInit(mobileNumber, pan, dob, globals) {
-  debugger;
   currentFormContext.VISIT_TYPE = 'AADHAR';
   const jsonObj = {
     requestString: {
@@ -282,7 +280,6 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
       },
     },
   };
-  debugger;
 
   const path = urlPath(endpoints.aadharInit);
   const response = fetchJsonResponse(path, jsonObj, 'POST');
