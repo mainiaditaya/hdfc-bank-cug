@@ -184,7 +184,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
       annualItr: '',
       permanentState: permanentAddress.state,
       communicationState: currentAddress.state,
-      authMode: '',
+      authMode: currentFormContext.journeyType === 'ETB' ? 'IDCOM' : '',
       userAgent: navigator.userAgent,
       journeyID: currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
