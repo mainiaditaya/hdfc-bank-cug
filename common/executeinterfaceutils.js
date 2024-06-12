@@ -233,13 +233,7 @@ const executeInterfaceApiFinal = (globals) => {
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
   requestObj.requestString.nameOnCard = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value;
   requestObj.requestString.productCode = formRuntime.productCode || formCallBackContext?.formRuntime?.productCode;
-  requestObj.requestString.addressEditFlag = 'N';
-  requestObj.requestString.panEditFlag = 'N';
-  requestObj.requestString.nameEditFlag = 'N';
-  requestObj.requestString.mobileEditFlag = 'N';
-  requestObj.requestString.resPhoneEditFlag = 'N';
-  requestObj.requestString.apsDobEditFlag = 'N';
-  requestObj.requestString.apsEmailEditFlag = 'N';
+
   const apiEndPoint = urlPath(endpoints.executeInterface);
   const eventHandlers = {
     successCallBack: (response) => {
