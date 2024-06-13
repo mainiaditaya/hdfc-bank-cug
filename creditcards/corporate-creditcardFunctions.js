@@ -316,6 +316,7 @@ const otpValHandler = (response, globals) => {
   const existingCustomer = existingCustomerCheck(res);
   if (existingCustomer) {
     currentFormContext.journeyType = 'ETB';
+    globals.form.corporateCardWizardView.yourDetailsPanel.etbFlowSelected.$value = 'on';
     personalDetailsPreFillFromBRE(res, globals);
   }
   (async () => {
