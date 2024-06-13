@@ -41,7 +41,7 @@ const { endpoints } = corpCreditCard;
 function checkMode(globals) {
   const formData = globals.functions.exportData();
   // temporarly added referenceNumber check for IDCOMM redirection to land on submit screen.
-  if (formData?.companyName?.result?.Address1 || formData?.currentFormContext?.referenceNumber) {
+  if (formData?.aadhaar_otp_val_data?.message && formData?.aadhaar_otp_val_data?.message === 'Aadhaar OTP Validate success') {
     globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: true });
     globals.functions.setProperty(globals.form.otpPanel, { visible: false });
     globals.functions.setProperty(globals.form.loginPanel, { visible: false });
@@ -53,8 +53,21 @@ function checkMode(globals) {
         Address1, Address2, Address3, City, State, Zipcode,
       },
     } = formData.aadhaar_otp_val_data;
+    const {
+      executeInterfaceReqObj: {
+        requestString: {
+          officeAddress1, officeAddress2, officeAddress3, officeCity, officeState, officeZipCode,
+          communicationAddress1, communicationAddress2, communicationAddress3, communicationCity, communicationState, comCityZip,
+        },
+      },
+    } = formData.currentFormContext;
     const aadharAddress = [Address1, Address2, Address3, City, State, Zipcode]?.filter(Boolean)?.join(', ');
-    globals.functions.setProperty(globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.AddressDeclarationAadhar.aadharAddressSelectKYC, { value: aadharAddress });
+    const officeAddress = [officeAddress1, officeAddress2, officeAddress3, officeCity, officeState, officeZipCode]?.filter(Boolean)?.join(', ');
+    const communicationAddress = [communicationAddress1, communicationAddress2, communicationAddress3, communicationCity, communicationState, comCityZip]?.filter(Boolean)?.join(', ');
+    const { AddressDeclarationAadhar, addressDeclarationOffice, CurrentAddressDeclaration } = globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel;
+    globals.functions.setProperty(AddressDeclarationAadhar.aadharAddressSelectKYC, { value: aadharAddress });
+    globals.functions.setProperty(addressDeclarationOffice.officeAddressSelectKYC, { value: officeAddress });
+    globals.functions.setProperty(CurrentAddressDeclaration.currentResidenceAddress, { value: communicationAddress });
   }
 }
 
