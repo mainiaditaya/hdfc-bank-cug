@@ -6,7 +6,6 @@ import {
   pinCodeMaster,
   validateEmailID,
   currentAddressToggleHandler,
-  finalDap,
   currentFormContext,
   otpValHandler,
   journeyResponseHandler,
@@ -16,20 +15,29 @@ import {
   resendOTP,
   formRuntime,
 } from '../creditcards/corporate-creditcardFunctions.js';
+
 import {
   validatePan,
   panAPISuccesHandler,
 } from './panvalidation.js';
+
 import {
   executeInterfaceApi,
+  executeInterfacePostRedirect,
   ipaRequestApi,
   ipaSuccessHandler,
 } from './executeinterfaceutils.js';
+
 import fetchAuthCode from './idcomutil.js';
+
 import {
   urlPath, santizedFormDataWithContext, getTimeStamp,
 } from './formutils.js';
-import { fetchJsonResponse, hideLoaderGif } from './makeRestAPI.js';
+
+import {
+  fetchJsonResponse, hideLoaderGif,
+} from './makeRestAPI.js';
+
 import corpCreditCard from './constants.js';
 
 const { endpoints } = corpCreditCard;
@@ -68,6 +76,8 @@ function checkMode(globals) {
     globals.functions.setProperty(AddressDeclarationAadhar.aadharAddressSelectKYC, { value: aadharAddress });
     globals.functions.setProperty(addressDeclarationOffice.officeAddressSelectKYC, { value: officeAddress });
     globals.functions.setProperty(CurrentAddressDeclaration.currentResidenceAddress, { value: communicationAddress });
+  } else if (currentFormContext.journeyID) {
+    executeInterfacePostRedirect('idCom', globals);
   }
 }
 
@@ -332,7 +342,6 @@ export {
   pinCodeMaster,
   validateEmailID,
   currentAddressToggleHandler,
-  finalDap,
   aadharInit,
   checkMode,
   otpValHandler,
@@ -351,4 +360,5 @@ export {
   fetchAuthCode,
   redirect,
   hideLoaderGif,
+  executeInterfacePostRedirect,
 };

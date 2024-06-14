@@ -8,7 +8,6 @@ import {
   pinCodeMaster,
   validateEmailID,
   currentAddressToggleHandler,
-  finalDap,
   aadharInit,
   checkMode,
   otpValHandler,
@@ -27,6 +26,7 @@ import {
   fetchAuthCode,
   redirect,
   hideLoaderGif,
+  executeInterfacePostRedirect,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -183,7 +183,6 @@ export {
   pinCodeMaster,
   validateEmailID,
   currentAddressToggleHandler,
-  finalDap,
   journeyResponseHandler,
   aadharInit,
   moveWizardView,
@@ -210,4 +209,5 @@ export {
   showElement,
   fetchAuthCode,
   redirect,
+  executeInterfacePostRedirect,
 };
