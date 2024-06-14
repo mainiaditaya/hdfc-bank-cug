@@ -304,8 +304,11 @@ const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJw
 const ipaSuccessHandler = (ipa, productEligibility, globals) => {
   const { productDetails } = productEligibility;
   const [firstProductDetail] = productDetails;
-
-  currentFormContext.productCode = firstProductDetail?.cardProductCode;
+  if (firstProductDetail) {
+    currentFormContext.productCode = firstProductDetail?.cardProductCode;
+  } else {
+    currentFormContext.productCode = globals.functions.exportData().form.productCode;
+  }
   currentFormContext.eRefNumber = ipa?.eRefNumber;
   currentFormContext.applRefNumber = ipa?.applRefNumber;
   formRuntime.filler8 = ipa?.filler8;
