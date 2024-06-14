@@ -12,8 +12,10 @@ import {
   fetchJsonResponse,
   fetchIPAResponse,
   hideLoaderGif,
+  getJsonResponse,
 } from './makeRestAPI.js';
 import corpCreditCard from './constants.js';
+import finalDap from './finaldaputils.js';
 
 const { endpoints, baseUrl } = corpCreditCard;
 const GENDER_MAP = {
@@ -303,10 +305,10 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
   const { productDetails } = productEligibility;
   const [firstProductDetail] = productDetails;
 
-  formRuntime.productCode = firstProductDetail.cardProductCode;
-  formRuntime.eRefNumber = ipa.eRefNumber;
-  formRuntime.applRefNumber = ipa.applRefNumber;
-  formRuntime.filler8 = ipa.filler8;
+  currentFormContext.productCode = firstProductDetail?.cardProductCode;
+  currentFormContext.eRefNumber = ipa?.eRefNumber;
+  currentFormContext.applRefNumber = ipa?.applRefNumber;
+  formRuntime.filler8 = ipa?.filler8;
 
   const imageEl = document.querySelector('.field-cardimage > picture');
   const imagePath = `${baseUrl}${firstProductDetail?.cardTypePath}?width=2000&optimize=medium`;
@@ -319,7 +321,7 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
 
   ['keyBenefitsText0', 'keyBenefitsText1', 'keyBenefitsText2'].forEach((key, index) => {
     const benefitsTextField = formUtil(globals, benefitsPanel[key]);
-    benefitsTextField.setValue(firstProductDetail.keyBenefits[index]);
+    benefitsTextField.setValue(firstProductDetail?.keyBenefits[index]);
   });
   if (currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag === 'N') {
     const { selectKycPanel } = globals.form.corporateCardWizardView;
@@ -330,9 +332,36 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
   listNameOnCard(globals);
 };
 
+/**
+ * Executes an interface post request with the appropriate authentication mode based on the response.
+ *
+ * @param {object} source - The source object (unused in the current implementation).
+ * @param {object} globals - An object containing global variables and functions.
+ */
+const executeInterfacePostRedirect = async (source, globals) => {
+  const formCallBackContext = globals.functions.exportData()?.currentFormContext;
+  const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
+  if (source === 'idCom') {
+    const mobileMatch = globals.functions.exportData().aadhaar_otp_val_data.result.mobileValid === 'y';
+    if (mobileMatch) {
+      requestObj.requestString.authMode = 'EKYCIDCOM';
+    } else {
+      requestObj.requestString.authMode = 'IDCOM';
+    }
+  }
+  const apiEndPoint = urlPath(endpoints.executeInterface);
+  const response = await getJsonResponse(apiEndPoint, requestObj, 'POST');
+  if (response?.errorCode === '0000') {
+    finalDap(globals);
+  } else {
+    console.log(response);
+  }
+};
+
 export {
   executeInterfaceApiFinal,
   executeInterfaceApi,
   ipaRequestApi,
   ipaSuccessHandler,
+  executeInterfacePostRedirect,
 };

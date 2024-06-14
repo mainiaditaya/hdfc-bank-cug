@@ -6,7 +6,6 @@ import {
   pinCodeMaster,
   validateEmailID,
   currentAddressToggleHandler,
-  finalDap,
   currentFormContext,
   otpValHandler,
   journeyResponseHandler,
@@ -15,25 +14,30 @@ import {
   aadharConsent123,
   resendOTP,
   formRuntime,
-  createDapRequestObj,
-  updatePanelVisibility,
 } from '../creditcards/corporate-creditcardFunctions.js';
+
 import {
   validatePan,
   panAPISuccesHandler,
 } from './panvalidation.js';
+
 import {
   executeInterfaceApi,
+  executeInterfacePostRedirect,
   ipaRequestApi,
   ipaSuccessHandler,
 } from './executeinterfaceutils.js';
+
 import fetchAuthCode from './idcomutil.js';
+
 import {
   urlPath, santizedFormDataWithContext, getTimeStamp,
 } from './formutils.js';
+
 import {
-  fetchJsonResponse, getJsonResponse, hideLoaderGif,
+  fetchJsonResponse, hideLoaderGif,
 } from './makeRestAPI.js';
+
 import corpCreditCard from './constants.js';
 
 const { endpoints } = corpCreditCard;
@@ -42,7 +46,7 @@ const { endpoints } = corpCreditCard;
  * @name checkMode - check the location
  * @param {object} globals -
  */
-async function checkMode(globals) {
+function checkMode(globals) {
   const formData = globals.functions.exportData();
   // temporarly added referenceNumber check for IDCOMM redirection to land on submit screen.
   if (formData?.aadhaar_otp_val_data?.message && formData?.aadhaar_otp_val_data?.message === 'Aadhaar OTP Validate success') {
@@ -72,19 +76,8 @@ async function checkMode(globals) {
     globals.functions.setProperty(AddressDeclarationAadhar.aadharAddressSelectKYC, { value: aadharAddress });
     globals.functions.setProperty(addressDeclarationOffice.officeAddressSelectKYC, { value: officeAddress });
     globals.functions.setProperty(CurrentAddressDeclaration.currentResidenceAddress, { value: communicationAddress });
-  } else {
-    // final dap api call
-    const payload = createDapRequestObj(globals);
-    const apiEndPoint = urlPath(endpoints.finalDapAndPdfGen);
-    const errorSuccessMethod = (res, global) => {
-      updatePanelVisibility(res, global);
-    };
-    try {
-      const response = await getJsonResponse(apiEndPoint, payload, 'POST');
-      errorSuccessMethod(response, globals);
-    } catch (error) {
-      errorSuccessMethod(error, globals);
-    }
+  } else if (currentFormContext.journeyID) {
+    executeInterfacePostRedirect('idCom', globals);
   }
 }
 
@@ -349,7 +342,6 @@ export {
   pinCodeMaster,
   validateEmailID,
   currentAddressToggleHandler,
-  finalDap,
   aadharInit,
   checkMode,
   otpValHandler,
@@ -368,4 +360,5 @@ export {
   fetchAuthCode,
   redirect,
   hideLoaderGif,
+  executeInterfacePostRedirect,
 };
