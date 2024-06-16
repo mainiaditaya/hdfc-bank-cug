@@ -76,7 +76,7 @@ function checkMode(globals) {
     globals.functions.setProperty(AddressDeclarationAadhar.aadharAddressSelectKYC, { value: aadharAddress });
     globals.functions.setProperty(addressDeclarationOffice.officeAddressSelectKYC, { value: officeAddress });
     globals.functions.setProperty(CurrentAddressDeclaration.currentResidenceAddress, { value: communicationAddress });
-  } else if (currentFormContext.journeyID) {
+  } else if (formData.currentFormContext.journeyID) {
     executeInterfacePostRedirect('idCom', globals);
   }
 }
