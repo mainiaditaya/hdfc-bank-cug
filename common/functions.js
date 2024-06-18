@@ -6,7 +6,7 @@ import {
   pinCodeMaster,
   validateEmailID,
   currentAddressToggleHandler,
-  currentFormContext,
+  corpCreditCardContext,
   otpValHandler,
   journeyResponseHandler,
   createJourneyId,
@@ -15,6 +15,8 @@ import {
   resendOTP,
   formRuntime,
 } from '../creditcards/corporate-creditcardFunctions.js';
+
+import { updatePanelVisibility } from './finaldaputils.js';
 
 import {
   validatePan,
@@ -41,6 +43,7 @@ import {
 import corpCreditCard from './constants.js';
 
 const { endpoints } = corpCreditCard;
+const { currentFormContext } = corpCreditCardContext;
 
 /**
  * @name checkMode - check the location
@@ -77,6 +80,7 @@ function checkMode(globals) {
     globals.functions.setProperty(addressDeclarationOffice.officeAddressSelectKYC, { value: officeAddress });
     globals.functions.setProperty(CurrentAddressDeclaration.currentResidenceAddress, { value: communicationAddress });
   } else if (formData.currentFormContext.journeyID) {
+    // updatePanelVisibility({}, globals);
     executeInterfacePostRedirect('idCom', globals);
   }
 }
@@ -347,7 +351,7 @@ export {
   otpValHandler,
   customSetFocus,
   journeyResponseHandler,
-  currentFormContext,
+  corpCreditCardContext,
   createJourneyId,
   validatePan,
   panAPISuccesHandler,

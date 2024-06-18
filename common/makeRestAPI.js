@@ -73,14 +73,14 @@ function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = 
         if (loader) hideLoaderGif();
         return response;
       }
-      const elapsedTime = (Date.now() - startTime) / 1000;
-      if (elapsedTime < parseInt(ipaDuration, 10) - 10) {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve(fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, true, startTime));
-          }, ipaTimer * 1000);
-        });
-      }
+      // const elapsedTime = (Date.now() - startTime) / 1000;
+      // if (elapsedTime < parseInt(ipaDuration, 10) - 10) {
+      //   return new Promise((resolve) => {
+      //     setTimeout(() => {
+      //       resolve(fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, true, startTime));
+      //     }, ipaTimer * 1000);
+      //   });
+      // }
       return response;
     });
 }
@@ -122,17 +122,17 @@ function getJsonResponse(url, payload, method = 'POST') {
  * @callback errorCallback - The callback function to handle after errors during the API call.
  */
 function restAPICall(globals, method, payload, path, successCallback, errorCallback, loadingText) {
-  displayLoader(loadingText);
+  if (loadingText) displayLoader(loadingText);
   getJsonResponse(path, payload, method)
     .then((res) => {
       if (res) {
-        hideLoaderGif();
+        if (loadingText) hideLoaderGif();
         successCallback(res, globals);
       }
     })
     .catch((err) => {
       // errorMethod
-      hideLoaderGif();
+      if (loadingText) hideLoaderGif();
       errorCallback(err, globals);
     });
 }

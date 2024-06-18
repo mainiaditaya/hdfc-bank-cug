@@ -3,11 +3,11 @@ import {
   urlPath,
   convertDateToDdMmYyyy,
 } from './formutils.js';
-import { currentFormContext, formRuntime } from './journey-utils.js';
+import { corpCreditCardContext, formRuntime } from './journey-utils.js';
 import corpCreditCard from './constants.js';
 
 const { endpoints, deadPanStatus } = corpCreditCard;
-
+const { currentFormContext } = corpCreditCardContext;
 /**
  * validatePan - creates PAN validation request and executes API.
  * @param {string} mobileNumber

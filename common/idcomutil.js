@@ -1,5 +1,5 @@
 import {
-  currentFormContext,
+  corpCreditCardContext,
   formRuntime,
 } from './journey-utils.js';
 import { urlPath } from './formutils.js';
@@ -7,6 +7,7 @@ import corpCreditCard from './constants.js';
 import { fetchJsonResponse } from './makeRestAPI.js';
 
 const { idCom, endpoints } = corpCreditCard;
+const { currentFormContext } = corpCreditCardContext;
 
 /**
  * Creates an IdCom request object based on the provided global data.

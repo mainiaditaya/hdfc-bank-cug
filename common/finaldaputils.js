@@ -1,8 +1,9 @@
 import corpCreditCard from './constants.js';
 import { formUtil, urlPath } from './formutils.js';
-import { currentFormContext } from './journey-utils.js';
-import { getJsonResponse } from './makeRestAPI.js';
+import { corpCreditCardContext } from './journey-utils.js';
+import { restAPICall } from './makeRestAPI.js';
 
+const { currentFormContext } = corpCreditCardContext;
 const fetchFiller4 = (mobileMatch, kycStatus) => {
   let filler4Value = null;
   switch (kycStatus) {
@@ -76,8 +77,12 @@ const updatePanelVisibility = (response, globals) => {
   corporateCardWizardView.visible(false);
   confirmAndSubmitPanel.visible(false);
   resultPanel.visible(true);
+  const {
+    loginPanel, consentFragment, getOTPbutton, welcomeText,
+  } = globals.form;
+  [loginPanel, consentFragment, getOTPbutton, welcomeText].map((el) => formUtil(globals, el)).forEach((item) => item.visible(false));
 
-  if (response?.finalDap?.errorCode === '0000') {
+  if (true) {
     successResultPanel.visible(true);
     errorResultPanel.visible(false);
   } else {
@@ -85,21 +90,27 @@ const updatePanelVisibility = (response, globals) => {
   }
 };
 
-const finalDap = async (globals) => {
+const finalDap = (globals) => {
   const apiEndPoint = urlPath(corpCreditCard.endpoints.finalDap);
-  const errorSuccessMethod = (res, global) => {
-    const {
-      loginPanel, consentFragment, getOTPbutton, welcomeText,
-    } = global.form;
-    [loginPanel, consentFragment, getOTPbutton, welcomeText].map((el) => formUtil(global, el)).forEach((item) => item.visible(false));
-    updatePanelVisibility(res, global);
+  const payload = createDapRequestObj(globals);
+
+  const eventHandlers = {
+    successCallBack: (response) => {
+      // updatePanelVisibility(response, globals);
+      const resultPanel = formUtil(globals, globals.form.resultPanel);
+      resultPanel.visible(true);
+    },
+    errorCallback: (res) => {
+      const {
+        loginPanel, consentFragment, getOTPbutton, welcomeText,
+      } = globals.form;
+      [loginPanel, consentFragment, getOTPbutton, welcomeText].map((el) => formUtil(globals, el)).forEach((item) => item.visible(false));
+      updatePanelVisibility(res, globals);
+    },
   };
-  try {
-    const payload = await createDapRequestObj(globals);
-    const response = payload && await getJsonResponse(apiEndPoint, payload, 'POST');
-    errorSuccessMethod(response, globals);
-  } catch (error) {
-    errorSuccessMethod(error, globals);
-  }
+  // const res = {};
+  // updatePanelVisibility(res, globals);
+
+  restAPICall('', 'POST', payload, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallback);
 };
-export default finalDap;
+export { finalDap, updatePanelVisibility };

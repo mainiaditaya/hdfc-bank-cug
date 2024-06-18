@@ -27,15 +27,17 @@ function createJourneyId(visitMode, journeyAbbreviation, channel, globals) {
   globals.functions.setProperty(globals.form.runtime.journeyId, { value: journeyId });
 }
 
-const currentFormContext = {};
+const corpCreditCardContext = {
+  currentFormContext: {},
+};
 const formRuntime = {};
 
-const getCurrentContext = () => currentFormContext;
+const getCurrentContext = () => corpCreditCardContext.currentFormContext;
 
 const setCurrentContext = (formContext) => {
-  this.currentFormContext = formContext;
-  if (!this.currentFormContext.isSet) {
-    this.currentFormContext.isSet = true;
+  this.corpCreditCardContext.currentFormContext = formContext;
+  if (!this.corpCreditCardContext.currentFormContext.isSet) {
+    this.corpCreditCardContext.currentFormContext.isSet = true;
   }
 };
 
@@ -82,6 +84,7 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
  * @return {PROMISE}
  */
 const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, journeyId, globals) => {
+  const { currentFormContext } = corpCreditCardContext;
   const sanitizedFormData = santizedFormDataWithContext(globals, currentFormContext);
   const journeyJSONObj = {
     RequestPayload: {
@@ -146,5 +149,13 @@ const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyI
 };
 
 export {
-  invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate, journeyResponseHandlerUtil, currentFormContext, getCurrentContext, setCurrentContext, createJourneyId, formRuntime,
+  invokeJourneyDropOff,
+  invokeJourneyDropOffByParam,
+  invokeJourneyDropOffUpdate,
+  journeyResponseHandlerUtil,
+  corpCreditCardContext,
+  getCurrentContext,
+  setCurrentContext,
+  createJourneyId,
+  formRuntime,
 };

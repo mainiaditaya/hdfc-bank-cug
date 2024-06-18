@@ -6,7 +6,7 @@ import {
   composeNameOption,
   setSelectOptions,
 } from './formutils.js';
-import { currentFormContext, formRuntime } from './journey-utils.js';
+import { corpCreditCardContext, formRuntime } from './journey-utils.js';
 import {
   restAPICall,
   fetchJsonResponse,
@@ -15,8 +15,9 @@ import {
   getJsonResponse,
 } from './makeRestAPI.js';
 import corpCreditCard from './constants.js';
-import finalDap from './finaldaputils.js';
+import { finalDap } from './finaldaputils.js';
 
+const { currentFormContext } = corpCreditCardContext;
 const { endpoints, baseUrl } = corpCreditCard;
 const GENDER_MAP = {
   M: '1',
@@ -353,12 +354,17 @@ const executeInterfacePostRedirect = async (source, globals) => {
     }
   }
   const apiEndPoint = urlPath(endpoints.executeInterface);
-  const response = await getJsonResponse(apiEndPoint, requestObj, 'POST');
-  if (response?.errorCode === '0000') {
-    finalDap(globals);
-  } else {
-    console.log(response);
-  }
+  const eventHandlers = {
+    successCallBack: (response) => {
+      if (response?.errorCode === '0000') {
+        finalDap(globals);
+      }
+    },
+    errorCallBack: (response) => {
+      console.log(response);
+    },
+  };
+  restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack);
 };
 
 export {

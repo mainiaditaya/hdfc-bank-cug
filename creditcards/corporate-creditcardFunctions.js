@@ -3,7 +3,7 @@ import {
   invokeJourneyDropOff,
   invokeJourneyDropOffUpdate,
   journeyResponseHandlerUtil,
-  currentFormContext,
+  corpCreditCardContext,
   createJourneyId,
   formRuntime,
 } from '../common/journey-utils.js';
@@ -28,7 +28,7 @@ import { sendAnalyticsEvent } from '../common/analytics.js';
 import corpCreditCard from '../common/constants.js';
 
 const { endpoints } = corpCreditCard;
-
+const { currentFormContext } = corpCreditCardContext;
 // Initialize all Corporate Card Journey Context Variables.
 currentFormContext.journeyName = corpCreditCard.journeyName;
 currentFormContext.journeyType = 'NTB';
@@ -689,7 +689,7 @@ const resendOTP = (globals) => {
 export {
   getThisCard,
   prefillForm,
-  currentFormContext,
+  corpCreditCardContext,
   formRuntime,
   getAddressDetails,
   pinCodeMaster,
