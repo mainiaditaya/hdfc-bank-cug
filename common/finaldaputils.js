@@ -69,14 +69,8 @@ const createDapRequestObj = (globals) => {
 };
 
 const updatePanelVisibility = (response, globals) => {
-  const corporateCardWizardView = formUtil(globals, globals.form.corporateCardWizardView);
-  const confirmAndSubmitPanel = formUtil(globals, globals.form.corporateCardWizardView.confirmAndSubmitPanel);
   const successResultPanel = formUtil(globals, globals.form.resultPanel.successResultPanel);
   const errorResultPanel = formUtil(globals, globals.form.resultPanel.errorResultPanel);
-  const resultPanel = formUtil(globals, globals.form.resultPanel);
-  corporateCardWizardView.visible(false);
-  confirmAndSubmitPanel.visible(false);
-  resultPanel.visible(true);
   const {
     loginPanel, consentFragment, getOTPbutton, welcomeText,
   } = globals.form;
@@ -96,9 +90,11 @@ const finalDap = (globals) => {
 
   const eventHandlers = {
     successCallBack: (response) => {
-      // updatePanelVisibility(response, globals);
-      const resultPanel = formUtil(globals, globals.form.resultPanel);
-      resultPanel.visible(true);
+      const resultShow = formUtil(globals, globals.form.resultPanel.resultShow);
+      resultShow.setValue('1');
+
+      // const resultPanel = formUtil(globals, globals.form.resultPanel);
+      // resultPanel.visible(true);
     },
     errorCallback: (res) => {
       const {
