@@ -355,6 +355,16 @@ const removeSpecialCharacters = (str, allowedChars) => {
    * @returns {object} -Object containing only defined values.
    */
 const santizedFormData = (globaObj) => JSON.parse(JSON.stringify(globaObj.functions.exportData()));
+/**
+   * Removes all undefined keys from the form datand reduces overall size of the object.
+   * @param {object} jsonObj
+   */
+const removeUndefinedKeys = (jsonObj) => {
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [key, value] of Object.entries(jsonObj)) {
+    if (value === null || value === undefined) delete jsonObj[key];
+  }
+};
 
 /**
    * Filters out all defined values from the form data using the globals object.
@@ -363,8 +373,13 @@ const santizedFormData = (globaObj) => JSON.parse(JSON.stringify(globaObj.functi
    * @returns {object} -Object containing only defined values.
    */
 const santizedFormDataWithContext = (globaObj, currentFormContext) => {
-  const formDataPayload = globaObj.functions.exportData();
-  formDataPayload.currentFormContext = currentFormContext;
+  const formData = globaObj.functions.exportData();
+  formData.currentFormContext = currentFormContext;
+  const {
+    data, analytics, queryParams, ...formDataPayload
+  } = formData;
+  removeUndefinedKeys(formDataPayload);
+  removeUndefinedKeys(formDataPayload?.form);
   return JSON.parse(JSON.stringify(formDataPayload));
 };
 
