@@ -56,7 +56,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
     employmentDetails,
   } = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage;
   const { prefilledEmploymentDetails } = employmentDetails;
-  const fullName = `${personalDetails.firstName.$value} ${personalDetails.middleName.$value} ${personalDetails.lastName.$value}`;
+  const fullName = !personalDetails.middleName.$value ? `${personalDetails.firstName.$value} ${personalDetails.lastName.$value}` : `${personalDetails.firstName.$value} ${personalDetails.middleName.$value} ${personalDetails.lastName.$value}`;
   let addressEditFlag = 'N';
   let panEditFlag = 'N';
   const panNumber = personalDetails.panNumberPersonalDetails.$value;
@@ -247,7 +247,7 @@ const executeInterfaceApiFinal = (globals) => {
       console.log(response);
     },
   };
-  //restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
+  // restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
   formRuntime?.getOtpLoader();
   return fetchJsonResponse(apiEndPoint, requestObj, 'POST', true);
 };
