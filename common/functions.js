@@ -25,6 +25,7 @@ import {
 
 import {
   executeInterfaceApi,
+  executeInterfaceApiFinal,
   executeInterfacePostRedirect,
   ipaRequestApi,
   ipaSuccessHandler,
@@ -376,4 +377,5 @@ export {
   redirect,
   hideLoaderGif,
   executeInterfacePostRedirect,
+  executeInterfaceApiFinal,
 };

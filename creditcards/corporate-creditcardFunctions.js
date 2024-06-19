@@ -396,7 +396,7 @@ const setConfirmScrAddressFields = (globalObj) => {
  */
 const getThisCard = (globals) => {
   const isAddressChanged = currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag === 'Y';
-  executeInterfaceApiFinal(globals);
+  //executeInterfaceApiFinal(globals);
   setConfirmScrAddressFields(globals);
   if (!isAddressChanged) {
     moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');

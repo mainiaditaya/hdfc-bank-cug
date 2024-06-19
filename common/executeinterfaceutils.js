@@ -227,11 +227,12 @@ const listNameOnCard = (globals) => {
 };
 
 /**
- * Executes the final interface API call and fetches authentication code upon success.
+ * @name executeInterfaceApiFinal
  * @param {Object} globals - The global object containing necessary data for the request.
- * @returns {void}
+ * @returns {PROMISE}
  */
 const executeInterfaceApiFinal = (globals) => {
+  debugger;
   const formCallBackContext = globals.functions.exportData()?.currentFormContext;
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
   requestObj.requestString.nameOnCard = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value;
@@ -246,7 +247,9 @@ const executeInterfaceApiFinal = (globals) => {
       console.log(response);
     },
   };
-  restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
+  //restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
+  formRuntime?.getOtpLoader();
+  return fetchJsonResponse(apiEndPoint, requestObj, 'POST', true);
 };
 
 /**
@@ -357,7 +360,7 @@ const executeInterfacePostRedirect = async (source, globals) => {
   const formCallBackContext = globals.functions.exportData()?.currentFormContext;
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
   if (source === 'idCom') {
-    const mobileMatch = globals.functions.exportData().aadhaar_otp_val_data.result.mobileValid === 'y';
+    const mobileMatch = globals.functions.exportData()?.aadhaar_otp_val_data?.result?.mobileValid === 'y';
     if (mobileMatch) {
       requestObj.requestString.authMode = 'EKYCIDCOM';
     } else {

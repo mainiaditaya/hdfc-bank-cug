@@ -38,7 +38,7 @@ const createDapRequestObj = (globals) => {
         || (officiallyValidDocumentsMethod.$value && 'OVD')
         || null,
   };
-  const mobileMatch = globals.functions.exportData().aadhaar_otp_val_data.result.mobileValid === 'y';
+  const mobileMatch = globals.functions.exportData()?.aadhaar_otp_val_data?.result?.mobileValid === 'y';
   const filler4 = fetchFiller4(mobileMatch, kycFill.KYC_STATUS);
   const finalDapPayload = {
     requestString: {
