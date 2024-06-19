@@ -151,13 +151,14 @@ function getOTP(mobileNumber, pan, dob, globals) {
  * @return {PROMISE}
  */
 function otpValidation(mobileNumber, pan, dob, otpNumber) {
+  debugger;
   const referenceNumber = `AD${getTimeStamp(new Date())}` ?? '';
   currentFormContext.referenceNumber = referenceNumber;
   const jsonObj = {
     requestString: {
       mobileNumber: mobileNumber.$value,
       passwordValue: otpNumber.$value,
-      dateOfBith: clearString(dob.$value) || '',
+      dateOfBirth: clearString(dob.$value) || '',
       panNumber: pan.$value || '',
       channelSource: '',
       journeyID: currentFormContext.journeyID,
