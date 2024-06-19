@@ -343,17 +343,17 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
  * @param {object} globals - An object containing global variables and functions.
  */
 const executeInterfacePostRedirect = async (source, globals) => {
-  const corporateCardWizardView = formUtil(globals, globals.form.corporateCardWizardView);
-  const confirmAndSubmitPanel = formUtil(globals, globals.form.corporateCardWizardView.confirmAndSubmitPanel);
-  const resultPanel = formUtil(globals, globals.form.resultPanel);
-  corporateCardWizardView.visible(false);
-  confirmAndSubmitPanel.visible(false);
-  resultPanel.visible(true);
-  const {
-    loginPanel, consentFragment, getOTPbutton, welcomeText,
-  } = globals.form;
-  [loginPanel, consentFragment, getOTPbutton, welcomeText].map((el) => formUtil(globals, el)).forEach((item) => item.visible(false));
+  // const corporateCardWizardView = formUtil(globals, globals.form.corporateCardWizardView);
+  // const confirmAndSubmitPanel = formUtil(globals, globals.form.corporateCardWizardView.confirmAndSubmitPanel);
 
+  // corporateCardWizardView.visible(false);
+  // confirmAndSubmitPanel.visible(false);
+
+  // const {
+  //   loginPanel, consentFragment, getOTPbutton, welcomeText,
+  // } = globals.form;
+  // [loginPanel, consentFragment, getOTPbutton, welcomeText].map((el) => formUtil(globals, el)).forEach((item) => item.visible(false));
+  debugger;
   const formCallBackContext = globals.functions.exportData()?.currentFormContext;
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
   if (source === 'idCom') {
@@ -367,9 +367,14 @@ const executeInterfacePostRedirect = async (source, globals) => {
   const apiEndPoint = urlPath(endpoints.executeInterface);
   const eventHandlers = {
     successCallBack: (response) => {
-      finalDap(globals);
       if (response?.errorCode === '0000') {
         finalDap(globals);
+      } else {
+        const resultPanel = formUtil(globals, globals.form.resultPanel);
+        resultPanel.visible(true);
+        globals.functions.setProperty(globals.form.confirmResult, { visible: false });
+        globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: false });
+        globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
       }
     },
     errorCallBack: (response) => {
