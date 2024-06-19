@@ -85,7 +85,7 @@ function checkMode(globals) {
     globals.functions.setProperty(CurrentAddressDeclaration.currentResidenceAddress, { value: communicationAddress });
   } if (idcomVisit === 'DebitCard') {
     const resultPanel = formUtil(globals, globals.form.resultPanel);
-    resultPanel.visible(false);
+    resultPanel.visible(true);
     globals.functions.setProperty(globals.form.otpPanel, { visible: false });
     globals.functions.setProperty(globals.form.loginPanel, { visible: false });
     globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
