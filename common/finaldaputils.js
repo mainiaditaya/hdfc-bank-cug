@@ -85,23 +85,28 @@ const updatePanelVisibility = (response, globals) => {
 };
 
 const finalDap = (globals) => {
+  debugger;
   const apiEndPoint = urlPath(corpCreditCard.endpoints.finalDap);
   const payload = createDapRequestObj(globals);
 
   const eventHandlers = {
     successCallBack: (response) => {
-      const resultShow = formUtil(globals, globals.form.resultPanel.resultShow);
-      resultShow.setValue('1');
-
-      // const resultPanel = formUtil(globals, globals.form.resultPanel);
-      // resultPanel.visible(true);
+      if (response?.errorCode === '0000') {
+        const resultPanel = formUtil(globals, globals.form.resultPanel);
+        resultPanel.visible(true);
+        globals.functions.setProperty(globals.form.confirmResult, { visible: false });
+        globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: true });
+        globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: false });
+      } else {
+        const resultPanel = formUtil(globals, globals.form.resultPanel);
+        resultPanel.visible(true);
+        globals.functions.setProperty(globals.form.confirmResult, { visible: false });
+        globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: false });
+        globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
+      }
     },
-    errorCallback: (res) => {
-      const {
-        loginPanel, consentFragment, getOTPbutton, welcomeText,
-      } = globals.form;
-      [loginPanel, consentFragment, getOTPbutton, welcomeText].map((el) => formUtil(globals, el)).forEach((item) => item.visible(false));
-      updatePanelVisibility(res, globals);
+    errorCallback: (response) => {
+      console.log(response);
     },
   };
   // const res = {};
