@@ -6,7 +6,7 @@ const corpCreditCard = {
     emailId: '/content/hdfc_commonforms/api/emailid.json',
     executeInterface: '/content/hdfc_haf/api/executeinterface.json',
     finalDap: '/content/hdfc_etb_wo_pacc/api/finaldap.json',
-    ipa: '/content/hdfc_etb_wo_pacc/api/ipa.json',
+    ipa: '/content/hdfc_haf/api/ipa.json',
     journeyDropOff: '/content/hdfc_commonforms/api/journeydropoff.json',
     journeyDropOffParam: '/content/hdfc_commonforms/api/journeydropoffparam.json',
     journeyDropOffUpdate: '/content/hdfc_commonforms/api/journeydropoffupdate.json',
