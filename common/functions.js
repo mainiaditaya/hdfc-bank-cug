@@ -34,7 +34,7 @@ import {
 import fetchAuthCode from './idcomutil.js';
 
 import {
-  urlPath, santizedFormDataWithContext, getTimeStamp, formUtil,
+  urlPath, santizedFormDataWithContext, getTimeStamp, formUtil, clearString,
 } from './formutils.js';
 
 import {
@@ -51,7 +51,6 @@ const { currentFormContext } = corpCreditCardContext;
  * @param {object} globals -
  */
 function checkMode(globals) {
-  debugger;
   const formData = globals.functions.exportData();
   const idcomVisit = formData?.queryParams?.authmode; // "DebitCard"
   const aadharVisit = formData?.queryParams?.visitType; // "EKYC_AUTH
@@ -158,7 +157,7 @@ function otpValidation(mobileNumber, pan, dob, otpNumber) {
     requestString: {
       mobileNumber: mobileNumber.$value,
       passwordValue: otpNumber.$value,
-      dateOfBith: dob.$value || '',
+      dateOfBith: clearString(dob.$value) || '',
       panNumber: pan.$value || '',
       channelSource: '',
       journeyID: currentFormContext.journeyID,
