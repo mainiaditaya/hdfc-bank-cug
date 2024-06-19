@@ -6,7 +6,7 @@ import {
   pinCodeMaster,
   validateEmailID,
   currentAddressToggleHandler,
-  currentFormContext,
+  corpCreditCardContext,
   otpValHandler,
   journeyResponseHandler,
   createJourneyId,
@@ -16,6 +16,8 @@ import {
   formRuntime,
 } from '../creditcards/corporate-creditcardFunctions.js';
 
+import { updatePanelVisibility } from './finaldaputils.js';
+
 import {
   validatePan,
   panAPISuccesHandler,
@@ -23,6 +25,7 @@ import {
 
 import {
   executeInterfaceApi,
+  executeInterfaceApiFinal,
   executeInterfacePostRedirect,
   ipaRequestApi,
   ipaSuccessHandler,
@@ -31,7 +34,7 @@ import {
 import fetchAuthCode from './idcomutil.js';
 
 import {
-  urlPath, santizedFormDataWithContext, getTimeStamp,
+  urlPath, santizedFormDataWithContext, getTimeStamp, formUtil,
 } from './formutils.js';
 
 import {
@@ -41,6 +44,7 @@ import {
 import corpCreditCard from './constants.js';
 
 const { endpoints } = corpCreditCard;
+const { currentFormContext } = corpCreditCardContext;
 
 /**
  * @name checkMode - check the location
@@ -48,8 +52,10 @@ const { endpoints } = corpCreditCard;
  */
 function checkMode(globals) {
   const formData = globals.functions.exportData();
+  const idcomVisit = formData?.queryParams?.authmode; // "DebitCard"
+  const aadharVisit = formData?.queryParams?.visitType; // "EKYC_AUTH
   // temporarly added referenceNumber check for IDCOMM redirection to land on submit screen.
-  if (formData?.aadhaar_otp_val_data?.message && formData?.aadhaar_otp_val_data?.message === 'Aadhaar OTP Validate success') {
+  if (aadharVisit === 'EKYC_AUTH' && formData?.aadhaar_otp_val_data?.message && formData?.aadhaar_otp_val_data?.message === 'Aadhaar OTP Validate success') {
     globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: true });
     globals.functions.setProperty(globals.form.otpPanel, { visible: false });
     globals.functions.setProperty(globals.form.loginPanel, { visible: false });
@@ -76,8 +82,18 @@ function checkMode(globals) {
     globals.functions.setProperty(AddressDeclarationAadhar.aadharAddressSelectKYC, { value: aadharAddress });
     globals.functions.setProperty(addressDeclarationOffice.officeAddressSelectKYC, { value: officeAddress });
     globals.functions.setProperty(CurrentAddressDeclaration.currentResidenceAddress, { value: communicationAddress });
-  } else if (formData.currentFormContext.journeyID) {
-    executeInterfacePostRedirect('idCom', globals);
+  } if (idcomVisit === 'DebitCard') {
+    const resultPanel = formUtil(globals, globals.form.resultPanel);
+    resultPanel.visible(false);
+    globals.functions.setProperty(globals.form.otpPanel, { visible: false });
+    globals.functions.setProperty(globals.form.loginPanel, { visible: false });
+    globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
+    globals.functions.setProperty(globals.form.consentFragment, { visible: false });
+    globals.functions.setProperty(globals.form.welcomeText, { visible: false });
+    globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: false });
+    globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: false });
+    globals.functions.setProperty(globals.form.confirmResult, { visible: true });
+    // executeInterfacePostRedirect('idCom', globals);
   }
 }
 
@@ -347,7 +363,7 @@ export {
   otpValHandler,
   customSetFocus,
   journeyResponseHandler,
-  currentFormContext,
+  corpCreditCardContext,
   createJourneyId,
   validatePan,
   panAPISuccesHandler,
@@ -361,4 +377,5 @@ export {
   redirect,
   hideLoaderGif,
   executeInterfacePostRedirect,
+  executeInterfaceApiFinal,
 };

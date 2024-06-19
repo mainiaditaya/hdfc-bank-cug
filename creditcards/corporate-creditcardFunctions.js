@@ -3,7 +3,7 @@ import {
   invokeJourneyDropOff,
   invokeJourneyDropOffUpdate,
   journeyResponseHandlerUtil,
-  currentFormContext,
+  corpCreditCardContext,
   createJourneyId,
   formRuntime,
 } from '../common/journey-utils.js';
@@ -28,7 +28,7 @@ import { sendAnalyticsEvent } from '../common/analytics.js';
 import corpCreditCard from '../common/constants.js';
 
 const { endpoints } = corpCreditCard;
-
+const { currentFormContext } = corpCreditCardContext;
 // Initialize all Corporate Card Journey Context Variables.
 currentFormContext.journeyName = corpCreditCard.journeyName;
 currentFormContext.journeyType = 'NTB';
@@ -396,7 +396,7 @@ const setConfirmScrAddressFields = (globalObj) => {
  */
 const getThisCard = (globals) => {
   const isAddressChanged = currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag === 'Y';
-  executeInterfaceApiFinal(globals);
+  //executeInterfaceApiFinal(globals);
   setConfirmScrAddressFields(globals);
   if (!isAddressChanged) {
     moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
@@ -537,6 +537,7 @@ const pinCodeMaster = async (globals) => {
  * @param {object} globals - The global object containing necessary globals form data.
  */
 const validateEmailID = async (email, globals) => {
+  debugger;
   const emailField = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.personalEmailAddress;
   const url = urlPath(endpoints.emailId);
   const setEmailField = formUtil(globals, emailField);
@@ -689,7 +690,7 @@ const resendOTP = (globals) => {
 export {
   getThisCard,
   prefillForm,
-  currentFormContext,
+  corpCreditCardContext,
   formRuntime,
   getAddressDetails,
   pinCodeMaster,

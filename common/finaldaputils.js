@@ -1,8 +1,9 @@
 import corpCreditCard from './constants.js';
 import { formUtil, urlPath } from './formutils.js';
-import { currentFormContext } from './journey-utils.js';
-import { getJsonResponse } from './makeRestAPI.js';
+import { corpCreditCardContext } from './journey-utils.js';
+import { restAPICall } from './makeRestAPI.js';
 
+const { currentFormContext } = corpCreditCardContext;
 const fetchFiller4 = (mobileMatch, kycStatus) => {
   let filler4Value = null;
   switch (kycStatus) {
@@ -37,7 +38,7 @@ const createDapRequestObj = (globals) => {
         || (officiallyValidDocumentsMethod.$value && 'OVD')
         || null,
   };
-  const mobileMatch = globals.functions.exportData().aadhaar_otp_val_data.result.mobileValid === 'y';
+  const mobileMatch = globals.functions.exportData()?.aadhaar_otp_val_data?.result?.mobileValid === 'y';
   const filler4 = fetchFiller4(mobileMatch, kycFill.KYC_STATUS);
   const finalDapPayload = {
     requestString: {
@@ -68,16 +69,14 @@ const createDapRequestObj = (globals) => {
 };
 
 const updatePanelVisibility = (response, globals) => {
-  const corporateCardWizardView = formUtil(globals, globals.form.corporateCardWizardView);
-  const confirmAndSubmitPanel = formUtil(globals, globals.form.corporateCardWizardView.confirmAndSubmitPanel);
   const successResultPanel = formUtil(globals, globals.form.resultPanel.successResultPanel);
   const errorResultPanel = formUtil(globals, globals.form.resultPanel.errorResultPanel);
-  const resultPanel = formUtil(globals, globals.form.resultPanel);
-  corporateCardWizardView.visible(false);
-  confirmAndSubmitPanel.visible(false);
-  resultPanel.visible(true);
+  const {
+    loginPanel, consentFragment, getOTPbutton, welcomeText,
+  } = globals.form;
+  [loginPanel, consentFragment, getOTPbutton, welcomeText].map((el) => formUtil(globals, el)).forEach((item) => item.visible(false));
 
-  if (response?.finalDap?.errorCode === '0000') {
+  if (true) {
     successResultPanel.visible(true);
     errorResultPanel.visible(false);
   } else {
@@ -85,21 +84,34 @@ const updatePanelVisibility = (response, globals) => {
   }
 };
 
-const finalDap = async (globals) => {
+const finalDap = (globals) => {
+  debugger;
   const apiEndPoint = urlPath(corpCreditCard.endpoints.finalDap);
-  const errorSuccessMethod = (res, global) => {
-    const {
-      loginPanel, consentFragment, getOTPbutton, welcomeText,
-    } = global.form;
-    [loginPanel, consentFragment, getOTPbutton, welcomeText].map((el) => formUtil(global, el)).forEach((item) => item.visible(false));
-    updatePanelVisibility(res, global);
+  const payload = createDapRequestObj(globals);
+
+  const eventHandlers = {
+    successCallBack: (response) => {
+      if (response?.errorCode === '0000') {
+        const resultPanel = formUtil(globals, globals.form.resultPanel);
+        resultPanel.visible(true);
+        globals.functions.setProperty(globals.form.confirmResult, { visible: false });
+        globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: true });
+        globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: false });
+      } else {
+        const resultPanel = formUtil(globals, globals.form.resultPanel);
+        resultPanel.visible(true);
+        globals.functions.setProperty(globals.form.confirmResult, { visible: false });
+        globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: false });
+        globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
+      }
+    },
+    errorCallback: (response) => {
+      console.log(response);
+    },
   };
-  try {
-    const payload = await createDapRequestObj(globals);
-    const response = payload && await getJsonResponse(apiEndPoint, payload, 'POST');
-    errorSuccessMethod(response, globals);
-  } catch (error) {
-    errorSuccessMethod(error, globals);
-  }
+  // const res = {};
+  // updatePanelVisibility(res, globals);
+
+  restAPICall('', 'POST', payload, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallback);
 };
-export default finalDap;
+export { finalDap, updatePanelVisibility };

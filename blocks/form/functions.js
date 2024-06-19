@@ -13,7 +13,7 @@ import {
   otpValHandler,
   customSetFocus,
   journeyResponseHandler,
-  currentFormContext,
+  corpCreditCardContext,
   createJourneyId,
   validatePan,
   panAPISuccesHandler,
@@ -27,6 +27,7 @@ import {
   redirect,
   hideLoaderGif,
   executeInterfacePostRedirect,
+  executeInterfaceApiFinal,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -35,6 +36,8 @@ import {
   sendGenericClickEvent,
 } from '../../common/analytics.js';
 import { invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
+
+const { currentFormContext } = corpCreditCardContext;
 
 /**
  * Get Full Name
@@ -210,4 +213,5 @@ export {
   fetchAuthCode,
   redirect,
   executeInterfacePostRedirect,
+  executeInterfaceApiFinal,
 };

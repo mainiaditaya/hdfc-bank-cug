@@ -6,7 +6,7 @@ import {
   composeNameOption,
   setSelectOptions,
 } from './formutils.js';
-import { currentFormContext, formRuntime } from './journey-utils.js';
+import { corpCreditCardContext, formRuntime } from './journey-utils.js';
 import {
   restAPICall,
   fetchJsonResponse,
@@ -15,8 +15,9 @@ import {
   getJsonResponse,
 } from './makeRestAPI.js';
 import corpCreditCard from './constants.js';
-import finalDap from './finaldaputils.js';
+import { finalDap } from './finaldaputils.js';
 
+const { currentFormContext } = corpCreditCardContext;
 const { endpoints, baseUrl } = corpCreditCard;
 const GENDER_MAP = {
   M: '1',
@@ -226,11 +227,12 @@ const listNameOnCard = (globals) => {
 };
 
 /**
- * Executes the final interface API call and fetches authentication code upon success.
+ * @name executeInterfaceApiFinal
  * @param {Object} globals - The global object containing necessary data for the request.
- * @returns {void}
+ * @returns {PROMISE}
  */
 const executeInterfaceApiFinal = (globals) => {
+  debugger;
   const formCallBackContext = globals.functions.exportData()?.currentFormContext;
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
   requestObj.requestString.nameOnCard = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value;
@@ -245,7 +247,9 @@ const executeInterfaceApiFinal = (globals) => {
       console.log(response);
     },
   };
-  restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
+  //restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
+  formRuntime?.getOtpLoader();
+  return fetchJsonResponse(apiEndPoint, requestObj, 'POST', true);
 };
 
 /**
@@ -342,10 +346,21 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
  * @param {object} globals - An object containing global variables and functions.
  */
 const executeInterfacePostRedirect = async (source, globals) => {
+  // const corporateCardWizardView = formUtil(globals, globals.form.corporateCardWizardView);
+  // const confirmAndSubmitPanel = formUtil(globals, globals.form.corporateCardWizardView.confirmAndSubmitPanel);
+
+  // corporateCardWizardView.visible(false);
+  // confirmAndSubmitPanel.visible(false);
+
+  // const {
+  //   loginPanel, consentFragment, getOTPbutton, welcomeText,
+  // } = globals.form;
+  // [loginPanel, consentFragment, getOTPbutton, welcomeText].map((el) => formUtil(globals, el)).forEach((item) => item.visible(false));
+  debugger;
   const formCallBackContext = globals.functions.exportData()?.currentFormContext;
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
   if (source === 'idCom') {
-    const mobileMatch = globals.functions.exportData().aadhaar_otp_val_data.result.mobileValid === 'y';
+    const mobileMatch = globals.functions.exportData()?.aadhaar_otp_val_data?.result?.mobileValid === 'y';
     if (mobileMatch) {
       requestObj.requestString.authMode = 'EKYCIDCOM';
     } else {
@@ -353,12 +368,23 @@ const executeInterfacePostRedirect = async (source, globals) => {
     }
   }
   const apiEndPoint = urlPath(endpoints.executeInterface);
-  const response = await getJsonResponse(apiEndPoint, requestObj, 'POST');
-  if (response?.errorCode === '0000') {
-    finalDap(globals);
-  } else {
-    console.log(response);
-  }
+  const eventHandlers = {
+    successCallBack: (response) => {
+      if (response?.errorCode === '0000') {
+        finalDap(globals);
+      } else {
+        const resultPanel = formUtil(globals, globals.form.resultPanel);
+        resultPanel.visible(true);
+        globals.functions.setProperty(globals.form.confirmResult, { visible: false });
+        globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: false });
+        globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
+      }
+    },
+    errorCallBack: (response) => {
+      console.log(response);
+    },
+  };
+  restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack);
 };
 
 export {
