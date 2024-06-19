@@ -3,12 +3,32 @@ import { formUtil, urlPath } from './formutils.js';
 import { corpCreditCardContext } from './journey-utils.js';
 import { restAPICall } from './makeRestAPI.js';
 
+function getCurrentDateAndTime(dobFormatNo) {
+  /*
+      dobFormatNo: 1 (DD-MM-YYYY HH:MM:SS)
+      dobFormatNo: 2 (YYYYMMDDHHMMSS)
+      dobFormatNo: 3 (DDMMYYYYHHMMSS)
+  */
+  const newDate = new Date();
+  const year = newDate.getFullYear();
+  const month = newDate.getMonth()+1;
+  const todaySDate = newDate.getDate();
+  const hours = newDate.getHours();
+  const minutes = newDate.getMinutes();
+  const seconds = newDate.getSeconds();
+
+  if (dobFormatNo === '1') {
+    return `${todaySDate}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+  }
+  return `${year}-${month}-${todaySDate} ${hours}:${minutes}:${seconds}`;
+}
+
 const { currentFormContext } = corpCreditCardContext;
 const fetchFiller4 = (mobileMatch, kycStatus) => {
   let filler4Value = null;
   switch (kycStatus) {
     case 'aadhar':
-      filler4Value = mobileMatch ? `NVKYC${new Date().toISOString()}` : `VKYC${new Date().toISOString()}`;
+      filler4Value = mobileMatch ? `NVKYC${getCurrentDateAndTime(3)}` : `VKYC${getCurrentDateAndTime(3)}`;
       break;
     case 'bioKYC':
       filler4Value = 'bioKYC';
