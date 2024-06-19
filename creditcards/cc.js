@@ -218,9 +218,10 @@ linkModalFunction(viewAllBtnPannelConfig);
 const queryStrings = window.location.search.split('?')[1].split('&');
 // eslint-disable-next-line no-restricted-syntax
 for (const queryString of queryStrings) {
+  
   // eslint-disable-next-line no-unused-vars
   const [key, value] = queryString.split('=');
-  if (value === 'EKYC_AUTH' || key === 'authmode') {
+  if (value === 'EKYC_AUTH') {
     const navigateFrom = document.getElementsByName('corporateCardWizardView')?.[0];
     const current = navigateFrom?.querySelector('.current-wizard-step');
     const currentMenuItem = navigateFrom?.querySelector('.wizard-menu-active-item');
@@ -239,6 +240,24 @@ for (const queryString of queryStrings) {
       bubbles: false,
     });
     navigateFrom?.dispatchEvent(event);
+  }else if( key === 'authmode'){
+    debugger;
+    const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyID) => {
+      const journeyJSONObj = {
+        RequestPayload: {
+          leadProfile: {
+            mobileNumber,
+          },
+          journeyInfo: {
+            journeyID : queryStrings[3].split('=')[1]
+          },
+        },
+      };
+      const url = urlPath(endpoints.journeyDropOffParam);
+      const method = 'POST';
+      return fetchJsonResponse(url, journeyJSONObj, method);
+    };
+   
   }
 }
 

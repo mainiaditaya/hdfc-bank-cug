@@ -49,6 +49,7 @@ const setCurrentContext = (formContext) => {
  * @return {PROMISE}
  */
 const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
+  debugger;
   const journeyJSONObj = {
     RequestPayload: {
       userAgent: (typeof window !== 'undefined') ? window.navigator.userAgent : 'onLoad',
@@ -84,11 +85,12 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
  * @return {PROMISE}
  */
 const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, journeyId, globals) => {
+  debugger;
   const { currentFormContext } = corpCreditCardContext;
   const sanitizedFormData = santizedFormDataWithContext(globals, currentFormContext);
   const journeyJSONObj = {
     RequestPayload: {
-      userAgent: window.navigator.userAgent,
+      userAgent: (typeof window !== 'undefined') ? window.navigator.userAgent : '',
       leadProfile: {
         mobileNumber,
         leadProfileId: leadProfileId.toString(),

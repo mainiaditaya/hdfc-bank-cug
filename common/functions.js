@@ -50,8 +50,10 @@ const { currentFormContext } = corpCreditCardContext;
 /**
  * @name checkMode - check the location
  * @param {object} globals -
+ * @return {PROMISE}
  */
 function checkMode(globals) {
+  debugger;
   const formData = globals.functions.exportData();
   const idcomVisit = formData?.queryParams?.authmode; // "DebitCard"
   const aadharVisit = formData?.queryParams?.visitType; // "EKYC_AUTH
@@ -94,7 +96,7 @@ function checkMode(globals) {
     globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: false });
     globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: false });
     globals.functions.setProperty(globals.form.confirmResult, { visible: true });
-    // executeInterfacePostRedirect('idCom', globals);
+    executeInterfacePostRedirect('idCom', globals);
   }
 }
 
@@ -348,6 +350,7 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
  * @param {string} redirectUrl - The URL to redirect the browser to.
  */
 function redirect(redirectUrl) {
+  debugger;
   window.location.href = redirectUrl;
 }
 

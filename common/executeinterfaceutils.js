@@ -6,7 +6,7 @@ import {
   composeNameOption,
   setSelectOptions,
 } from './formutils.js';
-import { corpCreditCardContext, formRuntime } from './journey-utils.js';
+import { corpCreditCardContext, formRuntime, invokeJourneyDropOffUpdate } from './journey-utils.js';
 import {
   restAPICall,
   fetchJsonResponse,
@@ -389,6 +389,12 @@ const executeInterfacePostRedirect = async (source, globals) => {
       if (response?.errorCode === '0000') {
         finalDap(globals);
       } else {
+        debugger;
+        const formContextCallbackData = globals.functions.exportData()?.currentFormContext;
+        const mobileNumber = globals.functions.exportData().form.login.registeredMobileNumber;
+        const leadProfileId = globals.functions.exportData().leadProifileId;
+        const journeyId = formContextCallbackData.journeyID;;
+        invokeJourneyDropOffUpdate('POST_EXECUTEINTERFACE_FAILURE', mobileNumber, leadProfileId, journeyId, globals) 
         const resultPanel = formUtil(globals, globals.form.resultPanel);
         resultPanel.visible(true);
         globals.functions.setProperty(globals.form.confirmResult, { visible: false });

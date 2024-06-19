@@ -1,6 +1,6 @@
 import corpCreditCard from './constants.js';
 import { formUtil, urlPath } from './formutils.js';
-import { corpCreditCardContext } from './journey-utils.js';
+import { corpCreditCardContext,invokeJourneyDropOffUpdate   } from './journey-utils.js';
 import { restAPICall } from './makeRestAPI.js';
 
 function getCurrentDateAndTime(dobFormatNo) {
@@ -115,7 +115,13 @@ const finalDap = (globals) => {
 
   const eventHandlers = {
     successCallBack: (response) => {
+      debugger;
+      const formContextCallbackData = globals.functions.exportData()?.currentFormContext;
+      const mobileNumber = formContextCallbackData;
+      const leadProfileId = formContextCallbackData;
+      const journeyId = formContextCallbackData;
       if (response?.errorCode === '0000') {
+        invokeJourneyDropOffUpdate('FINAL_DAP_SUCCESS', mobileNumber, leadProfileId, journeyId, globals) 
         const resultPanel = formUtil(globals, globals.form.resultPanel);
         resultPanel.visible(true);
         globals.functions.setProperty(globals.form.confirmResult, { visible: false });
