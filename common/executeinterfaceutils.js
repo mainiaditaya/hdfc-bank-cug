@@ -254,6 +254,15 @@ const executeInterfaceApiFinal = (globals) => {
 };
 
 /**
+ * @name executeInterfaceResponseHandler
+ * @param {object} resPayload
+ */
+const executeInterfaceResponseHandler=(resPayload)=>{
+  debugger
+  currentFormContext.executeInterfaceResPayload= resPayload;
+}
+
+/**
  * @name executeInterfaceApi
  * @param {boolean} showLoader
  * @param {boolean} hideLoader
@@ -385,6 +394,7 @@ const executeInterfacePostRedirect = async (source, globals) => {
         globals.functions.setProperty(globals.form.confirmResult, { visible: false });
         globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: false });
         globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
+        globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: false });
       }
     },
     errorCallBack: (response) => {
@@ -400,4 +410,5 @@ export {
   ipaRequestApi,
   ipaSuccessHandler,
   executeInterfacePostRedirect,
+  executeInterfaceResponseHandler,
 };

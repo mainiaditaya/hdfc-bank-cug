@@ -26,9 +26,11 @@ function getCurrentDateAndTime(dobFormatNo) {
 const { currentFormContext } = corpCreditCardContext;
 const fetchFiller4 = (mobileMatch, kycStatus) => {
   let filler4Value = null;
+  debugger
+  currentFormContext
   switch (kycStatus) {
     case 'aadhar':
-      filler4Value = mobileMatch ? `NVKYC${getCurrentDateAndTime(3)}` : `VKYC${getCurrentDateAndTime(3)}`;
+      filler4Value = (currentFormContext?.journeyType === 'NTB') ? `VKYC${getCurrentDateAndTime(3)}`: ((currentFormContext?.journeyType === 'ETB') && mobileMatch) ? `NVKYC${getCurrentDateAndTime(3)}` : `VKYC${getCurrentDateAndTime(3)}`;
       break;
     case 'bioKYC':
       filler4Value = 'bioKYC';
@@ -60,6 +62,8 @@ const createDapRequestObj = (globals) => {
   };
   const mobileMatch = globals.functions.exportData()?.aadhaar_otp_val_data?.result?.mobileValid === 'y';
   const filler4 = fetchFiller4(mobileMatch, kycFill.KYC_STATUS);
+  const { executeInterfaceResPayload } =  formContextCallbackData;
+  const filler2 = executeInterfaceResPayload ? `${executeInterfaceResPayload?.applicationRefNumber}X${executeInterfaceResPayload?.eRefNumber}`: '';
   const finalDapPayload = {
     requestString: {
       applRefNumber: formContextCallbackData?.applRefNumber,
@@ -80,9 +84,9 @@ const createDapRequestObj = (globals) => {
       filler7: '',
       Segment: 'ONLY_HL',
       biometricStatus: kycFill.KYC_STATUS,
-      filler2: '',
+      filler2,
       filler4,
-      filler5: `${new Date().toISOString()}Y`,
+      filler5: `English`,
     },
   };
   return finalDapPayload;
@@ -117,12 +121,14 @@ const finalDap = (globals) => {
         globals.functions.setProperty(globals.form.confirmResult, { visible: false });
         globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: true });
         globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: false });
+        globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: false });
       } else {
         const resultPanel = formUtil(globals, globals.form.resultPanel);
         resultPanel.visible(true);
         globals.functions.setProperty(globals.form.confirmResult, { visible: false });
         globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: false });
         globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
+        globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: false });
       }
     },
     errorCallback: (response) => {

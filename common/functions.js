@@ -29,6 +29,7 @@ import {
   executeInterfacePostRedirect,
   ipaRequestApi,
   ipaSuccessHandler,
+  executeInterfaceResponseHandler,
 } from './executeinterfaceutils.js';
 
 import fetchAuthCode from './idcomutil.js';
@@ -379,4 +380,5 @@ export {
   hideLoaderGif,
   executeInterfacePostRedirect,
   executeInterfaceApiFinal,
+  executeInterfaceResponseHandler,
 };
