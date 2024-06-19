@@ -212,6 +212,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
  * @param {object} globals - globals variables object containing form configurations.
  */
 const listNameOnCard = (globals) => {
+  debugger
   const elementNameSelect = 'nameOnCardDropdown';
   const { personalDetails } = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage;
   const firstName = personalDetails.firstName.$value;
@@ -330,6 +331,12 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
     const benefitsTextField = formUtil(globals, benefitsPanel[key]);
     benefitsTextField.setValue(firstProductDetail?.keyBenefits[index]);
   });
+
+  const cardNameTitle = formUtil(globals, globals.form.corporateCardWizardView.confirmCardPanel.cardNameTitle)
+  if(firstProductDetail?.product){
+    cardNameTitle.setValue(firstProductDetail?.product);
+  }
+
   if (currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag === 'N') {
     const { selectKycPanel } = globals.form.corporateCardWizardView;
     const selectKycPanelUtil = formUtil(globals, selectKycPanel);
