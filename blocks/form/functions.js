@@ -28,6 +28,7 @@ import {
   hideLoaderGif,
   executeInterfacePostRedirect,
   executeInterfaceApiFinal,
+  executeInterfaceResponseHandler,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -214,4 +215,5 @@ export {
   redirect,
   executeInterfacePostRedirect,
   executeInterfaceApiFinal,
+  executeInterfaceResponseHandler,
 };

@@ -11,7 +11,7 @@ const corpCreditCard = {
     journeyDropOffParam: '/content/hdfc_commonforms/api/journeydropoffparam.json',
     journeyDropOffUpdate: '/content/hdfc_commonforms/api/journeydropoffupdate.json',
     otpGen: '/content/hdfc_haf/api/otpgenerationccV4.json',
-    otpValFetchAssetDemog: '/content/hdfc_cc_unified/api/otpValFetchAssetDemog.json',
+    otpValFetchAssetDemog: '/content/hdfc_haf/api/otpfetchdemog.json',
     panValNameMatch: '/content/hdfc_forms_common_v2/api/panValNameMatch.json',
   },
   idCom: {

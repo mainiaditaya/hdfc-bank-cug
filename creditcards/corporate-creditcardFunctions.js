@@ -537,7 +537,6 @@ const pinCodeMaster = async (globals) => {
  * @param {object} globals - The global object containing necessary globals form data.
  */
 const validateEmailID = async (email, globals) => {
-  debugger;
   const emailField = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.personalEmailAddress;
   const url = urlPath(endpoints.emailId);
   const setEmailField = formUtil(globals, emailField);

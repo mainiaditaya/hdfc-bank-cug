@@ -6,13 +6,12 @@ import {
   composeNameOption,
   setSelectOptions,
 } from './formutils.js';
-import { corpCreditCardContext, formRuntime } from './journey-utils.js';
+import { corpCreditCardContext, formRuntime, invokeJourneyDropOffUpdate } from './journey-utils.js';
 import {
   restAPICall,
   fetchJsonResponse,
   fetchIPAResponse,
   hideLoaderGif,
-  getJsonResponse,
 } from './makeRestAPI.js';
 import corpCreditCard from './constants.js';
 import { finalDap } from './finaldaputils.js';
@@ -56,7 +55,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
     employmentDetails,
   } = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage;
   const { prefilledEmploymentDetails } = employmentDetails;
-  const fullName = `${personalDetails.firstName.$value} ${personalDetails.middleName.$value} ${personalDetails.lastName.$value}`;
+  const fullName = !personalDetails.middleName.$value ? `${personalDetails.firstName.$value} ${personalDetails.lastName.$value}` : `${personalDetails.firstName.$value} ${personalDetails.middleName.$value} ${personalDetails.lastName.$value}`;
   let addressEditFlag = 'N';
   let panEditFlag = 'N';
   const panNumber = personalDetails.panNumberPersonalDetails.$value;
@@ -143,7 +142,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
       firstName: personalDetails.firstName.$value,
       lastName: personalDetails.lastName.$value,
       gender: GENDER_MAP[personalDetails.gender.$value],
-      occupation: '5',
+      occupation: '1',
       officialEmailId: prefilledEmploymentDetails.workEmailAddress.$value,
       panEditFlag,
       panNumber,
@@ -187,7 +186,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
       annualItr: '',
       permanentState: permanentAddress.state,
       communicationState: currentAddress.state,
-      authMode: currentFormContext.journeyType === 'ETB' ? 'IDCOM' : '',
+      authMode: '',
       userAgent: navigator.userAgent,
       journeyID: currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
@@ -232,24 +231,22 @@ const listNameOnCard = (globals) => {
  * @returns {PROMISE}
  */
 const executeInterfaceApiFinal = (globals) => {
-  debugger;
   const formCallBackContext = globals.functions.exportData()?.currentFormContext;
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
   requestObj.requestString.nameOnCard = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value;
   requestObj.requestString.productCode = formRuntime.productCode || formCallBackContext?.formRuntime?.productCode;
-
   const apiEndPoint = urlPath(endpoints.executeInterface);
-  const eventHandlers = {
-    successCallBack: (response) => {
-      console.log(response);
-    },
-    errorCallBack: (response) => {
-      console.log(response);
-    },
-  };
-  //restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
+  // restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
   formRuntime?.getOtpLoader();
   return fetchJsonResponse(apiEndPoint, requestObj, 'POST', true);
+};
+
+/**
+ * @name executeInterfaceResponseHandler
+ * @param {object} resPayload
+ */
+const executeInterfaceResponseHandler = (resPayload) => {
+  currentFormContext.executeInterfaceResPayload = resPayload;
 };
 
 /**
@@ -330,6 +327,12 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
     const benefitsTextField = formUtil(globals, benefitsPanel[key]);
     benefitsTextField.setValue(firstProductDetail?.keyBenefits[index]);
   });
+
+  const cardNameTitle = formUtil(globals, globals.form.corporateCardWizardView.confirmCardPanel.cardNameTitle);
+  if (firstProductDetail?.product) {
+    cardNameTitle.setValue(firstProductDetail?.product);
+  }
+
   if (currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag === 'N') {
     const { selectKycPanel } = globals.form.corporateCardWizardView;
     const selectKycPanelUtil = formUtil(globals, selectKycPanel);
@@ -356,7 +359,6 @@ const executeInterfacePostRedirect = async (source, globals) => {
   //   loginPanel, consentFragment, getOTPbutton, welcomeText,
   // } = globals.form;
   // [loginPanel, consentFragment, getOTPbutton, welcomeText].map((el) => formUtil(globals, el)).forEach((item) => item.visible(false));
-  debugger;
   const formCallBackContext = globals.functions.exportData()?.currentFormContext;
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
   if (source === 'idCom') {
@@ -373,11 +375,17 @@ const executeInterfacePostRedirect = async (source, globals) => {
       if (response?.errorCode === '0000') {
         finalDap(globals);
       } else {
+        const formContextCallbackData = globals.functions.exportData()?.currentFormContext;
+        const mobileNumber = globals.functions.exportData().form.login.registeredMobileNumber;
+        const leadProfileId = globals.functions.exportData().leadProifileId;
+        const journeyId = formContextCallbackData.journeyID;
+        invokeJourneyDropOffUpdate('POST_EXECUTEINTERFACE_FAILURE', mobileNumber, leadProfileId, journeyId, globals);
         const resultPanel = formUtil(globals, globals.form.resultPanel);
         resultPanel.visible(true);
         globals.functions.setProperty(globals.form.confirmResult, { visible: false });
         globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: false });
         globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
+        globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: false });
       }
     },
     errorCallBack: (response) => {
@@ -393,4 +401,5 @@ export {
   ipaRequestApi,
   ipaSuccessHandler,
   executeInterfacePostRedirect,
+  executeInterfaceResponseHandler,
 };

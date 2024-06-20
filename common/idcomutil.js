@@ -30,7 +30,7 @@ const createIdComRequestObj = (globals) => {
     requestString: {
       mobileNumber: globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
       ProductCode: idCom.productCode,
-      PANNo: globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.panNumberPersonalDetails.$value,
+      PANNo: (globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.panNumberPersonalDetails.$value)?.toUpperCase(),
       userAgent: navigator.userAgent,
       journeyID: currentFormContext?.journeyID || globals.functions.exportData().currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
