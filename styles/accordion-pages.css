@@ -348,7 +348,6 @@ fieldset fieldset {
 
     p { font-size: 14px; }
   }
-  .file-dragText { display: none; }
   .file-dragIcon { content: url('../icons/doc-upload-icon.svg'); }
   .field-docuploaddropdown { width: 49%; }
 
