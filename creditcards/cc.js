@@ -215,6 +215,29 @@ const viewAllBtnPannelConfig = {
 };
 linkModalFunction(viewAllBtnPannelConfig);
 
+const displayLoader = (loadingText) => {
+  const bodyContainer = document?.querySelector('.appear');
+  bodyContainer?.classList?.add('preloader');
+  if (loadingText) {
+    bodyContainer.setAttribute('loader-text', loadingText);
+  }
+};
+
+const hideLoaderGif = () => {
+  const bodyContainer = document?.querySelector('.appear');
+  bodyContainer?.classList?.remove('preloader');
+  if (bodyContainer.hasAttribute('loader-text')) {
+    bodyContainer.removeAttribute('loader-text');
+  }
+};
+
+const errorPannelMethod = () => {
+  const errorPannel = document.getElementsByName('errorResultPanel')?.[0];
+  const resultPanel = document.getElementsByName('resultPanel')?.[0];
+  resultPanel.setAttribute('data-visible', true);
+  errorPannel.setAttribute('data-visible', true);
+};
+
 const queryStrings = window.location.search.split('?')[1].split('&');
 // eslint-disable-next-line no-restricted-syntax
 for (const queryString of queryStrings) {
@@ -253,7 +276,7 @@ for (const queryString of queryStrings) {
       };
       const url = 'https://applyonlinedev.hdfcbank.com/content/hdfc_commonforms/api/journeydropoffparam.json';
       const method = 'POST';
-      // return fetchJsonResponse(url, journeyJSONObj, method);
+      displayLoader();
       return fetch(url, {
         method,
         body: JSON.stringify(journeyJSONObj),
@@ -265,22 +288,28 @@ for (const queryString of queryStrings) {
       })
         .then((res) => res.json()).then((res) => {
           debugger;
+          hideLoaderGif();
           const data = res;
-          console.log(data, 'data');
-          if (data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1].state === 'FINAL_DAP_SUCCESS') {
-            //success
+          const checkExecuteInterFinalDap = (data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1].state === 'FINAL_DAP_SUCCESS');
+          if (checkExecuteInterFinalDap) {
+            // success
             const resultPanel = document.getElementsByName('resultPanel')?.[0];
+            const successPanel = document.getElementsByName('successResultPanel')?.[0];
             resultPanel.setAttribute('data-visible', true);
+            successPanel.setAttribute('data-visible', true);
           } else {
-            const errorPannel = document.getElementsByName('errorResultPanel')?.[0];
-            const resultPanel = document.getElementsByName('resultPanel')?.[0];
-            resultPanel.setAttribute('data-visible', true);
-            errorPannel.setAttribute('data-visible', true);
-            //errror
+            // errror
+            const err = 'badResponse';
+            throw err;
           }
+        }).catch((e) => {
+          hideLoaderGif();
+          errorPannelMethod();
         });
     };
-    invokeJourneyDropOffByParam('', '', queryStrings[3].split('=')[1]);
+    setTimeout(() => {
+      invokeJourneyDropOffByParam('', '', queryStrings[3].split('=')[1]);
+    }, 1000);
   }
 }
 
