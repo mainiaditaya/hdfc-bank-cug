@@ -58,6 +58,7 @@ const fetchFiller4 = (mobileMatch, kycStatus, journeyType) => {
  * @returns {Object} - The DAP request object.
  */
 const createDapRequestObj = (globals) => {
+  debugger
   const formContextCallbackData = globals.functions.exportData()?.currentFormContext;
   const segment = formContextCallbackData?.breDemogResponse?.SEGMENT;
   const customerInfo = currentFormContext?.executeInterfaceReqObj?.requestString || formContextCallbackData?.executeInterfaceReqObj?.requestString;
@@ -75,7 +76,7 @@ const createDapRequestObj = (globals) => {
   const mobileMatch = globals.functions.exportData()?.aadhaar_otp_val_data?.result?.mobileValid === 'y';
   const filler4 = fetchFiller4(mobileMatch, kycFill.KYC_STATUS, journeyType);
   const formData = globals.functions.exportData();
-  const filler2 = `${formData?.aadhaar_otp_val_data?.result?.ADVRefrenceKey}X${formData?.aadhaar_otp_val_data.result?.RRN}`;
+  const filler2 = mobileMatch ? `${formData?.aadhaar_otp_val_data?.result?.ADVRefrenceKey}X${formData?.aadhaar_otp_val_data.result?.RRN}` : '';
   const finalDapPayload = {
     requestString: {
       applRefNumber: formContextCallbackData?.applRefNumber,
@@ -83,10 +84,10 @@ const createDapRequestObj = (globals) => {
       customerId: customerInfo.customerID,
       communicationCity: customerInfo.communicationCity,
       idcomStatus: 'N',
-      id_token_jwt: currentFormContext.jwtToken,
-      motherFirstName: globals.functions.exportData()?.form?.motherFirstName,
-      motherMiddleName: globals.functions.exportData()?.form?.motherMiddleName,
-      motherLastName: globals.functions.exportData()?.form?.motherLastName,
+      id_token_jwt: formContextCallbackData?.jwtToken || currentFormContext.jwtToken,
+      motherFirstName: globals.functions.exportData()?.form?.mothersFirstName ?? '',
+      motherMiddleName: globals.functions.exportData()?.form?.mothersMiddleName ?? '',
+      motherLastName: globals.functions.exportData()?.form?.mothersLastName ?? '',
       ckycNumber: '',
       motherNameTitle: '',
       mobileNumber: globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
@@ -121,6 +122,7 @@ const updatePanelVisibility = (response, globals) => {
 };
 
 const finalDap = (globals) => {
+  debugger
   const apiEndPoint = urlPath(corpCreditCard.endpoints.finalDap);
   const payload = createDapRequestObj(globals);
   const formContextCallbackData = globals.functions.exportData()?.currentFormContext;
