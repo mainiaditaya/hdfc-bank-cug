@@ -317,7 +317,7 @@ fieldset fieldset {
     }
   }
 
-  .field-ckycdetailscontinueetbpanel, .field-ckycdetailscontinuentbaadhar, .field-docuploadovdbutton { 
+  .field-ckycdetailscontinueetbpanel, .field-ckycdetailscontinuentbaadhar, .field-docuploadovdbutton, .field-ckycdetailscontinuentbbiometric, .field-ckycdetailscontinuentbovd { 
     text-align: left;
     max-width: 260px;
   }
@@ -327,6 +327,8 @@ fieldset fieldset {
 
 /* Doc upload screen */
 .field-docuploadetbflow {
+  .field-docuploadfront, .field-docuploadback { grid-column: span 6; }
+
   .field-docuploadlabel {
     p {
       font-size: var(--body-md-font-size);
@@ -348,7 +350,15 @@ fieldset fieldset {
 
     p { font-size: 14px; }
   }
-  .file-dragText { display: none; }
+  
+  .file-dragText {
+    p {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+      color: #111827;
+    }
+  }
   .file-dragIcon { content: url('../icons/doc-upload-icon.svg'); }
   .field-docuploaddropdown { width: 49%; }
 
@@ -529,8 +539,7 @@ main .form form .field-corporatecardwizardview.wizard {
   
   li.wizard-menu-item { width: auto; }
 
-  .field-yourdetailspanel .field-checkofferbutton, .field-confirmcardpanel .field-getthiscardbutton,
-  .field-selectkycpanel .field-ckycdetailscontinueetbpanel, .field-selectkycpanel .field-ckycdetailscontinuentbaadhar, .field-selectkycpanel .field-docuploadovdbutton {
+  .field-yourdetailspanel .field-checkofferbutton, .field-confirmcardpanel .field-getthiscardbutton, .field-selectkycpanel .field-ckycdetailscontinueetbpanel, .field-selectkycpanel .field-ckycdetailscontinuentbaadhar, .field-selectkycpanel .field-docuploadovdbutton, .field-selectkycpanel .field-ckycdetailscontinuentbbiometric, .field-selectkycpanel .field-ckycdetailscontinuentbovd {
     text-align: center;
     max-width: initial;
   }
