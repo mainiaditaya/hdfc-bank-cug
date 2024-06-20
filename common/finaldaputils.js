@@ -3,6 +3,7 @@ import { formUtil, urlPath } from './formutils.js';
 import { corpCreditCardContext, invokeJourneyDropOffUpdate } from './journey-utils.js';
 import { restAPICall } from './makeRestAPI.js';
 
+// eslint-disable-next-line consistent-return
 function getCurrentDateAndTime(dobFormatNo) {
   /*
       dobFormatNo: 1 (DD-MM-YYYY HH:MM:SS)
@@ -17,12 +18,14 @@ function getCurrentDateAndTime(dobFormatNo) {
   const minutes = newDate.getMinutes();
   const seconds = newDate.getSeconds();
 
-  if (dobFormatNo === '1') {
+  if (dobFormatNo === '3') {
+    return `${todaySDate}${month}${year.toString().substring(2, 4)}${hours}${minutes}${seconds}`;
+  } if (dobFormatNo === '1') {
     return `${todaySDate}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+  } if (dobFormatNo === '2') {
+    return `${year}${month}${todaySDate}${hours}${minutes}${seconds}`;
   }
-  return `${year}-${month}-${todaySDate} ${hours}:${minutes}:${seconds}`;
 }
-
 const { currentFormContext } = corpCreditCardContext;
 const fetchFiller4 = (mobileMatch, kycStatus) => {
   let filler4Value = null;
@@ -63,8 +66,8 @@ const createDapRequestObj = (globals) => {
 
   const mobileMatch = globals.functions.exportData()?.aadhaar_otp_val_data?.result?.mobileValid === 'y';
   const filler4 = fetchFiller4(mobileMatch, kycFill.KYC_STATUS);
-  const { executeInterfaceResPayload } = formContextCallbackData;
-  const filler2 = executeInterfaceResPayload ? `${executeInterfaceResPayload?.applicationRefNumber}X${executeInterfaceResPayload?.eRefNumber}` : '';
+  const formData = globals.functions.exportData();
+  const filler2 = mobileMatch ? `${formData?.aadhaar_otp_val_data?.result?.ADVRefrenceKey}X${formData?.aadhaar_otp_val_data.result?.RRN}` : '';
   const finalDapPayload = {
     requestString: {
       applRefNumber: formContextCallbackData?.applRefNumber,
@@ -73,9 +76,9 @@ const createDapRequestObj = (globals) => {
       communicationCity: customerInfo.communicationCity,
       idcomStatus: 'N',
       id_token_jwt: currentFormContext.jwtToken || formContextCallbackData.jwtToken,
-      motherFirstName: '',
-      motherMiddleName: '',
-      motherLastName: '',
+      motherFirstName: globals.functions.exportData()?.form?.motherFirstName,
+      motherMiddleName: globals.functions.exportData()?.form?.motherMiddleName,
+      motherLastName: globals.functions.exportData()?.form?.motherLastName,
       ckycNumber: '',
       motherNameTitle: '',
       mobileNumber: globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
@@ -87,7 +90,7 @@ const createDapRequestObj = (globals) => {
       biometricStatus: kycFill.KYC_STATUS,
       filler2,
       filler4,
-      filler5: 'English',
+      filler5: `${getCurrentDateAndTime(3)}``{YEnglishxeng1x0}`,
     },
   };
   return finalDapPayload;
