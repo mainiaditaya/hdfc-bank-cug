@@ -58,7 +58,6 @@ const fetchFiller4 = (mobileMatch, kycStatus, journeyType) => {
  * @returns {Object} - The DAP request object.
  */
 const createDapRequestObj = (globals) => {
-  debugger;
   const formContextCallbackData = globals.functions.exportData()?.currentFormContext;
   const segment = formContextCallbackData?.breDemogResponse?.SEGMENT;
   const customerInfo = currentFormContext?.executeInterfaceReqObj?.requestString || formContextCallbackData?.executeInterfaceReqObj?.requestString;
@@ -76,7 +75,7 @@ const createDapRequestObj = (globals) => {
   const mobileMatch = globals.functions.exportData()?.aadhaar_otp_val_data?.result?.mobileValid === 'y';
   const filler4 = fetchFiller4(mobileMatch, kycFill.KYC_STATUS, journeyType);
   const formData = globals.functions.exportData();
-  const filler2 = mobileMatch ? `${formData?.aadhaar_otp_val_data?.result?.ADVRefrenceKey}X${formData?.aadhaar_otp_val_data.result?.RRN}` : '';
+  const filler2 = `${formData?.aadhaar_otp_val_data?.result?.ADVRefrenceKey}X${formData?.aadhaar_otp_val_data.result?.RRN}`;
   const finalDapPayload = {
     requestString: {
       applRefNumber: formContextCallbackData?.applRefNumber,
@@ -84,7 +83,7 @@ const createDapRequestObj = (globals) => {
       customerId: customerInfo.customerID,
       communicationCity: customerInfo.communicationCity,
       idcomStatus: 'N',
-      id_token_jwt: currentFormContext.jwtToken || formContextCallbackData.jwtToken,
+      id_token_jwt: currentFormContext.jwtToken,
       motherFirstName: globals.functions.exportData()?.form?.motherFirstName,
       motherMiddleName: globals.functions.exportData()?.form?.motherMiddleName,
       motherLastName: globals.functions.exportData()?.form?.motherLastName,
@@ -92,7 +91,7 @@ const createDapRequestObj = (globals) => {
       motherNameTitle: '',
       mobileNumber: globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
       userAgent: navigator.userAgent,
-      journeyID: currentFormContext.journeyID,
+      journeyID: formContextCallbackData.journeyID || currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
       filler7: '',
       Segment: segment,

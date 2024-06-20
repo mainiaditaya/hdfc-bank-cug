@@ -373,6 +373,7 @@ const executeInterfacePostRedirect = async (source, globals) => {
   const eventHandlers = {
     successCallBack: (response) => {
       if (response?.errorCode === '0000') {
+        currentFormContext.jwtToken = response.Id_token_jwt;
         finalDap(globals);
       } else {
         const formContextCallbackData = globals.functions.exportData()?.currentFormContext;
