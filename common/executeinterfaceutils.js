@@ -380,12 +380,6 @@ const executeInterfacePostRedirect = async (source, globals) => {
         const leadProfileId = globals.functions.exportData().leadProifileId;
         const journeyId = formContextCallbackData.journeyID;
         invokeJourneyDropOffUpdate('POST_EXECUTEINTERFACE_FAILURE', mobileNumber, leadProfileId, journeyId, globals);
-        const resultPanel = formUtil(globals, globals.form.resultPanel);
-        resultPanel.visible(true);
-        globals.functions.setProperty(globals.form.confirmResult, { visible: false });
-        globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: false });
-        globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
-        globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: false });
       }
     },
     errorCallBack: (response) => {

@@ -3,8 +3,7 @@ import { formUtil, urlPath } from './formutils.js';
 import { corpCreditCardContext, invokeJourneyDropOffUpdate } from './journey-utils.js';
 import { restAPICall } from './makeRestAPI.js';
 
-// eslint-disable-next-line consistent-return
-function getCurrentDateAndTime(dobFormatNo) {
+const getCurrentDateAndTime = (dobFormatNo) => {
   /*
       dobFormatNo: 1 (DD-MM-YYYY HH:MM:SS)
       dobFormatNo: 2 (YYYYMMDDHHMMSS)
@@ -17,22 +16,30 @@ function getCurrentDateAndTime(dobFormatNo) {
   const hours = newDate.getHours();
   const minutes = newDate.getMinutes();
   const seconds = newDate.getSeconds();
-
-  if (dobFormatNo === '3') {
-    return `${todaySDate}${month}${year.toString().substring(2, 4)}${hours}${minutes}${seconds}`;
-  } if (dobFormatNo === '1') {
-    return `${todaySDate}-${month}-${year} ${hours}:${minutes}:${seconds}`;
-  } if (dobFormatNo === '2') {
-    return `${year}${month}${todaySDate}${hours}${minutes}${seconds}`;
+  let formatedTime = '';
+  switch (dobFormatNo) {
+    case 1:
+      formatedTime = `${todaySDate}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+      break;
+    case 2:
+      formatedTime = `${year}${month}${todaySDate}${hours}${minutes}${seconds}`;
+      break;
+    case 3:
+      formatedTime = `${todaySDate}${month}${year.toString().substring(2, 4)}${hours}${minutes}${seconds}`;
+      break;
+    default:
+      formatedTime = '';
   }
-}
+  return formatedTime;
+};
+
 const { currentFormContext } = corpCreditCardContext;
-const fetchFiller4 = (mobileMatch, kycStatus) => {
+const fetchFiller4 = (mobileMatch, kycStatus, journeyType) => {
   let filler4Value = null;
   switch (kycStatus) {
     case 'aadhar':
       // eslint-disable-next-line no-nested-ternary
-      filler4Value = (currentFormContext?.journeyType === 'NTB') ? `VKYC${getCurrentDateAndTime(3)}` : ((currentFormContext?.journeyType === 'ETB') && mobileMatch) ? `NVKYC${getCurrentDateAndTime(3)}` : `VKYC${getCurrentDateAndTime(3)}`;
+      filler4Value = (journeyType === 'NTB') ? `VKYC${getCurrentDateAndTime(3)}` : ((currentFormContext?.journeyType === 'ETB') && mobileMatch) ? `NVKYC${getCurrentDateAndTime(3)}` : `VKYC${getCurrentDateAndTime(3)}`;
       break;
     case 'bioKYC':
       filler4Value = 'bioKYC';
@@ -51,6 +58,7 @@ const fetchFiller4 = (mobileMatch, kycStatus) => {
  * @returns {Object} - The DAP request object.
  */
 const createDapRequestObj = (globals) => {
+  debugger;
   const formContextCallbackData = globals.functions.exportData()?.currentFormContext;
   const segment = formContextCallbackData?.breDemogResponse?.SEGMENT;
   const customerInfo = currentFormContext?.executeInterfaceReqObj?.requestString || formContextCallbackData?.executeInterfaceReqObj?.requestString;
@@ -64,8 +72,9 @@ const createDapRequestObj = (globals) => {
         || null,
   };
 
+  const journeyType = (globals.functions.exportData()?.currentFormContext?.breDemogResponse?.BREFILLER2 === 'D101') ? 'ETB' : 'NTB';
   const mobileMatch = globals.functions.exportData()?.aadhaar_otp_val_data?.result?.mobileValid === 'y';
-  const filler4 = fetchFiller4(mobileMatch, kycFill.KYC_STATUS);
+  const filler4 = fetchFiller4(mobileMatch, kycFill.KYC_STATUS, journeyType);
   const formData = globals.functions.exportData();
   const filler2 = mobileMatch ? `${formData?.aadhaar_otp_val_data?.result?.ADVRefrenceKey}X${formData?.aadhaar_otp_val_data.result?.RRN}` : '';
   const finalDapPayload = {
@@ -90,7 +99,7 @@ const createDapRequestObj = (globals) => {
       biometricStatus: kycFill.KYC_STATUS,
       filler2,
       filler4,
-      filler5: `${getCurrentDateAndTime(3)}``{YEnglishxeng1x0}`,
+      filler5: `${getCurrentDateAndTime(3)}YEnglishxeng1x0`,
     },
   };
   return finalDapPayload;
@@ -115,32 +124,20 @@ const updatePanelVisibility = (response, globals) => {
 const finalDap = (globals) => {
   const apiEndPoint = urlPath(corpCreditCard.endpoints.finalDap);
   const payload = createDapRequestObj(globals);
-
+  const formContextCallbackData = globals.functions.exportData()?.currentFormContext;
+  const mobileNumber = globals.functions.exportData().form.login.registeredMobileNumber;
+  const leadProfileId = globals.functions.exportData().leadProifileId;
+  const journeyId = formContextCallbackData.journeyID;
   const eventHandlers = {
     successCallBack: (response) => {
-      const formContextCallbackData = globals.functions.exportData()?.currentFormContext;
-      const mobileNumber = globals.functions.exportData().form.login.registeredMobileNumber;
-      const leadProfileId = globals.functions.exportData().leadProifileId;
-      const journeyId = formContextCallbackData.journeyID;
       if (response?.errorCode === '0000') {
         invokeJourneyDropOffUpdate('FINAL_DAP_SUCCESS', mobileNumber, leadProfileId, journeyId, globals);
-        const resultPanel = formUtil(globals, globals.form.resultPanel);
-        resultPanel.visible(true);
-        globals.functions.setProperty(globals.form.confirmResult, { visible: false });
-        globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: true });
-        globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: false });
-        globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: false });
       } else {
         invokeJourneyDropOffUpdate('FINAL_DAP_FAILURE', mobileNumber, leadProfileId, journeyId, globals);
-        const resultPanel = formUtil(globals, globals.form.resultPanel);
-        resultPanel.visible(true);
-        globals.functions.setProperty(globals.form.confirmResult, { visible: false });
-        globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: false });
-        globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
-        globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: false });
       }
     },
     errorCallback: (response) => {
+      invokeJourneyDropOffUpdate('FINAL_DAP_FAILURE', mobileNumber, leadProfileId, journeyId, globals);
       console.log(response);
     },
   };
