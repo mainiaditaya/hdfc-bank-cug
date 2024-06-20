@@ -1,7 +1,7 @@
 const corpCreditCard = {
   endpoints: {
     aadharCallback: '/content/hdfc_etb_wo_pacc/api/aadharCallback.json',
-    aadharInit: '/content/hdfc_etb_wo_pacc/api/aadharInit.json',
+    aadharInit: '/content/hdfc_haf/api/aadhaarInit.json',
     fetchAuthCode: '/content/hdfc_commonforms/api/fetchauthcode.json',
     emailId: '/content/hdfc_commonforms/api/emailid.json',
     executeInterface: '/content/hdfc_haf/api/executeinterface.json',
@@ -11,7 +11,7 @@ const corpCreditCard = {
     journeyDropOffParam: '/content/hdfc_commonforms/api/journeydropoffparam.json',
     journeyDropOffUpdate: '/content/hdfc_commonforms/api/journeydropoffupdate.json',
     otpGen: '/content/hdfc_haf/api/otpgenerationccV4.json',
-    otpValFetchAssetDemog: '/content/hdfc_haf/api/otpfetchdemog.json',
+    otpValFetchAssetDemog: '/content/hdfc_haf/api/otpvaldemogV4.json',
     panValNameMatch: '/content/hdfc_forms_common_v2/api/panValNameMatch.json',
   },
   idCom: {
