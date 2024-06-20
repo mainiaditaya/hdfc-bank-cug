@@ -53,7 +53,6 @@ const { currentFormContext } = corpCreditCardContext;
  * @return {PROMISE}
  */
 function checkMode(globals) {
-  debugger;
   const formData = globals.functions.exportData();
   const idcomVisit = formData?.queryParams?.authmode; // "DebitCard"
   const aadharVisit = formData?.queryParams?.visitType; // "EKYC_AUTH
@@ -154,7 +153,6 @@ function getOTP(mobileNumber, pan, dob, globals) {
  * @return {PROMISE}
  */
 function otpValidation(mobileNumber, pan, dob, otpNumber) {
-  debugger;
   const referenceNumber = `AD${getTimeStamp(new Date())}` ?? '';
   currentFormContext.referenceNumber = referenceNumber;
   const jsonObj = {
@@ -350,7 +348,6 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
  * @param {string} redirectUrl - The URL to redirect the browser to.
  */
 function redirect(redirectUrl) {
-  debugger;
   window.location.href = redirectUrl;
 }
 

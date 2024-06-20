@@ -121,7 +121,7 @@ async function loadLazy(doc) {
 function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
-  window.setTimeout(() => import('../creditcards/cc.js'), 700);
+  window.setTimeout(() => import('../creditcards/cc.js'), 1000);
   // load anything that can be postponed to the latest here
 }
 

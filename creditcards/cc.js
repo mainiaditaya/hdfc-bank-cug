@@ -309,7 +309,7 @@ for (const queryString of queryStrings) {
     };
     setTimeout(() => {
       invokeJourneyDropOffByParam('', '', queryStrings[3].split('=')[1]);
-    }, 1000);
+    }, 2000);
   }
 }
 

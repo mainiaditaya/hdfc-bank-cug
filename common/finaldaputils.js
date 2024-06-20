@@ -26,10 +26,9 @@ function getCurrentDateAndTime(dobFormatNo) {
 const { currentFormContext } = corpCreditCardContext;
 const fetchFiller4 = (mobileMatch, kycStatus) => {
   let filler4Value = null;
-  debugger;
-  currentFormContext;
   switch (kycStatus) {
     case 'aadhar':
+      // eslint-disable-next-line no-nested-ternary
       filler4Value = (currentFormContext?.journeyType === 'NTB') ? `VKYC${getCurrentDateAndTime(3)}` : ((currentFormContext?.journeyType === 'ETB') && mobileMatch) ? `NVKYC${getCurrentDateAndTime(3)}` : `VKYC${getCurrentDateAndTime(3)}`;
       break;
     case 'bioKYC':
@@ -50,6 +49,7 @@ const fetchFiller4 = (mobileMatch, kycStatus) => {
  */
 const createDapRequestObj = (globals) => {
   const formContextCallbackData = globals.functions.exportData()?.currentFormContext;
+  const segment = formContextCallbackData?.breDemogResponse?.SEGMENT;
   const customerInfo = currentFormContext?.executeInterfaceReqObj?.requestString || formContextCallbackData?.executeInterfaceReqObj?.requestString;
   // const { prefilledEmploymentDetails } = employmentDetails;
   const { selectKYCMethodOption1: { aadharEKYCVerification }, selectKYCMethodOption2: { aadharBiometricVerification }, selectKYCMethodOption3: { officiallyValidDocumentsMethod } } = globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel;
@@ -60,6 +60,7 @@ const createDapRequestObj = (globals) => {
         || (officiallyValidDocumentsMethod.$value && 'OVD')
         || null,
   };
+
   const mobileMatch = globals.functions.exportData()?.aadhaar_otp_val_data?.result?.mobileValid === 'y';
   const filler4 = fetchFiller4(mobileMatch, kycFill.KYC_STATUS);
   const { executeInterfaceResPayload } = formContextCallbackData;
@@ -82,7 +83,7 @@ const createDapRequestObj = (globals) => {
       journeyID: currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
       filler7: '',
-      Segment: 'ONLY_HL',
+      Segment: segment,
       biometricStatus: kycFill.KYC_STATUS,
       filler2,
       filler4,
@@ -109,17 +110,15 @@ const updatePanelVisibility = (response, globals) => {
 };
 
 const finalDap = (globals) => {
-  debugger;
   const apiEndPoint = urlPath(corpCreditCard.endpoints.finalDap);
   const payload = createDapRequestObj(globals);
 
   const eventHandlers = {
     successCallBack: (response) => {
-      debugger;
-      // const formContextCallbackData = globals.functions.exportData()?.currentFormContext;
-      const mobileNumber = globals.functions.exportData()?.form.login.registeredMobileNumber;
+      const formContextCallbackData = globals.functions.exportData()?.currentFormContext;
+      const mobileNumber = globals.functions.exportData().form.login.registeredMobileNumber;
       const leadProfileId = globals.functions.exportData().leadProifileId;
-      const { journeyId } = globals.functions.exportData();
+      const journeyId = formContextCallbackData.journeyID;
       if (response?.errorCode === '0000') {
         invokeJourneyDropOffUpdate('FINAL_DAP_SUCCESS', mobileNumber, leadProfileId, journeyId, globals);
         const resultPanel = formUtil(globals, globals.form.resultPanel);

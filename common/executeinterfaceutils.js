@@ -12,7 +12,6 @@ import {
   fetchJsonResponse,
   fetchIPAResponse,
   hideLoaderGif,
-  getJsonResponse,
 } from './makeRestAPI.js';
 import corpCreditCard from './constants.js';
 import { finalDap } from './finaldaputils.js';
@@ -212,7 +211,6 @@ const createExecuteInterfaceRequestObj = (globals) => {
  * @param {object} globals - globals variables object containing form configurations.
  */
 const listNameOnCard = (globals) => {
-  debugger
   const elementNameSelect = 'nameOnCardDropdown';
   const { personalDetails } = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage;
   const firstName = personalDetails.firstName.$value;
@@ -233,21 +231,11 @@ const listNameOnCard = (globals) => {
  * @returns {PROMISE}
  */
 const executeInterfaceApiFinal = (globals) => {
-  debugger;
   const formCallBackContext = globals.functions.exportData()?.currentFormContext;
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
   requestObj.requestString.nameOnCard = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value;
   requestObj.requestString.productCode = formRuntime.productCode || formCallBackContext?.formRuntime?.productCode;
-
   const apiEndPoint = urlPath(endpoints.executeInterface);
-  const eventHandlers = {
-    successCallBack: (response) => {
-      console.log(response);
-    },
-    errorCallBack: (response) => {
-      console.log(response);
-    },
-  };
   // restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
   formRuntime?.getOtpLoader();
   return fetchJsonResponse(apiEndPoint, requestObj, 'POST', true);
@@ -257,10 +245,9 @@ const executeInterfaceApiFinal = (globals) => {
  * @name executeInterfaceResponseHandler
  * @param {object} resPayload
  */
-const executeInterfaceResponseHandler=(resPayload)=>{
-  debugger
-  currentFormContext.executeInterfaceResPayload= resPayload;
-}
+const executeInterfaceResponseHandler = (resPayload) => {
+  currentFormContext.executeInterfaceResPayload = resPayload;
+};
 
 /**
  * @name executeInterfaceApi
@@ -341,8 +328,8 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
     benefitsTextField.setValue(firstProductDetail?.keyBenefits[index]);
   });
 
-  const cardNameTitle = formUtil(globals, globals.form.corporateCardWizardView.confirmCardPanel.cardNameTitle)
-  if(firstProductDetail?.product){
+  const cardNameTitle = formUtil(globals, globals.form.corporateCardWizardView.confirmCardPanel.cardNameTitle);
+  if (firstProductDetail?.product) {
     cardNameTitle.setValue(firstProductDetail?.product);
   }
 
@@ -372,7 +359,6 @@ const executeInterfacePostRedirect = async (source, globals) => {
   //   loginPanel, consentFragment, getOTPbutton, welcomeText,
   // } = globals.form;
   // [loginPanel, consentFragment, getOTPbutton, welcomeText].map((el) => formUtil(globals, el)).forEach((item) => item.visible(false));
-  debugger;
   const formCallBackContext = globals.functions.exportData()?.currentFormContext;
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
   if (source === 'idCom') {
@@ -389,12 +375,11 @@ const executeInterfacePostRedirect = async (source, globals) => {
       if (response?.errorCode === '0000') {
         finalDap(globals);
       } else {
-        debugger;
         const formContextCallbackData = globals.functions.exportData()?.currentFormContext;
         const mobileNumber = globals.functions.exportData().form.login.registeredMobileNumber;
         const leadProfileId = globals.functions.exportData().leadProifileId;
-        const journeyId = formContextCallbackData.journeyID;;
-        invokeJourneyDropOffUpdate('POST_EXECUTEINTERFACE_FAILURE', mobileNumber, leadProfileId, journeyId, globals) 
+        const journeyId = formContextCallbackData.journeyID;
+        invokeJourneyDropOffUpdate('POST_EXECUTEINTERFACE_FAILURE', mobileNumber, leadProfileId, journeyId, globals);
         const resultPanel = formUtil(globals, globals.form.resultPanel);
         resultPanel.visible(true);
         globals.functions.setProperty(globals.form.confirmResult, { visible: false });
