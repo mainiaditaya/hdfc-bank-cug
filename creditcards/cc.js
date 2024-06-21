@@ -314,18 +314,19 @@ const pageRedirected = (aadhar, idCom) => {
           debugger;
           hideLoaderGif();
           const data = res;
-          const checkExecuteInterFinalDap = (data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1].state === 'FINAL_DAP_SUCCESS');
-          if (checkExecuteInterFinalDap) {
-            // success
-            // get arn number from the data ..
-            // use dom api to show it on the thank you page..
-            // success
-            // const finalDapSuucessResponse = JSON.parse(data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1]);
-            // console.log(finalDapSuucessResponse.arnNuber); // setArnNumberInResult-function to set
+          const journeyDropOffParamLast = data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1];
+          const checkFinalDapSuccess = (journeyDropOffParamLast.state === 'FINAL_DAP_SUCCESS');
+          if (checkFinalDapSuccess) {
+            const { currentFormContext: { ARN_NUM, VKYC_URL } } = JSON.parse(journeyDropOffParamLast.stateInfo);
             const resultPanel = document.getElementsByName('resultPanel')?.[0];
             const successPanel = document.getElementsByName('successResultPanel')?.[0];
             resultPanel.setAttribute('data-visible', true);
             successPanel.setAttribute('data-visible', true);
+            setArnNumberInResult(ARN_NUM);
+            // const vkycProceedButton = document.getElementsByName('vkycProceedButton')?.[0];
+            // vkycProceedButton.addEventListener('click', (e) => {
+            //   window.location.href = VKYC_URL;
+            // });
           } else {
             // errror
             const err = 'badResponse';
