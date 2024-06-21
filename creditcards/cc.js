@@ -238,12 +238,35 @@ const errorPannelMethod = () => {
   errorPannel.setAttribute('data-visible', true);
 };
 
-const queryStrings = window.location.search.split('?')[1].split('&');
-// eslint-disable-next-line no-restricted-syntax
-for (const queryString of queryStrings) {
-  // eslint-disable-next-line no-unused-vars
-  const [key, value] = queryString.split('=');
-  if (value === 'EKYC_AUTH') {
+const setArnNumberInResult = (arnNumRef) => {
+  const nameOfArnRefPanel = 'arnRefNumPanel';
+  const classNamefieldArnNo = '.field-arnnumber';
+  const arnRefNumPanel = document.querySelector(`[name= ${nameOfArnRefPanel}]`);
+  const arnNumberElement = arnRefNumPanel.querySelector(classNamefieldArnNo);
+  if (arnNumberElement) {
+    // Manipulate the content of the <p> tag inside '.field-arnnumber'
+    arnNumberElement.querySelector('p').textContent = arnNumRef;
+  }
+};
+
+// post-redirect-aadhar-or-idcom
+const searchParam = new URLSearchParams(window.location.search);
+const visitTypeParam = searchParam.get('visitType');
+const authModeParam = searchParam.get('authmode');
+const journeyId = searchParam.get('journeyId');
+const aadharRedirect = visitTypeParam && (visitTypeParam === 'EKYC_AUTH');
+const idComRedirect = authModeParam && (authModeParam === 'DebitCard');
+/**
+ * Redirects the user to different panels based on conditions.
+ * If `aadhar` is true, navigates from 'corporateCardWizardView' to 'confirmAndSubmitPanel'
+ * If `idCom` is true, initiates a journey drop-off process and handles the response which handles after all the final dap api call.
+ * @param {boolean} aadhar - Indicates whether Aadhar redirection is triggered.
+ * @param {boolean} idCom - Indicates whether ID com redirection is triggered.
+ * @returns {void}
+ */
+const pageRedirected = (aadhar, idCom) => {
+  if (aadhar) {
+    debugger;
     const navigateFrom = document.getElementsByName('corporateCardWizardView')?.[0];
     const current = navigateFrom?.querySelector('.current-wizard-step');
     const currentMenuItem = navigateFrom?.querySelector('.wizard-menu-active-item');
@@ -262,8 +285,10 @@ for (const queryString of queryStrings) {
       bubbles: false,
     });
     navigateFrom?.dispatchEvent(event);
-  } else if (key === 'authmode') {
+  }
+  if (idCom) {
     debugger;
+    displayLoader();
     const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyID) => {
       const journeyJSONObj = {
         RequestPayload: {
@@ -276,7 +301,6 @@ for (const queryString of queryStrings) {
       };
       const url = 'https://applyonlinedev.hdfcbank.com/content/hdfc_commonforms/api/journeydropoffparam.json';
       const method = 'POST';
-      displayLoader();
       return fetch(url, {
         method,
         body: JSON.stringify(journeyJSONObj),
@@ -293,6 +317,11 @@ for (const queryString of queryStrings) {
           const checkExecuteInterFinalDap = (data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1].state === 'FINAL_DAP_SUCCESS');
           if (checkExecuteInterFinalDap) {
             // success
+            // get arn number from the data ..
+            // use dom api to show it on the thank you page..
+            // success
+            // const finalDapSuucessResponse = JSON.parse(data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1]);
+            // console.log(finalDapSuucessResponse.arnNuber); // setArnNumberInResult-function to set
             const resultPanel = document.getElementsByName('resultPanel')?.[0];
             const successPanel = document.getElementsByName('successResultPanel')?.[0];
             resultPanel.setAttribute('data-visible', true);
@@ -308,10 +337,11 @@ for (const queryString of queryStrings) {
         });
     };
     setTimeout(() => {
-      invokeJourneyDropOffByParam('', '', queryStrings[3].split('=')[1]);
+      invokeJourneyDropOffByParam('', '', journeyId);
     }, 20000);
   }
-}
+};
+pageRedirected(aadharRedirect, idComRedirect);
 
 /**
  * Changes the language of the Aadhar content to the specified language.
