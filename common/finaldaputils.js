@@ -66,7 +66,7 @@ const createDapRequestObj = (globals) => {
   const { selectKYCMethodOption1: { aadharEKYCVerification }, selectKYCMethodOption2: { aadharBiometricVerification }, selectKYCMethodOption3: { officiallyValidDocumentsMethod } } = globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel;
   const kycFill = {
     KYC_STATUS:
-        (aadharEKYCVerification.$value && 'aadhar')
+        (aadharEKYCVerification.$value && 'aadhaar')
         || (aadharBiometricVerification.$value && 'bioKYC')
         || (officiallyValidDocumentsMethod.$value && 'OVD')
         || null,
