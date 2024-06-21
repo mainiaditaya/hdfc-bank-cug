@@ -74,7 +74,7 @@ const createDapRequestObj = (globals) => {
 
   const journeyType = (globals.functions.exportData()?.currentFormContext?.breDemogResponse?.BREFILLER2 === 'D101') ? 'ETB' : 'NTB';
   const mobileMatch = globals.functions.exportData()?.aadhaar_otp_val_data?.result?.mobileValid !== undefined;
-  const filler4 = fetchFiller4(mobileMatch, kycFill.KYC_STATUS, journeyType);
+  const VKYCConsent = fetchFiller4(mobileMatch, kycFill.KYC_STATUS, journeyType);
   const formData = globals.functions.exportData();
   const ekycSuccess = mobileMatch ? `${formData?.aadhaar_otp_val_data?.result?.ADVRefrenceKey}X${formData?.aadhaar_otp_val_data.result?.RRN}` : '';
   const finalDapPayload = {
@@ -98,7 +98,7 @@ const createDapRequestObj = (globals) => {
       Segment: segment,
       biometricStatus: kycFill.KYC_STATUS,
       ekycSuccess,
-      filler4,
+      VKYCConsent,
       ekycConsent: `${getCurrentDateAndTime(3)}YEnglishxeng1x0`,
     },
   };
