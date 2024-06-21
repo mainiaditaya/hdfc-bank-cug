@@ -132,6 +132,8 @@ const finalDap = (globals) => {
   const eventHandlers = {
     successCallBack: (response) => {
       if (response?.errorCode === '0000') {
+        currentFormContext.VKYC_URL = response.vkycURL;
+        currentFormContext.VKYC_URL = response.erefNumber;
         invokeJourneyDropOffUpdate('FINAL_DAP_SUCCESS', mobileNumber, leadProfileId, journeyId, globals);
       } else {
         invokeJourneyDropOffUpdate('FINAL_DAP_FAILURE', mobileNumber, leadProfileId, journeyId, globals);
