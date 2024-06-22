@@ -7,7 +7,6 @@ import {
   createJourneyId,
   formRuntime,
 } from '../common/journey-utils.js';
-import { executeInterfaceApiFinal } from '../common/executeinterfaceutils.js';
 import {
   formUtil,
   urlPath,
@@ -97,7 +96,6 @@ const splitName = (fullName) => {
 
 /**
  * Handles toggling of the current address based on certain conditions.
- *
  * @param {Object} globals - Global object containing form and context information.
  * @returns {void}
  */
@@ -108,7 +106,6 @@ const currentAddressToggleHandler = (globals) => {
     === 'on'
   ) {
     const { newCurentAddressPanel } = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.currentDetails.currentAddressETB;
-
     const newCurentAddressLine1 = formUtil(globals, newCurentAddressPanel.newCurentAddressLine1);
     const newCurentAddressLine2 = formUtil(globals, newCurentAddressPanel.newCurentAddressLine2);
     const newCurentAddressLine3 = formUtil(globals, newCurentAddressPanel.newCurentAddressLine3);
@@ -158,7 +155,6 @@ const currentAddressToggleHandler = (globals) => {
         value: false,
       });
     }
-
     newCurentAddressCity.setValue(BRE_DEMOG_RESPONSE?.VDCUSTCITY, { attrChange: true, value: false });
     newCurentAddressPin.setValue(BRE_DEMOG_RESPONSE?.VDCUSTZIPCODE, { attrChange: true, value: false });
     newCurentAddressState.setValue(BRE_DEMOG_RESPONSE?.VDCUSTSTATE, { attrChange: true, value: false });
@@ -181,7 +177,6 @@ const personalDetailsPreFillFromBRE = (res, globals) => {
   currentAddressNTBUtil.visible(false);
   // Extract breCheckAndFetchDemogResponse from res
   const breCheckAndFetchDemogResponse = res?.demogResponse?.BRECheckAndFetchDemogResponse;
-
   if (!breCheckAndFetchDemogResponse) return;
   BRE_DEMOG_RESPONSE = breCheckAndFetchDemogResponse;
   currentFormContext.breDemogResponse = breCheckAndFetchDemogResponse;
@@ -321,9 +316,8 @@ const otpValHandler = (response, globals) => {
     personalDetailsPreFillFromBRE(res, globals);
   }
   (async () => {
-    const myImportedModule = await import('./cc.js');
-    myImportedModule.onWizardInit();
-    return true;
+    const importCCModule = await import('./cc.js');
+    importCCModule.onWizardInit();
   })();
 };
 
@@ -396,7 +390,6 @@ const setConfirmScrAddressFields = (globalObj) => {
  */
 const getThisCard = (globals) => {
   const isAddressChanged = currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag === 'Y';
-  //executeInterfaceApiFinal(globals);
   setConfirmScrAddressFields(globals);
   if (!isAddressChanged) {
     moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
@@ -589,14 +582,6 @@ const aadharConsent123 = async (globals) => {
     console.error(error);
   }
 };
-
-/**
- * @name journeyResponseHandler
- * @param {string} payload.
- */
-function journeyResponseHandler(payload) {
-  currentFormContext.leadProfile = journeyResponseHandlerUtil(String(payload.leadProfileId), currentFormContext)?.leadProfile;
-}
 
 /**
  * logic hanlding during prefill of form.
