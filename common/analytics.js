@@ -1,10 +1,11 @@
 import data from './analyticsConstants.js';
-import corpCreditCard from './constants.js';
+import * as CC_CONSTANT from '../creditcards/constant.js';
 
+const { JOURNEY_NAME } = CC_CONSTANT;
 const digitalDataPageLoad = {
   page: {
     pageInfo: {
-      pageName: corpCreditCard.journeyName,
+      pageName: JOURNEY_NAME,
       errorCode: '',
       errorMessage: '',
     },
@@ -12,7 +13,7 @@ const digitalDataPageLoad = {
   user: {
     pseudoID: 'TBD',
     journeyID: '',
-    journeyName: corpCreditCard.journeyName,
+    journeyName: JOURNEY_NAME,
     journeyState: '',
     casa: '',
   },
@@ -63,7 +64,7 @@ function sendSubmitClickEvent(phone, linkName, linkType, formContext, currentFor
   const digitalDataEvent = digitalData || {
     page: {
       pageInfo: {
-        pageName: corpCreditCard.journeyName,
+        pageName: JOURNEY_NAME,
         errorCode: '',
         errorMessage: '',
       },
@@ -71,7 +72,7 @@ function sendSubmitClickEvent(phone, linkName, linkType, formContext, currentFor
     user: {
       pseudoID: 'TBD',
       journeyID: '',
-      journeyName: corpCreditCard.journeyName,
+      journeyName: JOURNEY_NAME,
       journeyState: '',
       casa: '',
       gender: '',
@@ -131,7 +132,7 @@ function sendSubmitClickEvent(phone, linkName, linkType, formContext, currentFor
 function sendPageloadEvent(formContext) {
   digitalDataPageLoad.user.journeyID = formContext.journeyID;
   digitalDataPageLoad.user.journeyState = formContext?.journeyState || 'CUSTOMER_IDENTITY_UNRESOLVED';
-  digitalDataPageLoad.user['Journey Name'] = corpCreditCard.journeyName;
+  digitalDataPageLoad.user['Journey Name'] = JOURNEY_NAME;
   if (window) {
     window.digitalData = digitalDataPageLoad || {};
   }
@@ -161,7 +162,7 @@ function sendAnalyticsEvent(payload, formData, currentFormContext) {
   const digitalDataEvent = {
     page: {
       pageInfo: {
-        pageName: corpCreditCard.journeyName,
+        pageName: JOURNEY_NAME,
         errorCode: '',
         errorMessage: '',
       },
@@ -169,7 +170,7 @@ function sendAnalyticsEvent(payload, formData, currentFormContext) {
     user: {
       pseudoID: 'TBD',
       journeyID: '',
-      journeyName: corpCreditCard.journeyName,
+      journeyName: JOURNEY_NAME,
       journeyState: '',
       casa: '',
       gender: '',

@@ -1,39 +1,12 @@
-import corpCreditCard from './constants.js';
-import { formUtil, urlPath } from './formutils.js';
-import { corpCreditCardContext, invokeJourneyDropOffUpdate } from './journey-utils.js';
-import { restAPICall } from './makeRestAPI.js';
+import { getCurrentDateAndTime, urlPath } from '../../common/formutils.js';
+import { corpCreditCardContext, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
+import { restAPICall } from '../../common/makeRestAPI.js';
+import * as CONSTANT from '../../common/constants.js';
 
-const getCurrentDateAndTime = (dobFormatNo) => {
-  /*
-      dobFormatNo: 1 (DD-MM-YYYY HH:MM:SS)
-      dobFormatNo: 2 (YYYYMMDDHHMMSS)
-      dobFormatNo: 3 (DDMMYYYYHHMMSS)
-  */
-  const newDate = new Date();
-  const year = newDate.getFullYear();
-  const month = newDate.getMonth() + 1;
-  const todaySDate = newDate.getDate();
-  const hours = newDate.getHours();
-  const minutes = newDate.getMinutes();
-  const seconds = newDate.getSeconds();
-  let formatedTime = '';
-  switch (dobFormatNo) {
-    case 1:
-      formatedTime = `${todaySDate}-${month}-${year} ${hours}:${minutes}:${seconds}`;
-      break;
-    case 2:
-      formatedTime = `${year}${month}${todaySDate}${hours}${minutes}${seconds}`;
-      break;
-    case 3:
-      formatedTime = `${todaySDate}${month}${year.toString().substring(2, 4)}${hours}${minutes}${seconds}`;
-      break;
-    default:
-      formatedTime = '';
-  }
-  return formatedTime;
-};
+const { ENDPOINTS } = CONSTANT;
 
 const { currentFormContext } = corpCreditCardContext;
+
 const fetchFiller4 = (mobileMatch, kycStatus, journeyType) => {
   let filler4Value = null;
   switch (kycStatus) {
@@ -58,7 +31,6 @@ const fetchFiller4 = (mobileMatch, kycStatus, journeyType) => {
  * @returns {Object} - The DAP request object.
  */
 const createDapRequestObj = (globals) => {
-  debugger;
   const formContextCallbackData = globals.functions.exportData()?.currentFormContext || currentFormContext;
   const segment = formContextCallbackData?.breDemogResponse?.SEGMENT || currentFormContext;
   const customerInfo = currentFormContext?.executeInterfaceReqObj?.requestString || formContextCallbackData?.executeInterfaceReqObj?.requestString;
@@ -105,22 +77,6 @@ const createDapRequestObj = (globals) => {
   return finalDapPayload;
 };
 
-const updatePanelVisibility = (response, globals) => {
-  const successResultPanel = formUtil(globals, globals.form.resultPanel.successResultPanel);
-  const errorResultPanel = formUtil(globals, globals.form.resultPanel.errorResultPanel);
-  const {
-    loginPanel, consentFragment, getOTPbutton, welcomeText,
-  } = globals.form;
-  [loginPanel, consentFragment, getOTPbutton, welcomeText].map((el) => formUtil(globals, el)).forEach((item) => item.visible(false));
-
-  if (true) {
-    successResultPanel.visible(true);
-    errorResultPanel.visible(false);
-  } else {
-    errorResultPanel.visible(true);
-  }
-};
-
 const throughDomSetArnNum = (arnNumRef) => {
   const nameOfArnRefPanel = 'arnRefNumPanel';
   const classNamefieldArnNo = '.field-newarnnumber';
@@ -133,7 +89,7 @@ const throughDomSetArnNum = (arnNumRef) => {
 };
 
 const finalDap = (userRedirected, globals) => {
-  const apiEndPoint = urlPath(corpCreditCard.endpoints.finalDap);
+  const apiEndPoint = urlPath(ENDPOINTS.finalDap);
   const payload = createDapRequestObj(globals);
   const formContextCallbackData = globals.functions.exportData()?.currentFormContext || currentFormContext;
   const mobileNumber = globals.functions.exportData().form.login.registeredMobileNumber || globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value;
@@ -172,8 +128,6 @@ const finalDap = (userRedirected, globals) => {
       invokeJourneyDropOffUpdate('FINAL_DAP_FAILURE', mobileNumber, leadProfileId, journeyId, globalObj);
     },
   };
-  // const res = {};
-  // updatePanelVisibility(res, globals);
   restAPICall(globals, 'POST', payload, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallback);
 };
-export { finalDap, updatePanelVisibility };
+export default finalDap;

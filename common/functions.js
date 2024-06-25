@@ -14,25 +14,19 @@ import {
   aadharConsent123,
   resendOTP,
   formRuntime,
+  executeInterfaceApi,
+  executeInterfaceApiFinal,
+  executeInterfacePostRedirect,
+  executeInterfaceResponseHandler,
+  ipaRequestApi,
+  ipaSuccessHandler,
+  documentUpload,
 } from '../creditcards/corporate-creditcardFunctions.js';
-
-import { updatePanelVisibility } from './finaldaputils.js';
 
 import {
   validatePan,
   panAPISuccesHandler,
 } from './panvalidation.js';
-
-import {
-  executeInterfaceApi,
-  executeInterfaceApiFinal,
-  executeInterfacePostRedirect,
-  ipaRequestApi,
-  ipaSuccessHandler,
-  executeInterfaceResponseHandler,
-} from './executeinterfaceutils.js';
-
-import documentUpload from './docuploadutils.js';
 
 import fetchAuthCode from './idcomutil.js';
 
@@ -44,11 +38,15 @@ import {
   fetchJsonResponse, hideLoaderGif,
 } from './makeRestAPI.js';
 
-import corpCreditCard from './constants.js';
+import * as CONSTANT from './constants.js';
+import * as CC_CONSTANT from '../creditcards/constant.js';
 
-const { endpoints } = corpCreditCard;
+const { ENDPOINTS } = CONSTANT;
+const { JOURNEY_NAME } = CC_CONSTANT;
 const { currentFormContext } = corpCreditCardContext;
 
+// dynamically we can change according to journey
+const journeyNameConstant = JOURNEY_NAME;
 /**
  * @name checkMode - check the location
  * @param {object} globals -
@@ -138,13 +136,13 @@ function getOTP(mobileNumber, pan, dob, globals) {
       dateOfBith: dob.$value || '',
       panNumber: pan.$value || '',
       journeyID: globals.form.runtime.journeyId.$value,
-      journeyName: corpCreditCard.journeyName,
+      journeyName: journeyNameConstant,
       userAgent: window.navigator.userAgent,
       identifierValue: pan.$value || dob.$value,
       identifierName: pan.$value ? 'PAN' : 'DOB',
     },
   };
-  const path = urlPath(endpoints.otpGen);
+  const path = urlPath(ENDPOINTS.otpGen);
   formRuntime?.getOtpLoader();
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
@@ -167,13 +165,13 @@ function otpValidation(mobileNumber, pan, dob, otpNumber) {
       panNumber: pan.$value || '',
       channelSource: '',
       journeyID: currentFormContext.journeyID,
-      journeyName: currentFormContext.journeyName,
+      journeyName: journeyNameConstant,
       dedupeFlag: 'N',
       userAgent: window.navigator.userAgent,
       referenceNumber: referenceNumber ?? '',
     },
   };
-  const path = urlPath(endpoints.otpValFetchAssetDemog);
+  const path = urlPath(ENDPOINTS.otpValFetchAssetDemog);
   formRuntime?.otpValLoader();
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
@@ -251,7 +249,7 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
       initParameters: {
         journeyId: currentFormContext.journeyID,
         transactionId: currentFormContext.journeyID.replace(/-/g, '').replace(/_/g, ''),
-        journeyName: corpCreditCard.journeyName,
+        journeyName: journeyNameConstant,
         userAgent: window.navigator.userAgent,
         mobileNumber: mobileNumber.$value,
         leadProfileId: globals?.form.runtime.leadProifileId.$value,
@@ -271,7 +269,7 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
       data_app: {
         journey_id: currentFormContext.journeyID,
         lead_profile_id: globals?.form.runtime.leadProifileId.$value,
-        callback: urlPath(endpoints.aadharCallback),
+        callback: urlPath(ENDPOINTS.aadharCallback),
         lead_profile: {
           leadProfileId: globals?.form.runtime.leadProifileId.$value,
           mobileNumber: mobileNumber.$value,
@@ -279,7 +277,7 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
         },
         journeyStateInfo: {
           state: 'CUSTOMER_AADHAR_VALIDATION',
-          stateInfo: corpCreditCard.journeyName,
+          stateInfo: journeyNameConstant,
           formData: santizedFormDataWithContext(globals, currentFormContext),
         },
         auditData: {
@@ -326,7 +324,7 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
     },
   };
 
-  const path = urlPath(endpoints.aadharInit);
+  const path = urlPath(ENDPOINTS.aadharInit);
   const response = fetchJsonResponse(path, jsonObj, 'POST');
   response
     .then((res) => {

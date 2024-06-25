@@ -7,7 +7,6 @@ import {
   createJourneyId,
   formRuntime,
 } from '../common/journey-utils.js';
-import { executeInterfaceApiFinal } from '../common/executeinterfaceutils.js';
 import {
   formUtil,
   urlPath,
@@ -25,12 +24,24 @@ import {
   displayLoader, hideLoaderGif,
 } from '../common/makeRestAPI.js';
 import { sendAnalyticsEvent } from '../common/analytics.js';
-import corpCreditCard from '../common/constants.js';
+import {
+  executeInterfaceApiFinal,
+  executeInterfaceApi,
+  ipaRequestApi,
+  ipaSuccessHandler,
+  executeInterfacePostRedirect,
+  executeInterfaceResponseHandler,
+} from './executeinterface/executeinterface.js';
+import documentUpload from './docupload/docupload.js';
+import * as CONSTANT from '../common/constants.js';
+import * as CC_CONSTANT from './constant.js';
 
-const { endpoints } = corpCreditCard;
+const { ENDPOINTS } = CONSTANT;
+const { JOURNEY_NAME } = CC_CONSTANT;
+const journeyNameConstant = JOURNEY_NAME;
 const { currentFormContext } = corpCreditCardContext;
 // Initialize all Corporate Card Journey Context Variables.
-currentFormContext.journeyName = corpCreditCard.journeyName;
+currentFormContext.journeyName = journeyNameConstant;
 currentFormContext.journeyType = 'NTB';
 currentFormContext.formName = 'CorporateCreditCard';
 currentFormContext.errorCode = '';
@@ -396,7 +407,7 @@ const setConfirmScrAddressFields = (globalObj) => {
  */
 const getThisCard = (globals) => {
   const isAddressChanged = currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag === 'Y';
-  //executeInterfaceApiFinal(globals);
+  // executeInterfaceApiFinal(globals);
   setConfirmScrAddressFields(globals);
   if (!isAddressChanged) {
     moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
@@ -538,7 +549,7 @@ const pinCodeMaster = async (globals) => {
  */
 const validateEmailID = async (email, globals) => {
   const emailField = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.personalEmailAddress;
-  const url = urlPath(endpoints.emailId);
+  const url = urlPath(ENDPOINTS.emailId);
   const setEmailField = formUtil(globals, emailField);
   const invalidMsg = 'Please enter valid email id.';
   const payload = {
@@ -668,7 +679,7 @@ const resendOTP = (globals) => {
       dateOfBith: dob || '',
       panNumber: panNo || '',
       journeyID: globals.form.runtime.journeyId.$value,
-      journeyName: corpCreditCard.journeyName,
+      journeyName: journeyNameConstant,
       userAgent: window.navigator.userAgent,
       identifierValue: panNo || dob.$value,
       identifierName: panNo ? 'PAN' : 'DOB',
@@ -678,7 +689,7 @@ const resendOTP = (globals) => {
   const errorCallback = (err, globalObj) => errorResendOtp(err, globalObj);
   const loadingText = 'Please wait otp sending again...';
   const method = 'POST';
-  const path = urlPath(endpoints.otpGen);
+  const path = urlPath(ENDPOINTS.otpGen);
   try {
     restAPICall(globals, method, payload, path, successCallback, errorCallback, loadingText);
   } catch (error) {
@@ -701,4 +712,13 @@ export {
   sendAnalytics,
   aadharConsent123,
   resendOTP,
+  //
+  executeInterfaceApiFinal,
+  executeInterfaceApi,
+  ipaRequestApi,
+  ipaSuccessHandler,
+  executeInterfacePostRedirect,
+  executeInterfaceResponseHandler,
+  documentUpload,
+  //
 };

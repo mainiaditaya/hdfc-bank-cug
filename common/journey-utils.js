@@ -6,9 +6,14 @@ import {
   generateUUID,
 } from './formutils.js';
 import { fetchJsonResponse } from './makeRestAPI.js';
-import corpCreditCard from './constants.js';
 
-const { endpoints } = corpCreditCard;
+import * as CONSTANT from './constants.js';
+import * as CC_CONSTANT from '../creditcards/constant.js';
+
+const { ENDPOINTS, CHANNEL } = CONSTANT;
+const { JOURNEY_NAME } = CC_CONSTANT;
+const journeyNameConstant = JOURNEY_NAME;
+const channelConstant = CHANNEL;
 
 /**
  * generates the journeyId
@@ -53,8 +58,8 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
         mobileNumber,
       },
       formData: {
-        channel: corpCreditCard.channel,
-        journeyName: corpCreditCard.journeyName,
+        channel: channelConstant,
+        journeyName: journeyNameConstant,
         journeyID: globals.form.runtime.journeyId.$value,
         journeyStateInfo: [
           {
@@ -66,7 +71,7 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
       },
     },
   };
-  const url = urlPath(endpoints.journeyDropOff);
+  const url = urlPath(ENDPOINTS.journeyDropOff);
   const method = 'POST';
   return fetchJsonResponse(url, journeyJSONObj, method);
 };
@@ -91,8 +96,8 @@ const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, jo
         leadProfileId: leadProfileId.toString(),
       },
       formData: {
-        channel: corpCreditCard.channel,
-        journeyName: currentFormContext.journeyName,
+        channel: channelConstant,
+        journeyName: journeyNameConstant,
         journeyID: journeyId,
         journeyStateInfo: [
           {
@@ -105,7 +110,7 @@ const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, jo
     },
   };
   // sendSubmitClickEvent(mobileNumber, linkName, sanitizedFormData);
-  const url = urlPath(endpoints.journeyDropOffUpdate);
+  const url = urlPath(ENDPOINTS.journeyDropOffUpdate);
   const method = 'POST';
   return fetchJsonResponse(url, journeyJSONObj, method);
 };
@@ -140,7 +145,7 @@ const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyI
       },
     },
   };
-  const url = urlPath(endpoints.journeyDropOffParam);
+  const url = urlPath(ENDPOINTS.journeyDropOffParam);
   const method = 'POST';
   return fetchJsonResponse(url, journeyJSONObj, method);
 };

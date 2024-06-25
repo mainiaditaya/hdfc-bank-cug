@@ -1,23 +1,24 @@
 /* eslint-disable no-console */
 import {
   urlPath,
-  moveWizardView,
   formUtil,
   composeNameOption,
-  setSelectOptions,
-} from './formutils.js';
-import { corpCreditCardContext, formRuntime, invokeJourneyDropOffUpdate } from './journey-utils.js';
+  formatDate,
+} from '../../common/formutils.js';
+import { moveWizardView, setSelectOptions } from '../domutils/domutils.js';
+import { corpCreditCardContext, formRuntime, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
 import {
   restAPICall,
   fetchJsonResponse,
   fetchIPAResponse,
   hideLoaderGif,
-} from './makeRestAPI.js';
-import corpCreditCard from './constants.js';
-import { finalDap } from './finaldaputils.js';
+} from '../../common/makeRestAPI.js';
+import finalDap from '../finaldap/finaldap.js';
+import * as CONSTANT from '../../common/constants.js';
 
 const { currentFormContext } = corpCreditCardContext;
-const { endpoints, baseUrl } = corpCreditCard;
+const { ENDPOINTS, BASEURL } = CONSTANT;
+
 const GENDER_MAP = {
   M: '1',
   F: '2',
@@ -30,23 +31,12 @@ const GENDER_MAP = {
   Other: '3',
   T: '3',
 };
-const formatDate = (inputDate) => {
-  const date = new Date(inputDate);
-
-  const day = date.getDate();
-  const month = date.toLocaleString('default', { month: 'short' }).substring(0, 3);
-  const year = date.getFullYear();
-
-  const formattedDate = `${day}-${month}-${year}`;
-
-  return formattedDate;
-};
 
 /**
- * Creates an Execute Interface request object based on the provided global data.
- * @param {Object} globals - The global object containing necessary data for ExecuteInterface request.
- * @returns {Object} - The ExecuteInterface request object.
- */
+   * Creates an Execute Interface request object based on the provided global data.
+   * @param {Object} globals - The global object containing necessary data for ExecuteInterface request.
+   * @returns {Object} - The ExecuteInterface request object.
+   */
 const createExecuteInterfaceRequestObj = (globals) => {
   const { breDemogResponse } = currentFormContext;
   const {
@@ -207,9 +197,9 @@ const createExecuteInterfaceRequestObj = (globals) => {
 };
 
 /**
- * create a list of name to be dispayed on card dropdown in confirm card screen.
- * @param {object} globals - globals variables object containing form configurations.
- */
+   * create a list of name to be dispayed on card dropdown in confirm card screen.
+   * @param {object} globals - globals variables object containing form configurations.
+   */
 const listNameOnCard = (globals) => {
   const elementNameSelect = 'nameOnCardDropdown';
   const { personalDetails } = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage;
@@ -226,56 +216,55 @@ const listNameOnCard = (globals) => {
 };
 
 /**
- * @name executeInterfaceApiFinal
- * @param {Object} globals - The global object containing necessary data for the request.
- * @returns {PROMISE}
- */
+   * @name executeInterfaceApiFinal
+   * @param {Object} globals - The global object containing necessary data for the request.
+   * @returns {PROMISE}
+   */
 const executeInterfaceApiFinal = (globals) => {
   const formCallBackContext = globals.functions.exportData()?.currentFormContext;
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
   requestObj.requestString.nameOnCard = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value;
   requestObj.requestString.productCode = formRuntime.productCode || formCallBackContext?.formRuntime?.productCode;
-  const apiEndPoint = urlPath(endpoints.executeInterface);
-  // restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
+  const apiEndPoint = urlPath(ENDPOINTS.executeInterface);
   formRuntime?.getOtpLoader();
   return fetchJsonResponse(apiEndPoint, requestObj, 'POST', true);
 };
 
 /**
- * @name executeInterfaceResponseHandler
- * @param {object} resPayload
- */
+   * @name executeInterfaceResponseHandler
+   * @param {object} resPayload
+   */
 const executeInterfaceResponseHandler = (resPayload) => {
   currentFormContext.executeInterfaceResPayload = resPayload;
 };
 
 /**
- * @name executeInterfaceApi
- * @param {boolean} showLoader
- * @param {boolean} hideLoader
- * @param {object} globals
- * @return {PROMISE}
- */
+   * @name executeInterfaceApi
+   * @param {boolean} showLoader
+   * @param {boolean} hideLoader
+   * @param {object} globals
+   * @return {PROMISE}
+   */
 const executeInterfaceApi = (showLoader, hideLoader, globals) => {
   const executeInterfaceRequest = createExecuteInterfaceRequestObj(globals);
   currentFormContext.executeInterfaceReqObj = { ...executeInterfaceRequest };
-  const apiEndPoint = urlPath(endpoints.executeInterface);
+  const apiEndPoint = urlPath(ENDPOINTS.executeInterface);
   if (showLoader) formRuntime.executeInterface();
   return fetchJsonResponse(apiEndPoint, executeInterfaceRequest, 'POST', hideLoader);
 };
 
 /**
- * @name ipaRequestApi ipaRequestApi
- * @param {string} eRefNumber
- * @param {string} mobileNumber
- * @param {string} applicationRefNumber
- * @param {string} idTokenJwt
- * @param {string} ipaDuration
- * @param {string} ipaTimer
- * @param {boolean} showLoader
- * @param {boolean} hideLoader
- * @return {PROMISE}
- */
+   * @name ipaRequestApi ipaRequestApi
+   * @param {string} eRefNumber
+   * @param {string} mobileNumber
+   * @param {string} applicationRefNumber
+   * @param {string} idTokenJwt
+   * @param {string} ipaDuration
+   * @param {string} ipaTimer
+   * @param {boolean} showLoader
+   * @param {boolean} hideLoader
+   * @return {PROMISE}
+   */
 const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJwt, ipaDuration, ipaTimer, showLoader, hideLoader) => {
   currentFormContext.jwtToken = idTokenJwt;
   const ipaRequestObj = {
@@ -290,18 +279,18 @@ const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJw
       productCode: formRuntime.productCode,
     },
   };
-  const apiEndPoint = urlPath(endpoints.ipa);
+  const apiEndPoint = urlPath(ENDPOINTS.ipa);
   if (showLoader) formRuntime?.ipa.dispalyLoader();
   return fetchIPAResponse(apiEndPoint, ipaRequestObj, 'POST', ipaDuration, ipaTimer, hideLoader);
 };
 
 /**
- * Handles the successful response for IPA.
- *
- * @param {Object} ipa - The ipa prop in response object.
- * @param {Object} productEligibility - The product eligibility prop in response object.
- * @param {Object} globals - The global context object containing form and view configurations.
- */
+   * Handles the successful response for IPA.
+   *
+   * @param {Object} ipa - The ipa prop in response object.
+   * @param {Object} productEligibility - The product eligibility prop in response object.
+   * @param {Object} globals - The global context object containing form and view configurations.
+   */
 const ipaSuccessHandler = (ipa, productEligibility, globals) => {
   const { productDetails } = productEligibility;
   const [firstProductDetail] = productDetails;
@@ -315,7 +304,7 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
   formRuntime.filler8 = ipa?.filler8;
 
   const imageEl = document.querySelector('.field-cardimage > picture');
-  const imagePath = `${baseUrl}${firstProductDetail?.cardTypePath}?width=2000&optimize=medium`;
+  const imagePath = `${BASEURL}${firstProductDetail?.cardTypePath}?width=2000&optimize=medium`;
 
   imageEl.childNodes[5].setAttribute('src', imagePath);
   imageEl.childNodes[3].setAttribute('srcset', imagePath);
@@ -343,22 +332,12 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
 };
 
 /**
- * Executes an interface post request with the appropriate authentication mode based on the response.
- *
- * @param {object} source - The source object (unused in the current implementation).
- * @param {object} globals - An object containing global variables and functions.
- */
+   * Executes an interface post request with the appropriate authentication mode based on the response.
+   *
+   * @param {object} source - The source object (unused in the current implementation).
+   * @param {object} globals - An object containing global variables and functions.
+   */
 const executeInterfacePostRedirect = async (source, userRedirected, globals) => {
-  // const corporateCardWizardView = formUtil(globals, globals.form.corporateCardWizardView);
-  // const confirmAndSubmitPanel = formUtil(globals, globals.form.corporateCardWizardView.confirmAndSubmitPanel);
-
-  // corporateCardWizardView.visible(false);
-  // confirmAndSubmitPanel.visible(false);
-
-  // const {
-  //   loginPanel, consentFragment, getOTPbutton, welcomeText,
-  // } = globals.form;
-  // [loginPanel, consentFragment, getOTPbutton, welcomeText].map((el) => formUtil(globals, el)).forEach((item) => item.visible(false));
   const formCallBackContext = globals.functions.exportData()?.currentFormContext;
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
   if (source === 'idCom') {
@@ -369,7 +348,7 @@ const executeInterfacePostRedirect = async (source, userRedirected, globals) => 
       requestObj.requestString.authMode = 'IDCOM';
     }
   }
-  const apiEndPoint = urlPath(endpoints.executeInterface);
+  const apiEndPoint = urlPath(ENDPOINTS.executeInterface);
   const eventHandlers = {
     successCallBack: (response) => {
       if (response?.errorCode === '0000') {

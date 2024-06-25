@@ -1,7 +1,9 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint no-bitwise: ["error", { "allow": ["^", ">>", "&"] }] */
 
-import corpCreditCard from './constants.js';
+import * as CONSTANT from './constants.js';
+
+const { BASEURL } = CONSTANT;
 
 // declare-CONSTANTS
 const DATA_ATTRIBUTE_EMPTY = 'data-empty';
@@ -13,7 +15,7 @@ const ANCESTOR_CLASS_NAME = 'field-wrapper';
  * @returns {string} - The complete API URL including the base URL and the provided endpoint.
  */
 
-const urlPath = (path) => `${corpCreditCard.baseUrl}${path}`;
+const urlPath = (path) => `${BASEURL}${path}`;
 
 /**
  * Masks a number by replacing the specified number of leading digits with asterisks.
@@ -390,6 +392,53 @@ const santizedFormDataWithContext = (globaObj, currentFormContext) => {
  */
 const generateUUID = () => ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16));
 
+/**
+ * Formate date in `DD-MM-YYYY` into string format by accepting inputDate as string.
+ * @param {string} inputDate - Date string
+ * @returns {string} - sring in `DD-MM-YYYY` format.
+ */
+const formatDate = (inputDate) => {
+  const date = new Date(inputDate);
+  const day = date.getDate();
+  const month = date.toLocaleString('default', { month: 'short' }).substring(0, 3);
+  const year = date.getFullYear();
+  const formattedDate = `${day}-${month}-${year}`;
+  return formattedDate;
+};
+
+/**
+ * To get a current dateTime format as like below based on the argument value
+ * dobFormatNo: 1 (DD-MM-YYYY HH:MM:SS)
+ * dobFormatNo: 2 (YYYYMMDDHHMMSS)
+ * dobFormatNo: 3 (DDMMYYYYHHMMSS)
+ * @param {Number} dobFormatNo - Accepts number value 1, 2 or 3 to get the format the format of time
+ * @returns {string} - dobFormatNo
+ */
+const getCurrentDateAndTime = (dobFormatNo) => {
+  const newDate = new Date();
+  const year = newDate.getFullYear();
+  const month = newDate.getMonth() + 1;
+  const todaySDate = newDate.getDate();
+  const hours = newDate.getHours();
+  const minutes = newDate.getMinutes();
+  const seconds = newDate.getSeconds();
+  let formatedTime = '';
+  switch (dobFormatNo) {
+    case 1:
+      formatedTime = `${todaySDate}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+      break;
+    case 2:
+      formatedTime = `${year}${month}${todaySDate}${hours}${minutes}${seconds}`;
+      break;
+    case 3:
+      formatedTime = `${todaySDate}${month}${year.toString().substring(2, 4)}${hours}${minutes}${seconds}`;
+      break;
+    default:
+      formatedTime = '';
+  }
+  return formatedTime;
+};
+
 export {
   urlPath,
   maskNumber,
@@ -409,4 +458,6 @@ export {
   makeFieldInvalid,
   santizedFormDataWithContext,
   generateUUID,
+  formatDate,
+  getCurrentDateAndTime,
 };

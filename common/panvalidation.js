@@ -4,9 +4,11 @@ import {
   convertDateToDdMmYyyy,
 } from './formutils.js';
 import { corpCreditCardContext, formRuntime } from './journey-utils.js';
-import corpCreditCard from './constants.js';
+import * as CONSTANT from './constants.js';
+import * as CC_CONSTANT from '../creditcards/constant.js';
 
-const { endpoints, deadPanStatus } = corpCreditCard;
+const { ENDPOINTS } = CONSTANT;
+const deadPanStatus = CC_CONSTANT.DEAD_PAN_STATUS;
 const { currentFormContext } = corpCreditCardContext;
 /**
  * validatePan - creates PAN validation request and executes API.
@@ -31,7 +33,7 @@ const validatePan = (mobileNumber, panNumber, dob, firstName, showLoader, hideLo
     },
   };
   if (showLoader) formRuntime?.validatePanLoader();
-  const apiEndPoint = urlPath(endpoints.panValNameMatch);
+  const apiEndPoint = urlPath(ENDPOINTS.panValNameMatch);
   return fetchJsonResponse(apiEndPoint, validatePanRequest, 'POST', hideLoader);
 };
 

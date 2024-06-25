@@ -3,11 +3,14 @@ import {
   formRuntime,
 } from './journey-utils.js';
 import { urlPath } from './formutils.js';
-import corpCreditCard from './constants.js';
 import { fetchJsonResponse } from './makeRestAPI.js';
+import * as CONSTANT from './constants.js';
+import * as CC_CONSTANT from '../creditcards/constant.js';
 
-const { idCom, endpoints } = corpCreditCard;
 const { currentFormContext } = corpCreditCardContext;
+const { ENDPOINTS } = CONSTANT;
+const { ID_COM } = CC_CONSTANT;
+const idCom = ID_COM;
 
 /**
  * Creates an IdCom request object based on the provided global data.
@@ -52,7 +55,7 @@ const createIdComRequestObj = (globals) => {
 const fetchAuthCode = (globals) => {
   currentFormContext.VISIT_TYPE = 'IDCOMM';
   const idComRequest = createIdComRequestObj(globals);
-  const apiEndPoint = urlPath(endpoints.fetchAuthCode);
+  const apiEndPoint = urlPath(ENDPOINTS.fetchAuthCode);
   return fetchJsonResponse(apiEndPoint, idComRequest, 'POST');
 };
 
