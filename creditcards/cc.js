@@ -240,13 +240,21 @@ const errorPannelMethod = () => {
 
 const setArnNumberInResult = (arnNumRef) => {
   const nameOfArnRefPanel = 'arnRefNumPanel';
-  const classNamefieldArnNo = '.field-arnnumber';
+  const classNamefieldArnNo = '.field-newarnnumber';
   const arnRefNumPanel = document.querySelector(`[name= ${nameOfArnRefPanel}]`);
   const arnNumberElement = arnRefNumPanel.querySelector(classNamefieldArnNo);
   if (arnNumberElement) {
-    // Manipulate the content of the <p> tag inside '.field-arnnumber'
+    // Manipulate the content of the <p> tag inside '.field-newarnnumber'
     arnNumberElement.querySelector('p').textContent = arnNumRef;
   }
+};
+
+const successPannelMethod = (applRefNum) => {
+  const resultPanel = document.getElementsByName('resultPanel')?.[0];
+  const successPanel = document.getElementsByName('successResultPanel')?.[0];
+  resultPanel.setAttribute('data-visible', true);
+  successPanel.setAttribute('data-visible', true);
+  setArnNumberInResult(applRefNum);
 };
 
 // post-redirect-aadhar-or-idcom
@@ -318,11 +326,7 @@ const pageRedirected = (aadhar, idCom) => {
           const checkFinalDapSuccess = (journeyDropOffParamLast.state === 'FINAL_DAP_SUCCESS');
           if (checkFinalDapSuccess) {
             const { currentFormContext: { ARN_NUM, VKYC_URL } } = JSON.parse(journeyDropOffParamLast.stateInfo);
-            const resultPanel = document.getElementsByName('resultPanel')?.[0];
-            const successPanel = document.getElementsByName('successResultPanel')?.[0];
-            resultPanel.setAttribute('data-visible', true);
-            successPanel.setAttribute('data-visible', true);
-            setArnNumberInResult(ARN_NUM);
+            successPannelMethod(ARN_NUM);
             // const vkycProceedButton = document.getElementsByName('vkycProceedButton')?.[0];
             // vkycProceedButton.addEventListener('click', (e) => {
             //   window.location.href = VKYC_URL;
