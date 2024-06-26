@@ -439,6 +439,33 @@ const getCurrentDateAndTime = (dobFormatNo) => {
   return formatedTime;
 };
 
+/**
+ * Sanitizes the name for special characters.
+ * @param {String} name - The name token.
+ * @returns {String} sanitized name - removes special chars, spaces.
+ */
+const sanitizeName = (name) => name.replace(/[^a-zA-Z]/g, '');
+
+/**
+ * Splits a full name into its components: first name, middle name, and last name.
+ *
+ * @param {string} fullName - The full name to split. i.e - fistName<space>middleName<space>lastName
+ * @returns {Object} An object containing the first name, middle name, and last name.
+ * @property {string} firstName - The first name extracted from the full name.
+ * @property {string} middleName - The middle name extracted from the full name.
+ * @property {string} lastName - The last name extracted from the full name.
+ */
+const splitName = (fullName) => {
+  const name = { firstName: '', middleName: '', lastName: '' };
+  if (fullName) {
+    const parts = fullName.split(' ');
+    name.firstName = sanitizeName(parts.shift()) || '';
+    name.lastName = sanitizeName(parts.pop()) || '';
+    name.middleName = parts.length > 0 ? sanitizeName(parts[0]) : '';
+  }
+  return name;
+};
+
 export {
   urlPath,
   maskNumber,
@@ -460,4 +487,5 @@ export {
   generateUUID,
   formatDate,
   getCurrentDateAndTime,
+  splitName,
 };

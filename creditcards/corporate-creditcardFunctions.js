@@ -15,8 +15,8 @@ import {
   moveWizardView,
   parseCustomerAddress,
   removeSpecialCharacters,
-  // dateFormat,
   santizedFormDataWithContext,
+  splitName,
 } from '../common/formutils.js';
 import {
   getJsonResponse,
@@ -63,7 +63,7 @@ const ALLOWED_CHARACTERS = '/ -,';
 
 /**
  * Adds the 'wrapper-disabled' class to the parent elements of inputs or selects within the given panel
- * if their values are truthy.
+ * if their values are truthy (or) the name of the panel input is 'middleName'.
  * @param {HTMLElement} selectedPanel - The panel element containing the inputs or selects.
  */
 const addDisableClass = (selectedPanel) => {
@@ -77,33 +77,6 @@ const addDisableClass = (selectedPanel) => {
       panelInput.parentElement.classList.add('wrapper-disabled');
     }
   });
-};
-
-/**
- * Sanitizes the name for special characters.
- * @param {String} name - The name token.
- * @returns {String} sanitized name.
- */
-const sanitizeName = (name) => name.replace(/[^a-zA-Z]/g, '');
-
-/**
- * Splits a full name into its components: first name, middle name, and last name.
- *
- * @param {string} fullName - The full name to split.
- * @returns {Object} An object containing the first name, middle name, and last name.
- * @property {string} firstName - The first name extracted from the full name.
- * @property {string} middleName - The middle name extracted from the full name.
- * @property {string} lastName - The last name extracted from the full name.
- */
-const splitName = (fullName) => {
-  const name = { firstName: '', middleName: '', lastName: '' };
-  if (fullName) {
-    const parts = fullName.split(' ');
-    name.firstName = sanitizeName(parts.shift()) || '';
-    name.lastName = sanitizeName(parts.pop()) || '';
-    name.middleName = parts.length > 0 ? sanitizeName(parts[0]) : '';
-  }
-  return name;
 };
 
 /**
@@ -576,7 +549,7 @@ const aadharConsent123 = async (globals) => {
   try {
     if (typeof window !== 'undefined') {
       const openModal = (await import('../blocks/modal/modal.js')).default;
-      const { aadharLangChange } = await import('./cc.js');
+      const { aadharLangChange } = await import('./domutils/domutils.js');
       const contentDomName = 'aadharConsentPopup';
       const btnWrapClassName = 'button-wrapper';
       const config = {
