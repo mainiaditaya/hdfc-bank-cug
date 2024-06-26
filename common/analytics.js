@@ -1,5 +1,5 @@
 import data from './analyticsConstants.js';
-import * as CC_CONSTANT from '../creditcards/constant.js';
+import * as CC_CONSTANT from '../creditcards/corporate-creditcard/constant.js';
 
 const { JOURNEY_NAME } = CC_CONSTANT;
 const digitalDataPageLoad = {

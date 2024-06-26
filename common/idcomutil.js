@@ -5,7 +5,7 @@ import {
 import { urlPath } from './formutils.js';
 import { fetchJsonResponse } from './makeRestAPI.js';
 import * as CONSTANT from './constants.js';
-import * as CC_CONSTANT from '../creditcards/constant.js';
+import * as CC_CONSTANT from '../creditcards/corporate-creditcard/constant.js';
 
 const { currentFormContext } = corpCreditCardContext;
 const { ENDPOINTS } = CONSTANT;

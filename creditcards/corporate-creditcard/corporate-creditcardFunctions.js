@@ -6,7 +6,7 @@ import {
   corpCreditCardContext,
   createJourneyId,
   formRuntime,
-} from '../common/journey-utils.js';
+} from '../../common/journey-utils.js';
 import {
   formUtil,
   urlPath,
@@ -17,13 +17,14 @@ import {
   removeSpecialCharacters,
   santizedFormDataWithContext,
   splitName,
-} from '../common/formutils.js';
+  addDisableClass,
+} from '../../common/formutils.js';
 import {
   getJsonResponse,
   restAPICall,
   displayLoader, hideLoaderGif,
-} from '../common/makeRestAPI.js';
-import { sendAnalyticsEvent } from '../common/analytics.js';
+} from '../../common/makeRestAPI.js';
+import { sendAnalyticsEvent } from '../../common/analytics.js';
 import {
   executeInterfaceApiFinal,
   executeInterfaceApi,
@@ -31,9 +32,9 @@ import {
   ipaSuccessHandler,
   executeInterfacePostRedirect,
   executeInterfaceResponseHandler,
-} from './corporate-creditcard/executeinterfaceutils.js';
-import documentUpload from './corporate-creditcard/docuploadutils.js';
-import * as CONSTANT from '../common/constants.js';
+} from './executeinterfaceutils.js';
+import documentUpload from './docuploadutils.js';
+import * as CONSTANT from '../../common/constants.js';
 import * as CC_CONSTANT from './constant.js';
 
 const { ENDPOINTS } = CONSTANT;
@@ -60,24 +61,6 @@ let RESEND_OTP_COUNT = 3;
 const CUSTOMER_DEMOG_DATA = {};
 let BRE_DEMOG_RESPONSE = {};
 const ALLOWED_CHARACTERS = '/ -,';
-
-/**
- * Adds the 'wrapper-disabled' class to the parent elements of inputs or selects within the given panel
- * if their values are truthy (or) the name of the panel input is 'middleName'.
- * @param {HTMLElement} selectedPanel - The panel element containing the inputs or selects.
- */
-const addDisableClass = (selectedPanel) => {
-  const panelInputs = Array.from(selectedPanel.querySelectorAll('input, select'));
-
-  // Iterates over each input or select element
-  panelInputs.forEach((panelInput) => {
-    // Checks if the input or select element has a truthy value
-    if (panelInput.value || panelInput.name === 'middleName') {
-      // Adds the 'wrapper-disabled' class to the parent element
-      panelInput.parentElement.classList.add('wrapper-disabled');
-    }
-  });
-};
 
 /**
  * Handles toggling of the current address based on certain conditions.
@@ -548,8 +531,8 @@ const validateEmailID = async (email, globals) => {
 const aadharConsent123 = async (globals) => {
   try {
     if (typeof window !== 'undefined') {
-      const openModal = (await import('../blocks/modal/modal.js')).default;
-      const { aadharLangChange } = await import('../common/formutils.js');
+      const openModal = (await import('../../blocks/modal/modal.js')).default;
+      const { aadharLangChange } = await import('../../common/formutils.js');
       const contentDomName = 'aadharConsentPopup';
       const btnWrapClassName = 'button-wrapper';
       const config = {

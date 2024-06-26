@@ -5,7 +5,7 @@ import {
 } from './formutils.js';
 import { corpCreditCardContext, formRuntime } from './journey-utils.js';
 import * as CONSTANT from './constants.js';
-import * as CC_CONSTANT from '../creditcards/constant.js';
+import * as CC_CONSTANT from '../creditcards/corporate-creditcard/constant.js';
 
 const { ENDPOINTS } = CONSTANT;
 const deadPanStatus = CC_CONSTANT.DEAD_PAN_STATUS;

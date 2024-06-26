@@ -1,3 +1,7 @@
+// DOM - UTILS - having cer tain dom overing function which has been used in formutils.js by the imported
+// and got declared in constant name as - DOM_API.
+// search with key - DOM_API to track of all dom function to track in formutils which is used over all the functions.
+
 /**
  * Makes a form field invalid by adding error message and styling through Dom api.
  * If the field already has an error message element, updates its content.
@@ -139,6 +143,24 @@ const removeIncorrectOtpText = () => {
   });
 };
 
+/**
+ * Adds the 'wrapper-disabled' class to the parent elements of inputs or selects within the given panel
+ * if their values are truthy (or) the name of the panel input is 'middleName'.
+ * @param {HTMLElement} selectedPanel - The panel element containing the inputs or selects.
+ */
+const addDisableClass = (selectedPanel) => {
+  const panelInputs = Array.from(selectedPanel.querySelectorAll('input, select'));
+
+  // Iterates over each input or select element
+  panelInputs.forEach((panelInput) => {
+    // Checks if the input or select element has a truthy value
+    if (panelInput.value || panelInput.name === 'middleName') {
+      // Adds the 'wrapper-disabled' class to the parent element
+      panelInput.parentElement.classList.add('wrapper-disabled');
+    }
+  });
+};
+
 export {
   makeFieldInvalid,
   setDataAttributeOnClosestAncestor,
@@ -146,4 +168,5 @@ export {
   moveWizardView,
   aadharLangChange,
   removeIncorrectOtpText,
+  addDisableClass,
 };

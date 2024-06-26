@@ -10,6 +10,7 @@ const {
   setSelectOptions,
   moveWizardView,
   aadharLangChange,
+  addDisableClass,
 } = DOM_API; // DOM_MANIPULATE_CODE_FUNCTION
 
 const { BASEURL } = CONSTANT;
@@ -404,4 +405,5 @@ export {
   formatDate,
   getCurrentDateAndTime,
   splitName,
+  addDisableClass,
 };
