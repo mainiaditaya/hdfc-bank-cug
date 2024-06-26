@@ -274,7 +274,6 @@ const idComRedirect = authModeParam && (authModeParam === 'DebitCard');
  */
 const pageRedirected = (aadhar, idCom) => {
   if (aadhar) {
-    debugger;
     const navigateFrom = document.getElementsByName('corporateCardWizardView')?.[0];
     const current = navigateFrom?.querySelector('.current-wizard-step');
     const currentMenuItem = navigateFrom?.querySelector('.wizard-menu-active-item');
@@ -295,7 +294,6 @@ const pageRedirected = (aadhar, idCom) => {
     navigateFrom?.dispatchEvent(event);
   }
   if (idCom) {
-    debugger;
     displayLoader();
     const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyID) => {
       const journeyJSONObj = {
@@ -319,7 +317,6 @@ const pageRedirected = (aadhar, idCom) => {
         },
       })
         .then((res) => res.json()).then((res) => {
-          debugger;
           hideLoaderGif();
           const data = res;
           const journeyDropOffParamLast = data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1];
@@ -327,6 +324,8 @@ const pageRedirected = (aadhar, idCom) => {
           if (checkFinalDapSuccess) {
             const { currentFormContext: { ARN_NUM, VKYC_URL } } = JSON.parse(journeyDropOffParamLast.stateInfo);
             successPannelMethod(ARN_NUM);
+            // eslint-disable-next-line no-console
+            console.log(VKYC_URL);
             // const vkycProceedButton = document.getElementsByName('vkycProceedButton')?.[0];
             // vkycProceedButton.addEventListener('click', (e) => {
             //   window.location.href = VKYC_URL;
@@ -339,6 +338,8 @@ const pageRedirected = (aadhar, idCom) => {
         }).catch((e) => {
           hideLoaderGif();
           errorPannelMethod();
+          // eslint-disable-next-line no-console
+          console.log(e, 'dropoffParamCC.JS');
         });
     };
     setTimeout(() => {
@@ -347,39 +348,6 @@ const pageRedirected = (aadhar, idCom) => {
   }
 };
 pageRedirected(aadharRedirect, idComRedirect);
-
-/**
- * Changes the language of the Aadhar content to the specified language.
- * @param {Object} content - The content configuration for Aadhar.
- * @param {string} defaultLang - The language to show us default.
- */
-// select dropdow-aadhar
-const aadharLangChange = (adharContentDom, defaultLang) => {
-  const selectOp = adharContentDom.querySelector(`[name= ${'selectLanguage'}]`);
-  const findFieldSet = adharContentDom?.querySelectorAll('fieldset');
-  const selectedClass = 'selected-language';
-  const defaultOptionClass = `field-aadharconsent-${defaultLang?.toLowerCase()}`;
-  const applySelected = (fieldNode, optionClass, nameClass) => {
-    fieldNode?.forEach((element) => {
-      if (element?.classList?.contains(optionClass)) {
-        element.style.display = 'block';
-        element?.classList.add(nameClass);
-      } else {
-        element.style.display = 'none';
-        element?.classList.remove(nameClass);
-      }
-    });
-  };
-  applySelected(findFieldSet, defaultOptionClass, selectedClass);
-  selectOp.value = defaultLang;
-  selectOp?.addEventListener('change', (e) => {
-    e.preventDefault();
-    const { value: valueSelected } = e.target;
-    selectOp.value = valueSelected;
-    const optionClass = `field-aadharconsent-${valueSelected?.toLowerCase()}`;
-    applySelected(findFieldSet, optionClass, selectedClass);
-  });
-};
 
 /**
  * Hides the incorrect OTP text message when the user starts typing in the OTP input field.
@@ -399,5 +367,4 @@ removeIncorrectOtpText();
 export {
   decorateStepper,
   onWizardInit,
-  aadharLangChange,
 };

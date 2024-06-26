@@ -2,6 +2,15 @@
 /* eslint no-bitwise: ["error", { "allow": ["^", ">>", "&"] }] */
 
 import * as CONSTANT from './constants.js';
+import * as DOM_API from '../creditcards/domutils/domutils.js';
+
+const {
+  makeFieldInvalid,
+  setDataAttributeOnClosestAncestor,
+  setSelectOptions,
+  moveWizardView,
+  aadharLangChange,
+} = DOM_API; // DOM_MANIPULATE_CODE_FUNCTION
 
 const { BASEURL } = CONSTANT;
 
@@ -36,32 +45,6 @@ const maskNumber = (number, digitsToMask) => {
  * @returns {string} - The input string with spaces and special characters removed.
  */
 const clearString = (str) => (str ? str?.replace(/[\s~`!@#$%^&*(){}[\];:"'<,.>?/\\|_+=-]/g, '') : '');
-
-/**
- * Makes a form field invalid by adding error message and styling through Dom api.
- * If the field already has an error message element, updates its content.
- * If not, creates a new error message element.
- * @param {string} fieldName - The name attribute of the field to make invalid.
- * @param {string} [invalidMsg] - The error message to display. Optional, defaults to an empty string.
- */
-const makeFieldInvalid = (fieldName, invalidMsg) => {
-  const fieldDescClass = 'field-description';
-  const invalidClass = 'field-invalid';
-  const invalidPin = document.querySelector(`[name=${fieldName}]`);
-  const parentElement = invalidPin?.parentElement;
-  if (parentElement) {
-    const fd = parentElement?.querySelector(`.${fieldDescClass}`);
-    if (fd) {
-      fd.textContent = invalidMsg || '';
-    } else {
-      parentElement?.classList.add(invalidClass);
-      const fieldDesc = document.createElement('div');
-      fieldDesc.textContent = invalidMsg || '';
-      fieldDesc.classList.add(fieldDescClass);
-      parentElement.appendChild(fieldDesc);
-    }
-  }
-};
 
 /**
  * Utility function for managing properties of a panel.
@@ -217,31 +200,6 @@ const dateFormat = (dateString, format) => {
 };
 
 /**
- * Sets data attribute and value on the closest ancestor element with the specified class name.
- * @param {string} elementName - The name of the element to search for.
- * @param {string} fieldValue - The value to check for existence before setting data.
- * @param {string} dataAttribute - The name of the data attribute to set.
- * @param {string} value - The value to set for the data attribute.
- * @param {string} ancestorClassName - The class name of the ancestor element where the data attribute will be set.
- */
-const setDataAttributeOnClosestAncestor = (elementName, fieldValue, dataAttribute, value, ancestorClassName) => {
-  if (!fieldValue) {
-    return;
-  }
-
-  // Get the element by name
-  const element = document.getElementsByName(elementName)?.[0];
-
-  // If element exists, set data attribute on the closest ancestor with the specified class name
-  if (element) {
-    const closestAncestor = element.closest(`.${ancestorClassName}`);
-    if (closestAncestor) {
-      closestAncestor.setAttribute(dataAttribute, value);
-    }
-  }
-};
-
-/**
  * Generates an array of objects representing different name compositions based on the provided names.
  * @param {string} fn - The first name.
  * @param {string} mn - The middle name.
@@ -267,23 +225,6 @@ const composeNameOption = (fn, mn, ln) => {
 };
 
 /**
- * Sets the options of a select element based on the provided option lists.
- * @param {Array<object>} optionLists - An array of objects representing the options to be set.
- * @param {string} elementName - The name attribute of the select element.
- */
-const setSelectOptions = (optionLists, elementName) => {
-  const selectOption = document.querySelector(`[name=${elementName}]`);
-  optionLists?.forEach((option) => {
-    const optionElement = document.createElement('option');
-    optionElement.value = option?.value;
-    optionElement.textContent = option?.label;
-    const parent = selectOption?.parentNode;
-    selectOption?.appendChild(optionElement);
-    parent?.setAttribute('data-active', true);
-  });
-};
-
-/**
  * Parses the given address into substrings, each containing up to 30 characters.
  * @param {string} address - The address to parse.
  * @returns {string[]} An array of substrings, each containing up to 30 characters.
@@ -306,32 +247,6 @@ const parseCustomerAddress = (address) => {
   });
 
   return substrings;
-};
-
-/**
- * Moves the corporate card wizard view from one step to the next step.
- * @param {String} source - The name attribute of the source element (parent wizard panel).
- * @param {String} target - The name attribute of the destination element.
- */
-const moveWizardView = (source, target) => {
-  const navigateFrom = document.getElementsByName(source)?.[0];
-  const current = navigateFrom?.querySelector('.current-wizard-step');
-  const currentMenuItem = navigateFrom?.querySelector('.wizard-menu-active-item');
-  const navigateTo = document.getElementsByName(target)?.[0];
-  current?.classList?.remove('current-wizard-step');
-  navigateTo?.classList?.add('current-wizard-step');
-  // add/remove active class from menu item
-  const navigateToMenuItem = navigateFrom?.querySelector(`li[data-index="${navigateTo?.dataset?.index}"]`);
-  currentMenuItem?.classList?.remove('wizard-menu-active-item');
-  navigateToMenuItem?.classList?.add('wizard-menu-active-item');
-  const event = new CustomEvent('wizard:navigate', {
-    detail: {
-      prevStep: { id: current?.id, index: parseInt(current?.dataset?.index || 0, 10) },
-      currStep: { id: navigateTo?.id, index: parseInt(navigateTo?.dataset?.index || 0, 10) },
-    },
-    bubbles: false,
-  });
-  navigateFrom?.dispatchEvent(event);
 };
 
 /**
@@ -479,6 +394,7 @@ export {
   composeNameOption,
   parseCustomerAddress,
   moveWizardView,
+  aadharLangChange,
   removeSpecialCharacters,
   santizedFormData,
   dateFormat,

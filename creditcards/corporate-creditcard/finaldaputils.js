@@ -77,17 +77,6 @@ const createDapRequestObj = (globals) => {
   return finalDapPayload;
 };
 
-const throughDomSetArnNum = (arnNumRef) => {
-  const nameOfArnRefPanel = 'arnRefNumPanel';
-  const classNamefieldArnNo = '.field-newarnnumber';
-  const arnRefNumPanel = document?.querySelector(`[name= ${nameOfArnRefPanel}]`);
-  const arnNumberElement = arnRefNumPanel.querySelector(classNamefieldArnNo);
-  if (arnNumberElement) {
-    // Manipulate the content of the <p> tag inside '.field-newarnnumber'
-    arnNumberElement.querySelector('p').textContent = arnNumRef;
-  }
-};
-
 const finalDap = (userRedirected, globals) => {
   const apiEndPoint = urlPath(ENDPOINTS.finalDap);
   const payload = createDapRequestObj(globals);
@@ -107,10 +96,7 @@ const finalDap = (userRedirected, globals) => {
           globals.functions.setProperty(globals.form.resultPanel, { visible: true });
           globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: false });
           globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: true });
-          // 👇 it is not setting the value.
           globals.functions.setProperty(globals.form.resultPanel.successResultPanel.arnRefNumPanel.newARNNumber, { value: response.applicationNumber });
-          // setting through DomApi
-          throughDomSetArnNum(response.applicationNumber);
         }
       } else {
         invokeJourneyDropOffUpdate('FINAL_DAP_FAILURE', mobileNumber, leadProfileId, journeyId, globals);

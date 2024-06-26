@@ -549,7 +549,7 @@ const aadharConsent123 = async (globals) => {
   try {
     if (typeof window !== 'undefined') {
       const openModal = (await import('../blocks/modal/modal.js')).default;
-      const { aadharLangChange } = await import('./domutils/domutils.js');
+      const { aadharLangChange } = await import('../common/formutils.js');
       const contentDomName = 'aadharConsentPopup';
       const btnWrapClassName = 'button-wrapper';
       const config = {

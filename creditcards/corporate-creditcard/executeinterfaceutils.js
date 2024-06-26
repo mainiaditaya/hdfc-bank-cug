@@ -4,8 +4,9 @@ import {
   formUtil,
   composeNameOption,
   formatDate,
+  moveWizardView,
+  setSelectOptions,
 } from '../../common/formutils.js';
-import { moveWizardView, setSelectOptions } from '../domutils/domutils.js';
 import { corpCreditCardContext, formRuntime, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
 import {
   restAPICall,

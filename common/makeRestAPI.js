@@ -56,6 +56,7 @@ function fetchJsonResponse(url, payload, method, loader = false) {
 * @param {object} payload - The data payload to send with the request.
 * @returns {*} - The JSON response from the server.
 */
+// eslint-disable-next-line no-unused-vars
 function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = false, startTime = Date.now()) {
   return fetch(url, {
     method,
