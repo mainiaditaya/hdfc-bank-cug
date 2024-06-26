@@ -1,36 +1,13 @@
 /* eslint-disable no-console */
 import {
-  getThisCard,
-  prefillForm,
-  getAddressDetails,
-  pinCodeMaster,
-  validateEmailID,
-  currentAddressToggleHandler,
   corpCreditCardContext,
-  otpValHandler,
   journeyResponseHandler,
   createJourneyId,
   sendAnalytics,
-  aadharConsent123,
   resendOTP,
   formRuntime,
-  executeInterfaceApi,
-  executeInterfaceApiFinal,
-  executeInterfacePostRedirect,
-  executeInterfaceResponseHandler,
-  ipaRequestApi,
-  ipaSuccessHandler,
-  documentUpload,
-  checkMode,
   customSetFocus,
 } from '../creditcards/corporate-creditcard/corporate-creditcardFunctions.js';
-
-import {
-  validatePan,
-  panAPISuccesHandler,
-} from './panvalidation.js';
-
-import fetchAuthCode from './idcomutil.js';
 
 import {
   urlPath, santizedFormDataWithContext, getTimeStamp, clearString,
@@ -276,45 +253,15 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
     }).catch((err) => console.log(err));
 }
 
-/**
- * Redirects the browser to the specified URL.
- *
- * @name redirect
- * @param {string} redirectUrl - The URL to redirect the browser to.
- */
-function redirect(redirectUrl) {
-  window.location.href = redirectUrl;
-}
-
 export {
   getOTP,
   otpValidation,
-  getThisCard,
-  prefillForm,
-  getAddressDetails,
-  pinCodeMaster,
-  validateEmailID,
-  currentAddressToggleHandler,
   aadharInit,
-  checkMode,
-  otpValHandler,
   customSetFocus,
   journeyResponseHandler,
   corpCreditCardContext,
   createJourneyId,
-  validatePan,
-  panAPISuccesHandler,
-  executeInterfaceApi,
-  ipaRequestApi,
-  ipaSuccessHandler,
   sendAnalytics,
-  aadharConsent123,
   resendOTP,
-  fetchAuthCode,
-  redirect,
   hideLoaderGif,
-  executeInterfacePostRedirect,
-  executeInterfaceApiFinal,
-  executeInterfaceResponseHandler,
-  documentUpload,
 };
