@@ -13,7 +13,7 @@ import {
   fetchIPAResponse,
   hideLoaderGif,
 } from '../../common/makeRestAPI.js';
-import finalDap from '../finaldap/finaldap.js';
+import finalDap from './finaldaputils.js';
 import * as CONSTANT from '../../common/constants.js';
 
 const { currentFormContext } = corpCreditCardContext;
