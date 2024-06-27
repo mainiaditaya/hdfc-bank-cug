@@ -11,6 +11,7 @@ const {
   moveWizardView,
   aadharLangChange,
   addDisableClass,
+  onWizardInit,
 } = DOM_API; // DOM_MANIPULATE_CODE_FUNCTION
 
 const { BASEURL } = CONSTANT;
@@ -406,4 +407,5 @@ export {
   getCurrentDateAndTime,
   splitName,
   addDisableClass,
+  onWizardInit,
 };

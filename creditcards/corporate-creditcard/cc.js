@@ -2,71 +2,6 @@
 /* eslint no-console: ["error", { allow: ["warn", "error", "debug"] }] */
 import openModal from '../../blocks/modal/modal.js';
 
-const createLabelInElement = (elementSelector, labelClass) => {
-  /**
-	 * The main element in the DOM where the form resides.
-	 * @type {HTMLElement}
-	 */
-  const mainEl = document.getElementsByTagName('main')[0];
-  /**
-	 * The form element containing the target element.
-	 * @type {HTMLElement}
-	 */
-  const formEl = mainEl.querySelector('form');
-  /**
-	 * The target element to which the label will be appended.
-	 * @type {HTMLElement}
-	 */
-  const element = formEl.querySelector(elementSelector);
-  if (!element) {
-    console.debug(`Element with selector '${elementSelector}' not found.`);
-    return;
-  }
-  /**
-	 * The text content of the label element.
-	 * @type {string}
-	 */
-  const labelText = element.getElementsByTagName('label')[0].innerHTML;
-  element.getElementsByTagName('label')[0].innerHTML = '';
-  if (!labelText) {
-    console.error(`No data-label attribute found for element with selector '${elementSelector}'.`);
-    return;
-  }
-
-  /**
-	 * The newly created label element.
-	 * @type {HTMLLabelElement}
-	 */
-  const labelElement = document.createElement('label');
-  labelElement.classList.add(labelClass);
-  labelElement.textContent = labelText;
-  element.appendChild(labelElement);
-};
-/**
- * Decorates the stepper for CC yourDetails panel
- * @name decorateStepper Runs after yourDetails panel is initialized
- */
-function decorateStepper() {
-  const totalIndex = document.querySelector('.field-corporatecardwizardview.wizard').style.getPropertyValue('--wizard-step-count');
-  const ccDetailsWizard = document.querySelector('.field-corporatecardwizardview.wizard ul');
-  Array.from(ccDetailsWizard.children).forEach((child) => {
-    if (child.tagName.toLowerCase() === 'li' && Number(child.getAttribute('data-index')) !== totalIndex - 1) {
-      child?.classList?.add('stepper-style');
-    }
-  });
-}
-
-/**
- * On Wizard Init.
- * @name onWizardInit Runs on initialization of wizard
- */
-function onWizardInit() {
-  createLabelInElement('.field-permanentaddresstoggle', 'permanent-address-toggle__label');
-  createLabelInElement('.field-currentaddresstoggle', 'current-address-toggle__label');
-  createLabelInElement('.field-ckyctoggle', 'ckyctoggle__label');
-  decorateStepper();
-}
-
 /* startCode for creating Modal */
 /**
  * Function to link a trigger element with a modal opening functionality.
@@ -363,8 +298,3 @@ const removeIncorrectOtpText = () => {
   });
 };
 removeIncorrectOtpText();
-
-export {
-  decorateStepper,
-  onWizardInit,
-};

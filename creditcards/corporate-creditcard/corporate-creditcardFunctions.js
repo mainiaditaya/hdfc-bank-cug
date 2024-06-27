@@ -18,6 +18,7 @@ import {
   santizedFormDataWithContext,
   splitName,
   addDisableClass,
+  onWizardInit,
 } from '../../common/formutils.js';
 import {
   getJsonResponse,
@@ -287,11 +288,7 @@ const otpValHandler = (response, globals) => {
     etbFlowSelected.setValue('on');
     personalDetailsPreFillFromBRE(res, globals);
   }
-  (async () => {
-    const myImportedModule = await import('./cc.js');
-    myImportedModule.onWizardInit();
-    return true;
-  })();
+  onWizardInit();
 };
 
 /**

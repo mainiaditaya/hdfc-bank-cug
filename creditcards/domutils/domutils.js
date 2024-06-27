@@ -1,6 +1,14 @@
-// DOM - UTILS - having cer tain dom overing function which has been used in formutils.js by the imported
-// and got declared in constant name as - DOM_API.
-// search with key - DOM_API to track of all dom function to track in formutils which is used over all the functions.
+/* eslint no-console: ["error", { allow: ["warn", "error", "debug"] }] */
+
+/**
+ * Utility functions for interacting with the DOM in form-related operations.
+ * These functions are imported and declared in formutils.js under the constant name DOM_API.
+ * To track all DOM-related functions used across the project, search for the key - DOM_API.
+ * All functions exported from domUtils are available in formutils.js.
+ *
+ * @module domUtils
+ * @constant {Object} DOM_API - Constant holding various DOM utility functions for form operations.
+ */
 
 /**
  * Makes a form field invalid by adding error message and styling through Dom api.
@@ -161,6 +169,77 @@ const addDisableClass = (selectedPanel) => {
   });
 };
 
+/**
+ * Creates a new label element and appends it to a specified element within a form.
+ * @param {string} elementSelector - The CSS selector for the target element within the form.
+ * @param {string} labelClass  - The CSS class to be applied to the created label element.
+ * @returns {void}
+ */
+const createLabelInElement = (elementSelector, labelClass) => {
+/**
+ * The main element in the DOM where the form resides.
+ * @type {HTMLElement}
+ */
+  const mainEl = document.getElementsByTagName('main')[0];
+  /**
+ * The form element containing the target element.
+ * @type {HTMLElement}
+ */
+  const formEl = mainEl.querySelector('form');
+  /**
+ * The target element to which the label will be appended.
+ * @type {HTMLElement}
+ */
+  const element = formEl.querySelector(elementSelector);
+  if (!element) {
+    console.debug(`Element with selector '${elementSelector}' not found.`);
+    return;
+  }
+  /**
+ * The text content of the label element.
+ * @type {string}
+ */
+  const labelText = element.getElementsByTagName('label')[0].innerHTML;
+  element.getElementsByTagName('label')[0].innerHTML = '';
+  if (!labelText) {
+    console.error(`No data-label attribute found for element with selector '${elementSelector}'.`);
+    return;
+  }
+
+  /**
+ * The newly created label element.
+ * @type {HTMLLabelElement}
+ */
+  const labelElement = document.createElement('label');
+  labelElement.classList.add(labelClass);
+  labelElement.textContent = labelText;
+  element.appendChild(labelElement);
+};
+/**
+ * Decorates the stepper for CC yourDetails panel
+ * @name decorateStepper Runs after yourDetails panel is initialized
+ */
+const decorateStepper = () => {
+  const totalIndex = document.querySelector('.field-corporatecardwizardview.wizard').style.getPropertyValue('--wizard-step-count');
+  const ccDetailsWizard = document.querySelector('.field-corporatecardwizardview.wizard ul');
+  Array.from(ccDetailsWizard.children).forEach((child) => {
+    if (child.tagName.toLowerCase() === 'li' && Number(child.getAttribute('data-index')) !== totalIndex - 1) {
+      child?.classList?.add('stepper-style');
+    }
+  });
+};
+
+/**
+ * On Wizard Init.
+ * @name onWizardInit Runs on initialization of wizard
+ */
+const onWizardInit = () => {
+  createLabelInElement('.field-permanentaddresstoggle', 'permanent-address-toggle__label');
+  createLabelInElement('.field-currentaddresstoggle', 'current-address-toggle__label');
+  createLabelInElement('.field-ckyctoggle', 'ckyctoggle__label');
+  decorateStepper();
+};
+
 export {
   makeFieldInvalid,
   setDataAttributeOnClosestAncestor,
@@ -169,4 +248,5 @@ export {
   aadharLangChange,
   removeIncorrectOtpText,
   addDisableClass,
+  onWizardInit,
 };
