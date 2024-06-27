@@ -88,7 +88,6 @@ const resendOTP = (globals) => {
       panNumber: panNo || '',
       journeyID: globals.form.runtime.journeyId.$value,
       journeyName: journeyNameConstant,
-      userAgent: window.navigator.userAgent,
       identifierValue: panNo || dob.$value,
       identifierName: panNo ? 'PAN' : 'DOB',
     },

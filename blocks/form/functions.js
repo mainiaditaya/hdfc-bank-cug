@@ -2,7 +2,6 @@
 import {
   getOTP,
   otpValidation,
-  aadharInit,
   customSetFocus,
   journeyResponseHandler,
   corpCreditCardContext,
@@ -163,7 +162,6 @@ export {
   otpValidation,
   days,
   journeyResponseHandler,
-  aadharInit,
   moveWizardView,
   customSetFocus,
   getFormContext,
