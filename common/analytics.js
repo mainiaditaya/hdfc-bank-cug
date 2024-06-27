@@ -209,7 +209,7 @@ function sendAnalyticsEvent(payload, formData, currentFormContext) {
       annualFee: '',
     },
   };
-  const apiResponse = JSON.parse(payload || {});
+  const apiResponse = payload || {};
   const action = currentFormContext?.action;
   const attributes = data[action];
   populateResponse(apiResponse, action, digitalDataEvent);
