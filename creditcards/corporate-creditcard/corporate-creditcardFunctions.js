@@ -20,6 +20,10 @@ import { sendAnalyticsEvent } from '../../common/analytics.js';
 import * as CONSTANT from '../../common/constants.js';
 import * as CC_CONSTANT from './constant.js';
 
+import {
+  analyticsTrackOtpClicks,
+} from '../../scripts/lib-analytics.js';
+
 const { ENDPOINTS } = CONSTANT;
 const { JOURNEY_NAME } = CC_CONSTANT;
 const journeyNameConstant = JOURNEY_NAME;
@@ -120,6 +124,17 @@ function customSetFocus(errorMessage, numRetries, globals) {
   }
 }
 
+/**
+ * sends data to rum server.
+ * @param {object} payload
+ * @param {object} globals
+ */
+const sendDataToRum = (eventName, data, globals) => {
+  analyticsTrackOtpClicks(eventName, data, santizedFormDataWithContext(globals), currentFormContext);
+  // eslint-disable-next-line no-console
+  console.log('Event Payload: ', data);
+};
+
 export {
   corpCreditCardContext,
   formRuntime,
@@ -128,4 +143,5 @@ export {
   sendAnalytics,
   resendOTP,
   customSetFocus,
+  sendDataToRum,
 };

@@ -7,6 +7,7 @@ import {
   resendOTP,
   formRuntime,
   customSetFocus,
+  sendDataToRum,
 } from '../creditcards/corporate-creditcard/corporate-creditcardFunctions.js';
 
 import {
@@ -94,4 +95,5 @@ export {
   sendAnalytics,
   resendOTP,
   hideLoaderGif,
+  sendDataToRum,
 };

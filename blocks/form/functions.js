@@ -9,6 +9,7 @@ import {
   sendAnalytics,
   resendOTP,
   hideLoaderGif,
+  sendDataToRum,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -176,4 +177,5 @@ export {
   sendAnalytics,
   resendOTP,
   showElement,
+  sendDataToRum,
 };
