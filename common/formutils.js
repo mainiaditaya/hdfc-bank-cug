@@ -51,6 +51,7 @@ const makeFieldInvalid = (fieldName, invalidMsg) => {
     const fd = parentElement?.querySelector(`.${fieldDescClass}`);
     if (fd) {
       fd.textContent = invalidMsg || '';
+      parentElement?.classList.add(invalidClass);
     } else {
       parentElement?.classList.add(invalidClass);
       const fieldDesc = document.createElement('div');

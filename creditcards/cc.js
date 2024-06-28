@@ -382,31 +382,92 @@ const aadharLangChange = (adharContentDom, defaultLang) => {
 };
 
 /**
- * Hides the incorrect OTP text message when the user starts typing in the OTP input field.
+ * Validates the date of birth field to ensure the age is between 18 and 70.
+ * @param {string} inputName - The name of the calendar input field.
+  */
+const validateDob = (inputName) => {
+  const calendarEl = document.querySelector(`[name= ${inputName}]`);
+  const minAge = 18;
+  const maxAge = 70;
+  const calendarElParent = calendarEl?.parentElement;
+  const dobDefFieldDesc = calendarElParent.querySelector('.field-description');
+  const radioDob = document.getElementById('pandobselection');
+  const dobErrorText = 'Age should be between 18 to 70';
+  dobDefFieldDesc.style.display = 'none';
+  calendarEl?.addEventListener('blur', async (e) => {
+    const ipDobValue = e?.target?.value;
+    if (ipDobValue) {
+      const utils = await import('../common/formutils.js');
+      const ageValid = utils.ageValidator(minAge, maxAge, ipDobValue);
+      if (!ageValid) {
+        utils.makeFieldInvalid(inputName, dobErrorText);
+        dobDefFieldDesc.style.display = 'block';
+      }
+    }
+  });
+  calendarEl?.addEventListener('input', async () => {
+    dobDefFieldDesc.style.display = 'none';
+  });
+  if (!(inputName === 'dateOfBirth')) return;
+  radioDob?.addEventListener('click', () => {
+    dobDefFieldDesc.style.display = 'none';
+    calendarEl?.setAttribute('type', 'date');
+    calendarEl?.setAttribute('edit-value', '');
+    calendarEl?.setAttribute('display-value', '');
+  });
+};
+
+/**
+ * Validates a date field, disables future dates, and optionally validates age based on ageValidate flag.
+ * @param {string} inputName - The name of the input field.
+ * @param {boolean} ageValidate - Flag indicating whether to validate age (minAge:18, maxAge:70).
  */
-const removeIncorrectOtpText = () => {
-  const otpNumFormName = 'otpNumber';// constantName-otpNumberfieldName
-  const otpNumbrQry = document.getElementsByName(otpNumFormName)?.[0];
+const dateFieldValidate = (inputName, ageValidate) => {
+  const calendarEl = document.querySelector(`[name= ${inputName}]`);
+  calendarEl?.setAttribute('max', new Date()?.toISOString()?.split('T')?.[0]);
+  if (ageValidate) {
+    validateDob(inputName);
+  }
+};
+dateFieldValidate('employedFrom');
+dateFieldValidate('dateOfBirth', true);
+dateFieldValidate('dobPersonalDetails', true);
+
+/**
+ *  Validates and restricts input on the OTP number field to allow only numeric characters.
+ *  Hides the incorrect OTP text message when the user starts typing in the OTP input field.
+ */
+const otpFieldValidate = () => {
+  const otpNumFormName = 'otpNumber';// constantName-otpFieldValidateName
+  const otpNumber = document.querySelector(`[name= ${otpNumFormName}]`);
   const incorectOtp = document.querySelector('.field-incorrectotptext');
-  otpNumbrQry?.addEventListener('input', (e) => {
+  otpNumber?.addEventListener('input', (e) => {
     if (e.target.value) {
+      const input = e.target;
+      input.value = input.value.replace(/\D/g, ''); // Replace non-numeric characters with an empty string
       incorectOtp.style.display = 'none';
     }
   });
 };
-removeIncorrectOtpText();
+otpFieldValidate();
 
 /**
- * To disable future date from the calendar input.
- * @param {string} inputName - accepts the name of the calendar input
+ * Validates and sanitizes input for personal names.
+ * This function binds an 'input' event listener to the input field identified by the given name attribute.
+ * It filters out non-numeric characters,spaces and special characters from the input value.
+ *
+ * @param {string} inputName - The name attribute value of the input field to be validated.
+ * @returns {void}
  */
-const disableFutureDate = (inputName) => {
-  const calendarEl = document.querySelector(`[name= ${inputName}]`);
-  calendarEl?.setAttribute('max', new Date()?.toISOString()?.split('T')?.[0]);
+const validateNamesOfYourDetail = (inputName) => {
+  const fName = document.querySelector(`[name= ${inputName}]`);
+  fName.addEventListener('input', (e) => {
+    const input = e.target;
+    input.value = input.value.replace(/(?![A-Z])[`!@#$%^&*_\=\[\]{};':"\\|,.<>\/?~0-9()+-_ ]/g, ''); // Replace non-numeric characters with an empty string
+  });
 };
-disableFutureDate('employedFrom');
-disableFutureDate('dateOfBirth');
-disableFutureDate('dobPersonalDetails');
+
+['firstName', 'middleName', 'lastName'].forEach((ipName) => validateNamesOfYourDetail(ipName));
 
 export {
   decorateStepper,
