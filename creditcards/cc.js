@@ -396,6 +396,18 @@ const removeIncorrectOtpText = () => {
 };
 removeIncorrectOtpText();
 
+/**
+ * To disable future date from the calendar input.
+ * @param {string} inputName - accepts the name of the calendar input
+ */
+const disableFutureDate = (inputName) => {
+  const calendarEl = document.querySelector(`[name= ${inputName}]`);
+  calendarEl?.setAttribute('max', new Date()?.toISOString()?.split('T')?.[0]);
+};
+disableFutureDate('employedFrom');
+disableFutureDate('dateOfBirth');
+disableFutureDate('dobPersonalDetails');
+
 export {
   decorateStepper,
   onWizardInit,
