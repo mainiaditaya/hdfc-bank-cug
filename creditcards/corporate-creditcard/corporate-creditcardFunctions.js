@@ -56,7 +56,16 @@ function journeyResponseHandler(payload) {
 */
 // eslint-disable-next-line no-unused-vars
 function sendAnalytics(payload, globals) {
-  sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
+  // sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
+  const eventType = 'otp click';
+  switch (eventType) {
+    case 'otp click':
+      analyticsTrackOtpClicks(eventType, payload, santizedFormDataWithContext(globals), currentFormContext);
+      break;
+    default:
+      console.log('NA');
+      break;
+  }
 }
 
 /**

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /*
  * Copyright 2024 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
@@ -11,6 +12,8 @@
  */
 /* global alloy */
 
+import { ANALYTICS_DATA_OBJECT } from '../creditcards/corporate-creditcard/constant.js';
+import { createDeepCopyFromBlueprint } from '../common/formutils.js';
 /**
  * Customer's XDM schema namespace
  * @type {string}
@@ -172,44 +175,13 @@ const getValidationMethod = (formContext) => {
 };
 
 export async function analyticsTrackOtpClicks(eventName, payload, formData, formContext, linkType = 'button', additionalXdmFields = {}) {
-  const jsonString = JSON.stringify(payload || {});
-  const apiResponse = JSON.parse(jsonString);
+  // const jsonString = JSON.stringify(payload || {});
+  // const apiResponse = JSON.parse(jsonString);
 
-  const xdmData = {
-    eventType: 'web.webinteraction.linkClicks',
-    web: {
-      webInteraction: {
-        // eslint-disable-next-line no-nested-ternary
-        name: eventName,
-        linkClicks: {
-          value: 1,
-        },
-        type: linkType,
-      },
-    },
-    [CUSTOM_SCHEMA_NAMESPACE]: {
-      error: {
-        errorMessage: apiResponse?.otpGenResponse?.status?.errorMsg,
-        errorCode: apiResponse?.otpGenResponse?.status?.errorCode,
-      },
-      form: {
-        name: 'Corporate credit card',
-      },
-      page: {
-        pageName: 'CORPORATE_CARD_JOURNEY',
-      },
-      journey: {
-        journeyID: formContext?.journeyID,
-        journeyName: 'CORPORATE_CARD_JOURNEY',
-        journeyState: formContext?.journeyState,
-        formloginverificationmethod: getValidationMethod(formData),
-      },
-      identifier: {
-        mobileHash: formData?.login?.registeredMobileNumber,
-      },
-      ...additionalXdmFields,
-    },
-  };
-
+  const xdmData = createDeepCopyFromBlueprint(ANALYTICS_DATA_OBJECT);
+  xdmData.eventType = 'web.webinteraction.linkClicks';
+  xdmData.web.webInteraction.name = 'otp click';
+  xdmData.web.webInteraction.type = linkType;
+  xdmData._hdfcbank.error.errorCode = 'test';
   return sendAnalyticsEvent(xdmData);
 }
