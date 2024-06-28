@@ -12,13 +12,11 @@ import {
   urlPath,
   clearString,
   convertDateToMmmDdYyyy,
-  moveWizardView,
   parseCustomerAddress,
   removeSpecialCharacters,
   santizedFormDataWithContext,
   splitName,
-  addDisableClass,
-  onWizardInit,
+  DOM_API,
 } from '../../common/formutils.js';
 import {
   getJsonResponse,
@@ -222,7 +220,7 @@ const personalDetailsPreFillFromBRE = (res, globals) => {
   const personaldetails = document.querySelector('.field-personaldetails');
   personaldetails.classList.add('personaldetails-disabled');
   setTimeout(() => {
-    addDisableClass(personaldetails);
+    DOM_API.addDisableClass(personaldetails);
   }, 10);
 };
 
@@ -288,7 +286,7 @@ const otpValHandler = (response, globals) => {
     etbFlowSelected.setValue('on');
     personalDetailsPreFillFromBRE(res, globals);
   }
-  onWizardInit();
+  DOM_API.onWizardInit();
 };
 
 /**
@@ -363,7 +361,7 @@ const getThisCard = (globals) => {
   // executeInterfaceApiFinal(globals);
   setConfirmScrAddressFields(globals);
   if (!isAddressChanged) {
-    moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
+    DOM_API.moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
     const { addressDeclarationPanel } = globals.form.corporateCardWizardView.confirmAndSubmitPanel;
     const {
       cardDeliveryAddressPanel,
@@ -393,14 +391,14 @@ const getThisCard = (globals) => {
     continueToIDCOMUtil.visible(true);
     confirmAndSubmitButtonUtil.visible(false);
   } else {
-    moveWizardView('corporateCardWizardView', 'selectKycPanel');
+    DOM_API.moveWizardView('corporateCardWizardView', 'selectKycPanel');
   }
 };
 
 /**
  * Moves the wizard view to the "confirmAndSubmitPanel" step.
  */
-const getAddressDetails = () => moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
+const getAddressDetails = () => DOM_API.moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
 
 /**
  * Handles API call for validating pinCode using the pinCodeMaster function.
@@ -529,7 +527,6 @@ const aadharConsent123 = async (globals) => {
   try {
     if (typeof window !== 'undefined') {
       const openModal = (await import('../../blocks/modal/modal.js')).default;
-      const { aadharLangChange } = await import('../../common/formutils.js');
       const contentDomName = 'aadharConsentPopup';
       const btnWrapClassName = 'button-wrapper';
       const config = {
@@ -541,7 +538,7 @@ const aadharConsent123 = async (globals) => {
         formRuntime.aadharConfig = config;
       }
       await openModal(formRuntime.aadharConfig);
-      aadharLangChange(formRuntime.aadharConfig?.content, 'English');
+      DOM_API.aadharLangChange(formRuntime.aadharConfig?.content, 'English');
       config?.content?.addEventListener('modalTriggerValue', (event) => {
         const receivedData = event.detail;
         if (receivedData?.aadharConsentAgree) {

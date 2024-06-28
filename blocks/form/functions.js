@@ -32,7 +32,7 @@ import {
   documentUpload,
 } from '../../common/functions.js';
 
-import { moveWizardView } from '../../common/formutils.js';
+import { DOM_API } from '../../common/formutils.js';
 import {
   sendSubmitClickEvent,
   sendGenericClickEvent,
@@ -40,6 +40,7 @@ import {
 import { invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
 
 const { currentFormContext } = corpCreditCardContext;
+const { moveWizardView } = DOM_API;
 
 /**
  * Get Full Name

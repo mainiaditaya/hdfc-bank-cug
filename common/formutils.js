@@ -2,17 +2,7 @@
 /* eslint no-bitwise: ["error", { "allow": ["^", ">>", "&"] }] */
 
 import * as CONSTANT from './constants.js';
-import * as DOM_API from '../creditcards/domutils/domutils.js';
-
-const {
-  makeFieldInvalid,
-  setDataAttributeOnClosestAncestor,
-  setSelectOptions,
-  moveWizardView,
-  aadharLangChange,
-  addDisableClass,
-  onWizardInit,
-} = DOM_API; // DOM_MANIPULATE_CODE_FUNCTION
+import * as DOM_API from '../creditcards/domutils/domutils.js'; // DOM_MANIPULATE_CODE_FUNCTION
 
 const { BASEURL } = CONSTANT;
 
@@ -126,7 +116,7 @@ const formUtil = (globalObj, panelName) => ({
     dispatchLoad.valid = val;
     if (errorMsg) dispatchLoad.errorMessage = errorMsg;
     globalObj.functions.setProperty(panelName, dispatchLoad);
-    makeFieldInvalid(panelName?.$name, errorMsg);
+    DOM_API.makeFieldInvalid(panelName?.$name, errorMsg);
   },
 });
 
@@ -390,22 +380,16 @@ export {
   formUtil,
   getTimeStamp,
   convertDateToMmmDdYyyy,
-  setDataAttributeOnClosestAncestor,
   convertDateToDdMmYyyy,
-  setSelectOptions,
   composeNameOption,
   parseCustomerAddress,
-  moveWizardView,
-  aadharLangChange,
   removeSpecialCharacters,
   santizedFormData,
   dateFormat,
-  makeFieldInvalid,
   santizedFormDataWithContext,
   generateUUID,
   formatDate,
   getCurrentDateAndTime,
   splitName,
-  addDisableClass,
-  onWizardInit,
+  DOM_API,
 };

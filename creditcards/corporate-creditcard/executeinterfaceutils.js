@@ -4,8 +4,7 @@ import {
   formUtil,
   composeNameOption,
   formatDate,
-  moveWizardView,
-  setSelectOptions,
+  DOM_API,
 } from '../../common/formutils.js';
 import { corpCreditCardContext, formRuntime, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
 import {
@@ -210,10 +209,10 @@ const listNameOnCard = (globals) => {
   const dropDownSelectField = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown;
   const options = composeNameOption(firstName, middleName, lastName);
   const initialValue = options[0]?.value;
-  setSelectOptions(options, elementNameSelect);
+  DOM_API.setSelectOptions(options, elementNameSelect);
   const setDropdownField = formUtil(globals, dropDownSelectField);
   setDropdownField.setEnum(options, initialValue); // setting initial value
-  moveWizardView('corporateCardWizardView', 'confirmCardPanel');
+  DOM_API.moveWizardView('corporateCardWizardView', 'confirmCardPanel');
 };
 
 /**
