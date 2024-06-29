@@ -249,12 +249,57 @@ const setArnNumberInResult = (arnNumRef) => {
   }
 };
 
-const successPannelMethod = (applRefNum) => {
+const successPannelMethod = (data) => {
+  const {
+    executeInterfaceReqObj, aadharOtpValData, finalDapRequest, finalDapResponse,
+  } = data;
+  const journeyName = executeInterfaceReqObj?.requestString?.journeyFlag;
+  const addressEditFlag = executeInterfaceReqObj?.requestString?.addressEditFlag;
+  // eslint-disable-next-line no-unused-vars
+  const { applicationNumber, vkycUrl } = finalDapResponse;
+  // eslint-disable-next-line no-unused-vars
+  const { result: { mobileValid } } = aadharOtpValData;
   const resultPanel = document.getElementsByName('resultPanel')?.[0];
   const successPanel = document.getElementsByName('successResultPanel')?.[0];
   resultPanel.setAttribute('data-visible', true);
   successPanel.setAttribute('data-visible', true);
-  setArnNumberInResult(applRefNum);
+  setArnNumberInResult(applicationNumber);
+
+  const vkycProceedButton = document.querySelector('.field-vkycproceedbutton ');
+  const offerLink = document.querySelector('.field-offerslink');
+  const vkycConfirmText = document.querySelector('.field-vkycconfirmationtext');
+  const filler4Val = finalDapRequest?.requestString?.VKYCConsent?.split(/[0-9]/g)?.[0];
+  const mobileMatch = !(filler4Val === 'NVKYC');
+  const kycStatus = (finalDapRequest.requestString.biometricStatus);
+  const vkycCameraConfirmation = document.querySelector(`[name= ${'vkycCameraConfirmation'}]`);
+
+  if (journeyName === 'ETB') {
+    // const mobileMatch =  !(mobileValid === 'n');  // (mobileValid === 'n') - unMatched - this should be the condition which has to be finalDap - need to verify.
+    if (addressEditFlag === 'N') {
+      vkycProceedButton.setAttribute('data-visible', false);
+      vkycConfirmText.setAttribute('data-visible', false);
+      offerLink.setAttribute('data-visible', true);
+    } else if (kycStatus === 'OVD') {
+      vkycProceedButton.setAttribute('data-visible', false);
+      vkycConfirmText.setAttribute('data-visible', true);
+      offerLink.setAttribute('data-visible', false); // Adjusted assumption for offerLink
+    } else if (mobileMatch && kycStatus === 'aadhaar' && addressEditFlag === 'Y') {
+      vkycProceedButton.setAttribute('data-visible', false);
+      vkycConfirmText.setAttribute('data-visible', false);
+      offerLink.setAttribute('data-visible', true);
+    } else {
+      vkycProceedButton.setAttribute('data-visible', true);
+      vkycConfirmText.setAttribute('data-visible', false);
+      offerLink.setAttribute('data-visible', false);
+    }
+  }
+  if (journeyName === 'NTB' && (kycStatus === 'aadhaar')) {
+    vkycCameraConfirmation.setAttribute('data-visible', true);
+    vkycProceedButton.setAttribute('data-visible', true);
+    // vkycProceedButton.addEventListener('click', (e) => {
+    //   window.location.href = vkycUrl;
+    // });
+  }
 };
 
 // post-redirect-aadhar-or-idcom
@@ -325,8 +370,15 @@ const pageRedirected = (aadhar, idCom) => {
           const journeyDropOffParamLast = data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1];
           const checkFinalDapSuccess = (journeyDropOffParamLast.state === 'FINAL_DAP_SUCCESS');
           if (checkFinalDapSuccess) {
-            const { currentFormContext: { ARN_NUM, VKYC_URL } } = JSON.parse(journeyDropOffParamLast.stateInfo);
-            successPannelMethod(ARN_NUM);
+            const {
+              currentFormContext: {
+                executeInterfaceReqObj, finalDapRequest, finalDapResponse,
+              }, aadhaar_otp_val_data: aadharOtpValData,
+            } = JSON.parse(journeyDropOffParamLast.stateInfo);
+            successPannelMethod({
+              executeInterfaceReqObj, aadharOtpValData, finalDapRequest, finalDapResponse,
+            });
+
             // const vkycProceedButton = document.getElementsByName('vkycProceedButton')?.[0];
             // vkycProceedButton.addEventListener('click', (e) => {
             //   window.location.href = VKYC_URL;
