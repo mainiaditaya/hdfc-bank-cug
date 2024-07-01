@@ -332,6 +332,11 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
   if (firstProductDetail?.product) {
     cardNameTitle.setValue(firstProductDetail?.product);
   }
+  if (firstProductDetail?.features) {
+    const cardFeature = formUtil(globals, globals.form.corporateCardWizardView.confirmCardPanel.viewAllCardBenefitsPanel.cardBenefitsText);
+    const mapPTag = firstProductDetail?.features?.map((el) => `<p>${el}</p>`)?.join(' ');
+    cardFeature.setValue(mapPTag);
+  }
 
   if (currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag === 'N') {
     const { selectKycPanel } = globals.form.corporateCardWizardView;
