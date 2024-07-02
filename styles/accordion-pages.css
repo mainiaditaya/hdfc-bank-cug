@@ -134,9 +134,22 @@ fieldset fieldset {
   padding: 20px;
   border-radius: 10px;
 
+  .field-cardimage {
+    position: relative;
+    color: white;
+  }
+
   img { 
     border-radius: 10px; 
     width: 400px;
+  }
+
+  .cardNameText {
+    position: absolute;
+    bottom: 20px;
+    left: 30px;
+    font-size: 12px;
+    font-weight: 500;
   }
 
   .field-nameoncarddropdown {

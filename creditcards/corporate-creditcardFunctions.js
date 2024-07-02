@@ -692,7 +692,11 @@ const resendOTP = (globals) => {
  */
 
 const setNameOnCard = (name) => {
-  debugger;
+  let cardImg = document.querySelector('.field-cardimage');
+  document.querySelectorAll('span.cardNameText')?.forEach(function(span) {
+    span.remove();
+  });
+  cardImg.innerHTML += `<span class='cardNameText'>${name}</span>`;
 };
 
 export {
