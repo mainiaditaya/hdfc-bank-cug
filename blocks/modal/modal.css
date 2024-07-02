@@ -114,6 +114,9 @@ body.modal-open {
   .field-viewallcardbenefitspanel {
     p { margin: 3px;}
     .field-label { display: none; }
+    .feature-text{
+      margin: 16px;
+    }
 
     .field-cardbenefitstext {
       p:has(b):not(:first-of-type) {margin-top: 16px;}
