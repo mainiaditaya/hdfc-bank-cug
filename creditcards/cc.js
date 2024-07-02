@@ -444,7 +444,7 @@ const validateDob = (inputName) => {
   const calendarElParent = calendarEl?.parentElement;
   const dobDefFieldDesc = calendarElParent.querySelector('.field-description');
   const radioDob = document.getElementById('pandobselection');
-  const dobErrorText = 'Age should be between 18 to 70';
+  const dobErrorText = `Age should be between ${minAge} to ${maxAge}`;
   dobDefFieldDesc.style.display = 'none';
   calendarEl?.addEventListener('blur', async (e) => {
     const ipDobValue = e?.target?.value;
