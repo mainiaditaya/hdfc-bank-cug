@@ -58,7 +58,6 @@ const fetchFiller4 = (mobileMatch, kycStatus, journeyType) => {
  * @returns {Object} - The DAP request object.
  */
 const createDapRequestObj = (globals) => {
-  debugger;
   const formContextCallbackData = globals.functions.exportData()?.currentFormContext || currentFormContext;
   const segment = formContextCallbackData?.breDemogResponse?.SEGMENT || currentFormContext;
   const customerInfo = currentFormContext?.executeInterfaceReqObj?.requestString || formContextCallbackData?.executeInterfaceReqObj?.requestString;
@@ -139,13 +138,16 @@ const finalDap = (userRedirected, globals) => {
   const mobileNumber = globals.functions.exportData().form.login.registeredMobileNumber || globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value;
   const leadProfileId = globals.functions.exportData().leadProifileId || globals.form.runtime.leadProifileId.$value;
   const journeyId = formContextCallbackData.journeyID;
+  const journeyName = formContextCallbackData?.executeInterfaceReqObj?.requestString?.journeyFlag || formContextCallbackData?.journeyType;
+  const kycStatus = payload?.requestString.biometricStatus;
   const eventHandlers = {
     successCallBack: (response) => {
       if (response?.errorCode === '0000') {
+        invokeJourneyDropOffUpdate('FINAL_DAP_SUCCESS', mobileNumber, leadProfileId, journeyId, globals);
+        currentFormContext.finalDapRequest = payload;
+        currentFormContext.finalDapResponse = response;
         currentFormContext.VKYC_URL = response.vkycUrl;
         currentFormContext.ARN_NUM = response.applicationNumber;
-        currentFormContext.finalDapResponse = response;
-        invokeJourneyDropOffUpdate('FINAL_DAP_SUCCESS', mobileNumber, leadProfileId, journeyId, globals);
         if (!userRedirected) {
           globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: false });
           globals.functions.setProperty(globals.form.resultPanel, { visible: true });
@@ -153,7 +155,11 @@ const finalDap = (userRedirected, globals) => {
           globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: true });
           // 👇 it is not setting the value.
           globals.functions.setProperty(globals.form.resultPanel.successResultPanel.arnRefNumPanel.newARNNumber, { value: response.applicationNumber });
-          // setting through DomApi
+          // setting through DomApi using throughDomSetArnNum function.
+          if (journeyName === 'NTB' && (kycStatus === 'aadhaar')) {
+            globals.functions.setProperty(globals.form.resultPanel.successResultPanel.vkycCameraConfirmation, { visible: true });
+            globals.functions.setProperty(globals.form.resultPanel.successResultPanel.vkycProceedButton, { visible: true });
+          }
           throughDomSetArnNum(response.applicationNumber);
         }
       } else {

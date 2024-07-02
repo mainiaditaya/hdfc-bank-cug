@@ -190,7 +190,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
       userAgent: navigator.userAgent,
       journeyID: currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
-      nameOnCard: fullName.length > 19 ? '' : fullName,
+      nameOnCard: fullName.length > 19 ? '' : fullName?.toUpperCase(),
       dsaValue: '',
       cardsData: '',
       channelSource: '',
@@ -233,7 +233,7 @@ const listNameOnCard = (globals) => {
 const executeInterfaceApiFinal = (globals) => {
   const formCallBackContext = globals.functions.exportData()?.currentFormContext;
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
-  requestObj.requestString.nameOnCard = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value;
+  requestObj.requestString.nameOnCard = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value?.toUpperCase();
   requestObj.requestString.productCode = formRuntime.productCode || formCallBackContext?.formRuntime?.productCode;
   const apiEndPoint = urlPath(endpoints.executeInterface);
   // restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
@@ -331,6 +331,11 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
   const cardNameTitle = formUtil(globals, globals.form.corporateCardWizardView.confirmCardPanel.cardNameTitle);
   if (firstProductDetail?.product) {
     cardNameTitle.setValue(firstProductDetail?.product);
+  }
+  if (firstProductDetail?.features) {
+    const cardFeature = formUtil(globals, globals.form.corporateCardWizardView.confirmCardPanel.viewAllCardBenefitsPanel.cardBenefitsText);
+    const mapPTag = firstProductDetail?.features?.map((el) => `<p>${el}</p>`)?.join(' ');
+    cardFeature.setValue(mapPTag);
   }
 
   if (currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag === 'N') {

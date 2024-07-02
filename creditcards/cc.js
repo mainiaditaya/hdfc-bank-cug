@@ -249,12 +249,57 @@ const setArnNumberInResult = (arnNumRef) => {
   }
 };
 
-const successPannelMethod = (applRefNum) => {
+const successPannelMethod = (data) => {
+  const {
+    executeInterfaceReqObj, aadharOtpValData, finalDapRequest, finalDapResponse,
+  } = data;
+  const journeyName = executeInterfaceReqObj?.requestString?.journeyFlag;
+  const addressEditFlag = executeInterfaceReqObj?.requestString?.addressEditFlag;
+  // eslint-disable-next-line no-unused-vars
+  const { applicationNumber, vkycUrl } = finalDapResponse;
+  // eslint-disable-next-line no-unused-vars
+  const { result: { mobileValid } } = aadharOtpValData;
   const resultPanel = document.getElementsByName('resultPanel')?.[0];
   const successPanel = document.getElementsByName('successResultPanel')?.[0];
   resultPanel.setAttribute('data-visible', true);
   successPanel.setAttribute('data-visible', true);
-  setArnNumberInResult(applRefNum);
+  setArnNumberInResult(applicationNumber);
+
+  const vkycProceedButton = document.querySelector('.field-vkycproceedbutton ');
+  const offerLink = document.querySelector('.field-offerslink');
+  const vkycConfirmText = document.querySelector('.field-vkycconfirmationtext');
+  const filler4Val = finalDapRequest?.requestString?.VKYCConsent?.split(/[0-9]/g)?.[0];
+  const mobileMatch = !(filler4Val === 'NVKYC');
+  const kycStatus = (finalDapRequest.requestString.biometricStatus);
+  const vkycCameraConfirmation = document.querySelector(`[name= ${'vkycCameraConfirmation'}]`);
+
+  if (journeyName === 'ETB') {
+    // const mobileMatch =  !(mobileValid === 'n');  // (mobileValid === 'n') - unMatched - this should be the condition which has to be finalDap - need to verify.
+    if (addressEditFlag === 'N') {
+      vkycProceedButton.setAttribute('data-visible', false);
+      vkycConfirmText.setAttribute('data-visible', false);
+      offerLink.setAttribute('data-visible', true);
+    } else if (kycStatus === 'OVD') {
+      vkycProceedButton.setAttribute('data-visible', false);
+      vkycConfirmText.setAttribute('data-visible', true);
+      offerLink.setAttribute('data-visible', false); // Adjusted assumption for offerLink
+    } else if (mobileMatch && kycStatus === 'aadhaar' && addressEditFlag === 'Y') {
+      vkycProceedButton.setAttribute('data-visible', false);
+      vkycConfirmText.setAttribute('data-visible', false);
+      offerLink.setAttribute('data-visible', true);
+    } else {
+      vkycProceedButton.setAttribute('data-visible', true);
+      vkycConfirmText.setAttribute('data-visible', false);
+      offerLink.setAttribute('data-visible', false);
+    }
+  }
+  if (journeyName === 'NTB' && (kycStatus === 'aadhaar')) {
+    vkycCameraConfirmation.setAttribute('data-visible', true);
+    vkycProceedButton.setAttribute('data-visible', true);
+    // vkycProceedButton.addEventListener('click', (e) => {
+    //   window.location.href = vkycUrl;
+    // });
+  }
 };
 
 // post-redirect-aadhar-or-idcom
@@ -325,8 +370,15 @@ const pageRedirected = (aadhar, idCom) => {
           const journeyDropOffParamLast = data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1];
           const checkFinalDapSuccess = (journeyDropOffParamLast.state === 'FINAL_DAP_SUCCESS');
           if (checkFinalDapSuccess) {
-            const { currentFormContext: { ARN_NUM, VKYC_URL } } = JSON.parse(journeyDropOffParamLast.stateInfo);
-            successPannelMethod(ARN_NUM);
+            const {
+              currentFormContext: {
+                executeInterfaceReqObj, finalDapRequest, finalDapResponse,
+              }, aadhaar_otp_val_data: aadharOtpValData,
+            } = JSON.parse(journeyDropOffParamLast.stateInfo);
+            successPannelMethod({
+              executeInterfaceReqObj, aadharOtpValData, finalDapRequest, finalDapResponse,
+            });
+
             // const vkycProceedButton = document.getElementsByName('vkycProceedButton')?.[0];
             // vkycProceedButton.addEventListener('click', (e) => {
             //   window.location.href = VKYC_URL;
@@ -382,31 +434,92 @@ const aadharLangChange = (adharContentDom, defaultLang) => {
 };
 
 /**
- * Hides the incorrect OTP text message when the user starts typing in the OTP input field.
+ * Validates the date of birth field to ensure the age is between 18 and 70.
+ * @param {string} inputName - The name of the calendar input field.
+  */
+const validateDob = (inputName) => {
+  const calendarEl = document.querySelector(`[name= ${inputName}]`);
+  const minAge = 18;
+  const maxAge = 70;
+  const calendarElParent = calendarEl?.parentElement;
+  const dobDefFieldDesc = calendarElParent.querySelector('.field-description');
+  const radioDob = document.getElementById('pandobselection');
+  const dobErrorText = `Age should be between ${minAge} to ${maxAge}`;
+  dobDefFieldDesc.style.display = 'none';
+  calendarEl?.addEventListener('blur', async (e) => {
+    const ipDobValue = e?.target?.value;
+    if (ipDobValue) {
+      const utils = await import('../common/formutils.js');
+      const ageValid = utils.ageValidator(minAge, maxAge, ipDobValue);
+      if (!ageValid) {
+        utils.makeFieldInvalid(inputName, dobErrorText);
+        dobDefFieldDesc.style.display = 'block';
+      }
+    }
+  });
+  calendarEl?.addEventListener('input', async () => {
+    dobDefFieldDesc.style.display = 'none';
+  });
+  if (!(inputName === 'dateOfBirth')) return;
+  radioDob?.addEventListener('click', () => {
+    dobDefFieldDesc.style.display = 'none';
+    calendarEl?.setAttribute('type', 'date');
+    calendarEl?.setAttribute('edit-value', '');
+    calendarEl?.setAttribute('display-value', '');
+  });
+};
+
+/**
+ * Validates a date field, disables future dates, and optionally validates age based on ageValidate flag.
+ * @param {string} inputName - The name of the input field.
+ * @param {boolean} ageValidate - Flag indicating whether to validate age (minAge:18, maxAge:70).
  */
-const removeIncorrectOtpText = () => {
-  const otpNumFormName = 'otpNumber';// constantName-otpNumberfieldName
-  const otpNumbrQry = document.getElementsByName(otpNumFormName)?.[0];
+const dateFieldValidate = (inputName, ageValidate) => {
+  const calendarEl = document.querySelector(`[name= ${inputName}]`);
+  calendarEl?.setAttribute('max', new Date()?.toISOString()?.split('T')?.[0]);
+  if (ageValidate) {
+    validateDob(inputName);
+  }
+};
+dateFieldValidate('employedFrom');
+dateFieldValidate('dateOfBirth', true);
+dateFieldValidate('dobPersonalDetails', true);
+
+/**
+ *  Validates and restricts input on the OTP number field to allow only numeric characters.
+ *  Hides the incorrect OTP text message when the user starts typing in the OTP input field.
+ */
+const otpFieldValidate = () => {
+  const otpNumFormName = 'otpNumber';// constantName-otpFieldValidateName
+  const otpNumber = document.querySelector(`[name= ${otpNumFormName}]`);
   const incorectOtp = document.querySelector('.field-incorrectotptext');
-  otpNumbrQry?.addEventListener('input', (e) => {
+  otpNumber?.addEventListener('input', (e) => {
     if (e.target.value) {
+      const input = e.target;
+      input.value = input.value.replace(/\D/g, ''); // Replace non-numeric characters with an empty string
       incorectOtp.style.display = 'none';
     }
   });
 };
-removeIncorrectOtpText();
+otpFieldValidate();
 
 /**
- * To disable future date from the calendar input.
- * @param {string} inputName - accepts the name of the calendar input
+ * Validates and sanitizes input for personal names.
+ * This function binds an 'input' event listener to the input field identified by the given name attribute.
+ * It filters out non-numeric characters,spaces and special characters from the input value.
+ *
+ * @param {string} inputName - The name attribute value of the input field to be validated.
+ * @returns {void}
  */
-const disableFutureDate = (inputName) => {
-  const calendarEl = document.querySelector(`[name= ${inputName}]`);
-  calendarEl?.setAttribute('max', new Date()?.toISOString()?.split('T')?.[0]);
+const validateNamesOfYourDetail = (inputName) => {
+  const fName = document.querySelector(`[name= ${inputName}]`);
+  fName.addEventListener('input', (e) => {
+    const input = e.target;
+    input.value = input.value.replace(/(?![A-Z])[`!@#$%^&*_\=\[\]{};':"\\|,.<>\/?~0-9()+-_ ]/g, ''); // Replace non-numeric characters with an empty string
+  });
 };
-disableFutureDate('employedFrom');
-disableFutureDate('dateOfBirth');
-disableFutureDate('dobPersonalDetails');
+
+['firstName', 'middleName', 'lastName'].forEach((ipName) => validateNamesOfYourDetail(ipName));
 
 export {
   decorateStepper,
