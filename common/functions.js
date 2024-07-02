@@ -14,6 +14,7 @@ import {
   aadharConsent123,
   resendOTP,
   formRuntime,
+  setNameOnCard,
 } from '../creditcards/corporate-creditcardFunctions.js';
 
 import { updatePanelVisibility } from './finaldaputils.js';
@@ -386,4 +387,5 @@ export {
   executeInterfaceApiFinal,
   executeInterfaceResponseHandler,
   documentUpload,
+  setNameOnCard,
 };

@@ -396,7 +396,7 @@ const setConfirmScrAddressFields = (globalObj) => {
  */
 const getThisCard = (globals) => {
   const isAddressChanged = currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag === 'Y';
-  //executeInterfaceApiFinal(globals);
+  // executeInterfaceApiFinal(globals);
   setConfirmScrAddressFields(globals);
   if (!isAddressChanged) {
     moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
@@ -686,6 +686,15 @@ const resendOTP = (globals) => {
   }
 };
 
+/**
+ * @name setNameOnCard
+ * @param {string} name - name of the dropdow.
+ */
+
+const setNameOnCard = (name) => {
+  debugger;
+};
+
 export {
   getThisCard,
   prefillForm,
@@ -701,4 +710,5 @@ export {
   sendAnalytics,
   aadharConsent123,
   resendOTP,
+  setNameOnCard,
 };
