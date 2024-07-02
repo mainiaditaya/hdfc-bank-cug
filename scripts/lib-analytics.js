@@ -174,14 +174,36 @@ const getValidationMethod = (formContext) => {
   return '';
 };
 
+const setGenericClickProps = (xdmData, eventName, linkType, formData, formContext) => {
+  xdmData.eventType = 'web.webinteraction.linkClicks';
+  xdmData.web.webInteraction.name = eventName;
+  xdmData.web.webInteraction.type = linkType;
+  xdmData._hdfcbank.page.uRL = '';
+  xdmData._hdfcbank.journey.journeyID = formData.journeyId;
+  xdmData._hdfcbank.journey.journeyName = formContext.journeyName;
+  xdmData._hdfcbank.journey.journeyState = '';
+  xdmData._hdfcbank.journey.journeyID_State = '';
+  xdmData._hdfcbank.journey.journeyInformation = '';
+  xdmData._hdfcbank.journey.cASACustomer = '';
+  xdmData._hdfcbank.identifier.pseudoID = '';
+};
+
 export async function analyticsTrackOtpClicks(eventName, payload, formData, formContext, linkType = 'button', additionalXdmFields = {}) {
-  // const jsonString = JSON.stringify(payload || {});
-  // const apiResponse = JSON.parse(jsonString);
+  const jsonString = JSON.stringify(payload || {});
+  const apiResponse = JSON.parse(jsonString);
 
   const xdmData = createDeepCopyFromBlueprint(ANALYTICS_DATA_OBJECT);
-  xdmData.eventType = 'web.webinteraction.linkClicks';
-  xdmData.web.webInteraction.name = 'otp click';
-  xdmData.web.webInteraction.type = linkType;
-  xdmData._hdfcbank.error.errorCode = 'test';
+
+  setGenericClickProps(xdmData, eventName, linkType, formData, formContext);
+  xdmData._hdfcbank.error.errorCode = apiResponse.status.errorCode;
+  xdmData._hdfcbank.identifier.mobileHash = formData.form.login.registeredMobileNumber;
+  return sendAnalyticsEvent(xdmData);
+}
+
+export async function analyticsCheckOffersClick(eventName, payload, formData, formContext, linkType = 'button', additionalXdmFields = {}) {
+  const xdmData = createDeepCopyFromBlueprint(ANALYTICS_DATA_OBJECT);
+  const jsonString = JSON.stringify(payload || {});
+  const apiResponse = JSON.parse(jsonString);
+  setGenericClickProps(xdmData, eventName, linkType, formData, formContext);
   return sendAnalyticsEvent(xdmData);
 }

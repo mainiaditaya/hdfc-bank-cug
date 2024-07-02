@@ -22,6 +22,7 @@ import * as CC_CONSTANT from './constant.js';
 
 import {
   analyticsTrackOtpClicks,
+  analyticsCheckOffersClick,
 } from '../../scripts/lib-analytics.js';
 
 const { ENDPOINTS } = CONSTANT;
@@ -57,10 +58,13 @@ function journeyResponseHandler(payload) {
 // eslint-disable-next-line no-unused-vars
 function sendAnalytics(payload, globals) {
   // sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
-  const eventType = 'otp click';
+  const eventType = 'check offers';
   switch (eventType) {
     case 'otp click':
       analyticsTrackOtpClicks(eventType, payload, santizedFormDataWithContext(globals), currentFormContext);
+      break;
+    case 'check offers':
+      analyticsCheckOffersClick(eventType, payload, santizedFormDataWithContext(globals), currentFormContext);
       break;
     default:
       console.log('NA');
