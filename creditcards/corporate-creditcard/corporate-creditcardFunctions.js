@@ -16,7 +16,6 @@ import {
   restAPICall,
   displayLoader, hideLoaderGif,
 } from '../../common/makeRestAPI.js';
-import { sendAnalyticsEvent } from '../../common/analytics.js';
 import * as CONSTANT from '../../common/constants.js';
 import * as CC_CONSTANT from './constant.js';
 
@@ -58,7 +57,7 @@ function journeyResponseHandler(payload) {
 // eslint-disable-next-line no-unused-vars
 function sendAnalytics(payload, globals) {
   // sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
-  const eventType = 'check offers';
+  const eventType = 'otp click';
   switch (eventType) {
     case 'otp click':
       analyticsTrackOtpClicks(eventType, payload, santizedFormDataWithContext(globals), currentFormContext);
