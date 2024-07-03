@@ -30,6 +30,7 @@ import {
   executeInterfaceApiFinal,
   executeInterfaceResponseHandler,
   documentUpload,
+  setNameOnCard,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -218,4 +219,5 @@ export {
   executeInterfaceApiFinal,
   executeInterfaceResponseHandler,
   documentUpload,
+  setNameOnCard,
 };

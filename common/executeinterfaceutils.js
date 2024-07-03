@@ -334,7 +334,7 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
   }
   if (firstProductDetail?.features) {
     const cardFeature = formUtil(globals, globals.form.corporateCardWizardView.confirmCardPanel.viewAllCardBenefitsPanel.cardBenefitsText);
-    const mapPTag = firstProductDetail?.features?.map((el) => `<p>${el}</p>`)?.join(' ');
+    const mapPTag = firstProductDetail?.features?.map((el) => `<p class='popuptext-resp'>${el}</p>`)?.join(' ');
     cardFeature.setValue(mapPTag);
   }
 
