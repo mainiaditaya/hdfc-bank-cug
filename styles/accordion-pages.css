@@ -134,7 +134,7 @@ fieldset fieldset {
 
   .field-cardimage {
     position: relative;
-    color: white;
+    color: var(--color-interface-background-primary);
   }
 
   img { 
@@ -146,8 +146,8 @@ fieldset fieldset {
     position: absolute;
     bottom: 20px;
     left: 30px;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: var(--body-x-sm-font-size);
+    font-weight: var(--font-weight-medium);
   }
 
   .field-nameoncarddropdown {
@@ -269,7 +269,7 @@ fieldset fieldset {
 
         legend {
           font-weight: 400;
-          font-size: 12px;
+          font-size: var(--body-x-sm-font-size);
           line-height: 20px;
           background-color: #D0DDFC;
           width: fit-content;
@@ -310,7 +310,7 @@ fieldset fieldset {
 
       p {
         font-weight: 400;
-        font-size: 12px !important;
+        font-size: var(--body-x-sm-font-size) !important;
         margin: 0 !important;
       }
       } 
@@ -567,7 +567,7 @@ main .form form .field-corporatecardwizardview.wizard {
   :is([data-active='true'], [data-empty='false'], .date-wrapper):not(.field-joiningrenewalfee) > label {
       margin-left: 5px;
       font-weight: 400;
-      font-size: 12px;
+      font-size: var(--body-x-sm-font-size);
       padding: 0;
   }
 
