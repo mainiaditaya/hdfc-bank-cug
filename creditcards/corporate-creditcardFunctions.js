@@ -27,6 +27,8 @@ import corpCreditCard from '../common/constants.js';
 import {
   analyticsTrackOtpClicks,
   analyticsCheckOffersClick,
+  analyticsInitialLoad,
+  analyticsGetThisCardOnLoad,
 } from '../scripts/lib-analytics.js';
 
 const { endpoints } = corpCreditCard;
@@ -694,6 +696,12 @@ function sendAnalytics(eventType, payload, globals) {
       break;
     case 'check offers':
       analyticsCheckOffersClick(eventType, santizedFormDataWithContext(globals), currentFormContext);
+      break;
+    case 'initialLoad':
+      analyticsInitialLoad(eventType, santizedFormDataWithContext(globals), currentFormContext);
+      break;
+    case 'get this card on load':
+      analyticsGetThisCardOnLoad(eventType, santizedFormDataWithContext(globals), currentFormContext);
       break;
     default:
       // console.log('NA');

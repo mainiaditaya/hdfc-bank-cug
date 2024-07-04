@@ -188,6 +188,12 @@ const setGenericClickProps = (xdmData, eventName, linkType, formData, formContex
   xdmData._hdfcbank.identifier.pseudoID = '';
 };
 
+const setGenericPageLoadProps = (xdmData, eventName, linkType, formData, formContext) => {
+  xdmData.web.webPageDetails.name = 'Page name';
+  xdmData._hdfcbank.pageName = 'Page name';
+  xdmData._hdfcbank.previousPageName = 'previous Page name';
+};
+
 export async function analyticsTrackOtpClicks(eventName, payload, formData, formContext, linkType = 'other', additionalXdmFields = {}) {
   const jsonString = JSON.stringify(payload || {});
   const apiResponse = JSON.parse(jsonString);
@@ -195,7 +201,7 @@ export async function analyticsTrackOtpClicks(eventName, payload, formData, form
   const xdmData = createDeepCopyFromBlueprint(ANALYTICS_DATA_OBJECT);
 
   setGenericClickProps(xdmData, eventName, linkType, formData, formContext);
-  xdmData._hdfcbank.error.errorCode = apiResponse.status.errorCode;
+  xdmData._hdfcbank.journey.formloginverificationmethod = '';
   xdmData._hdfcbank.identifier.mobileHash = formData.form.login.registeredMobileNumber;
   return sendAnalyticsEvent(xdmData);
 }
@@ -211,5 +217,16 @@ export async function analyticsCheckOffersClick(eventName, formData, formContext
   xdmData._hdfcbank.journey.formLocationCity = '';
   xdmData._hdfcbank.journey.formLocationState = '';
   xdmData._hdfcbank.identifier.emailID = formData.form.workEmailAddress;
+  return sendAnalyticsEvent(xdmData);
+}
+
+export async function analyticsInitialLoad(eventName, formData, formContext, linkType = 'button', additionalXdmFields = {}) {
+  const xdmData = createDeepCopyFromBlueprint(ANALYTICS_DATA_OBJECT);
+  setGenericPageLoadProps(xdmData, eventName, linkType, formData, formContext);
+  return sendAnalyticsEvent(xdmData);
+}
+export async function analyticsGetThisCardOnLoad(eventName, formData, formContext, linkType = 'button', additionalXdmFields = {}) {
+  const xdmData = createDeepCopyFromBlueprint(ANALYTICS_DATA_OBJECT);
+  setGenericPageLoadProps(xdmData, eventName, linkType, formData, formContext);
   return sendAnalyticsEvent(xdmData);
 }

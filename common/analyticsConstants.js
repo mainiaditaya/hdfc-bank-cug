@@ -17,6 +17,14 @@ const ANALYTICS_DATA_OBJECT = {
       name: '',
       type: '',
     },
+    webPageDetails: {
+      name: '',
+      server: '',
+      pageViews: {
+        value: 1,
+      },
+      siteSection: '',
+    },
   },
   _hdfcbank: {
     campaign: {
@@ -64,6 +72,7 @@ const ANALYTICS_DATA_OBJECT = {
       formLocationState: '',
       formOfferedLoan: '',
       formRateofInterest: '',
+      formReferenceNumber: '',
       formStepsuccess: '',
       formVisitCount: '',
       formVisitNumber: '',
@@ -80,6 +89,8 @@ const ANALYTICS_DATA_OBJECT = {
     page: {
       DestinationLink: '',
       newrepeat: '',
+      pageName: '',
+      previousPageName: '',
       platform: '',
       sessionRestored: '',
       uRL: '',
