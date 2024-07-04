@@ -348,22 +348,28 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
 };
 
 /**
+ * comAddressType param for executeInterface
+ * Returns '1' for office address and '2' for current address.
+ * @param {Object} globals - The global context object containing form and view configurations.
+ * @returns {string} - '1' if the office address is selected, otherwise '2'.
+ */
+const comAddressType = (globals) => {
+  const formData = globals.functions.exportData().form;
+  const deliveryPanel = globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.cardDeliveryAddressPanel;
+  const cardDelivery = {
+    current: formData?.cardDeliveryAddressOption1 || deliveryPanel.cardDeliveryAddressOption1.$value,
+    office: formData?.cardDeliveryAddressOption2 || deliveryPanel.cardDeliveryAddressOption2.$value,
+  };
+  return cardDelivery?.office ? '1' : '2';
+};
+
+/**
  * Executes an interface post request with the appropriate authentication mode based on the response.
  *
  * @param {object} source - The source object (unused in the current implementation).
  * @param {object} globals - An object containing global variables and functions.
  */
 const executeInterfacePostRedirect = async (source, userRedirected, globals) => {
-  // const corporateCardWizardView = formUtil(globals, globals.form.corporateCardWizardView);
-  // const confirmAndSubmitPanel = formUtil(globals, globals.form.corporateCardWizardView.confirmAndSubmitPanel);
-
-  // corporateCardWizardView.visible(false);
-  // confirmAndSubmitPanel.visible(false);
-
-  // const {
-  //   loginPanel, consentFragment, getOTPbutton, welcomeText,
-  // } = globals.form;
-  // [loginPanel, consentFragment, getOTPbutton, welcomeText].map((el) => formUtil(globals, el)).forEach((item) => item.visible(false));
   const formCallBackContext = globals.functions.exportData()?.currentFormContext;
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
   if (source === 'idCom') {
@@ -374,6 +380,7 @@ const executeInterfacePostRedirect = async (source, userRedirected, globals) => 
       requestObj.requestString.authMode = 'IDCOM';
     }
   }
+  requestObj.requestString.comAddressType = comAddressType(globals); // set com address type
   const apiEndPoint = urlPath(endpoints.executeInterface);
   const eventHandlers = {
     successCallBack: (response) => {

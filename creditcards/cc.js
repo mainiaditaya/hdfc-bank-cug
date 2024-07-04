@@ -272,6 +272,7 @@ const successPannelMethod = (data) => {
   const mobileMatch = !(filler4Val === 'NVKYC');
   const kycStatus = (finalDapRequest.requestString.biometricStatus);
   const vkycCameraConfirmation = document.querySelector(`[name= ${'vkycCameraConfirmation'}]`);
+  const vkycCameraPannelInstruction = document.querySelector('.field-cameraconfirmationpanelinstruction');
 
   if (journeyName === 'ETB') {
     // const mobileMatch =  !(mobileValid === 'n');  // (mobileValid === 'n') - unMatched - this should be the condition which has to be finalDap - need to verify.
@@ -291,14 +292,15 @@ const successPannelMethod = (data) => {
       vkycProceedButton.setAttribute('data-visible', true);
       vkycConfirmText.setAttribute('data-visible', false);
       offerLink.setAttribute('data-visible', false);
+      // vkycProceedButton.addEventListener('click', (e) => {
+      //   window.location.href = vkycUrl;
+      // });
     }
   }
   if (journeyName === 'NTB' && (kycStatus === 'aadhaar')) {
     vkycCameraConfirmation.setAttribute('data-visible', true);
+    vkycCameraPannelInstruction.setAttribute('data-visible', true);
     vkycProceedButton.setAttribute('data-visible', true);
-    // vkycProceedButton.addEventListener('click', (e) => {
-    //   window.location.href = vkycUrl;
-    // });
   }
 };
 

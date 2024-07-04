@@ -352,10 +352,22 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
  * @name redirect
  * @param {string} redirectUrl - The URL to redirect the browser to.
  */
-function redirect(redirectUrl) {
-  window.location.href = redirectUrl;
+function redirect(redirectUrl, globals) {
+  let urlLink = redirectUrl;
+  if (redirectUrl === 'VKYCURL' && currentFormContext.VKYC_URL) {
+    urlLink = currentFormContext.VKYC_URL;
+  }
+  window.location.href = urlLink;
 }
 
+/**
+ * Reloads the current page.
+ * @name reloadPage
+ */
+
+function reloadPage() {
+  window.location.reload();
+}
 export {
   getOTP,
   otpValidation,
@@ -382,6 +394,7 @@ export {
   resendOTP,
   fetchAuthCode,
   redirect,
+  reloadPage,
   hideLoaderGif,
   executeInterfacePostRedirect,
   executeInterfaceApiFinal,
