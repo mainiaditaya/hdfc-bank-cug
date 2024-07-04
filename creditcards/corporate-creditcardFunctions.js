@@ -7,7 +7,6 @@ import {
   createJourneyId,
   formRuntime,
 } from '../common/journey-utils.js';
-import { executeInterfaceApiFinal } from '../common/executeinterfaceutils.js';
 import {
   formUtil,
   urlPath,
@@ -24,8 +23,11 @@ import {
   restAPICall,
   displayLoader, hideLoaderGif,
 } from '../common/makeRestAPI.js';
-import { sendAnalyticsEvent } from '../common/analytics.js';
 import corpCreditCard from '../common/constants.js';
+import {
+  analyticsTrackOtpClicks,
+  analyticsCheckOffersClick,
+} from '../scripts/lib-analytics.js';
 
 const { endpoints } = corpCreditCard;
 const { currentFormContext } = corpCreditCardContext;
@@ -396,7 +398,7 @@ const setConfirmScrAddressFields = (globalObj) => {
  */
 const getThisCard = (globals) => {
   const isAddressChanged = currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag === 'Y';
-  //executeInterfaceApiFinal(globals);
+  // executeInterfaceApiFinal(globals);
   setConfirmScrAddressFields(globals);
   if (!isAddressChanged) {
     moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
@@ -627,16 +629,6 @@ const prefillForm = (globals) => {
 };
 
 /**
-* sendAnalytics
-* @param {string} payload
-* @param {object} globals
-*/
-// eslint-disable-next-line no-unused-vars
-function sendAnalytics(payload, globals) {
-  sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
-}
-
-/**
  * @name resendOTP
  * @param {Object} globals - The global object containing necessary data for DAP request.
  */
@@ -685,6 +677,29 @@ const resendOTP = (globals) => {
     console.error(error);
   }
 };
+
+/**
+* sendAnalytics
+* @param {string} eventType
+* @param {string} payload
+* @param {object} globals
+*/
+// eslint-disable-next-line no-unused-vars
+function sendAnalytics(eventType, payload, globals) {
+  // sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
+  // const eventType = 'otp click';
+  switch (eventType) {
+    case 'otp click':
+      analyticsTrackOtpClicks(eventType, payload, santizedFormDataWithContext(globals), currentFormContext);
+      break;
+    case 'check offers':
+      analyticsCheckOffersClick(eventType, payload, santizedFormDataWithContext(globals), currentFormContext);
+      break;
+    default:
+      // console.log('NA');
+      break;
+  }
+}
 
 export {
   getThisCard,

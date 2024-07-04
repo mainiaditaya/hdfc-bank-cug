@@ -406,6 +406,18 @@ const ageValidator = (minAge, maxAge, dobValue) => {
   const ageBtwMinMax = (age >= minAge && age <= maxAge);
   return ageBtwMinMax;
 };
+/**
+ * Creates a deep copy of the given blueprint object.
+ *
+ * This function returns a new object that is a deep copy of the blueprint object,
+ * ensuring that nested objects are also copied rather than referenced.
+ *
+ * @param {Object} blueprint - The blueprint object to copy.
+ * @returns {Object} A deep copy of the blueprint object.
+ */
+function createDeepCopyFromBlueprint(blueprint) {
+  return JSON.parse(JSON.stringify(blueprint));
+}
 
 export {
   urlPath,
@@ -427,4 +439,5 @@ export {
   santizedFormDataWithContext,
   generateUUID,
   ageValidator,
+  createDeepCopyFromBlueprint,
 };
