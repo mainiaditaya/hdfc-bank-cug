@@ -693,7 +693,7 @@ function sendAnalytics(eventType, payload, globals) {
       analyticsTrackOtpClicks(eventType, payload, santizedFormDataWithContext(globals), currentFormContext);
       break;
     case 'check offers':
-      analyticsCheckOffersClick(eventType, payload, santizedFormDataWithContext(globals), currentFormContext);
+      analyticsCheckOffersClick(eventType, santizedFormDataWithContext(globals), currentFormContext);
       break;
     default:
       // console.log('NA');

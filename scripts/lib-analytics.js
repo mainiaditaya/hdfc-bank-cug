@@ -200,11 +200,16 @@ export async function analyticsTrackOtpClicks(eventName, payload, formData, form
   return sendAnalyticsEvent(xdmData);
 }
 
-export async function analyticsCheckOffersClick(eventName, payload, formData, formContext, linkType = 'button', additionalXdmFields = {}) {
+export async function analyticsCheckOffersClick(eventName, formData, formContext, linkType = 'button', additionalXdmFields = {}) {
   const xdmData = createDeepCopyFromBlueprint(ANALYTICS_DATA_OBJECT);
-  const jsonString = JSON.stringify(payload || {});
-  const apiResponse = JSON.parse(jsonString);
+  // const jsonString = JSON.stringify(payload || {});
+  // const apiResponse = JSON.parse(jsonString);
   setGenericClickProps(xdmData, eventName, linkType, formData, formContext);
-
+  xdmData._hdfcbank.journey.gender = formData.form.gender;
+  xdmData._hdfcbank.journey.formEmploymentType = formData.form.employmentType;
+  xdmData._hdfcbank.journey.formLocationPincode = formData.form.officeAddressPincode;
+  xdmData._hdfcbank.journey.formLocationCity = '';
+  xdmData._hdfcbank.journey.formLocationState = '';
+  xdmData._hdfcbank.identifier.emailID = formData.form.workEmailAddress;
   return sendAnalyticsEvent(xdmData);
 }
