@@ -54,6 +54,7 @@ const ANALYTICS_DATA_OBJECT = {
     },
     journey: {
       amountSelected: '',
+      cardAnnualFee: '',
       cASACustomer: '',
       eligibleOffers: '',
       formloginverificationmethod: '',
