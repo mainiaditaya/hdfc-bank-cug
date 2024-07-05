@@ -1,5 +1,12 @@
-import data from './analyticsConstants.js';
+import {
+  data,
+  ANALYTICS_OBJECT,
+} from './analyticsConstants.js';
 import corpCreditCard from './constants.js';
+import createDeepCopyFromBlueprint from './formutils.js';
+import { corpCreditCardContext } from './journey-utils.js';
+
+const { currentFormContext } = corpCreditCardContext;
 
 const digitalDataPageLoad = {
   page: {
@@ -30,18 +37,16 @@ const digitalDataPageLoad = {
  * @param {object} digitalData
  */
 
-function sendGenericClickEvent(linkName, linkType, formContext, digitalData) {
+function sendGenericClickEvent(linkName, linkType, formData, digitalData) {
   const digitalDataEvent = digitalData || {};
   digitalDataEvent.link = {
     linkName,
     linkType,
   };
-  digitalDataEvent.user.journeyID = formContext?.currentFormContext?.journeyID;
-  digitalDataEvent.user.journeyState = formContext?.currentFormContext?.journeyState;
+  digitalDataEvent.user.journeyID = formData?.currentFormContext?.journeyID;
+  digitalDataEvent.user.journeyState = formData?.currentFormContext?.journeyState;
   digitalDataEvent.event = {};
   window.digitalData = digitalDataEvent || {};
-  // eslint-disable-next-line no-undef
-  _satellite.track('event');
 }
 
 const getValidationMethod = (formContext) => {
@@ -55,69 +60,66 @@ const getValidationMethod = (formContext) => {
  *Creates digital data for otp click event.
  * @param {string} phone
  * @param {string} validationType
- * @param {string} linkName
+ * @param {string} eventType
  * @param {object} formContext
  * @param {object} digitalData
  */
-function sendSubmitClickEvent(phone, linkName, linkType, formContext, currentFormContext, digitalData) {
-  const digitalDataEvent = digitalData || {
-    page: {
-      pageInfo: {
-        pageName: corpCreditCard.journeyName,
-        errorCode: '',
-        errorMessage: '',
-      },
-    },
-    user: {
-      pseudoID: 'TBD',
-      journeyID: '',
-      journeyName: corpCreditCard.journeyName,
-      journeyState: '',
-      casa: '',
-      gender: '',
-      email: '',
-    },
-    form: {
-      name: 'Corporate credit card',
-    },
-    link: {
-      linkName: '',
-      linkType: '',
-      linkPosition: 'form',
-    },
-    event: {
-      phone: '',
-      validationMethod: '',
-      status: '',
-      rating: '',
-    },
-    formDetails: {
-      employmentType: '',
-      companyName: '',
-      designation: '',
-      relationshipNumber: '',
-      pincode: '',
-      city: '',
-      state: '',
-      KYCVerificationMethod: '',
-      languageSelected: '',
-      reference: '',
-      isVideoKYC: '',
-    },
-    card: {
-      selectedCard: '',
-      eligibleCard: '',
-      annualFee: '',
-    },
-  };
-  sendGenericClickEvent(linkName, linkType, currentFormContext, digitalDataEvent);
-  digitalDataEvent.event = {
-    phone,
-    validationMethod: getValidationMethod(formContext),
-  };
-  digitalDataEvent.formDetails = {
+function sendSubmitClickEvent(phone, eventType, linkType, formData, digitalDataEvent) {
+  digitalDataEvent.page.pageInfo = corpCreditCard.journeyName;
+  digitalDataEvent.user.journeyName = corpCreditCard.journeyName;
+  digitalDataEvent.form.name = 'Corporate credit card';
+  digitalDataEvent.link.linkPosition = 'form';
+  sendGenericClickEvent(eventType, linkType, formData, digitalDataEvent);
+  switch (eventType) {
+    case 'get otp': {
+      digitalDataEvent.event = {
+        phone,
+        validationMethod: getValidationMethod(formData),
+      };
+      break;
+    }
+    case 'check offers': {
+      digitalDataEvent.user = {
+        gender: 'Male',
+        email: 'hardcodedMailId@gmail.com',
+      };
+      if (formData.form.currentAddressToggle === 'off') {
+        digitalDataEvent.formDetails = {
+          pincode: currentFormContext.breDemogResponse.VDCUSTZIPCODE,
+          city: currentFormContext.breDemogResponse.VDCUSTCITY,
+          state: currentFormContext.breDemogResponse.VDCUSTSTATE,
+        };
+      } else {
+        const isETB = currentFormContext.journeyType === 'ETB';
+        digitalDataEvent.formDetails = {
+          pincode: isETB ? formData.form.newCurentAddressPin : formData.form.currentAddresPincodeNTB,
+          city: isETB ? 'hardcodedETBCity' : 'hardcodedNTBCity',
+          state: isETB ? 'hardcodedETBState' : 'hardcodedNTBState',
+        };
+      }
+      Object.assign(digitalDataEvent.formDetails, {
+        employmentType: formData.form.employmentType,
+        companyName: formData.form.companyName,
+        designation: formData.form.designation,
+        relationshipNumber: formData.form.relationshipNumber,
+      });
+      break;
+    }
 
-  };
+    case 'get this card': {
+      digitalDataEvent.card = {
+        selectedCard: formData.form.productCode,
+        annualFee: formData.form.joiningRenewalFee,
+      };
+      digitalDataEvent.event = {
+        status: formData.cardBenefitsAgreeCheckbox,
+      };
+      break;
+    }
+    default: {
+      /* empty */
+    }
+  }
   window.digitalData = digitalDataEvent || {};
   // eslint-disable-next-line no-undef
   _satellite.track('submit');
@@ -139,11 +141,17 @@ function sendPageloadEvent(formContext) {
   _satellite.track('pageload');
 }
 
-function populateResponse(payload, action, digitalDataEvent) {
-  switch (action) {
-    case 'getOTP': {
+function populateResponse(payload, eventType, digitalDataEvent) {
+  switch (eventType) {
+    case 'otp click': {
       digitalDataEvent.page.pageInfo.errorCode = payload?.status?.errorCode;
-      digitalDataEvent.page.pageInfo.errorMessage = payload?.status?.errorMsg;
+      digitalDataEvent.page.pageInfo.errorMessage = payload?.status?.errorMessage;
+      break;
+    }
+    case 'check offers':
+    case 'get this card': {
+      digitalDataEvent.page.pageInfo.errorCode = payload?.errorCode;
+      digitalDataEvent.page.pageInfo.errorMessage = payload?.errorMessage;
       break;
     }
     default: {
@@ -154,65 +162,17 @@ function populateResponse(payload, action, digitalDataEvent) {
 
 /**
  * Send analytics events.
+ * @param {string} eventType
  * @param {object} payload
  * @param {object} formData
+ * @param {object} currentFormContext
  */
-function sendAnalyticsEvent(payload, formData, currentFormContext) {
-  const digitalDataEvent = {
-    page: {
-      pageInfo: {
-        pageName: corpCreditCard.journeyName,
-        errorCode: '',
-        errorMessage: '',
-      },
-    },
-    user: {
-      pseudoID: 'TBD',
-      journeyID: '',
-      journeyName: corpCreditCard.journeyName,
-      journeyState: '',
-      casa: '',
-      gender: '',
-      email: '',
-    },
-    form: {
-      name: 'Corporate credit card',
-    },
-    link: {
-      linkName: '',
-      linkType: '',
-      linkPosition: 'form',
-    },
-    event: {
-      phone: '',
-      validationMethod: '',
-      status: '',
-      rating: '',
-    },
-    formDetails: {
-      employmentType: '',
-      companyName: '',
-      designation: '',
-      relationshipNumber: '',
-      pincode: '',
-      city: '',
-      state: '',
-      KYCVerificationMethod: '',
-      languageSelected: '',
-      reference: '',
-      isVideoKYC: '',
-    },
-    card: {
-      selectedCard: '',
-      eligibleCard: '',
-      annualFee: '',
-    },
-  };
+function sendAnalyticsEvent(eventType, payload, formData) {
+  const digitalDataEvent = createDeepCopyFromBlueprint(ANALYTICS_OBJECT);
   const apiResponse = JSON.parse(payload || {});
-  const action = currentFormContext?.action;
-  const attributes = data[action];
-  populateResponse(apiResponse, action, digitalDataEvent);
-  sendSubmitClickEvent(formData?.login?.registeredMobileNumber, action, attributes?.linkType, formData, currentFormContext, digitalDataEvent);
+  const attributes = data[eventType];
+  populateResponse(apiResponse, eventType, digitalDataEvent);
+  sendSubmitClickEvent(formData?.login?.registeredMobileNumber, eventType, attributes?.linkType, formData, digitalDataEvent);
 }
 
 export {

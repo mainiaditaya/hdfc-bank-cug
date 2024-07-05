@@ -19,7 +19,7 @@ import {
   validateLogin,
 } from '../creditcards/corporate-creditcardFunctions.js';
 
-import { updatePanelVisibility } from './finaldaputils.js';
+// import { updatePanelVisibility } from './finaldaputils.js';
 
 import {
   validatePan,
@@ -58,7 +58,6 @@ const { currentFormContext } = corpCreditCardContext;
  * @return {PROMISE}
  */
 function checkMode(globals) {
-  debugger;
   const formData = globals.functions.exportData();
   const idcomVisit = formData?.queryParams?.authmode; // "DebitCard"
   const aadharVisit = formData?.queryParams?.visitType; // "EKYC_AUTH
@@ -354,7 +353,7 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
  * @name redirect
  * @param {string} redirectUrl - The URL to redirect the browser to.
  */
-function redirect(redirectUrl, globals) {
+function redirect(redirectUrl) {
   let urlLink = redirectUrl;
   if (redirectUrl === 'VKYCURL' && currentFormContext.VKYC_URL) {
     urlLink = currentFormContext.VKYC_URL;
