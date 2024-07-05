@@ -198,3 +198,77 @@ body.modal-open {
     }
   }
 }
+fieldset[class*='field-helppopupcontainer'] {
+  .field-helppopuplabel p{
+    text-align: center;
+    color: var(--color-interface-background-tertiary);
+    font-size: var(--body-md-font-size);
+    font-weight: var(--form-button-font-weight);
+  }
+  .field-helppanel1, .field-helppanel2 {
+    border: 1px dotted #ccc;
+    margin-bottom: 20px;
+    display: flex;
+    border-radius: 10px;
+    .image-wrapper{
+      flex: 1;
+      align-content: center;
+      img {
+        margin: 0 20px 0 0;
+      }
+    }
+    .button-wrapper {
+      flex: 1 1 100%;
+      text-align: left;
+      button {
+        position: relative;
+        background: none;
+        color: var(--color-interface-background-tertiary);
+        font-size: var(--body-x-sm-font-size);
+      }
+      :hover {
+        background: none !important;
+      }
+      :after {
+        content: '\003e';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        font-size: var(--body-xx-lg-font-size);
+        transform: translateY(-50%);
+      }  
+    }      
+  }
+  .field-customercarepanel {
+    display: flex;
+    .field-helpcustomercaretext{
+      b:first-child{
+        display: block;
+      }
+    }
+  }    
+}
+fieldset[class*='field-helppopupsubpanel'] {
+  .plain-text-wrapper{
+
+  }
+  .button-wrapper {
+    display: inline-block;
+    width: 50%;
+    &:last-child {
+      button {
+        text-decoration: none;
+        background: green;
+        color: var(--color-interface-background-primary);
+      }
+    }
+    button {
+      text-decoration: underline;
+      background: none;
+      color: var(--color-interface-background-tertiary);
+    }
+  }
+}
+.modal-dialog:has(.modal-content .field-helppopupsubpanel) {
+  width: 200px;
+}
