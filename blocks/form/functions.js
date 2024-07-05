@@ -25,12 +25,15 @@ import {
   resendOTP,
   fetchAuthCode,
   redirect,
+  reloadPage,
   hideLoaderGif,
   executeInterfacePostRedirect,
   executeInterfaceApiFinal,
   executeInterfaceResponseHandler,
   documentUpload,
   setNameOnCard,
+  firstLastNameValidation,
+  validateLogin,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -215,9 +218,12 @@ export {
   showElement,
   fetchAuthCode,
   redirect,
+  reloadPage,
   executeInterfacePostRedirect,
   executeInterfaceApiFinal,
   executeInterfaceResponseHandler,
   documentUpload,
   setNameOnCard,
+  firstLastNameValidation,
+  validateLogin,
 };

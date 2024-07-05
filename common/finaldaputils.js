@@ -143,11 +143,11 @@ const finalDap = (userRedirected, globals) => {
   const eventHandlers = {
     successCallBack: (response) => {
       if (response?.errorCode === '0000') {
-        invokeJourneyDropOffUpdate('FINAL_DAP_SUCCESS', mobileNumber, leadProfileId, journeyId, globals);
-        currentFormContext.finalDapRequest = payload;
+        currentFormContext.finalDapRequest = JSON.parse(JSON.stringify(payload));
         currentFormContext.finalDapResponse = response;
         currentFormContext.VKYC_URL = response.vkycUrl;
         currentFormContext.ARN_NUM = response.applicationNumber;
+        invokeJourneyDropOffUpdate('FINAL_DAP_SUCCESS', mobileNumber, leadProfileId, journeyId, globals);
         if (!userRedirected) {
           globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: false });
           globals.functions.setProperty(globals.form.resultPanel, { visible: true });
@@ -158,6 +158,7 @@ const finalDap = (userRedirected, globals) => {
           // setting through DomApi using throughDomSetArnNum function.
           if (journeyName === 'NTB' && (kycStatus === 'aadhaar')) {
             globals.functions.setProperty(globals.form.resultPanel.successResultPanel.vkycCameraConfirmation, { visible: true });
+            globals.functions.setProperty(globals.form.resultPanel.successResultPanel.cameraConfirmationPanelInstruction, { visible: true });
             globals.functions.setProperty(globals.form.resultPanel.successResultPanel.vkycProceedButton, { visible: true });
           }
           throughDomSetArnNum(response.applicationNumber);

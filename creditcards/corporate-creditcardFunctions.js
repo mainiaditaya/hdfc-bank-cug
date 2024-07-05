@@ -18,6 +18,7 @@ import {
   removeSpecialCharacters,
   // dateFormat,
   santizedFormDataWithContext,
+  ageValidator,
 } from '../common/formutils.js';
 import {
   getJsonResponse,
@@ -699,6 +700,108 @@ const setNameOnCard = (name) => {
   cardImg.innerHTML += `<span class='cardNameText'>${name}</span>`;
 };
 
+/**
+ * Validates the date of birth field to ensure the age is between 18 and 70.
+ * @param {Object} globals - The global object containing necessary data for DAP request.
+*/
+const validateLogin = (globals) => {
+  const { $value, $name } = globals.form.loginPanel.identifierPanel.dateOfBirth;
+  const dobValue = globals.form.loginPanel.identifierPanel.dateOfBirth.$value;
+  const panValue = globals.form.loginPanel.identifierPanel.pan.$value;
+  const panDobSelection = globals.form.loginPanel.identifierPanel.panDobSelection.$value;
+  const radioSelect = (panDobSelection === '0') ? 'DOB' : 'PAN';
+  const regexPan = /^[a-zA-Z]{3}[Pp][a-zA-Z][0-9]{4}[a-zA-Z]{1}/g;
+  const consentFirst = globals.form.consentFragment.checkboxConsent1Label.$value;
+  const panErrorText = 'Please enter a valid PAN Number';
+  globals.functions.setProperty(globals.form.getOTPbutton, { enabled: false });
+
+  const panInput = document.querySelector(`[name=${'pan'} ]`);
+  const panWrapper = panInput.parentElement;
+  switch (radioSelect) {
+    case 'DOB':
+      if (dobValue && String(new Date(dobValue).getFullYear()).length === 4) {
+        const calendarEl = document.querySelector(`[name= ${$name}]`);
+        const calendarElParent = calendarEl?.parentElement;
+        const dobDefFieldDesc = calendarElParent.querySelector('.field-description');
+        calendarElParent.setAttribute('data-empty', true);
+        const minAge = 18;
+        const maxAge = 70;
+        const dobErrorText = `Age should be between ${minAge} to ${maxAge}`;
+        dobDefFieldDesc.style.display = 'none';
+        const ageValid = ageValidator(minAge, maxAge, $value);
+        if (ageValid && consentFirst) {
+          globals.functions.setProperty(globals.form.getOTPbutton, { enabled: true });
+          globals.functions.markFieldAsInvalid('$form.loginPanel.identifierPanel.dateOfBirth', '', { useQualifiedName: true });
+        }
+        if (!ageValid) {
+          dobDefFieldDesc.style.display = 'block';
+          globals.functions.markFieldAsInvalid('$form.loginPanel.identifierPanel.dateOfBirth', dobErrorText, { useQualifiedName: true });
+          globals.functions.setProperty(globals.form.getOTPbutton, { enabled: false });
+        }
+        if (!consentFirst) {
+          globals.functions.setProperty(globals.form.getOTPbutton, { enabled: false });
+        }
+      }
+      break;
+    case 'PAN':
+      panWrapper.setAttribute('data-empty', true);
+      if (panValue) {
+        panWrapper.setAttribute('data-empty', false);
+        const validPan = regexPan.test(panValue);
+        if (validPan && consentFirst) {
+          globals.functions.markFieldAsInvalid('$form.loginPanel.identifierPanel.pan', '', { useQualifiedName: true });
+          globals.functions.setProperty(globals.form.getOTPbutton, { enabled: true });
+        }
+        if (!validPan) {
+          globals.functions.markFieldAsInvalid('$form.loginPanel.identifierPanel.pan', panErrorText, { useQualifiedName: true });
+          globals.functions.setProperty(globals.form.getOTPbutton, { enabled: false });
+        }
+        if (!consentFirst) {
+          globals.functions.setProperty(globals.form.getOTPbutton, { enabled: false });
+        }
+      }
+      break;
+    default:
+      globals.functions.setProperty(globals.form.getOTPbutton, { enabled: false });
+  }
+};
+
+/**
+* @name firstLastNameValidation
+* @param {string} firstName
+* @param {string} lastName
+* @param {object} globals
+*/
+const firstLastNameValidation = (fn, ln, globals) => {
+  const { firstName, lastName } = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails;
+  const fNameField = formUtil(globals, firstName);
+  const lNameField = formUtil(globals, lastName);
+  const invalidMsg = {
+    fName: 'Please enter valid First Name',
+    lName: 'Please enter valid Last Name',
+  };
+  // fNameField.markInvalid(false, invalidMsg.fName);
+  // lNameField.markInvalid(false, invalidMsg.lName);
+  const MAX_LENGTH = 1;
+  let validStatus = null;
+  if ((fn && ln) && (fn?.length === MAX_LENGTH) && (ln?.length === MAX_LENGTH)) {
+    // temporry fix 👇//
+    // fNameField.markInvalid(false, invalidMsg.fName);
+    // lNameField.markInvalid(false, invalidMsg.lName);
+    if ((fn?.length === MAX_LENGTH)) {
+      globals.functions.markFieldAsInvalid('$form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.firstName', invalidMsg.fName, { useQualifiedName: true });
+    }
+    if ((ln?.length === MAX_LENGTH)) {
+      globals.functions.markFieldAsInvalid('$form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.lastName', invalidMsg.lName, { useQualifiedName: true });
+    }
+    validStatus = false;
+    // else {
+    //   // temporry fix 👇//
+    //   validStatus = true;
+    // }
+  }
+  // return validStatus;
+};
 export {
   getThisCard,
   prefillForm,
@@ -715,4 +818,6 @@ export {
   aadharConsent123,
   resendOTP,
   setNameOnCard,
+  firstLastNameValidation,
+  validateLogin,
 };

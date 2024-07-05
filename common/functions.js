@@ -15,6 +15,8 @@ import {
   resendOTP,
   formRuntime,
   setNameOnCard,
+  firstLastNameValidation,
+  validateLogin,
 } from '../creditcards/corporate-creditcardFunctions.js';
 
 import { updatePanelVisibility } from './finaldaputils.js';
@@ -131,7 +133,7 @@ function customSetFocus(errorMessage, numRetries, globals) {
 function getOTP(mobileNumber, pan, dob, globals) {
   currentFormContext.action = 'getOTP';
   currentFormContext.journeyID = globals.form.runtime.journeyId.$value;
-  console.log(currentFormContext);
+  currentFormContext.leadIdParam = globals.functions.exportData().queryParams;
   // currentFormContext.leadProfile = {};
   const jsonObj = {
     requestString: {
@@ -352,10 +354,30 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
  * @name redirect
  * @param {string} redirectUrl - The URL to redirect the browser to.
  */
-function redirect(redirectUrl) {
-  window.location.href = redirectUrl;
+function redirect(redirectUrl, globals) {
+  let urlLink = redirectUrl;
+  if (redirectUrl === 'VKYCURL' && currentFormContext.VKYC_URL) {
+    urlLink = currentFormContext.VKYC_URL;
+  }
+  window.location.href = urlLink;
 }
 
+/**
+ * Reloads the current page.
+ * lead idParam is been strored in current formContext after otpGen btn click
+ * @name reloadPage
+ * @param {object} globals
+ */
+function reloadPage(globals) {
+  const leadIdParam = globals.functions.exportData()?.currentFormContext?.leadIdParam || currentFormContext?.leadIdParam;
+  const { origin, pathname } = window.location;
+  const homeUrl = `${origin}${pathname}?leadId=${leadIdParam?.leadId}${(leadIdParam?.mode === 'dev') ? '&mode=dev' : ''} `;
+  if (leadIdParam?.leadId) {
+    window.location.href = homeUrl;
+  } else {
+    window.location.reload();
+  }
+}
 export {
   getOTP,
   otpValidation,
@@ -382,10 +404,13 @@ export {
   resendOTP,
   fetchAuthCode,
   redirect,
+  reloadPage,
   hideLoaderGif,
   executeInterfacePostRedirect,
   executeInterfaceApiFinal,
   executeInterfaceResponseHandler,
   documentUpload,
   setNameOnCard,
+  firstLastNameValidation,
+  validateLogin,
 };
