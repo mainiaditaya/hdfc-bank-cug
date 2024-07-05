@@ -1,5 +1,6 @@
 /* eslint-disable no-tabs */
 /* eslint no-console: ["error", { allow: ["warn", "error", "debug"] }] */
+import iconModal from '../blocks/icon-modal/icon-modal.js';
 import openModal from '../blocks/modal/modal.js';
 
 const createLabelInElement = (elementSelector, labelClass) => {
@@ -214,6 +215,85 @@ const viewAllBtnPannelConfig = {
   reqConsentAgree: true,
 };
 linkModalFunction(viewAllBtnPannelConfig);
+
+/* help modal- header */
+
+
+const fieldSet1 = document.getElementsByName('helpPanel1')?.[0];
+
+const nestedModal = (config) => {
+  config?.triggerElement?.addEventListener('click', async (e) => {
+    const { checked, type } = e.target;
+    const checkBoxElement = (type === 'checkbox') && checked;
+    const otherElement = true;
+    const elementType = (type === 'checkbox') ? checkBoxElement : otherElement;
+    if (elementType) {
+      e.preventDefault();
+      await iconModal(config);
+      config?.content?.addEventListener('modalTriggerValue', (event) => {
+        const receivedData = event.detail;
+        if (config?.updateUI) {
+          config?.updateUI(receivedData);
+        }
+      });
+    }
+  });
+};
+
+/// /////////////
+
+// Select the parent element
+
+// const parent = document.getElementsByName('helpPopupContainer')?.[0];
+// const child = document.getElementsByName('helpPopupSubpanel')?.[0];
+// parent.removeChild(child)
+// let deepCont;
+// if (parent && child) {
+//   // Create a deep copy of the parent node
+//   deepCont = parent.cloneNode(true);
+//   // Remove the child element from the copied parent node
+//   const childToRemove = deepCont.querySelector('[name="helpPopupSubpanel"]');
+//   if (childToRemove) {
+//     childToRemove.parentNode.removeChild(childToRemove);
+//   }
+//   // Now parentCopy contains a deep copy of parent without the childTrigger element
+// }
+// nestedModal(configHelp);
+
+const helpPopupSubpanelConfig = {
+  content: document.getElementsByName('helpPopupSubpanel')?.[0], // content to display in modal
+  actionWrapClass: 'button-wrapper', // wrapper class containing all the buttons
+  reqConsentAgree: false, // Indicates if consent agreement is needed; shows close icon if not.
+  /**
+   * Updates the UI based on received data.
+   * @param {Object} receivedData - Data received after the modal button trigger,contains name of the btn triggered which is used to update the UI.
+   */
+  updateUI(receivedData) {
+    debugger;
+    receivedData;
+  },
+};
+
+const helpConfig = {
+  // config to create modal for consent-2
+  // triggerElement: document.querySelector('header > .cmp-container.block').children[1],
+  triggerElement: document.getElementsByName('helpTrigger')?.[0],
+  content: document.getElementsByName('helpPopupContainer')?.[0], // content to display in modal
+  actionWrapClass: 'button-wrapper', // wrapper class containing all the buttons
+  reqConsentAgree: false, // Indicates if consent agreement is needed; shows close icon if not.
+  /**
+	 * Updates the UI based on received data.
+	 * @param {Object} receivedData - Data received after the modal button trigger,contains name of the btn triggered which is used to update the UI.
+	 */
+  updateUI(receivedData) {
+    debugger;
+    if (receivedData?.helpBox1) {
+      iconModal(helpPopupSubpanelConfig);
+    }
+  },
+};
+nestedModal(helpConfig);
+//
 
 const displayLoader = (loadingText) => {
   const bodyContainer = document?.querySelector('.appear');
