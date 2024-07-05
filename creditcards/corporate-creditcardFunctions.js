@@ -719,7 +719,6 @@ const validateLogin = (globals) => {
   const panWrapper = panInput.parentElement;
   switch (radioSelect) {
     case 'DOB':
-      debugger;
       if (dobValue && String(new Date(dobValue).getFullYear()).length === 4) {
         const calendarEl = document.querySelector(`[name= ${$name}]`);
         const calendarElParent = calendarEl?.parentElement;
@@ -745,7 +744,6 @@ const validateLogin = (globals) => {
       }
       break;
     case 'PAN':
-      debugger;
       panWrapper.setAttribute('data-empty', true);
       if (panValue) {
         panWrapper.setAttribute('data-empty', false);
