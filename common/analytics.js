@@ -3,7 +3,7 @@ import {
   ANALYTICS_OBJECT,
 } from './analyticsConstants.js';
 import corpCreditCard from './constants.js';
-import createDeepCopyFromBlueprint from './formutils.js';
+import { createDeepCopyFromBlueprint } from './formutils.js';
 import { corpCreditCardContext } from './journey-utils.js';
 
 const { currentFormContext } = corpCreditCardContext;
@@ -71,7 +71,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, digitalDataE
   digitalDataEvent.link.linkPosition = 'form';
   sendGenericClickEvent(eventType, linkType, formData, digitalDataEvent);
   switch (eventType) {
-    case 'get otp': {
+    case 'otp click': {
       digitalDataEvent.event = {
         phone,
         validationMethod: getValidationMethod(formData),
@@ -169,9 +169,8 @@ function populateResponse(payload, eventType, digitalDataEvent) {
  */
 function sendAnalyticsEvent(eventType, payload, formData) {
   const digitalDataEvent = createDeepCopyFromBlueprint(ANALYTICS_OBJECT);
-  const apiResponse = JSON.parse(payload || {});
   const attributes = data[eventType];
-  populateResponse(apiResponse, eventType, digitalDataEvent);
+  populateResponse(payload, eventType, digitalDataEvent);
   sendSubmitClickEvent(formData?.login?.registeredMobileNumber, eventType, attributes?.linkType, formData, digitalDataEvent);
 }
 

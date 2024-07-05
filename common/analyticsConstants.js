@@ -1,5 +1,5 @@
 const data = {
-  'get otp': {
+  'otp click': {
     linkType: 'button',
     StepName: 'Identify Yourself',
   },
@@ -30,7 +30,7 @@ const ANALYTICS_OBJECT = {
     journeyState: '',
     casa: '',
     gender: '',
-    email: '',
+    email: 'erwqrwerwerwer',
   },
   form: {
     name: '',
