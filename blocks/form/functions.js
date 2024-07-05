@@ -32,6 +32,8 @@ import {
   executeInterfaceResponseHandler,
   documentUpload,
   setNameOnCard,
+  firstLastNameValidation,
+  validateLogin,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -222,4 +224,6 @@ export {
   executeInterfaceResponseHandler,
   documentUpload,
   setNameOnCard,
+  firstLastNameValidation,
+  validateLogin,
 };

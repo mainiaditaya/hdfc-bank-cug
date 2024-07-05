@@ -258,7 +258,8 @@ const successPannelMethod = async (data) => {
   const { applicationNumber, vkycUrl } = finalDapResponse;
   const { currentFormContext } = (await import('../common/journey-utils.js')).corpCreditCardContext;
   currentFormContext.VKYC_URL = vkycUrl;
-  const { result: { mobileValid } } = aadharOtpValData;
+  // const { result: { mobileValid } } = aadharOtpValData;
+  const mobileValid = aadharOtpValData?.result?.mobileValid;
   const resultPanel = document.getElementsByName('resultPanel')?.[0];
   const successPanel = document.getElementsByName('successResultPanel')?.[0];
   resultPanel.setAttribute('data-visible', true);
@@ -393,7 +394,7 @@ const finalDapFetchRes = async () => {
     finalDap.PROMOSE_COUNT += 1;
     const errorCase = (finalDap.journeyParamState === 'FINAL_DAP_FAILURE' || finalDap.PROMOSE_COUNT >= finalDap.AFFORD_COUNT);
     if (errorCase) {
-      eventHandler.errorMethod(error);
+      return eventHandler.errorMethod(error);
     }
     return setTimeout(() => finalDapFetchRes(), 1000);
   }
@@ -411,7 +412,7 @@ const finalDapFetchRes = async () => {
  */
 const pageRedirected = (aadhar, idCom) => {
   if (aadhar) {
-    debugger;
+    // debugger;
     const navigateFrom = document.getElementsByName('corporateCardWizardView')?.[0];
     const current = navigateFrom?.querySelector('.current-wizard-step');
     const currentMenuItem = navigateFrom?.querySelector('.wizard-menu-active-item');
@@ -432,7 +433,7 @@ const pageRedirected = (aadhar, idCom) => {
     navigateFrom?.dispatchEvent(event);
   }
   if (idCom) {
-    debugger;
+    // debugger;
     /**
      * finaldapResponse starts for ETB - address change scenario.
      */

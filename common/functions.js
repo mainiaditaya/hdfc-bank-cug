@@ -15,6 +15,8 @@ import {
   resendOTP,
   formRuntime,
   setNameOnCard,
+  firstLastNameValidation,
+  validateLogin,
 } from '../creditcards/corporate-creditcardFunctions.js';
 
 import { updatePanelVisibility } from './finaldaputils.js';
@@ -131,7 +133,7 @@ function customSetFocus(errorMessage, numRetries, globals) {
 function getOTP(mobileNumber, pan, dob, globals) {
   currentFormContext.action = 'getOTP';
   currentFormContext.journeyID = globals.form.runtime.journeyId.$value;
-  console.log(currentFormContext);
+  currentFormContext.leadIdParam = globals.functions.exportData().queryParams;
   // currentFormContext.leadProfile = {};
   const jsonObj = {
     requestString: {
@@ -362,11 +364,19 @@ function redirect(redirectUrl, globals) {
 
 /**
  * Reloads the current page.
+ * lead idParam is been strored in current formContext after otpGen btn click
  * @name reloadPage
+ * @param {object} globals
  */
-
-function reloadPage() {
-  window.location.reload();
+function reloadPage(globals) {
+  const leadIdParam = globals.functions.exportData()?.currentFormContext?.leadIdParam || currentFormContext?.leadIdParam;
+  const { origin, pathname } = window.location;
+  const homeUrl = `${origin}${pathname}?leadId=${leadIdParam?.leadId}${(leadIdParam?.mode === 'dev') ? '&mode=dev' : ''} `;
+  if (leadIdParam?.leadId) {
+    window.location.href = homeUrl;
+  } else {
+    window.location.reload();
+  }
 }
 export {
   getOTP,
@@ -401,4 +411,6 @@ export {
   executeInterfaceResponseHandler,
   documentUpload,
   setNameOnCard,
+  firstLastNameValidation,
+  validateLogin,
 };
