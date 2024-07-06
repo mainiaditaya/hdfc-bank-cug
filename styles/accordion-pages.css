@@ -13,6 +13,7 @@ overflow: hidden;
 padding: 0;
 
 .date-wrapper:not(.field-invalid) .field-description { display: none; }
+.date-wrapper.field-invalid .field-description {display: block !important;}
 
 input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
   appearance: none;
