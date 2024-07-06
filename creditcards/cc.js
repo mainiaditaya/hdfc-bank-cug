@@ -1,6 +1,9 @@
 /* eslint-disable no-tabs */
 /* eslint no-console: ["error", { allow: ["warn", "error", "debug"] }] */
-import iconModal from '../blocks/icon-modal/icon-modal.js';
+import {
+  closeDialog,
+  showDialog,
+} from '../blocks/icon-modal/icon-modal.js';
 import openModal from '../blocks/modal/modal.js';
 
 const createLabelInElement = (elementSelector, labelClass) => {
@@ -216,83 +219,78 @@ const viewAllBtnPannelConfig = {
 };
 linkModalFunction(viewAllBtnPannelConfig);
 
-/* help modal- header */
-
-
-const fieldSet1 = document.getElementsByName('helpPanel1')?.[0];
-
-const nestedModal = (config) => {
-  config?.triggerElement?.addEventListener('click', async (e) => {
-    const { checked, type } = e.target;
-    const checkBoxElement = (type === 'checkbox') && checked;
-    const otherElement = true;
-    const elementType = (type === 'checkbox') ? checkBoxElement : otherElement;
-    if (elementType) {
-      e.preventDefault();
-      await iconModal(config);
-      config?.content?.addEventListener('modalTriggerValue', (event) => {
-        const receivedData = event.detail;
-        if (config?.updateUI) {
-          config?.updateUI(receivedData);
-        }
-      });
-    }
-  });
+/* help icon modal- start */
+const youtubeVideo = (link) => { // dummy hardcode html
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = '<div class="youtube_player"><iframe id="YTplayer" class="iframe-container" frameborder="0" allowfullscreen="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" title="Get a Loan on Credit Card for your urgent money needs | HDFC Bank" width="640" height="360" src="https://www.youtube.com/embed/vpsiBSVeREE?modestbranding=1&amp;rel=0&amp;showinfo=0&amp;end=68000&amp;controls=0&amp;enablejsapi=1&amp;origin=https%3A%2F%2Fapplyonline.hdfcbank.com&amp;widgetid=1" style="height: 334.01px;"></iframe></div>';
+  return wrapper;
 };
-
-/// /////////////
-
-// Select the parent element
-
-// const parent = document.getElementsByName('helpPopupContainer')?.[0];
-// const child = document.getElementsByName('helpPopupSubpanel')?.[0];
-// parent.removeChild(child)
-// let deepCont;
-// if (parent && child) {
-//   // Create a deep copy of the parent node
-//   deepCont = parent.cloneNode(true);
-//   // Remove the child element from the copied parent node
-//   const childToRemove = deepCont.querySelector('[name="helpPopupSubpanel"]');
-//   if (childToRemove) {
-//     childToRemove.parentNode.removeChild(childToRemove);
-//   }
-//   // Now parentCopy contains a deep copy of parent without the childTrigger element
-// }
-// nestedModal(configHelp);
-
-const helpPopupSubpanelConfig = {
-  content: document.getElementsByName('helpPopupSubpanel')?.[0], // content to display in modal
+/**
+ *
+ */
+const helpSubPannel = { // child_modal_config_1
+  content: document.getElementsByName('helpPopupSubpanel')[0],
   actionWrapClass: 'button-wrapper', // wrapper class containing all the buttons
   reqConsentAgree: false, // Indicates if consent agreement is needed; shows close icon if not.
+  dialogClass: 'helppoupsubpanel-dialog',
   /**
    * Updates the UI based on received data.
    * @param {Object} receivedData - Data received after the modal button trigger,contains name of the btn triggered which is used to update the UI.
    */
   updateUI(receivedData) {
-    debugger;
-    receivedData;
+    if (receivedData?.noStayHere) {
+      // console.log(receivedData?.noStayHere);
+      closeDialog(this.dialogClass);
+    }
+    if (receivedData?.yesContinue) {
+      // console.log(receivedData?.yesContinue); // open new content in new tab
+      closeDialog(this.dialogClass);
+    }
   },
 };
 
-const helpConfig = {
-  // config to create modal for consent-2
-  // triggerElement: document.querySelector('header > .cmp-container.block').children[1],
-  triggerElement: document.getElementsByName('helpTrigger')?.[0],
-  content: document.getElementsByName('helpPopupContainer')?.[0], // content to display in modal
+const ytFramePanel = {
+  content: youtubeVideo(), // child_modal_config_2
+  // actionWrapClass: 'button-wrapper', // wrapper class containing all the buttons
+  reqConsentAgree: false, // Indicates if consent agreement is needed; shows close icon if not.
+  dialogClass: 'ytpanel-dialog',
+  /**
+   * Updates the UI based on received data.
+   * @param {Object} receivedData - Data received after the modal button trigger,contains name of the btn triggered which is used to update the UI.
+   */
+  updateUI(receivedData) {
+    if (receivedData?.noStayHere) {
+      // console.log(receivedData?.noStayHere);
+      closeDialog(this.dialogClass);
+    }
+    if (receivedData?.yesContinue) {
+      // console.log(receivedData?.yesContinue); // open new content in new tab
+      closeDialog(this.dialogClass);
+    }
+  },
+};
+
+const helpIconConfig = { // main_modal_config
+  triggerElement: document.getElementsByName('helpTrigger')?.[0], // click - event
+  content: document.getElementsByName('helpPopupContainer')?.[0], // content
   actionWrapClass: 'button-wrapper', // wrapper class containing all the buttons
   reqConsentAgree: false, // Indicates if consent agreement is needed; shows close icon if not.
+  dialogClass: 'helppopupcontainer-dialog',
   /**
 	 * Updates the UI based on received data.
 	 * @param {Object} receivedData - Data received after the modal button trigger,contains name of the btn triggered which is used to update the UI.
 	 */
   updateUI(receivedData) {
-    debugger;
     if (receivedData?.helpBox1) {
-      iconModal(helpPopupSubpanelConfig);
+      showDialog(helpSubPannel);
+    }
+    if (receivedData.helpBox2) {
+      showDialog(ytFramePanel);
     }
   },
 };
-nestedModal(helpConfig);
+showDialog(helpIconConfig);
+/* help icon modal- end */
 //
 
 const displayLoader = (loadingText) => {

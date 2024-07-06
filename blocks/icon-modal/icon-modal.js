@@ -4,11 +4,17 @@ import {
 } from '../../scripts/aem.js';
 
 // eslint-disable-next-line no-unused-vars
-async function createMainModal(content, actionWrapClass, reqConsentAgree) {
+const closeDialog = (modalClass) => {
+  const modal = document.querySelector(`dialog.${modalClass}`);
+  modal.close();
+};
+
+async function createMainModal(content, actionWrapClass, reqConsentAgree, dialogClass) {
   if (!content) {
     return null;
   }
   const dialog = document.createElement('dialog');
+  dialog.classList.add(dialogClass);
   const dialogContent = document.createElement('div');
   dialogContent.classList.add('modal-content');
   dialogContent.append(content);
@@ -28,20 +34,8 @@ async function createMainModal(content, actionWrapClass, reqConsentAgree) {
   if (!reqConsentAgree) {
     dialog.append(closeButton);
   }
-  // dialog button parsed binding close action for each buttons
-  debugger;
-//   const helpPopupPanel = document.querySelector('fieldset[name="helpPopupPanel"]');
 
-  // Select all div elements with the class "button-wrapper" inside this fieldset
-//   const buttonWrapperDivs = Array.from(divElements).filter(div => div.classList.contains('button-wrapper'));
-  const buttonWrapperDivs = content?.childNodes[1].querySelectorAll(`div.${actionWrapClass}`);
-
-  // Log the filtered divs to the console
-  buttonWrapperDivs.forEach((div) => {
-    console.log(div);
-  });
-  const consentBtns = content?.childNodes;
-  const formBtnWrap = Array?.from(consentBtns)?.filter((node) => node?.nodeType === 1 && node?.classList?.contains(`${actionWrapClass}`));
+  const buttonWrapperDivs = content.querySelectorAll(`div.${actionWrapClass}`);
   buttonWrapperDivs?.forEach((element) => {
     const actionBtns = element?.querySelectorAll('button');
     actionBtns?.forEach((button) => {
@@ -60,7 +54,6 @@ async function createMainModal(content, actionWrapClass, reqConsentAgree) {
   document.querySelector('main').append(block);
   decorateBlock(block);
   await loadBlock(block);
-  // decorateIcons(closeButton);
   dialog.addEventListener('close', () => {
     document.body.classList.remove('modal-open');
     block.remove();
@@ -90,8 +83,10 @@ async function createMainModal(content, actionWrapClass, reqConsentAgree) {
    * @param {boolean} reqConsentAgree - Whether consent agreement is required to close the modal.
    * @returns {Promise<void>} - A promise that resolves when the modal is opened.
    */
-function iconModal({ content, actionWrapClass, reqConsentAgree }) {
-  createMainModal(content, actionWrapClass, reqConsentAgree)
+function iconModal({
+  content, actionWrapClass, reqConsentAgree, dialogClass,
+}) {
+  createMainModal(content, actionWrapClass, reqConsentAgree, dialogClass)
     .then((res) => {
       if (res?.showModal) {
         res?.showModal();
@@ -102,4 +97,28 @@ function iconModal({ content, actionWrapClass, reqConsentAgree }) {
     });
 }
 
-export default iconModal;
+const showDialogContent = async (config) => {
+  await iconModal(config);
+  config?.content?.addEventListener('modalTriggerValue', (event) => {
+    const receivedData = event.detail;
+    if (config?.updateUI) {
+      config?.updateUI(receivedData);
+    }
+  });
+};
+
+const showDialog = (config) => {
+  if (config.triggerElement) {
+    config?.triggerElement?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      showDialogContent(config);
+    });
+  } else {
+    showDialogContent(config);
+  }
+};
+
+export {
+  closeDialog,
+  showDialog,
+};
