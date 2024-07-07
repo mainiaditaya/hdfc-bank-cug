@@ -5,7 +5,7 @@ body.modal-open {
   overflow: hidden;
 }
 
-.modal dialog {
+.icon-modal dialog {
   --dialog-border-radius: 16px;
   
   overscroll-behavior: none;
@@ -13,7 +13,7 @@ body.modal-open {
   border-radius: var(--dialog-border-radius);
 }
 
-.modal dialog:has(.field-aadharconsentpopup) {
+.icon-modal dialog:has(.field-aadharconsentpopup) {
   width: 525px;
   padding: 0;
 
@@ -131,14 +131,14 @@ body.modal-open {
   }
 }
 
-.modal dialog .modal-content {
+.icon-modal dialog .modal-content {
   overflow-y: auto;
   overscroll-behavior: none;
   max-height: calc(95dvh - 60px);
 }
 
 @media (width >=768px) {
-  .modal dialog {
+  .icon-modal dialog {
     width: 100%;
     max-width: 920px;
     font-size: 14px;
@@ -150,22 +150,22 @@ body.modal-open {
     overflow: hidden;
   }
 
-  .modal dialog .modal-content {
+  .icon-modal dialog .modal-content {
     max-height: calc(100vh - 90px);
   }
 }
 
 @media (width <= 540px) {
-  .modal dialog:has(.field-aadharconsentpopup) {
+  .icon-modal dialog:has(.field-aadharconsentpopup) {
     width: 100%;
   }
 }
 
-.modal dialog::backdrop {
+.icon-modal dialog::backdrop {
   background-color: rgb(0 0 0 / 50%);
 }
 
-.modal .close-button {
+.icon-modal .close-button {
   position: absolute;
   top: 0;
   right: 0;
@@ -180,7 +180,7 @@ body.modal-open {
   color: #6b7280;
 }
 
-.modal dialog .section {
+.icon-modal dialog .section {
   padding: 0;
 }
 
@@ -197,4 +197,78 @@ body.modal-open {
       border-radius: 6px;
     }
   }
+}
+fieldset[class*='field-helppopupcontainer'] {
+  .field-helppopuplabel p{
+    text-align: center;
+    color: var(--color-interface-background-tertiary);
+    font-size: var(--body-md-font-size);
+    font-weight: var(--form-button-font-weight);
+  }
+  .field-helppanel1, .field-helppanel2 {
+    border: 1px dotted #ccc;
+    margin-bottom: 20px;
+    display: flex;
+    border-radius: 10px;
+    .image-wrapper{
+      flex: 1;
+      align-content: center;
+      img {
+        margin: 0 20px 0 0;
+      }
+    }
+    .button-wrapper {
+      flex: 1 1 100%;
+      text-align: left;
+      button {
+        position: relative;
+        background: none;
+        color: var(--color-interface-background-tertiary);
+        font-size: var(--body-x-sm-font-size);
+      }
+      :hover {
+        background: none !important;
+      }
+      :after {
+        content: '\003e';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        font-size: var(--body-xx-lg-font-size);
+        transform: translateY(-50%);
+      }  
+    }      
+  }
+  .field-customercarepanel {
+    display: flex;
+    .field-helpcustomercaretext{
+      b:first-child{
+        display: block;
+      }
+    }
+  }    
+}
+fieldset[class*='field-helppopupsubpanel'] {
+  .plain-text-wrapper{
+
+  }
+  .button-wrapper {
+    display: inline-block;
+    width: 50%;
+    &:last-child {
+      button {
+        text-decoration: none;
+        background: green;
+        color: var(--color-interface-background-primary);
+      }
+    }
+    button {
+      text-decoration: underline;
+      background: none;
+      color: var(--color-interface-background-tertiary);
+    }
+  }
+}
+.icon-modal-dialog:has(.modal-content .field-helppopupsubpanel) {
+  width: 200px;
 }

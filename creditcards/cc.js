@@ -229,6 +229,7 @@ const youtubeVideo = (link) => { // dummy hardcode html
  *
  */
 const helpSubPannel = { // child_modal_config_1
+  triggerElement: document.getElementsByName('helpBox1')?.[0],
   content: document.getElementsByName('helpPopupSubpanel')[0],
   actionWrapClass: 'button-wrapper', // wrapper class containing all the buttons
   reqConsentAgree: false, // Indicates if consent agreement is needed; shows close icon if not.
@@ -248,8 +249,10 @@ const helpSubPannel = { // child_modal_config_1
     }
   },
 };
+showDialog(helpSubPannel);
 
 const ytFramePanel = {
+  triggerElement: document.getElementsByName('helpBox2')?.[0],
   content: youtubeVideo(), // child_modal_config_2
   // actionWrapClass: 'button-wrapper', // wrapper class containing all the buttons
   reqConsentAgree: false, // Indicates if consent agreement is needed; shows close icon if not.
@@ -269,6 +272,7 @@ const ytFramePanel = {
     }
   },
 };
+showDialog(ytFramePanel);
 
 const helpIconConfig = { // main_modal_config
   triggerElement: document.getElementsByName('helpTrigger')?.[0], // click - event
@@ -280,14 +284,14 @@ const helpIconConfig = { // main_modal_config
 	 * Updates the UI based on received data.
 	 * @param {Object} receivedData - Data received after the modal button trigger,contains name of the btn triggered which is used to update the UI.
 	 */
-  updateUI(receivedData) {
-    if (receivedData?.helpBox1) {
-      showDialog(helpSubPannel);
-    }
-    if (receivedData.helpBox2) {
-      showDialog(ytFramePanel);
-    }
-  },
+  // updateUI(receivedData) {
+  //   if (receivedData?.helpBox1) {
+  //     showDialog(helpSubPannel);
+  //   }
+  //   if (receivedData.helpBox2) {
+  //     showDialog(ytFramePanel);
+  //   }
+  // },
 };
 showDialog(helpIconConfig);
 /* help icon modal- end */

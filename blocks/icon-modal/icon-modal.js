@@ -50,7 +50,7 @@ async function createMainModal(content, actionWrapClass, reqConsentAgree, dialog
       });
     });
   });
-  const block = buildBlock('modal', '');
+  const block = buildBlock('icon-modal', '');
   document.querySelector('main').append(block);
   decorateBlock(block);
   await loadBlock(block);
