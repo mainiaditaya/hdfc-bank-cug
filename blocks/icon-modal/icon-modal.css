@@ -274,27 +274,47 @@ fieldset[class*='field-helppopupcontainer'] {
   }    
 }
 fieldset[class*='field-helppopupsubpanel'] {
+  
   .button-wrapper {
     display: inline-block;
     width: 50%;
-    text-align: center;
+    text-align: center;   
+    &:not(:last-child) {
+      text-align: left;
+      button {
+        width: auto;
+        &:hover {
+          background: none !important;
+        }
+      }      
+    }  
     &:last-child {
+      text-align: right;
       button {
         text-decoration: none;
         background: var(--color-action-background-ancillary-default);
         color: var(--color-interface-background-primary);
         border-radius: 20px;
+        padding: 0px 20px;
+        width: auto;
+        &:hover{
+          background: var(--color-action-background-ancillary-default) !important;
+        }
       }
+      
     }
     button {
       text-decoration: underline;
       background: none;
       color: var(--color-interface-background-tertiary);
+      height: auto;
+      font-size: var(--body-x-sm-font-size);
     }
   }
 }
 .icon-modal dialog {
   &.helppoupsubpanel-dialog {
+    max-width: 600px;
     .field-helppopupsubpanel {
       .plain-text-wrapper {
         font-size: var(--body-md-font-size);
