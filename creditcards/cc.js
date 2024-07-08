@@ -219,8 +219,11 @@ const viewAllBtnPannelConfig = {
 linkModalFunction(viewAllBtnPannelConfig);
 
 /* help icon modal- start */
-const youtubeVideo = (link) => { // dummy hardcode html for youtubePanel content
+
+const youtubeVideo = () => {
+  /* hardcode (temporary) html for youtubePanel content👇 */
   const wrapper = document.createElement('div');
+  // eslint-disable-next-line max-len
   wrapper.innerHTML = '<div class="youtube_player"><iframe id="YTplayer" class="iframe-container" frameborder="0" allowfullscreen="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" title="Get a Loan on Credit Card for your urgent money needs | HDFC Bank" width="640" height="360" src="https://www.youtube.com/embed/vpsiBSVeREE?modestbranding=1&amp;rel=0&amp;showinfo=0&amp;end=68000&amp;controls=0&amp;enablejsapi=1&amp;origin=https%3A%2F%2Fapplyonline.hdfcbank.com&amp;widgetid=1" style="height: 334.01px;"></iframe></div>';
   return wrapper;
 };
@@ -250,24 +253,23 @@ const findHelpIconInHeader = () => {
  * that trigger modals. It also configures and opens various modals, and handles
  * actions for closing the help subpanel modal.
  */
-const headerHelpModalFunction = () => {
-  const [helpIcon, helpIconText] = findHelpIconInHeader();
+const launchHelpModal = () => {
+  const [helpIcon, helpIconText] = findHelpIconInHeader(); // to find out the help icon & help text in header by using the class and keyword -help. 
   const helpIconConfig = new HelpIconModal(helpIcon, 'helpPopupContainer', 'button-wrapper', false, 'helppopupcontainer-dialog');
   const helpIconTextConfig = new HelpIconModal(helpIconText, 'helpPopupContainer', 'button-wrapper', false, 'helppopupcontainer-dialog');
   const helpSubPannel = new HelpIconModal('helpPanel1', 'helpPopupSubpanel', 'button-wrapper', false, 'helppoupsubpanel-dialog');
-  const ytFramePanel = new HelpIconModal('helpBox2', youtubeVideo(), null, false, 'ytpanel-dialog');
+  const ytFramePanel = new HelpIconModal('helpPanel2', youtubeVideo(), null, false, 'ytpanel-dialog');
   [helpIconConfig, helpIconTextConfig, helpSubPannel, ytFramePanel].forEach((modalScript) => modalScript.showDialog());
   helpSubPannel.btnAction((receivedData) => {
     if (receivedData?.noStayHere) {
       helpSubPannel.closeDialog();
     }
     if (receivedData?.YesContinue) {
-      debugger
       helpSubPannel.closeDialog();
     }
   });
 };
-headerHelpModalFunction();
+launchHelpModal();
 /* help icon modal- end */
 
 const displayLoader = (loadingText) => {

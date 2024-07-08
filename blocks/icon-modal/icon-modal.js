@@ -36,11 +36,10 @@ async function createMainModal(content, actionWrapClass, reqConsentAgree, dialog
     dialog.append(closeButton);
   }
 
-  const buttonWrapperDivs = content.querySelectorAll(`div.${actionWrapClass}`);
+  const buttonWrapperDivs = content?.querySelectorAll(`div.${actionWrapClass}`);
   buttonWrapperDivs?.forEach((element) => {
     const actionBtns = element?.querySelectorAll('button');
     const actionAnchor = element?.querySelectorAll('a');
-    console.log(actionBtns, 'actionBtns');
     actionBtns?.forEach((button) => {
       // providing close functionalities to all the btns available
       button?.addEventListener('click', (e) => {
@@ -48,19 +47,16 @@ async function createMainModal(content, actionWrapClass, reqConsentAgree, dialog
         const nameOfBtn = e?.target?.name;
         const resultScope = {};
         resultScope[`${nameOfBtn}`] = true;
-        // dialog.close();
         const customEvent = new CustomEvent('modalTriggerValue', { detail: resultScope, bubbles: false });
         content?.dispatchEvent(customEvent);
       });
     });
-    actionAnchor?.forEach((button) => {
-      // providing close functionalities to all the anchor tag alone and the authored link will be opened by authoring
-      button?.addEventListener('click', (e) => {
+    actionAnchor?.forEach((aTagText) => {
+      aTagText?.addEventListener('click', (e) => {
         const anchorText = clearString(e?.target?.innerText);
         const textOfAnch = anchorText;
         const resultScope = {};
         resultScope[`${textOfAnch}`] = true;
-        dialog.close();
         const customEvent = new CustomEvent('modalTriggerValue', { detail: resultScope, bubbles: false });
         content?.dispatchEvent(customEvent);
       });
