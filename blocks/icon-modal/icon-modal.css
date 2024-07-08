@@ -222,6 +222,7 @@ fieldset[class*='field-helppopupcontainer'] {
     box-sizing: border-box;
     overflow: hidden;
     padding: 0 10px 0 0;
+    cursor: pointer;
     .image-wrapper {
       display: flex;
       align-items: center;
@@ -294,7 +295,14 @@ fieldset[class*='field-helppopupsubpanel'] {
   .button-wrapper {
     display: inline-block;
     width: 50%;
-    text-align: center;   
+    text-align: center;
+    p:hover, a:hover, b:hover{
+      background: none !important;
+      color: var(--color-interface-background-tertiary);
+    }
+    a{
+      text-decoration: underline;
+    }
     &:not(:last-child) {
       text-align: left;
       button {
