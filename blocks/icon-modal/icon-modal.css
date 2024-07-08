@@ -203,6 +203,7 @@ body.modal-open {
   }
 }
 fieldset[class*='field-helppopupcontainer'] {
+  padding: 5px !important;
   .field-helppopuppanel {
     padding: 0;
   }
@@ -220,12 +221,12 @@ fieldset[class*='field-helppopupcontainer'] {
     border-radius: 10px;
     box-sizing: border-box;
     overflow: hidden;
-    padding: 0;
+    padding: 0 10px 0 0;
     .image-wrapper {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 10px;
+      padding: 0 0 0 10px;
       box-sizing: border-box;
       img {
         margin: 0 20px 0 0;
@@ -236,7 +237,7 @@ fieldset[class*='field-helppopupcontainer'] {
       display: flex;
       align-items: center;
       flex-grow: 1;
-      padding: 10px;
+      padding: 0;
       box-sizing: border-box;
       button {
         position: relative;
@@ -256,19 +257,34 @@ fieldset[class*='field-helppopupcontainer'] {
         top: 50%;
         font-size: var(--body-xx-lg-font-size);
         transform: translateY(-50%);
+        display: flex;
+        box-sizing: border-box;
+        align-items: center;
       }  
     }      
   }
   .field-customercarepanel {
     display: flex;    
+    padding: 0;
     .plain-text-wrapper{
       p{
         color: var(--color-interface-background-tertiary);
       }
     }
     .field-helpcustomercaretext {
+      padding: 0 40px 0 10px;
       b:first-child{
         display: block;
+      }
+    }
+    .image-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 0 0 10px;
+      box-sizing: border-box;
+      img {
+        margin: 0 20px 0 0;
       }
     }
   }    
