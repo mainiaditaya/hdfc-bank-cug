@@ -118,7 +118,64 @@ const showDialog = (config) => {
   }
 };
 
+/**
+ * config to create a modal
+ */
+class HelpIconModal {
+  /**
+   * Creates an instance of HelpIconModal.
+   * @param {HTMLElement|string} triggerElement - The element that triggers the modal, or its name attribute.
+   * @param {HTMLElement|string} content - The content to display in the modal, or its name attribute.
+   * @param {string} actionWrapClass - The CSS class of the action wrapper btn -.
+   * @param {boolean} reqConsentAgree - Indicates if consent agreement is required.
+   * @param {string} dialogClass - The CSS class of the dialog.
+   */
+  constructor(triggerElement, content, actionWrapClass, reqConsentAgree, dialogClass) {
+    this.triggerElement = document.getElementsByName(triggerElement)?.[0] ? document.getElementsByName(triggerElement)?.[0] : triggerElement;
+    this.content = document.getElementsByName(content)?.[0] ? document.getElementsByName(content)?.[0] : content;
+    this.actionWrapClass = actionWrapClass;
+    this.reqConsentAgree = reqConsentAgree;
+    this.dialogClass = dialogClass;
+  }
+
+  /**
+   * Shows the modal dialog when the trigger element is clicked if the trigger is not present it will open up modal without any click action.
+   */
+  showDialog() {
+    if (this.triggerElement) {
+      this?.triggerElement?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        showDialogContent(this);
+      });
+    } else {
+      showDialogContent(this);
+    }
+  }
+
+  /**
+   * Closes the modal dialog.
+   */
+  closeDialog() {
+    const modal = document.querySelector(`dialog.${this.dialogClass}`);
+    modal.close();
+  }
+
+  /**
+   * used to identify the name of the button which it got clicked.
+   * Sets up a custom event listener for handling actions within the modal.
+   * @param {function} data - A callback function to handle the data passed from the event.
+   */
+
+  btnAction(data) {
+    this.content?.addEventListener('modalTriggerValue', (event) => {
+      const receivedData = event.detail;
+      data(receivedData);
+    });
+  }
+}
+
 export {
+  HelpIconModal,
   closeDialog,
   showDialog,
 };

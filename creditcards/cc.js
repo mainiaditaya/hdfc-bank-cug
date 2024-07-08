@@ -1,8 +1,7 @@
 /* eslint-disable no-tabs */
 /* eslint no-console: ["error", { allow: ["warn", "error", "debug"] }] */
 import {
-  closeDialog,
-  showDialog,
+  HelpIconModal,
 } from '../blocks/icon-modal/icon-modal.js';
 import openModal from '../blocks/modal/modal.js';
 
@@ -220,82 +219,30 @@ const viewAllBtnPannelConfig = {
 linkModalFunction(viewAllBtnPannelConfig);
 
 /* help icon modal- start */
-const youtubeVideo = (link) => { // dummy hardcode html
+const youtubeVideo = (link) => { // dummy hardcode html for youtubePanel content
   const wrapper = document.createElement('div');
   wrapper.innerHTML = '<div class="youtube_player"><iframe id="YTplayer" class="iframe-container" frameborder="0" allowfullscreen="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" title="Get a Loan on Credit Card for your urgent money needs | HDFC Bank" width="640" height="360" src="https://www.youtube.com/embed/vpsiBSVeREE?modestbranding=1&amp;rel=0&amp;showinfo=0&amp;end=68000&amp;controls=0&amp;enablejsapi=1&amp;origin=https%3A%2F%2Fapplyonline.hdfcbank.com&amp;widgetid=1" style="height: 334.01px;"></iframe></div>';
   return wrapper;
 };
 /**
- *
+ * LoadHelpIconModal script for opening up modals and handling closing actions.
  */
-const helpSubPannel = { // child_modal_config_1
-  triggerElement: document.getElementsByName('helpBox1')?.[0],
-  content: document.getElementsByName('helpPopupSubpanel')[0],
-  actionWrapClass: 'button-wrapper', // wrapper class containing all the buttons
-  reqConsentAgree: false, // Indicates if consent agreement is needed; shows close icon if not.
-  dialogClass: 'helppoupsubpanel-dialog',
-  /**
-   * Updates the UI based on received data.
-   * @param {Object} receivedData - Data received after the modal button trigger,contains name of the btn triggered which is used to update the UI.
-   */
-  updateUI(receivedData) {
+const loadhelpIconScript = () => {
+  const helpIconConfig = new HelpIconModal('helpTrigger', 'helpPopupContainer', 'button-wrapper', false, 'helppopupcontainer-dialog');
+  const helpSubPannel = new HelpIconModal('helpBox1', 'helpPopupSubpanel', 'button-wrapper', false, 'helppoupsubpanel-dialog');
+  const ytFramePanel = new HelpIconModal('helpBox2', youtubeVideo(), null, false, 'ytpanel-dialog');
+  [helpIconConfig, helpSubPannel, ytFramePanel].forEach((modalScript) => modalScript.showDialog());
+  helpSubPannel.btnAction((receivedData) => {
     if (receivedData?.noStayHere) {
-      // console.log(receivedData?.noStayHere);
-      closeDialog(this.dialogClass);
+      helpSubPannel.closeDialog();
     }
     if (receivedData?.yesContinue) {
-      // console.log(receivedData?.yesContinue); // open new content in new tab
-      closeDialog(this.dialogClass);
+      helpSubPannel.closeDialog();
     }
-  },
+  });
 };
-showDialog(helpSubPannel);
-
-const ytFramePanel = {
-  triggerElement: document.getElementsByName('helpBox2')?.[0],
-  content: youtubeVideo(), // child_modal_config_2
-  // actionWrapClass: 'button-wrapper', // wrapper class containing all the buttons
-  reqConsentAgree: false, // Indicates if consent agreement is needed; shows close icon if not.
-  dialogClass: 'ytpanel-dialog',
-  /**
-   * Updates the UI based on received data.
-   * @param {Object} receivedData - Data received after the modal button trigger,contains name of the btn triggered which is used to update the UI.
-   */
-  updateUI(receivedData) {
-    if (receivedData?.noStayHere) {
-      // console.log(receivedData?.noStayHere);
-      closeDialog(this.dialogClass);
-    }
-    if (receivedData?.yesContinue) {
-      // console.log(receivedData?.yesContinue); // open new content in new tab
-      closeDialog(this.dialogClass);
-    }
-  },
-};
-showDialog(ytFramePanel);
-
-const helpIconConfig = { // main_modal_config
-  triggerElement: document.getElementsByName('helpTrigger')?.[0], // click - event
-  content: document.getElementsByName('helpPopupContainer')?.[0], // content
-  actionWrapClass: 'button-wrapper', // wrapper class containing all the buttons
-  reqConsentAgree: false, // Indicates if consent agreement is needed; shows close icon if not.
-  dialogClass: 'helppopupcontainer-dialog',
-  /**
-	 * Updates the UI based on received data.
-	 * @param {Object} receivedData - Data received after the modal button trigger,contains name of the btn triggered which is used to update the UI.
-	 */
-  // updateUI(receivedData) {
-  //   if (receivedData?.helpBox1) {
-  //     showDialog(helpSubPannel);
-  //   }
-  //   if (receivedData.helpBox2) {
-  //     showDialog(ytFramePanel);
-  //   }
-  // },
-};
-showDialog(helpIconConfig);
+loadhelpIconScript();
 /* help icon modal- end */
-//
 
 const displayLoader = (loadingText) => {
   const bodyContainer = document?.querySelector('.appear');
