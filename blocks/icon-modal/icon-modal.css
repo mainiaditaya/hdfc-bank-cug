@@ -140,7 +140,7 @@ body.modal-open {
 @media (width >=768px) {
   .icon-modal dialog {
     width: 100%;
-    max-width: 920px;
+    max-width: 480px;
     font-size: 14px;
     font-weight: 400;
     line-height: 20px;
@@ -148,7 +148,11 @@ body.modal-open {
     text-align: left;
     padding: 0;
     overflow: hidden;
+    &.ytpanel-dialog{
+      max-width: 640px;
+    }
   }
+
 
   .icon-modal dialog .modal-content {
     max-height: calc(100vh - 90px);
@@ -199,7 +203,10 @@ body.modal-open {
   }
 }
 fieldset[class*='field-helppopupcontainer'] {
-  .field-helppopuplabel p{
+  .field-helppopuppanel {
+    padding: 0;
+  }
+  .field-helppopuplabel p {
     text-align: center;
     color: var(--color-interface-background-tertiary);
     font-size: var(--body-md-font-size);
@@ -209,22 +216,35 @@ fieldset[class*='field-helppopupcontainer'] {
     border: 1px dotted #ccc;
     margin-bottom: 20px;
     display: flex;
+    flex-direction: row;
     border-radius: 10px;
-    .image-wrapper{
-      flex: 1;
-      align-content: center;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 0;
+    .image-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      box-sizing: border-box;
       img {
         margin: 0 20px 0 0;
       }
     }
     .button-wrapper {
-      flex: 1 1 100%;
       text-align: left;
+      display: flex;
+      align-items: center;
+      flex-grow: 1;
+      padding: 10px;
+      box-sizing: border-box;
       button {
         position: relative;
         background: none;
         color: var(--color-interface-background-tertiary);
         font-size: var(--body-x-sm-font-size);
+        white-space: normal;
+        text-align: left;
       }
       :hover {
         background: none !important;
@@ -240,8 +260,13 @@ fieldset[class*='field-helppopupcontainer'] {
     }      
   }
   .field-customercarepanel {
-    display: flex;
-    .field-helpcustomercaretext{
+    display: flex;    
+    .plain-text-wrapper{
+      p{
+        color: var(--color-interface-background-tertiary);
+      }
+    }
+    .field-helpcustomercaretext {
       b:first-child{
         display: block;
       }
@@ -249,17 +274,16 @@ fieldset[class*='field-helppopupcontainer'] {
   }    
 }
 fieldset[class*='field-helppopupsubpanel'] {
-  .plain-text-wrapper{
-
-  }
   .button-wrapper {
     display: inline-block;
     width: 50%;
+    text-align: center;
     &:last-child {
       button {
         text-decoration: none;
-        background: green;
+        background: var(--color-action-background-ancillary-default);
         color: var(--color-interface-background-primary);
+        border-radius: 20px;
       }
     }
     button {
@@ -269,6 +293,14 @@ fieldset[class*='field-helppopupsubpanel'] {
     }
   }
 }
-.icon-modal-dialog:has(.modal-content .field-helppopupsubpanel) {
-  width: 200px;
+.icon-modal dialog {
+  &.helppoupsubpanel-dialog {
+    .field-helppopupsubpanel {
+      .plain-text-wrapper {
+        font-size: var(--body-md-font-size);
+        color: var(--color-interface-background-tertiary);
+      }
+    }
+  }
+  
 }
