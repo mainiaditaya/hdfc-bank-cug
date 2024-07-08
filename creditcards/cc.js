@@ -224,24 +224,50 @@ const youtubeVideo = (link) => { // dummy hardcode html for youtubePanel content
   wrapper.innerHTML = '<div class="youtube_player"><iframe id="YTplayer" class="iframe-container" frameborder="0" allowfullscreen="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" title="Get a Loan on Credit Card for your urgent money needs | HDFC Bank" width="640" height="360" src="https://www.youtube.com/embed/vpsiBSVeREE?modestbranding=1&amp;rel=0&amp;showinfo=0&amp;end=68000&amp;controls=0&amp;enablejsapi=1&amp;origin=https%3A%2F%2Fapplyonline.hdfcbank.com&amp;widgetid=1" style="height: 334.01px;"></iframe></div>';
   return wrapper;
 };
+
 /**
- * LoadHelpIconModal script for opening up modals and handling closing actions.
+ * Finds the help icon and its associated text in the header container.
+ * This function searches for elements within a container class that contains the word "help"
+ * in their inner HTML content, and sets their cursor style to "pointer".
+ *
+ * @returns {Array<HTMLElement>} An array containing the help icon and the help text elements.
+ * If no elements are found, returns an empty array.
  */
-const loadhelpIconScript = () => {
-  const helpIconConfig = new HelpIconModal('helpTrigger', 'helpPopupContainer', 'button-wrapper', false, 'helppopupcontainer-dialog');
-  const helpSubPannel = new HelpIconModal('helpBox1', 'helpPopupSubpanel', 'button-wrapper', false, 'helppoupsubpanel-dialog');
+const findHelpIconInHeader = () => {
+  const HEADER_HELP_KEY = 'help';
+  const CONTAINER_CLASS = '.cmp-container';
+  const [headerHelpIcon, headerHelpIconText] = Array.from(document.querySelector(CONTAINER_CLASS)?.children).filter((el) => el?.innerHTML?.trim()?.toLowerCase()?.includes(HEADER_HELP_KEY));
+  [headerHelpIcon, headerHelpIconText].forEach((div) => {
+    div.style.cursor = 'pointer'; // helpicon + helpText cursor style
+  });
+  return [headerHelpIcon, headerHelpIconText];
+};
+
+/**
+ * Initializes and configures the Help Icon (in header) modal.
+ *
+ * This function sets up the help icon and its associated text as clickable elements
+ * that trigger modals. It also configures and opens various modals, and handles
+ * actions for closing the help subpanel modal.
+ */
+const headerHelpModalFunction = () => {
+  const [helpIcon, helpIconText] = findHelpIconInHeader();
+  const helpIconConfig = new HelpIconModal(helpIcon, 'helpPopupContainer', 'button-wrapper', false, 'helppopupcontainer-dialog');
+  const helpIconTextConfig = new HelpIconModal(helpIconText, 'helpPopupContainer', 'button-wrapper', false, 'helppopupcontainer-dialog');
+  const helpSubPannel = new HelpIconModal('helpPanel1', 'helpPopupSubpanel', 'button-wrapper', false, 'helppoupsubpanel-dialog');
   const ytFramePanel = new HelpIconModal('helpBox2', youtubeVideo(), null, false, 'ytpanel-dialog');
-  [helpIconConfig, helpSubPannel, ytFramePanel].forEach((modalScript) => modalScript.showDialog());
+  [helpIconConfig, helpIconTextConfig, helpSubPannel, ytFramePanel].forEach((modalScript) => modalScript.showDialog());
   helpSubPannel.btnAction((receivedData) => {
     if (receivedData?.noStayHere) {
       helpSubPannel.closeDialog();
     }
-    if (receivedData?.yesContinue) {
+    if (receivedData?.YesContinue) {
+      debugger
       helpSubPannel.closeDialog();
     }
   });
 };
-loadhelpIconScript();
+headerHelpModalFunction();
 /* help icon modal- end */
 
 const displayLoader = (loadingText) => {
