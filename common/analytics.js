@@ -1,51 +1,60 @@
+/* eslint-disable no-undef */
 import {
   data,
-  ANALYTICS_OBJECT,
+  ANALYTICS_CLICK_OBJECT,
+  ANALYTICS_PAGE_LOAD_OBJECT,
 } from './analyticsConstants.js';
+import {
+  createDeepCopyFromBlueprint,
+  santizedFormDataWithContext,
+} from './formutils.js';
 import corpCreditCard from './constants.js';
-import { createDeepCopyFromBlueprint } from './formutils.js';
 import { corpCreditCardContext } from './journey-utils.js';
 
 const { currentFormContext } = corpCreditCardContext;
 
-const digitalDataPageLoad = {
-  page: {
-    pageInfo: {
-      pageName: corpCreditCard.journeyName,
-      errorCode: '',
-      errorMessage: '',
-    },
-  },
-  user: {
-    pseudoID: 'TBD',
-    journeyID: '',
-    journeyName: corpCreditCard.journeyName,
-    journeyState: '',
-    casa: '',
-  },
-  form: {
-    name: 'Corporate credit card',
-  },
-};
-
 /**
- * send analytics call for click event
- * @name sendGenericEvent
+ * set analytics generic props for page load
+ * @name setAnalyticPageLoadProps
  * @param {string} linkName - linkName
  * @param {string} linkType - linkName
  * @param {object} formContext - currentFormContext.
  * @param {object} digitalData
  */
 
-function sendGenericClickEvent(linkName, linkType, formData, digitalData) {
-  const digitalDataEvent = digitalData || {};
+function setAnalyticPageLoadProps(journeyState, formData, digitalDataEvent) {
+  digitalDataEvent.page.pageInfo.pageName = '';
+  digitalDataEvent.user.pseudoID = '';
+  digitalDataEvent.user.journeyName = '';
+  digitalDataEvent.user.journeyID = currentFormContext?.journeyID;
+  digitalDataEvent.user.journeyState = journeyState;
+  digitalDataEvent.user.casa = '';
+  digitalDataEvent.form.name = corpCreditCard.formName;
+  window.digitalData = digitalDataEvent || {};
+}
+
+/**
+ * set analytics generic props for click event
+ * @name setAnalyticClickGenericProps
+ * @param {string} linkName - linkName
+ * @param {string} linkType - linkName
+ * @param {object} formContext - currentFormContext.
+ * @param {object} digitalData
+ */
+
+function setAnalyticClickGenericProps(linkName, linkType, formData, journeyState, digitalDataEvent) {
   digitalDataEvent.link = {
     linkName,
     linkType,
   };
-  digitalDataEvent.user.journeyID = formData?.currentFormContext?.journeyID;
-  digitalDataEvent.user.journeyState = formData?.currentFormContext?.journeyState;
-  digitalDataEvent.event = {};
+  digitalDataEvent.page.pageInfo.pageName = '';
+  digitalDataEvent.link.linkPosition = '';
+  digitalDataEvent.user.pseudoID = '';
+  digitalDataEvent.user.journeyName = currentFormContext?.journeyName;
+  digitalDataEvent.user.journeyID = currentFormContext?.journeyID;
+  digitalDataEvent.user.journeyState = journeyState;
+  digitalDataEvent.user.casa = '';
+  digitalDataEvent.form.name = corpCreditCard.formName;
   window.digitalData = digitalDataEvent || {};
 }
 
@@ -64,24 +73,21 @@ const getValidationMethod = (formContext) => {
  * @param {object} formContext
  * @param {object} digitalData
  */
-function sendSubmitClickEvent(phone, eventType, linkType, formData, digitalDataEvent) {
-  digitalDataEvent.page.pageInfo = corpCreditCard.journeyName;
-  digitalDataEvent.user.journeyName = corpCreditCard.journeyName;
-  digitalDataEvent.form.name = 'Corporate credit card';
-  digitalDataEvent.link.linkPosition = 'form';
-  sendGenericClickEvent(eventType, linkType, formData, digitalDataEvent);
+function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState, digitalDataEvent) {
+  setAnalyticClickGenericProps(eventType, linkType, formData, journeyState, digitalDataEvent);
   switch (eventType) {
     case 'otp click': {
       digitalDataEvent.event = {
         phone,
         validationMethod: getValidationMethod(formData),
       };
+      _satellite.track('submit');
       break;
     }
     case 'check offers': {
       digitalDataEvent.user = {
-        gender: 'Male',
-        email: 'hardcodedMailId@gmail.com',
+        gender: formData.form.gender,
+        email: formData.form.workEmailAddress,
       };
       if (formData.form.currentAddressToggle === 'off') {
         digitalDataEvent.formDetails = {
@@ -103,41 +109,81 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, digitalDataE
         designation: formData.form.designation,
         relationshipNumber: formData.form.relationshipNumber,
       });
+      currentFormContext.action = 'check offers';
+      _satellite.track('submit');
       break;
     }
 
     case 'get this card': {
       digitalDataEvent.card = {
         selectedCard: formData.form.productCode,
-        annualFee: formData.form.joiningRenewalFee,
+        annualFee: formData.form.joiningandRenewalFee,
       };
       digitalDataEvent.event = {
         status: formData.cardBenefitsAgreeCheckbox,
       };
+      currentFormContext.action = 'confirmation';
+      _satellite.track('submit');
       break;
     }
-    default: {
-      /* empty */
+
+    case 'address continue': {
+      break;
     }
+
+    case 'kyc continue': {
+      break;
+    }
+
+    case 'i agree': {
+      break;
+    }
+
+    case 'aadhaar otp': {
+      break;
+    }
+
+    case 'document upload continue': {
+      break;
+    }
+
+    case 'start kyc': {
+      break;
+    }
+
+    case 'submit review ': {
+      break;
+    }
+    default:
+      // do nothing
   }
   window.digitalData = digitalDataEvent || {};
-  // eslint-disable-next-line no-undef
-  _satellite.track('submit');
 }
 
 /**
  * Sends analytics event on page load.
  * @name sendPageloadEvent
- * @param {object} formContext.
+ * @param {string} journeyState.
+ * @param {object} formData.
  */
-function sendPageloadEvent(formContext) {
-  digitalDataPageLoad.user.journeyID = formContext.journeyID;
-  digitalDataPageLoad.user.journeyState = formContext?.journeyState || 'CUSTOMER_IDENTITY_UNRESOLVED';
-  digitalDataPageLoad.user['Journey Name'] = corpCreditCard.journeyName;
+function sendPageloadEvent(journeyState, formData) {
+  const digitalDataPageLoad = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
+  setAnalyticPageLoadProps(journeyState, formData, digitalDataPageLoad);
+  switch (currentFormContext.action) {
+    case 'check offers': {
+      digitalDataPageLoad.card.selectedCard = '';
+      digitalDataPageLoad.card.eligibleCard = '';
+      break;
+    }
+    case 'confirmation': {
+      break;
+    }
+    default:
+      // do nothing
+  }
   if (window) {
     window.digitalData = digitalDataPageLoad || {};
   }
-  // eslint-disable-next-line no-undef
   _satellite.track('pageload');
 }
 
@@ -154,9 +200,8 @@ function populateResponse(payload, eventType, digitalDataEvent) {
       digitalDataEvent.page.pageInfo.errorMessage = payload?.errorMessage;
       break;
     }
-    default: {
-      /* empty */
-    }
+    default:
+    // do nothing
   }
 }
 
@@ -164,20 +209,53 @@ function populateResponse(payload, eventType, digitalDataEvent) {
  * Send analytics events.
  * @param {string} eventType
  * @param {object} payload
+ * @param {string} journeyState
  * @param {object} formData
  * @param {object} currentFormContext
  */
-function sendAnalyticsEvent(eventType, payload, formData) {
-  const digitalDataEvent = createDeepCopyFromBlueprint(ANALYTICS_OBJECT);
+function sendAnalyticsEvent(eventType, payload, journeyState, formData) {
+  const digitalDataEvent = createDeepCopyFromBlueprint(ANALYTICS_CLICK_OBJECT);
   const attributes = data[eventType];
   populateResponse(payload, eventType, digitalDataEvent);
-  sendSubmitClickEvent(formData?.login?.registeredMobileNumber, eventType, attributes?.linkType, formData, digitalDataEvent);
+  sendSubmitClickEvent(formData?.login?.registeredMobileNumber, eventType, attributes?.linkType, formData, journeyState, digitalDataEvent);
+}
+
+/**
+* sendErrorAnalytics
+* @param {string} errorCode
+* @param {string} errorMsg
+* @param {string} journeyState
+* @param {object} globals
+*/
+function sendErrorAnalytics(errorCode, errorMsg, journeyState, globals) {
+  const digitalDataPageLoad = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
+  setAnalyticPageLoadProps(journeyState, santizedFormDataWithContext(globals), digitalDataPageLoad);
+  digitalDataPageLoad.page.pageInfo.errorCode = errorCode;
+  digitalDataPageLoad.page.pageInfo.errorMessage = errorMsg;
+  if (window) {
+    window.digitalData = digitalDataPageLoad || {};
+  }
+  _satellite.track('pageload');
+}
+
+/**
+* sendAnalytics
+* @param {string} eventType
+* @param {string} payload
+* @param {string} journeyState
+* @param {object} globals
+*/
+function sendAnalytics(eventType, payload, journeyState, globals) {
+  if (eventType === 'page load') {
+    sendPageloadEvent(journeyState, santizedFormDataWithContext(globals));
+  } else {
+    sendAnalyticsEvent(eventType, payload, journeyState, santizedFormDataWithContext(globals));
+  }
 }
 
 export {
-  digitalDataPageLoad,
   sendPageloadEvent,
-  sendSubmitClickEvent,
-  sendGenericClickEvent,
   sendAnalyticsEvent,
+  sendErrorAnalytics,
+  sendAnalytics,
 };

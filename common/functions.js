@@ -10,7 +10,6 @@ import {
   otpValHandler,
   journeyResponseHandler,
   createJourneyId,
-  sendAnalytics,
   aadharConsent123,
   resendOTP,
   formRuntime,
@@ -46,6 +45,11 @@ import {
 import {
   fetchJsonResponse, hideLoaderGif,
 } from './makeRestAPI.js';
+
+import {
+  sendErrorAnalytics,
+  sendAnalytics,
+} from './analytics.js';
 
 import corpCreditCard from './constants.js';
 
@@ -130,7 +134,6 @@ function customSetFocus(errorMessage, numRetries, globals) {
  * @return {PROMISE}
  */
 function getOTP(mobileNumber, pan, dob, globals) {
-  currentFormContext.action = 'getOTP';
   currentFormContext.journeyID = globals.form.runtime.journeyId.$value;
   currentFormContext.leadIdParam = globals.functions.exportData().queryParams;
   // currentFormContext.leadProfile = {};
@@ -412,4 +415,5 @@ export {
   setNameOnCard,
   firstLastNameValidation,
   validateLogin,
+  sendErrorAnalytics,
 };

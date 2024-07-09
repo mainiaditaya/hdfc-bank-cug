@@ -15,7 +15,7 @@ const data = {
     linkName: 'Get this Card',
   },
 };
-const ANALYTICS_OBJECT = {
+const ANALYTICS_CLICK_OBJECT = {
   page: {
     pageInfo: {
       pageName: '',
@@ -30,7 +30,7 @@ const ANALYTICS_OBJECT = {
     journeyState: '',
     casa: '',
     gender: '',
-    email: 'erwqrwerwerwer',
+    email: '',
   },
   form: {
     name: '',
@@ -66,7 +66,32 @@ const ANALYTICS_OBJECT = {
   },
 };
 
+const ANALYTICS_PAGE_LOAD_OBJECT = {
+  page: {
+    pageInfo: {
+      pageName: '',
+      errorCode: '',
+      errorMessage: '',
+    },
+  },
+  card: {
+    selectedCard: '',
+    eligibleCard: '',
+  },
+  user: {
+    pseudoID: '',
+    journeyID: '',
+    journeyName: '',
+    journeyState: '',
+    casa: '',
+  },
+  form: {
+    name: '',
+  },
+};
+
 export {
   data,
-  ANALYTICS_OBJECT,
+  ANALYTICS_CLICK_OBJECT,
+  ANALYTICS_PAGE_LOAD_OBJECT,
 };
