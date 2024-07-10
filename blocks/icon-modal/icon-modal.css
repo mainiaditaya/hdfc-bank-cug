@@ -6,7 +6,7 @@ body.modal-open {
 }
 
 .icon-modal dialog {
-  --dialog-border-radius: 16px;  
+  --dialog-border-radius: var(--form-modal-radius);  
   overscroll-behavior: none;
   border: 1px solid var(--color-interface-background-box-shadow-primary);
   border-radius: var(--dialog-border-radius);
@@ -78,7 +78,7 @@ body.modal-open {
   p {
     font-size: var(--body-sm-font-size);
     font-weight: var(--font-weight-regular);
-    line-height: 20px;
+    line-height: var(--font-linehight-regular);
     letter-spacing: 0; 
     text-align: left;
   }
@@ -90,7 +90,7 @@ body.modal-open {
   .field-label {
     font-size: var(--body-lg-font-size);
     font-weight: var(--font-weight-bold);
-    line-height: 28px;
+    line-height: var(----font-linehight-large);
     letter-spacing: 0;
     text-align: center;
     padding-top: 32px;
@@ -142,7 +142,7 @@ body.modal-open {
     max-width: 480px;
     font-size: var(--body-sm-font-size);
     font-weight: var(--font-weight-regular);
-    line-height: 20px;
+    line-height: var(--font-linehight-regular);
     letter-spacing: 0;
     text-align: left;
     padding: 0;
