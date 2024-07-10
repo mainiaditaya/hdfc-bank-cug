@@ -71,6 +71,37 @@ const getValidationMethod = (formContext) => {
 };
 
 /**
+ * Sends analytics event on page load.
+ * @name sendPageloadEvent
+ * @param {string} journeyState.
+ * @param {object} formData.
+ */
+function sendPageloadEvent(journeyState, formData) {
+  const digitalDataPageLoad = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
+  setAnalyticPageLoadProps(journeyState, formData, digitalDataPageLoad);
+  switch (currentFormContext.action) {
+    case 'check offers': {
+      digitalDataPageLoad.card.selectedCard = '';
+      digitalDataPageLoad.card.eligibleCard = '';
+      break;
+    }
+    case 'confirmation': {
+      // ((mobileValid === 'n')&&aadhaar_otp_val_data?.result?.mobileValid)
+      // applRefNumber or referenceNumber
+      digitalDataPageLoad.formDetails.reference = formData.currentFormContext.applRefNumber;
+      digitalData.formDetails.isVideoKYC = 'yes'; // value - ? 'yes' or 'no' if aadhar and then applicationMismatch
+      break;
+    }
+    default:
+      // do nothing
+  }
+  if (window) {
+    window.digitalData = digitalDataPageLoad || {};
+  }
+  _satellite.track('pageload');
+}
+
+/**
  *Creates digital data for otp click event.
  * @param {string} phone
  * @param {string} validationType
@@ -116,6 +147,9 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       });
       currentFormContext.action = 'check offers';
       _satellite.track('submit');
+      setTimeout(() => {
+        sendPageloadEvent(journeyState, santizedFormDataWithContext(globals));
+      }, 1000);
       break;
     }
 
@@ -124,72 +158,74 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
         selectedCard: formData.form.productCode,
         annualFee: formData.form.joiningandRenewalFee,
       };
-      digitalDataEvent.event = {
-        status: formData.cardBenefitsAgreeCheckbox,
-      };
+      // digitalDataEvent.event = {
+      //   status: formData.cardBenefitsAgreeCheckbox,
+      // };
       currentFormContext.action = 'confirmation';
       _satellite.track('submit');
       break;
     }
 
     case 'address continue': {
+      digitalDataEvent.event = {
+        status: formData?.form?.cardDeliveryAddressOption1 || formData?.form?.cardDeliveryAddressOption2,
+        validationMethod: '', // Netbanking or Debit card - validationMethod - authmode will be getting only after idcom redirected - how to use that value
+      };
+      _satellite.track('submit');
       break;
     }
 
     case 'kyc continue': {
+      const kyc = (formData?.form?.aadharEKYCVerification && 'Ekyc') || (formData?.form?.aadharBiometricVerification && 'Biometric') || (formData?.form?.officiallyValidDocumentsMethod && 'Other Docs');
+      digitalDataEvent.formDetails = {
+        KYCVerificationMethod: kyc,
+      };
+      _satellite.track('submit');
       break;
     }
 
     case 'i agree': {
+      digitalDataEvent.formDetails = {
+        languageSelected: currentFormContext?.languageSelected,
+      };
+      _satellite.track('submit');
       break;
     }
 
     case 'aadhaar otp': {
+      // UID OR VID  how to capture the value - aadhar in different portal.
+      digitalDataEvent.event = {
+        status: '',
+      };
+      _satellite.track('submit');
       break;
     }
 
     case 'document upload continue': {
+      digitalDataEvent.formDetails = {
+        documentProof: formData?.docUploadDropdown, // documentType
+      };
+      _satellite.track('submit');
       break;
     }
 
     case 'start kyc': {
+      digitalDataEvent.event = {
+        status: '1', // formData?.vkycProceedButton, //  value is '1' or '0' for -e63 capture
+      };
       break;
     }
 
     case 'submit review ': {
+      digitalDataEvent.event = {
+        rating: formData?.ratingvalue,
+      };
       break;
     }
     default:
       // do nothing
   }
   window.digitalData = digitalDataEvent || {};
-}
-
-/**
- * Sends analytics event on page load.
- * @name sendPageloadEvent
- * @param {string} journeyState.
- * @param {object} formData.
- */
-function sendPageloadEvent(journeyState, formData) {
-  const digitalDataPageLoad = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
-  setAnalyticPageLoadProps(journeyState, formData, digitalDataPageLoad);
-  switch (currentFormContext.action) {
-    case 'check offers': {
-      digitalDataPageLoad.card.selectedCard = '';
-      digitalDataPageLoad.card.eligibleCard = '';
-      break;
-    }
-    case 'confirmation': {
-      break;
-    }
-    default:
-      // do nothing
-  }
-  if (window) {
-    window.digitalData = digitalDataPageLoad || {};
-  }
-  _satellite.track('pageload');
 }
 
 function populateResponse(payload, eventType, digitalDataEvent) {
@@ -200,6 +236,8 @@ function populateResponse(payload, eventType, digitalDataEvent) {
       break;
     }
     case 'check offers':
+    case 'i agree':
+    case 'document upload continue':
     case 'get this card': {
       digitalDataEvent.page.pageInfo.errorCode = payload?.errorCode;
       digitalDataEvent.page.pageInfo.errorMessage = payload?.errorMessage;

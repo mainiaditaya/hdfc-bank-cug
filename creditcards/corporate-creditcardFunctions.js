@@ -23,6 +23,7 @@ import {
   displayLoader, hideLoaderGif,
 } from '../common/makeRestAPI.js';
 import corpCreditCard from '../common/constants.js';
+import { sendAnalytics } from '../common/analytics.js';
 
 const { endpoints } = corpCreditCard;
 const { currentFormContext } = corpCreditCardContext;
@@ -559,6 +560,7 @@ const validateEmailID = async (email, globals) => {
  * @param {Object} globals - The global object containing necessary data for DAP request.
  */
 const aadharConsent123 = async (globals) => {
+  debugger;
   try {
     if (typeof window !== 'undefined') {
       const openModal = (await import('../blocks/modal/modal.js')).default;
@@ -578,6 +580,7 @@ const aadharConsent123 = async (globals) => {
       config?.content?.addEventListener('modalTriggerValue', (event) => {
         const receivedData = event.detail;
         if (receivedData?.aadharConsentAgree) {
+          sendAnalytics('i agree', { errorCode: '0000', errorMessage: 'Success' }, 'JOURNEYSTATE', globals);
           globals.functions.setProperty(globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel.ckycDetailsContinueETBPanel.triggerAadharAPI, { value: 1 });
         }
       });

@@ -7,6 +7,7 @@ import {
   chainedFetchAsyncCall,
 } from './makeRestAPI.js';
 import { urlPath, generateUUID } from './formutils.js';
+import { sendAnalytics } from './analytics.js';
 
 /**
  * Creates a FormData payload for document upload.
@@ -82,6 +83,7 @@ const documentUpload = async (globals) => {
   };
   const apiEndPoint = urlPath(corpCreditCard.endpoints.docUpload);
   const method = 'POST';
+  sendAnalytics('document upload continue', { errorCode: '0000', errorMessage: 'Success' }, 'JOURNEYSTATE', globals); // should be called in form
   try {
     displayLoader();
     const fsFilePayload = await createDocPayload(frontDoc);

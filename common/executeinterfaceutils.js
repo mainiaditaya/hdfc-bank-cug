@@ -224,8 +224,6 @@ const listNameOnCard = (globals) => {
   const setDropdownField = formUtil(globals, dropDownSelectField);
   setDropdownField.setEnum(options, initialValue); // setting initial value
   moveWizardView('corporateCardWizardView', 'confirmCardPanel');
-  sendAnalytics('check offers', { errorCode: '0000', errorMessage: 'Success' }, 'JOURNEYSTATE', globals);
-  sendAnalytics('page load', { errorCode: '0000', errorMessage: 'Success' }, 'JOURNEYSTATE', globals);
 };
 
 /**

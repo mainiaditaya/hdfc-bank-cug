@@ -14,6 +14,14 @@ const data = {
     linkType: 'button',
     linkName: 'Get this Card',
   },
+  'i agreee': {
+    linkType: 'button',
+    linkName: 'I agree',
+  },
+  'document upload continue': {
+    linkType: 'button',
+    linkName: 'I agree',
+  },
 };
 const ANALYTICS_CLICK_OBJECT = {
   page: {
@@ -58,6 +66,7 @@ const ANALYTICS_CLICK_OBJECT = {
     languageSelected: '',
     reference: '',
     isVideoKYC: '',
+    documentProof: '',
   },
   card: {
     selectedCard: '',
