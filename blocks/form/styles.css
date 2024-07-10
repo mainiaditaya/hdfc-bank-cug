@@ -545,10 +545,7 @@ main .form .field-successresultpanel {
     }
 
     .field-submitfeedback button {
-      border: solid 1px var(--color-action-border-primary-default);
-      color: var(--color-action-text-secondary-default);
       width: 205px;
-      background: var(--color-interface-background-primary) !important;
     }
   }
 }
