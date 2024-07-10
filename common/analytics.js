@@ -53,8 +53,13 @@ function setAnalyticClickGenericProps(linkName, linkType, formData, journeyState
   digitalDataEvent.user.journeyName = currentFormContext?.journeyName;
   digitalDataEvent.user.journeyID = currentFormContext?.journeyID;
   digitalDataEvent.user.journeyState = journeyState;
-  digitalDataEvent.user.casa = '';
-  digitalDataEvent.form.name = corpCreditCard.formName;
+  if (linkName === 'otp click') {
+    digitalDataEvent.form.name = corpCreditCard.formName;
+    digitalDataEvent.user.casa = '';
+  } else {
+    digitalDataEvent.form.name = formData.etbFlowSelected === 'on' ? `${corpCreditCard.formName}-ETB` : `${corpCreditCard.formName}-NTB`;
+    digitalDataEvent.user.casa = formData.etbFlowSelected === 'on' ? 'Yes' : 'No';
+  }
   window.digitalData = digitalDataEvent || {};
 }
 
