@@ -26,6 +26,22 @@ const data = {
     linkType: 'button',
     linkName: 'Submit',
   },
+  'kyc continue': {
+    linkType: 'button',
+    linkName: 'Continue KYC',
+  },
+  // 'aadhaar otp': {
+  //   linkType: '',
+  //   linkName: '',
+  // },
+  'start kyc': {
+    linkType: 'button',
+    linkName: 'Start KYC',
+  },
+  'submit review': {
+    linkType: 'button',
+    linkName: 'Submit Feedback',
+  },
 };
 const ANALYTICS_CLICK_OBJECT = {
   page: {

@@ -210,13 +210,15 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       digitalDataEvent.event = {
         status: '1', // formData?.vkycProceedButton, //  value is '1' or '0' for -e63 capture
       };
+      _satellite.track('submit');
       break;
     }
 
-    case 'submit review ': {
+    case 'submit review': {
       digitalDataEvent.event = {
         rating: formData?.ratingvalue,
       };
+      _satellite.track('survey');
       break;
     }
     default:
