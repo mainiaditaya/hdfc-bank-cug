@@ -96,7 +96,7 @@ function checkMode(globals) {
     globals.functions.setProperty(addressDeclarationOffice.officeAddressSelectKYC, { value: officeAddress });
     globals.functions.setProperty(CurrentAddressDeclaration.currentResidenceAddress, { value: communicationAddress });
     currentFormContext.action = 'confirmation';
-    sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', santizedFormDataWithContext(globals));
+    sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globals);
   } if (idcomVisit === 'DebitCard') {
     const resultPanel = formUtil(globals, globals.form.resultPanel);
     resultPanel.visible(false);
@@ -111,7 +111,7 @@ function checkMode(globals) {
     const userRedirected = true;
     executeInterfacePostRedirect('idCom', userRedirected, globals);
     currentFormContext.action = 'confirmation';
-    sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', santizedFormDataWithContext(globals));
+    sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globals);
   }
 }
 
