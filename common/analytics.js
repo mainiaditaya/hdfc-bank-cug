@@ -77,7 +77,7 @@ const getValidationMethod = (formContext) => {
  */
 function sendPageloadEvent(journeyState, globals) {
   const digitalDataPageLoad = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
-  const formData = santizedFormDataWithContext(globals);
+  const formData = santizedFormDataWithContext(globals, globals.functions.exportData().currentFormContext);
   setAnalyticPageLoadProps(journeyState, formData, digitalDataPageLoad);
   switch (currentFormContext.action) {
     case 'check offers': {
@@ -87,8 +87,8 @@ function sendPageloadEvent(journeyState, globals) {
     }
     case 'confirmation': {
       // ((mobileValid === 'n')&&aadhaar_otp_val_data?.result?.mobileValid)
-      // applRefNumber or referenceNumber
-      digitalDataPageLoad.formDetails.reference = formData.currentFormContext.applRefNumber;
+      // arn_num
+      digitalDataPageLoad.formDetails.reference = formData.currentFormContext.ARN_NUM;
       digitalData.formDetails.isVideoKYC = 'yes'; // value - ? 'yes' or 'no' if aadhar and then applicationMismatch
       break;
     }
