@@ -50,6 +50,7 @@ import {
   sendErrorAnalytics,
   sendAnalytics,
   asyncAnalytics,
+  sendPageloadEvent,
 } from './analytics.js';
 
 import corpCreditCard from './constants.js';
@@ -94,6 +95,8 @@ function checkMode(globals) {
     globals.functions.setProperty(AddressDeclarationAadhar.aadharAddressSelectKYC, { value: aadharAddress });
     globals.functions.setProperty(addressDeclarationOffice.officeAddressSelectKYC, { value: officeAddress });
     globals.functions.setProperty(CurrentAddressDeclaration.currentResidenceAddress, { value: communicationAddress });
+    currentFormContext.action = 'confirmation';
+    sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', santizedFormDataWithContext(globals));
   } if (idcomVisit === 'DebitCard') {
     const resultPanel = formUtil(globals, globals.form.resultPanel);
     resultPanel.visible(false);
@@ -107,6 +110,8 @@ function checkMode(globals) {
     globals.functions.setProperty(globals.form.confirmResult, { visible: false });
     const userRedirected = true;
     executeInterfacePostRedirect('idCom', userRedirected, globals);
+    currentFormContext.action = 'confirmation';
+    sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', santizedFormDataWithContext(globals));
   }
 }
 

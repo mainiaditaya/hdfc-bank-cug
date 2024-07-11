@@ -75,8 +75,9 @@ const getValidationMethod = (formContext) => {
  * @param {string} journeyState.
  * @param {object} formData.
  */
-function sendPageloadEvent(journeyState, formData) {
+function sendPageloadEvent(journeyState, globals) {
   const digitalDataPageLoad = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
+  const formData = santizedFormDataWithContext(globals);
   setAnalyticPageLoadProps(journeyState, formData, digitalDataPageLoad);
   switch (currentFormContext.action) {
     case 'check offers': {
@@ -207,6 +208,8 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'start kyc': {
+      // ETB_ Capture clicks on Start vKYC CTA, Applicable only for ETB Address Change, Only in case of Aadhaar and Application no. mismatch
+      // NTB_ '1'(default without any condition)
       digitalDataEvent.event = {
         status: '1', // formData?.vkycProceedButton, //  value is '1' or '0' for -e63 capture
       };
@@ -215,6 +218,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'submit review': {
+      // common both ntb + etb
       digitalDataEvent.event = {
         rating: formData?.ratingvalue,
       };
