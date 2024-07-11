@@ -49,6 +49,7 @@ import {
 import {
   sendErrorAnalytics,
   sendAnalytics,
+  asyncAnalytics,
 } from './analytics.js';
 
 import corpCreditCard from './constants.js';
@@ -416,4 +417,5 @@ export {
   firstLastNameValidation,
   validateLogin,
   sendErrorAnalytics,
+  asyncAnalytics,
 };

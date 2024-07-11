@@ -224,6 +224,7 @@ const listNameOnCard = (globals) => {
   const setDropdownField = formUtil(globals, dropDownSelectField);
   setDropdownField.setEnum(options, initialValue); // setting initial value
   moveWizardView('corporateCardWizardView', 'confirmCardPanel');
+  // sendAnalytics('page load', { errorCode: '0000', errorMessage: 'Success' }, 'CUSTOMER_BUREAU_OFFER_AVAILABLE', globals);
 };
 
 /**
@@ -249,7 +250,7 @@ const executeInterfaceApiFinal = (globals) => {
  */
 const executeInterfaceResponseHandler = (resPayload, globals) => {
   currentFormContext.executeInterfaceResPayload = resPayload;
-  sendAnalytics('get this card', resPayload, 'JOURNEYSTATE_GET_THIS_CARD', globals);
+  sendAnalytics('get this card', resPayload, 'CUSTOMER_CARD_SELECTED', globals);
 };
 
 /**

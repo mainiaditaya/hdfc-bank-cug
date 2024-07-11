@@ -35,6 +35,7 @@ import {
   firstLastNameValidation,
   validateLogin,
   sendErrorAnalytics,
+  asyncAnalytics,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -222,4 +223,5 @@ export {
   firstLastNameValidation,
   validateLogin,
   sendErrorAnalytics,
+  asyncAnalytics,
 };

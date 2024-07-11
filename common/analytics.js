@@ -23,14 +23,13 @@ const { currentFormContext } = corpCreditCardContext;
  */
 
 function setAnalyticPageLoadProps(journeyState, formData, digitalDataEvent) {
-  digitalDataEvent.page.pageInfo.pageName = '';
-  digitalDataEvent.user.pseudoID = '';
-  digitalDataEvent.user.journeyName = '';
+  digitalDataEvent.page.pageInfo.pageName = 'Identify Yourself';
+  digitalDataEvent.user.pseudoID = '';// Need to check
+  digitalDataEvent.user.journeyName = currentFormContext?.journeyName;
   digitalDataEvent.user.journeyID = currentFormContext?.journeyID;
   digitalDataEvent.user.journeyState = journeyState;
   digitalDataEvent.user.casa = '';
   digitalDataEvent.form.name = corpCreditCard.formName;
-  window.digitalData = digitalDataEvent || {};
 }
 
 /**
@@ -60,7 +59,7 @@ function setAnalyticClickGenericProps(linkName, linkType, formData, journeyState
     digitalDataEvent.form.name = formData.etbFlowSelected === 'on' ? `${corpCreditCard.formName}-ETB` : `${corpCreditCard.formName}-NTB`;
     digitalDataEvent.user.casa = formData.etbFlowSelected === 'on' ? 'Yes' : 'No';
   }
-  window.digitalData = digitalDataEvent || {};
+  // window.digitalData = digitalDataEvent || {};
 }
 
 const getValidationMethod = (formContext) => {
@@ -95,9 +94,9 @@ function sendPageloadEvent(journeyState, formData) {
     default:
       // do nothing
   }
-  if (window) {
-    window.digitalData = digitalDataPageLoad || {};
-  }
+  // if (window) {
+  //   window.digitalData = digitalDataPageLoad || {};
+  // }
   _satellite.track('pageload');
 }
 
@@ -121,10 +120,8 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       break;
     }
     case 'check offers': {
-      digitalDataEvent.user = {
-        gender: formData.form.gender,
-        email: formData.form.workEmailAddress,
-      };
+      digitalDataEvent.user.gender = formData.form.gender;
+      digitalDataEvent.user.email = formData.form.workEmailAddress;
       if (formData.form.currentAddressToggle === 'off') {
         digitalDataEvent.formDetails = {
           pincode: currentFormContext.breDemogResponse.VDCUSTZIPCODE,
@@ -148,7 +145,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       currentFormContext.action = 'check offers';
       _satellite.track('submit');
       setTimeout(() => {
-        sendPageloadEvent(journeyState, santizedFormDataWithContext(globals));
+        sendPageloadEvent('CUSTOMER_BUREAU_OFFER_AVAILABLE', formData);
       }, 1000);
       break;
     }
@@ -225,7 +222,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     default:
       // do nothing
   }
-  window.digitalData = digitalDataEvent || {};
+  // window.digitalData = digitalDataEvent || {};
 }
 
 function populateResponse(payload, eventType, digitalDataEvent) {
@@ -275,9 +272,9 @@ function sendErrorAnalytics(errorCode, errorMsg, journeyState, globals) {
   setAnalyticPageLoadProps(journeyState, santizedFormDataWithContext(globals), digitalDataPageLoad);
   digitalDataPageLoad.page.pageInfo.errorCode = errorCode;
   digitalDataPageLoad.page.pageInfo.errorMessage = errorMsg;
-  if (window) {
-    window.digitalData = digitalDataPageLoad || {};
-  }
+  // if (window) {
+  //   window.digitalData = digitalDataPageLoad || {};
+  // }
   _satellite.track('pageload');
 }
 
@@ -290,10 +287,32 @@ function sendErrorAnalytics(errorCode, errorMsg, journeyState, globals) {
 */
 function sendAnalytics(eventType, payload, journeyState, globals) {
   if (eventType === 'page load') {
-    sendPageloadEvent(journeyState, santizedFormDataWithContext(globals));
+    sendPageloadEvent(journeyState, globals);
   } else {
     sendAnalyticsEvent(eventType, payload, journeyState, santizedFormDataWithContext(globals));
   }
+}
+
+/**
+ * Sends an analytics event and performs additional asynchronous operations.
+ *
+ * @param {string} eventType - The type of the event to be sent.
+ * @param {string} payload - The data to be sent with the event.
+ * @param {string} journeyState - The state of the current journey.
+ * @param {Object} globals - Global context or data required for the event.
+ * @returns {Promise<object>} A promise that resolves with 'Success' if the operation is successful, or rejects with an error.
+ */
+function asyncAnalytics(eventType, payload, journeyState, globals) {
+  return new Promise((resolve, reject) => {
+    sendAnalyticsEvent(eventType, payload, journeyState, santizedFormDataWithContext(globals));
+    anotherFunction()
+      .then(() => {
+        resolve({ response: 'success' });
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
 }
 
 export {
@@ -301,4 +320,5 @@ export {
   sendAnalyticsEvent,
   sendErrorAnalytics,
   sendAnalytics,
+  asyncAnalytics,
 };

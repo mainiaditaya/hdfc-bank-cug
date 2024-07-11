@@ -560,7 +560,6 @@ const validateEmailID = async (email, globals) => {
  * @param {Object} globals - The global object containing necessary data for DAP request.
  */
 const aadharConsent123 = async (globals) => {
-  debugger;
   try {
     if (typeof window !== 'undefined') {
       const openModal = (await import('../blocks/modal/modal.js')).default;
