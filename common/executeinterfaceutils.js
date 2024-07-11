@@ -223,6 +223,13 @@ const listNameOnCard = (globals) => {
   const setDropdownField = formUtil(globals, dropDownSelectField);
   setDropdownField.setEnum(options, initialValue); // setting initial value
   moveWizardView('corporateCardWizardView', 'confirmCardPanel');
+  invokeJourneyDropOffUpdate(
+    'CUSTOMER_BUREAU_OFFER_AVAILABLE',
+    globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
+    globals.form.runtime.leadProifileId.$value,
+    globals.form.runtime.journeyId.$value,
+    globals,
+  );
 };
 
 /**
@@ -296,8 +303,7 @@ const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJw
 };
 
 /**
- * Handles the successful response for IPA.
- *
+ * Handles the successful response for IPA and Journey State Update.
  * @param {Object} ipa - The ipa prop in response object.
  * @param {Object} productEligibility - The product eligibility prop in response object.
  * @param {Object} globals - The global context object containing form and view configurations.
@@ -337,7 +343,6 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
     const mapPTag = firstProductDetail?.features?.map((el) => `<p class='popuptext-resp'>&bull; ${el}</p>`)?.join(' ');
     cardFeature.setValue(mapPTag);
   }
-
   if (currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag === 'N') {
     const { selectKycPanel } = globals.form.corporateCardWizardView;
     const selectKycPanelUtil = formUtil(globals, selectKycPanel);

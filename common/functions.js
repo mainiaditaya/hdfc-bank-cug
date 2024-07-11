@@ -64,7 +64,8 @@ function checkMode(globals) {
   const aadharVisit = formData?.queryParams?.visitType; // "EKYC_AUTH
   // temporarly added referenceNumber check for IDCOMM redirection to land on submit screen.
   if (aadharVisit === 'EKYC_AUTH' && formData?.aadhaar_otp_val_data?.message && formData?.aadhaar_otp_val_data?.message === 'Aadhaar OTP Validate success') {
-    globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: true });
+    try{
+      globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: true });
     globals.functions.setProperty(globals.form.otpPanel, { visible: false });
     globals.functions.setProperty(globals.form.loginPanel, { visible: false });
     globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
@@ -90,6 +91,13 @@ function checkMode(globals) {
     globals.functions.setProperty(AddressDeclarationAadhar.aadharAddressSelectKYC, { value: aadharAddress });
     globals.functions.setProperty(addressDeclarationOffice.officeAddressSelectKYC, { value: officeAddress });
     globals.functions.setProperty(CurrentAddressDeclaration.currentResidenceAddress, { value: communicationAddress });
+    const mobileNumber = formData.form.login.registeredMobileNumber;
+    const leadProfileId = formData.leadProifileId;
+    const journeyId = formData?.currentFormContext.journeyID;
+    invokeJourneyDropOffUpdate('AADHAAR_REDIRECTION_SUCCESS', mobileNumber, leadProfileId, journeyId, globals);
+    }catch{
+      nvokeJourneyDropOffUpdate('AADHAAR_REDIRECTION_SUCCESS', mobileNumber, leadProfileId, journeyId, globals);
+    }
   } if (idcomVisit === 'DebitCard') {
     const resultPanel = formUtil(globals, globals.form.resultPanel);
     resultPanel.visible(false);
@@ -334,6 +342,7 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
   response
     .then((res) => {
       console.log(res);
+      debugger;
       // var aadharValidationForm = "<form action=" + res.RedirectUrl + " method='post'></form>";
       const aadharValidationForm = document.createElement('form');
       aadharValidationForm.setAttribute('action', res.RedirectUrl);

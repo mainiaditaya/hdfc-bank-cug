@@ -147,7 +147,7 @@ const finalDap = (userRedirected, globals) => {
         currentFormContext.finalDapResponse = response;
         currentFormContext.VKYC_URL = response.vkycUrl;
         currentFormContext.ARN_NUM = response.applicationNumber;
-        invokeJourneyDropOffUpdate('FINAL_DAP_SUCCESS', mobileNumber, leadProfileId, journeyId, globals);
+        invokeJourneyDropOffUpdate('CUSTOMER_FINAL_DAP_SUCCESS', mobileNumber, leadProfileId, journeyId, globals);
         if (!userRedirected) {
           globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: false });
           globals.functions.setProperty(globals.form.resultPanel, { visible: true });
@@ -162,9 +162,10 @@ const finalDap = (userRedirected, globals) => {
             globals.functions.setProperty(globals.form.resultPanel.successResultPanel.vkycProceedButton, { visible: true });
           }
           throughDomSetArnNum(response.applicationNumber);
+          invokeJourneyDropOffUpdate('CUSTOMER_ONBOARDING_COMPELTE', mobileNumber, leadProfileId, journeyId, globals);
         }
       } else {
-        invokeJourneyDropOffUpdate('FINAL_DAP_FAILURE', mobileNumber, leadProfileId, journeyId, globals);
+        invokeJourneyDropOffUpdate('CUSTOMER_FINAL_DAP_FAILURE', mobileNumber, leadProfileId, journeyId, globals);
         if (!userRedirected) {
           globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: false });
           globals.functions.setProperty(globals.form.resultPanel, { visible: true });
