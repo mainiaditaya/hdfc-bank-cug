@@ -304,8 +304,7 @@ function sendAnalytics(eventType, payload, journeyState, globals) {
  */
 function asyncAnalytics(eventType, payload, journeyState, globals) {
   return new Promise((resolve, reject) => {
-    sendAnalyticsEvent(eventType, payload, journeyState, santizedFormDataWithContext(globals));
-    anotherFunction()
+    sendAnalyticsEvent(eventType, payload, journeyState, santizedFormDataWithContext(globals))
       .then(() => {
         resolve({ response: 'success' });
       })

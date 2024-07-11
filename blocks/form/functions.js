@@ -36,6 +36,8 @@ import {
   validateLogin,
   sendErrorAnalytics,
   asyncAnalytics,
+  idcomUrlSet,
+  idcomRedirection,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -224,4 +226,6 @@ export {
   validateLogin,
   sendErrorAnalytics,
   asyncAnalytics,
+  idcomUrlSet,
+  idcomRedirection,
 };
