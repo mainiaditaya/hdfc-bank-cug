@@ -303,14 +303,13 @@ function sendAnalytics(eventType, payload, journeyState, globals) {
  * @returns {Promise<object>} A promise that resolves with 'Success' if the operation is successful, or rejects with an error.
  */
 function asyncAnalytics(eventType, payload, journeyState, globals) {
-  return new Promise((resolve, reject) => {
-    sendAnalyticsEvent(eventType, payload, journeyState, santizedFormDataWithContext(globals))
-      .then(() => {
-        resolve({ response: 'success' });
-      })
-      .catch((error) => {
-        reject(error);
-      });
+  return new Promise((resolve) => {
+    try {
+      sendAnalyticsEvent(eventType, payload, journeyState, santizedFormDataWithContext(globals));
+      setTimeout(() => resolve({ response: 'success' }), 2000);
+    } catch (ex) {
+      console.log(ex);
+    }
   });
 }
 

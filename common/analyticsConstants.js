@@ -22,6 +22,10 @@ const data = {
     linkType: 'button',
     linkName: 'I agree',
   },
+  'address continue': {
+    linkType: 'button',
+    linkName: 'Submit',
+  },
 };
 const ANALYTICS_CLICK_OBJECT = {
   page: {
