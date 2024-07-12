@@ -13,13 +13,8 @@ export default function passwordLayout(panel) {
   togglePasswordIcon.addEventListener('click', () => {
     const type = inputField.getAttribute('type') === 'password' ? 'text' : 'password';
     inputField.setAttribute('type', type);
-    if (type === 'password') {
-      togglePasswordIcon.classList.remove('bi-eye');
-      togglePasswordIcon.classList.add('bi-eye-slash');
-    } else {
-      togglePasswordIcon.classList.remove('bi-eye-slash');
-      togglePasswordIcon.classList.add('bi-eye');
-    }
+    togglePasswordIcon.classList.toggle('bi-eye', type !== 'password');
+    togglePasswordIcon.classList.toggle('bi-eye-slash', type === 'password');
   });
   return panel;
 }

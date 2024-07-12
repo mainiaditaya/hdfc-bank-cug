@@ -1,7 +1,13 @@
 /* eslint-disable no-tabs */
 /* eslint no-console: ["error", { allow: ["warn", "error", "debug"] }] */
 import openModal from '../../blocks/modal/modal.js';
+import { DOM_ELEMENT } from './constant.js';
 
+const {
+  identifyYourself,
+  otpValidate,
+
+} = DOM_ELEMENT;
 /* startCode for creating Modal */
 /**
  * Function to link a trigger element with a modal opening functionality.
@@ -37,9 +43,9 @@ const linkModalFunction = (config) => {
 // 1.consent-2 checkbox - modal
 const consent2Config = {
   // config to create modal for consent-2
-  triggerElement: document.getElementsByName('checkboxConsent2Label')?.[0], // trigger element for calling modalFunction
-  content: document.getElementsByName('consentPanel2')?.[0], // content to display in modal
-  actionWrapClass: 'button-wrapper', // wrapper class containing all the buttons
+  triggerElement: document.getElementsByName(identifyYourself.chekbox2Label)?.[0], // trigger element for calling modalFunction
+  content: document.getElementsByName(identifyYourself.consent2Content)?.[0], // content to display in modal
+  actionWrapClass: identifyYourself.modalBtnWrapper, // wrapper class containing all the buttons
   reqConsentAgree: false, // Indicates if consent agreement is needed; shows close icon if not.
   /**
 	 * Updates the UI based on received data.
@@ -60,14 +66,14 @@ const consent2Config = {
 };
 linkModalFunction(consent2Config);
 // 2.consent-2 otherProduct-text - modal
-const consent2OtherProduct = document?.querySelector('.field-checkboxconsent2label')?.querySelector('b');
-const linkClass = 'link';
+const consent2OtherProduct = document?.querySelector(identifyYourself.checkbox2ProductLabel)?.querySelector('b');
+const linkClass = identifyYourself.anchorTagClass;
 consent2OtherProduct?.classList.add(linkClass);
 const consent2OtherProductTxtConfig = {
   // config to create modal for consent-2
   triggerElement: consent2OtherProduct, // trigger element for calling modalFunction
   content: consent2Config?.content, // content to display in modal
-  actionWrapClass: 'button-wrapper', // wrapper class containing all the buttons
+  actionWrapClass: identifyYourself.modalBtnWrapper, // wrapper class containing all the buttons
   reqConsentAgree: false, // Indicates if consent agreement is needed; shows close icon if not.
   /**
 	 * Updates the UI based on received data.
@@ -90,9 +96,9 @@ linkModalFunction(consent2OtherProductTxtConfig);
 // 3.conset-1 checbox - modal
 const consent1Config = {
   // config to create modal for consent-1
-  triggerElement: document.getElementsByName('checkboxConsent1Label')?.[0], // trigger element for calling modalFunction
-  content: document.getElementsByName('consentPanel1')?.[0], // content to display in modal
-  actionWrapClass: 'button-wrapper', // wrapper class containing all the buttons
+  triggerElement: document.getElementsByName(identifyYourself.chekbox1Label)?.[0], // trigger element for calling modalFunction
+  content: document.getElementsByName(identifyYourself.consent1Content)?.[0], // content to display in modal
+  actionWrapClass: identifyYourself.modalBtnWrapper, // wrapper class containing all the buttons
   reqConsentAgree: true, // Indicates if consent agreement is needed; shows close icon if not.
   /**
 	 * Updates the UI based on received data.
@@ -114,13 +120,13 @@ const consent1Config = {
 linkModalFunction(consent1Config);
 
 // 4.consent-1 requestProduct-text - modal
-const consent1RequestProduct = document?.querySelector('.field-checkboxconsent1label')?.querySelector('b');
+const consent1RequestProduct = document?.querySelector(identifyYourself.checkbox1ProductLabel)?.querySelector('b');
 consent1RequestProduct?.classList.add(linkClass);
 const consent2RequestProductTxtConfig = {
   // config to create modal for consent-2
   triggerElement: consent1RequestProduct, // trigger element for calling modalFunction
   content: consent1Config?.content, // content to display in modal
-  actionWrapClass: 'button-wrapper', // wrapper class containing all the buttons
+  actionWrapClass: identifyYourself.modalBtnWrapper, // wrapper class containing all the buttons
   reqConsentAgree: true, // Indicates if consent agreement is needed; shows close icon if not.
   /**
 	 * Updates the UI based on received data.
@@ -144,9 +150,8 @@ linkModalFunction(consent2RequestProductTxtConfig);
  * Hides the incorrect OTP text message when the user starts typing in the OTP input field.
  */
 const removeIncorrectOtpText = () => {
-  const otpNumFormName = 'otpNumber';// constantName-otpNumberfieldName
-  const otpNumbrQry = document.getElementsByName(otpNumFormName)?.[0];
-  const incorectOtp = document.querySelector('.field-incorrectotptext');
+  const otpNumbrQry = document.getElementsByName(otpValidate.otpNumberField)?.[0];
+  const incorectOtp = document.querySelector(otpValidate.incorrectOtpField);
   otpNumbrQry?.addEventListener('input', (e) => {
     if (e.target.value) {
       incorectOtp.style.display = 'none';

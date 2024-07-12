@@ -3,32 +3,6 @@
 // search with key - DOM_API to track of all dom function to track in formutils which is used over all the functions.
 
 /**
- * Makes a form field invalid by adding error message and styling through Dom api.
- * If the field already has an error message element, updates its content.
- * If not, creates a new error message element.
- * @param {string} fieldName - The name attribute of the field to make invalid.
- * @param {string} [invalidMsg] - The error message to display. Optional, defaults to an empty string.
- */
-const makeFieldInvalid = (fieldName, invalidMsg) => {
-  const fieldDescClass = 'field-description';
-  const invalidClass = 'field-invalid';
-  const invalidPin = document.querySelector(`[name=${fieldName}]`);
-  const parentElement = invalidPin?.parentElement;
-  if (parentElement) {
-    const fd = parentElement?.querySelector(`.${fieldDescClass}`);
-    if (fd) {
-      fd.textContent = invalidMsg || '';
-    } else {
-      parentElement?.classList.add(invalidClass);
-      const fieldDesc = document.createElement('div');
-      fieldDesc.textContent = invalidMsg || '';
-      fieldDesc.classList.add(fieldDescClass);
-      parentElement.appendChild(fieldDesc);
-    }
-  }
-};
-
-/**
  * Sets data attribute and value on the closest ancestor element with the specified class name.
  * @param {string} elementName - The name of the element to search for.
  * @param {string} fieldValue - The value to check for existence before setting data.
@@ -161,12 +135,72 @@ const addDisableClass = (selectedPanel) => {
   });
 };
 
+/**
+ * Creates a label element and appends it to a specified element in the DOM.
+ * @param {string} elementSelector - The CSS selector for the target element.
+ * @param {string} labelClass - The class to be applied to the created label element.
+ * @returns {void}
+ */
+const createLabelInElement = (elementSelector, labelClass) => {
+  /**
+* The main element in the DOM where the form resides.
+* @type {HTMLElement}
+*/
+  const mainEl = document.getElementsByTagName('main')[0];
+  /**
+* The form element containing the target element.
+* @type {HTMLElement}
+*/
+  const formEl = mainEl.querySelector('form');
+  /**
+* The target element to which the label will be appended.
+* @type {HTMLElement}
+*/
+  const element = formEl.querySelector(elementSelector);
+  if (!element) {
+    return;
+  }
+
+  /**
+* The text content of the label element.
+* @type {string}
+*/
+  const labelText = element.getElementsByTagName('label')[0].innerHTML;
+  element.getElementsByTagName('label')[0].innerHTML = '';
+  if (!labelText) {
+    return;
+  }
+
+  /**
+* The newly created label element.
+* @type {HTMLLabelElement}
+*/
+  const labelElement = document.createElement('label');
+  labelElement.classList.add(labelClass);
+  labelElement.textContent = labelText;
+  element.appendChild(labelElement);
+};
+/**
+ * Decorates the stepper for CC yourDetails panel
+ * @name decorateStepper Runs after yourDetails panel is initialized
+ */
+function decorateStepper() {
+  const totalIndex = document.querySelector('.field-corporatecardwizardview.wizard').style.getPropertyValue('--wizard-step-count');
+  const ccDetailsWizard = document.querySelector('.field-corporatecardwizardview.wizard ul');
+  Array.from(ccDetailsWizard.children).forEach((child) => {
+    if (child.tagName.toLowerCase() === 'li' && Number(child.getAttribute('data-index')) !== totalIndex - 1) {
+      child?.classList?.add('stepper-style');
+    }
+  });
+}
+
 export {
-  makeFieldInvalid,
   setDataAttributeOnClosestAncestor,
   setSelectOptions,
   moveWizardView,
   aadharLangChange,
   removeIncorrectOtpText,
   addDisableClass,
+  createLabelInElement,
+  decorateStepper,
 };

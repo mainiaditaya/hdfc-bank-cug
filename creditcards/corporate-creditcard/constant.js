@@ -19,8 +19,25 @@ const ID_COM = {
   },
 };
 
+const DOM_ELEMENT = {
+  identifyYourself: {
+    chekbox1Label: 'checkboxConsent1Label',
+    chekbox2Label: 'checkboxConsent2Label',
+    consent1Content: 'consentPanel1',
+    consent2Content: 'consentPanel2',
+    modalBtnWrapper: 'button-wrapper',
+    checkbox1ProductLabel: '.field-checkboxconsent1label',
+    checkbox2ProductLabel: '.field-checkboxconsent2label',
+    anchorTagClass: 'link',
+  },
+  otpValidate: {
+    otpNumberField: 'otpNumber',
+    incorrectOtpField: '.field-incorrectotptext',
+  },
+};
 export {
   JOURNEY_NAME,
   DEAD_PAN_STATUS,
   ID_COM,
+  DOM_ELEMENT,
 };

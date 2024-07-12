@@ -38,8 +38,6 @@ const journeyNameConstant = JOURNEY_NAME;
 function getOTP(mobileNumber, pan, dob, globals) {
   currentFormContext.action = 'getOTP';
   currentFormContext.journeyID = globals.form.runtime.journeyId.$value;
-  console.log(currentFormContext);
-  // currentFormContext.leadProfile = {};
   const jsonObj = {
     requestString: {
       mobileNumber: mobileNumber.$value,
