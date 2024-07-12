@@ -63,18 +63,18 @@ const createDapRequestObj = (globals) => {
   const customerInfo = currentFormContext?.executeInterfaceReqObj?.requestString || formContextCallbackData?.executeInterfaceReqObj?.requestString;
   // const { prefilledEmploymentDetails } = employmentDetails;
   const { selectKYCMethodOption1: { aadharEKYCVerification }, selectKYCMethodOption2: { aadharBiometricVerification }, selectKYCMethodOption3: { officiallyValidDocumentsMethod } } = globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel;
+  const formData = globals.functions.exportData();
   const kycFill = {
     KYC_STATUS:
-        (aadharEKYCVerification.$value && 'aadhaar')
-        || (aadharBiometricVerification.$value && 'bioKYC')
-        || (officiallyValidDocumentsMethod.$value && 'OVD')
+        ((aadharEKYCVerification.$value || formData?.form?.aadharEKYCVerification) && 'aadhaar')
+        || ((aadharBiometricVerification.$value || formData?.form?.aadharBiometricVerification) && 'bioKYC')
+        || ((officiallyValidDocumentsMethod.$value || formData?.form?.officiallyValidDocumentsMethod) && 'OVD')
         || null,
   };
 
   const journeyType = (globals.functions.exportData()?.currentFormContext?.breDemogResponse?.BREFILLER2 === 'D101') ? 'ETB' : 'NTB';
   const mobileMatch = globals.functions.exportData()?.aadhaar_otp_val_data?.result?.mobileValid !== undefined;
   const VKYCConsent = fetchFiller4(mobileMatch, kycFill.KYC_STATUS, journeyType);
-  const formData = globals.functions.exportData();
   const ekycSuccess = mobileMatch ? `${formData?.aadhaar_otp_val_data?.result?.ADVRefrenceKey}X${formData?.aadhaar_otp_val_data.result?.RRN}` : '';
   const finalDapPayload = {
     requestString: {
