@@ -3,6 +3,8 @@
  * @param {string} loadingText - The loading text to display (optional).
  */
 
+import { invokeRestAPIWithDataSecurity } from './apiDataSecurity.js';
+
 function displayLoader(loadingText) {
   const bodyContainer = document.querySelector('.appear');
   bodyContainer.classList.add('preloader');
@@ -31,21 +33,26 @@ function hideLoaderGif() {
 * @param {object} payload - The data payload to send with the request.
 * @returns {*} - The JSON response from the server.
 */
-function fetchJsonResponse(url, payload, method, loader = false) {
-  // apiCall-fetch
-  return fetch(url, {
-    method,
-    body: payload ? JSON.stringify(payload) : null,
-    mode: 'cors',
-    headers: {
-      'Content-type': 'text/plain',
-      Accept: 'application/json',
-    },
+function fetchJsonResponse(url, payload, method) {
+  return invokeRestAPIWithDataSecurity(payload, (responseObj) => {
+    fetch(url, {
+      method,
+      body: responseObj.dataEnc,
+      mode: 'cors',
+      headers: {
+        'Content-type': 'text/plain',
+        Accept: 'application/json',
+
+      },
+    })
+      .then((res) => {
+        res.json();
+      })
+      .catch((err) => {
+        throw err;
+      });
   })
-    .then((res) => {
-      if (loader) hideLoaderGif();
-      return res.json();
-    });
+    .then((res) => res.json());
 }
 
 /**
