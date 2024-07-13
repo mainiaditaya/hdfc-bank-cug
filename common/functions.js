@@ -19,8 +19,7 @@ import {
   validateLogin,
 } from '../creditcards/corporate-creditcardFunctions.js';
 
-import { updatePanelVisibility } from './finaldaputils.js';
-import { corpCreditCardContext, invokeJourneyDropOffUpdate } from './journey-utils.js';
+import { invokeJourneyDropOffUpdate } from './journey-utils.js';
 import {
   validatePan,
   panAPISuccesHandler,
@@ -58,7 +57,6 @@ const { currentFormContext } = corpCreditCardContext;
  * @return {PROMISE}
  */
 function checkMode(globals) {
-  debugger;
   const formData = globals.functions.exportData();
   const idcomVisit = formData?.queryParams?.authmode; // "DebitCard"
   const aadharVisit = formData?.queryParams?.visitType; // "EKYC_AUTH
@@ -91,17 +89,21 @@ function checkMode(globals) {
       globals.functions.setProperty(AddressDeclarationAadhar.aadharAddressSelectKYC, { value: aadharAddress });
       globals.functions.setProperty(addressDeclarationOffice.officeAddressSelectKYC, { value: officeAddress });
       globals.functions.setProperty(CurrentAddressDeclaration.currentResidenceAddress, { value: communicationAddress });
-      invokeJourneyDropOffUpdate('AADHAAR_REDIRECTION_SUCCESS', 
-      formData.loginPanel.mobilePanel.registeredMobileNumber,
-      formData.runtime.leadProifileId,
-      formData.runtime.leadProifileId.journeyId,
-      globals);
+      invokeJourneyDropOffUpdate(
+        'AADHAAR_REDIRECTION_SUCCESS',
+        formData.loginPanel.mobilePanel.registeredMobileNumber,
+        formData.runtime.leadProifileId,
+        formData.runtime.leadProifileId.journeyId,
+        globals,
+      );
     } catch (e) {
-      invokeJourneyDropOffUpdate('AADHAAR_REDIRECTION_FAILURE',
-      formData.loginPanel.mobilePanel.registeredMobileNumber,
-      formData.runtime.leadProifileId,
-      formData.runtime.leadProifileId.journeyId, 
-      globals);
+      invokeJourneyDropOffUpdate(
+        'AADHAAR_REDIRECTION_FAILURE',
+        formData.loginPanel.mobilePanel.registeredMobileNumber,
+        formData.runtime.leadProifileId,
+        formData.runtime.leadProifileId.journeyId,
+        globals,
+      );
     }
   } if (idcomVisit === 'DebitCard') {
     const resultPanel = formUtil(globals, globals.form.resultPanel);
@@ -367,7 +369,7 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
  * @name redirect
  * @param {string} redirectUrl - The URL to redirect the browser to.
  */
-function redirect(redirectUrl, globals) {
+function redirect(redirectUrl) {
   let urlLink = redirectUrl;
   if (redirectUrl === 'VKYCURL' && currentFormContext.VKYC_URL) {
     urlLink = currentFormContext.VKYC_URL;
