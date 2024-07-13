@@ -38,6 +38,8 @@ import {
   idcomRedirection,
 } from '../../common/functions.js';
 
+import { initRestAPIDataSecurityServiceES6 } from '../../common/apiDataSecurity.js';
+
 import { moveWizardView } from '../../common/formutils.js';
 import {
   sendSubmitClickEvent,
@@ -230,4 +232,5 @@ export {
   validateLogin,
   idcomUrlSet,
   idcomRedirection,
+  initRestAPIDataSecurityServiceES6,
 };
