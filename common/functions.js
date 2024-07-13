@@ -394,6 +394,25 @@ function reloadPage(globals) {
     window.location.reload();
   }
 }
+
+/**
+ * set the value of idcom url in current form context
+ * @name idcomUrlSet
+ * @param {string} IdComUrl - idcomurl url parameter in string format.
+ */
+
+function idcomUrlSet(IdComUrl) {
+  currentFormContext.ID_COM_URL = IdComUrl;
+}
+
+/**
+ * @name idcomRedirection
+ * redirect the idcomurl by taking the url got saved in current form context
+ */
+function idcomRedirection() {
+  window.location.href = currentFormContext.ID_COM_URL;
+}
+
 export {
   getOTP,
   otpValidation,
@@ -429,4 +448,6 @@ export {
   setNameOnCard,
   firstLastNameValidation,
   validateLogin,
+  idcomUrlSet,
+  idcomRedirection,
 };

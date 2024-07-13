@@ -34,6 +34,8 @@ import {
   setNameOnCard,
   firstLastNameValidation,
   validateLogin,
+  idcomUrlSet,
+  idcomRedirection,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -226,4 +228,6 @@ export {
   setNameOnCard,
   firstLastNameValidation,
   validateLogin,
+  idcomUrlSet,
+  idcomRedirection,
 };
