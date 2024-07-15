@@ -33,7 +33,7 @@ function hideLoaderGif() {
 * @param {object} payload - The data payload to send with the request.
 * @returns {*} - The JSON response from the server.
 */
-async function fetchJsonResponse(url, payload, method) {
+async function fetchJsonResponse(url, payload, method, loader = false) {
   try {
     let response;
     let result;
@@ -49,6 +49,7 @@ async function fetchJsonResponse(url, payload, method) {
         },
       });
       result = await response.json();
+      if (loader) hideLoaderGif();
       return result;
     }
     const responseObj = await invokeRestAPIWithDataSecurity(payload);
@@ -65,6 +66,7 @@ async function fetchJsonResponse(url, payload, method) {
     });
     result = await response.text();
     const decryptedResult = await decryptDataES6(result, responseObj.secret);
+    if (loader) hideLoaderGif();
     return JSON.parse(decryptedResult);
   } catch (error) {
     console.error('Error in fetching JSON response:', error);
@@ -80,33 +82,45 @@ async function fetchJsonResponse(url, payload, method) {
 * @param {object} payload - The data payload to send with the request.
 * @returns {*} - The JSON response from the server.
 */
-function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = false, startTime = Date.now()) {
-  return fetch(url, {
-    method,
-    body: payload ? JSON.stringify(payload) : null,
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'text/plain',
-      Accept: 'application/json',
-    },
-  })
-    .then((res) => res.json())
-    .then((response) => {
-      const ipaResult = response?.ipa?.ipaResult;
-      if (ipaResult && ipaResult !== '' && ipaResult !== 'null' && ipaResult !== 'undefined') {
-        if (loader) hideLoaderGif();
-        return response;
-      }
-      // const elapsedTime = (Date.now() - startTime) / 1000;
-      // if (elapsedTime < parseInt(ipaDuration, 10) - 10) {
-      //   return new Promise((resolve) => {
-      //     setTimeout(() => {
-      //       resolve(fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, true, startTime));
-      //     }, ipaTimer * 1000);
-      //   });
-      // }
-      return response;
+async function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = false, startTime = Date.now()) {
+  try {
+    const responseObj = await invokeRestAPIWithDataSecurity(payload);
+    const response = await fetch(url, {
+      method,
+      body: responseObj.dataEnc,
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'text/plain',
+        Accept: 'application/json',
+        'X-Enckey': responseObj.keyEnc,
+        'X-Encsecret': responseObj.secretEnc,
+      },
     });
+    const result = await response.text();
+    const decryptedResult = await decryptDataES6(result, responseObj.secret);
+    const formattedResult = JSON.parse(decryptedResult);
+    const ipaResult = formattedResult?.ipa?.ipaResult;
+
+    if (ipaResult && ipaResult !== '' && ipaResult !== 'null' && ipaResult !== 'undefined') {
+      if (loader) hideLoaderGif();
+      return formattedResult;
+    }
+
+    const elapsedTime = (Date.now() - startTime) / 1000;
+    if (elapsedTime < parseInt(ipaDuration, 10) - 10) {
+      return new Promise((resolve) => {
+        setTimeout(async () => {
+          const res = await fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, true, startTime);
+          resolve(res);
+        }, ipaTimer * 1000);
+      });
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error in fetching IPA response:', error);
+    throw error;
+  }
 }
 
 /**
