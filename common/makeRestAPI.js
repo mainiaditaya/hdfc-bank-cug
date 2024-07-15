@@ -35,8 +35,24 @@ function hideLoaderGif() {
 */
 async function fetchJsonResponse(url, payload, method) {
   try {
+    let response;
+    let result;
+
+    if (typeof window === 'undefined') {
+      response = await fetch(url, {
+        method,
+        body: payload ? JSON.stringify(payload) : null,
+        mode: 'cors',
+        headers: {
+          'Content-type': 'text/plain',
+          Accept: 'application/json',
+        },
+      });
+      result = await response.json();
+      return result;
+    }
     const responseObj = await invokeRestAPIWithDataSecurity(payload);
-    const response = await fetch(url, {
+    response = await fetch(url, {
       method,
       body: responseObj.dataEnc,
       mode: 'cors',
@@ -47,10 +63,9 @@ async function fetchJsonResponse(url, payload, method) {
         'X-Encsecret': responseObj.secretEnc,
       },
     });
-    const result = await response.text();
+    result = await response.text();
     const decryptedResult = await decryptDataES6(result, responseObj.secret);
-    console.log(decryptedResult);
-    return result;
+    return JSON.parse(decryptedResult);
   } catch (error) {
     console.error('Error in fetching JSON response:', error);
     throw error;
