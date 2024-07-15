@@ -40,7 +40,7 @@ function fetchJsonResponse(url, payload, method) {
       body: responseObj.dataEnc,
       mode: 'cors',
       headers: {
-        'Content-type': 'application/json',
+        'Content-type': 'text/plain',
         Accept: 'application/json',
         'X-Enckey': responseObj.keyEnc,
         'X-Encsecret': responseObj.secretEnc,
