@@ -40,20 +40,24 @@ function fetchJsonResponse(url, payload, method) {
       body: responseObj.dataEnc,
       mode: 'cors',
       headers: {
-        'Content-type': 'text/plain',
+        'Content-type': 'application/json',
         Accept: 'application/json',
         'X-Enckey': responseObj.keyEnc,
         'X-Encsecret': responseObj.secretEnc,
       },
     })
       .then((res) => {
+        console.log(res);
         res.json();
       })
       .catch((err) => {
         throw err;
       });
   })
-    .then((res) => res.json());
+    .then((res) => {
+      console.log(res);
+      res.json();
+    });
 }
 
 /**
