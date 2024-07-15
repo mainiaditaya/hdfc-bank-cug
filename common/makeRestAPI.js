@@ -42,9 +42,8 @@ function fetchJsonResponse(url, payload, method) {
       headers: {
         'Content-type': 'text/plain',
         Accept: 'application/json',
-        'X-Enckey': 'somevalue123',
-        'X-Encsecret': 'somevalue7897987898',
-
+        'X-Enckey': responseObj.keyEnc,
+        'X-Encsecret': responseObj.secretEnc,
       },
     })
       .then((res) => {

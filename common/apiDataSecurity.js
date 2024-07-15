@@ -47,6 +47,16 @@ function isStringEmpty(str) {
 }
 
 /**
+     * Prepares the request headers
+     */
+function getDataEncRequestHeaders(keyEnc, secretEnc) {
+  const requestHeaders = {};
+  requestHeaders[restAPIDataSecurityServiceContext.SEC_KEY_HEADER] = keyEnc;
+  requestHeaders[restAPIDataSecurityServiceContext.SEC_SECRET_HEADER] = secretEnc;
+  return requestHeaders;
+}
+
+/**
    * Encrypts data
    */
 function encryptDataES6(data, successCallback) {
@@ -71,19 +81,10 @@ function encryptDataES6(data, successCallback) {
         secret,
         secretEnc: encSecret,
         keyEnc: restAPIDataSecurityServiceContext.encSymmetricKey,
+        requestHeader: getDataEncRequestHeaders(restAPIDataSecurityServiceContext.encSymmetricKey, encSecret),
       });
     });
   });
-}
-
-/**
-     * Prepares the request headers
-     */
-function getDataEncRequestHeaders(encDataPack) {
-  const requestHeaders = {};
-  requestHeaders[restAPIDataSecurityServiceContext.SEC_KEY_HEADER] = encDataPack.keyEnc;
-  requestHeaders[restAPIDataSecurityServiceContext.SEC_SECRET_HEADER] = encDataPack.secretEnc;
-  return requestHeaders;
 }
 
 
