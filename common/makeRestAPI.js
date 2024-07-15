@@ -3,7 +3,7 @@
  * @param {string} loadingText - The loading text to display (optional).
  */
 
-import { invokeRestAPIWithDataSecurity } from './apiDataSecurity.js';
+import { decryptDataES6, invokeRestAPIWithDataSecurity } from './apiDataSecurity.js';
 
 function displayLoader(loadingText) {
   const bodyContainer = document.querySelector('.appear');
@@ -33,31 +33,28 @@ function hideLoaderGif() {
 * @param {object} payload - The data payload to send with the request.
 * @returns {*} - The JSON response from the server.
 */
-function fetchJsonResponse(url, payload, method) {
-  return invokeRestAPIWithDataSecurity(payload, (responseObj) => {
-    fetch(url, {
+async function fetchJsonResponse(url, payload, method) {
+  try {
+    const responseObj = await invokeRestAPIWithDataSecurity(payload);
+    const response = await fetch(url, {
       method,
       body: responseObj.dataEnc,
       mode: 'cors',
       headers: {
         'Content-type': 'text/plain',
-        Accept: 'application/json',
+        Accept: 'text/plain',
         'X-Enckey': responseObj.keyEnc,
         'X-Encsecret': responseObj.secretEnc,
       },
-    })
-      .then((res) => {
-        console.log(res);
-        res.json();
-      })
-      .catch((err) => {
-        throw err;
-      });
-  })
-    .then((res) => {
-      console.log(res);
-      res.json();
     });
+    const result = await response.text();
+    const decryptedResult = await decryptDataES6(result, responseObj.secret);
+    console.log(decryptedResult);
+    return result;
+  } catch (error) {
+    console.error('Error in fetching JSON response:', error);
+    throw error;
+  }
 }
 
 /**
