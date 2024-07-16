@@ -533,6 +533,21 @@ main .form .field-successresultpanel {
       border-left: solid 1px #D2D5DB;
     }
   }
+
+  .field-ratingfragment {
+    .field-ratinglabel p { color: var(--color-interface-text-primary); }
+
+    .field-ratingpanel .field-rating .rating.hover{
+      justify-content: center;
+      margin-top: -20px;
+      .star { font-size: 36px; }
+      .emoji { display: none; }
+    }
+
+    .field-submitfeedback button {
+      width: 205px;
+    }
+  }
 }
 
 main .form .field-resultpanel > div:not(.bulleted-paragraph) {
@@ -627,7 +642,12 @@ main .form .field-resultpanel {
     .field-successresulttextlabel { margin-bottom: 12px; }
     .field-arnrefnumpanel::before { left: 24%; }
     .field-arnrefnumlabel, .field-newarnnumber { left: 36%; }
-    .field-vkycconfirmationtext { justify-content: center; }
+    .field-ratingpanel .field-rating .rating.hover {margin-top: 0 !important;}
+
+    .field-vkycconfirmationtext { 
+      justify-content: center; 
+      margin: 19px 0 !important; 
+    }
   }
 }
 

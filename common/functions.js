@@ -20,6 +20,7 @@ import {
 
 // import { updatePanelVisibility } from './finaldaputils.js';
 
+import { invokeJourneyDropOffUpdate } from './journey-utils.js';
 import {
   validatePan,
   panAPISuccesHandler,
@@ -69,32 +70,49 @@ function checkMode(globals) {
   const aadharVisit = formData?.queryParams?.visitType; // "EKYC_AUTH
   // temporarly added referenceNumber check for IDCOMM redirection to land on submit screen.
   if (aadharVisit === 'EKYC_AUTH' && formData?.aadhaar_otp_val_data?.message && formData?.aadhaar_otp_val_data?.message === 'Aadhaar OTP Validate success') {
-    globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: true });
-    globals.functions.setProperty(globals.form.otpPanel, { visible: false });
-    globals.functions.setProperty(globals.form.loginPanel, { visible: false });
-    globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
-    globals.functions.setProperty(globals.form.consentFragment, { visible: false });
-    globals.functions.setProperty(globals.form.welcomeText, { visible: false });
-    const {
-      result: {
-        Address1, Address2, Address3, City, State, Zipcode,
-      },
-    } = formData.aadhaar_otp_val_data;
-    const {
-      executeInterfaceReqObj: {
-        requestString: {
-          officeAddress1, officeAddress2, officeAddress3, officeCity, officeState, officeZipCode,
-          communicationAddress1, communicationAddress2, communicationAddress3, communicationCity, communicationState, comCityZip,
+    try {
+      globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: true });
+      globals.functions.setProperty(globals.form.otpPanel, { visible: false });
+      globals.functions.setProperty(globals.form.loginPanel, { visible: false });
+      globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
+      globals.functions.setProperty(globals.form.consentFragment, { visible: false });
+      globals.functions.setProperty(globals.form.welcomeText, { visible: false });
+      const {
+        result: {
+          Address1, Address2, Address3, City, State, Zipcode,
         },
-      },
-    } = formData.currentFormContext;
-    const aadharAddress = [Address1, Address2, Address3, City, State, Zipcode]?.filter(Boolean)?.join(', ');
-    const officeAddress = [officeAddress1, officeAddress2, officeAddress3, officeCity, officeState, officeZipCode]?.filter(Boolean)?.join(', ');
-    const communicationAddress = [communicationAddress1, communicationAddress2, communicationAddress3, communicationCity, communicationState, comCityZip]?.filter(Boolean)?.join(', ');
-    const { AddressDeclarationAadhar, addressDeclarationOffice, CurrentAddressDeclaration } = globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel;
-    globals.functions.setProperty(AddressDeclarationAadhar.aadharAddressSelectKYC, { value: aadharAddress });
-    globals.functions.setProperty(addressDeclarationOffice.officeAddressSelectKYC, { value: officeAddress });
-    globals.functions.setProperty(CurrentAddressDeclaration.currentResidenceAddress, { value: communicationAddress });
+      } = formData.aadhaar_otp_val_data;
+      const {
+        executeInterfaceReqObj: {
+          requestString: {
+            officeAddress1, officeAddress2, officeAddress3, officeCity, officeState, officeZipCode,
+            communicationAddress1, communicationAddress2, communicationAddress3, communicationCity, communicationState, comCityZip,
+          },
+        },
+      } = formData.currentFormContext;
+      const aadharAddress = [Address1, Address2, Address3, City, State, Zipcode]?.filter(Boolean)?.join(', ');
+      const officeAddress = [officeAddress1, officeAddress2, officeAddress3, officeCity, officeState, officeZipCode]?.filter(Boolean)?.join(', ');
+      const communicationAddress = [communicationAddress1, communicationAddress2, communicationAddress3, communicationCity, communicationState, comCityZip]?.filter(Boolean)?.join(', ');
+      const { AddressDeclarationAadhar, addressDeclarationOffice, CurrentAddressDeclaration } = globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel;
+      globals.functions.setProperty(AddressDeclarationAadhar.aadharAddressSelectKYC, { value: aadharAddress });
+      globals.functions.setProperty(addressDeclarationOffice.officeAddressSelectKYC, { value: officeAddress });
+      globals.functions.setProperty(CurrentAddressDeclaration.currentResidenceAddress, { value: communicationAddress });
+      invokeJourneyDropOffUpdate(
+        'AADHAAR_REDIRECTION_SUCCESS',
+        formData.loginPanel.mobilePanel.registeredMobileNumber,
+        formData.runtime.leadProifileId,
+        formData.runtime.leadProifileId.journeyId,
+        globals,
+      );
+    } catch (e) {
+      invokeJourneyDropOffUpdate(
+        'AADHAAR_REDIRECTION_FAILURE',
+        formData.loginPanel.mobilePanel.registeredMobileNumber,
+        formData.runtime.leadProifileId,
+        formData.runtime.leadProifileId.journeyId,
+        globals,
+      );
+    }
     currentFormContext.action = 'confirmation';
     sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globals);
   } if (idcomVisit === 'DebitCard') {
