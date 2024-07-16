@@ -35,25 +35,8 @@ function hideLoaderGif() {
 */
 async function fetchJsonResponse(url, payload, method, loader = false) {
   try {
-    let response;
-    let result;
-
-    if (typeof window === 'undefined') {
-      response = await fetch(url, {
-        method,
-        body: payload ? JSON.stringify(payload) : null,
-        mode: 'cors',
-        headers: {
-          'Content-type': 'text/plain',
-          Accept: 'application/json',
-        },
-      });
-      result = await response.json();
-      if (loader) hideLoaderGif();
-      return result;
-    }
     const responseObj = await invokeRestAPIWithDataSecurity(payload);
-    response = await fetch(url, {
+    const response = await fetch(url, {
       method,
       body: responseObj.dataEnc,
       mode: 'cors',
@@ -64,7 +47,7 @@ async function fetchJsonResponse(url, payload, method, loader = false) {
         'X-Encsecret': responseObj.secretEnc,
       },
     });
-    result = await response.text();
+    const result = await response.text();
     const decryptedResult = await decryptDataES6(result, responseObj.secret);
     if (loader) hideLoaderGif();
     return JSON.parse(decryptedResult);
@@ -131,21 +114,27 @@ async function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loa
  * @param {object} payload - The data payload to send with the request.
  * @returns {*} - The JSON response from the server.
  */
-function getJsonResponse(url, payload, method = 'POST') {
-  // apiCall-fetch
-  return fetch(url, {
-    method,
-    body: payload ? JSON.stringify(payload) : null,
-    mode: 'cors',
-    headers: {
-      'Content-type': 'text/plain',
-      Accept: 'application/json',
-    },
-  })
-    .then((res) => res.json())
-    .catch((err) => {
-      throw err;
+async function getJsonResponse(url, payload, method = 'POST') {
+  try {
+    const responseObj = await invokeRestAPIWithDataSecurity(payload);
+    const response = await fetch(url, {
+      method,
+      body: responseObj.dataEnc,
+      mode: 'cors',
+      headers: {
+        'Content-type': 'text/plain',
+        Accept: 'text/plain',
+        'X-Enckey': responseObj.keyEnc,
+        'X-Encsecret': responseObj.secretEnc,
+      },
     });
+    const result = await response.text();
+    const decryptedResult = await decryptDataES6(result, responseObj.secret);
+    return JSON.parse(decryptedResult);
+  } catch (error) {
+    console.error('Error in fetching JSON response:', error);
+    throw error;
+  }
 }
 
 /**
@@ -159,20 +148,20 @@ function getJsonResponse(url, payload, method = 'POST') {
  * @callback successCallback - The callback function to handle after successful API response.
  * @callback errorCallback - The callback function to handle after errors during the API call.
  */
-function restAPICall(globals, method, payload, path, successCallback, errorCallback, loadingText) {
-  if (loadingText) displayLoader(loadingText);
-  getJsonResponse(path, payload, method)
-    .then((res) => {
-      if (res) {
-        if (loadingText) hideLoaderGif();
-        successCallback(res, globals);
-      }
-    })
-    .catch((err) => {
-      // errorMethod
+async function restAPICall(globals, method, payload, path, successCallback, errorCallback, loadingText) {
+  try {
+    if (loadingText) displayLoader(loadingText);
+
+    const res = await getJsonResponse(path, payload, method);
+
+    if (res) {
       if (loadingText) hideLoaderGif();
-      errorCallback(err, globals);
-    });
+      successCallback(res, globals);
+    }
+  } catch (err) {
+    if (loadingText) hideLoaderGif();
+    errorCallback(err, globals);
+  }
 }
 
 /**

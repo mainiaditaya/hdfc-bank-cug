@@ -3,7 +3,7 @@
 const restAPIDataSecurityServiceContext = {
   SEC_KEY_HEADER: 'X-ENCKEY',
   SEC_SECRET_HEADER: 'X-ENCSECRET',
-  crypto: (typeof window !== 'undefined') ? (window.crypto || window.msCrypto) : false,
+  crypto,
   supportsES6: (typeof window !== 'undefined') ? (!window.msCrypto) : false,
   symmetricAlgo: 'AES-GCM',
   symmetricKeyLength: 256,
@@ -170,7 +170,7 @@ async function decryptDataES6(encData, secret) {
     return null; // Ensure the function always returns a value
   }
 }
-
+initRestAPIDataSecurityServiceES6();
 export {
   getDataEncRequestHeaders,
   invokeRestAPIWithDataSecurity,

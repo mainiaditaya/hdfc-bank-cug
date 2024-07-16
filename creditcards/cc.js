@@ -412,7 +412,6 @@ const finalDapFetchRes = async () => {
  */
 const pageRedirected = (aadhar, idCom) => {
   if (aadhar) {
-    // debugger;
     const navigateFrom = document.getElementsByName('corporateCardWizardView')?.[0];
     const current = navigateFrom?.querySelector('.current-wizard-step');
     const currentMenuItem = navigateFrom?.querySelector('.wizard-menu-active-item');
@@ -433,7 +432,6 @@ const pageRedirected = (aadhar, idCom) => {
     navigateFrom?.dispatchEvent(event);
   }
   if (idCom) {
-    // debugger;
     /**
      * finaldapResponse starts for ETB - address change scenario.
      */
