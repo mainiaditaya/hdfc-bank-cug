@@ -42,10 +42,6 @@ function arrayBufferToString(str) {
   return byteString;
 }
 
-function isStringEmpty(str) {
-  return (!str || str.length === 0);
-}
-
 /**
    * Encrypts data
    */
@@ -86,23 +82,10 @@ function getDataEncRequestHeaders(encDataPack) {
   return requestHeaders;
 }
 
-
-/**
-     * Adds custom headers to request headers
-     */
-function addCustomHeaders(headersObj, requestHeadersObj) {
-  // eslint-disable-next-line no-restricted-syntax, guard-for-in
-  for (const header in headersObj) {
-    requestHeadersObj[header] = headersObj[header];
-  }
-  return requestHeadersObj;
-}
-
 /**
      * Initialization in browsers where ES6 is supported
      */
 function initRestAPIDataSecurityServiceES6() {
-  debugger;
   // eslint-disable-next-line max-len
   const publicKeyPemContent = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoAatblmEzZTQOT732FU38hiT9vCvGK12+pUD3yENyHXjk7oN1uWPlpItm5OAcsPZt52WznDkpOb/AxLBeJKFYZPvOk75lo6ZAA1qyJEOekQru5XQUtpMzsC9w96T2zTYQQ4HUwMNXmYkWIVo4Ek/KCfX2yklRHxwm3Pqj93vJkUmoddLctXArddtm75HUjtYzf5jecQCGk//pyjTDJEswMpg3oXNiI2F1PnDUiKdQBE7+a1s5KB7CAKKYQLFNN48kjiOdDutMByjZxW0elPs9ETVU+NVNQ6ru9vKQYzvR/2YD7NNSHPUCpdexIpfiYeWrxUNgpHLM2qfXTOvn6UztQIDAQAB';
   // Base64 decode
@@ -144,7 +127,6 @@ function initRestAPIDataSecurityServiceES6() {
      * @name invokeRestAPIWithDataSecurity
      */
 function invokeRestAPIWithDataSecurity(data, successCallback) {
-  debugger;
   encryptDataES6(data, successCallback);
 }
 
