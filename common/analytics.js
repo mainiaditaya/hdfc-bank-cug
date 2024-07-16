@@ -22,7 +22,7 @@ const { currentFormContext } = corpCreditCardContext;
  * @param {object} digitalData
  */
 
-function setAnalyticPageLoadProps(journeyState, formData, digitalDataEvent) {
+function setAnalyticPageLoadProps(journeyState, digitalDataEvent) {
   digitalDataEvent.page.pageInfo.pageName = 'Identify Yourself';
   digitalDataEvent.user.pseudoID = '';// Need to check
   digitalDataEvent.user.journeyName = currentFormContext?.journeyName;
@@ -77,8 +77,7 @@ const getValidationMethod = (formContext) => {
  */
 function sendPageloadEvent(journeyState, globals) {
   const digitalDataPageLoad = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
-  const formData = santizedFormDataWithContext(globals, globals.functions.exportData().currentFormContext);
-  setAnalyticPageLoadProps(journeyState, formData, digitalDataPageLoad);
+  setAnalyticPageLoadProps(journeyState, digitalDataPageLoad);
   switch (currentFormContext.action) {
     case 'check offers': {
       digitalDataPageLoad.card.selectedCard = '';
@@ -88,6 +87,7 @@ function sendPageloadEvent(journeyState, globals) {
     case 'confirmation': {
       // ((mobileValid === 'n')&&aadhaar_otp_val_data?.result?.mobileValid)
       // arn_num
+      const formData = santizedFormDataWithContext(globals, globals.functions.exportData().currentFormContext);
       digitalDataPageLoad.formDetails.reference = formData.currentFormContext.ARN_NUM;
       digitalData.formDetails.isVideoKYC = 'yes'; // value - ? 'yes' or 'no' if aadhar and then applicationMismatch
       break;

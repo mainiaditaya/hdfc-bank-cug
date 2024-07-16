@@ -417,7 +417,7 @@ const executeInterfacePostRedirect = async (source, userRedirected, globals) => 
       console.log(response);
     },
   };
-  restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack);
+  restAPICall(globals, 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack);
 };
 
 export {

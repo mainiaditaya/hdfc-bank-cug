@@ -3,7 +3,7 @@
 const restAPIDataSecurityServiceContext = {
   SEC_KEY_HEADER: 'X-ENCKEY',
   SEC_SECRET_HEADER: 'X-ENCSECRET',
-  crypto: (typeof window !== 'undefined') ? (window.crypto || window.msCrypto) : false,
+  crypto,
   supportsES6: (typeof window !== 'undefined') ? (!window.msCrypto) : false,
   symmetricAlgo: 'AES-GCM',
   symmetricKeyLength: 256,
@@ -43,36 +43,6 @@ function arrayBufferToString(str) {
 }
 
 /**
-   * Encrypts data
-   */
-function encryptDataES6(data, successCallback) {
-  const dataStr = JSON.stringify(data);
-  const secret = restAPIDataSecurityServiceContext.crypto.getRandomValues(new Uint8Array(restAPIDataSecurityServiceContext.secretLength));
-  const dataBuf = stringToArrayBuffer(dataStr);
-  restAPIDataSecurityServiceContext.crypto.subtle.encrypt({
-    name: restAPIDataSecurityServiceContext.symmetricAlgo,
-    iv: secret,
-    tagLength: restAPIDataSecurityServiceContext.secretTagLength,
-  }, restAPIDataSecurityServiceContext.symmetricKey, dataBuf).then((dataEncBuf) => {
-    const dataEnc = btoa(arrayBufferToString(dataEncBuf));
-    restAPIDataSecurityServiceContext.crypto.subtle.encrypt({
-      name: restAPIDataSecurityServiceContext.aSymmetricAlgo,
-      hash: {
-        name: restAPIDataSecurityServiceContext.digestAlgo,
-      },
-    }, restAPIDataSecurityServiceContext.aSymmetricPublicKey, secret).then((encSecretBuf) => {
-      const encSecret = btoa(arrayBufferToString(encSecretBuf));
-      successCallback({
-        dataEnc,
-        secret,
-        secretEnc: encSecret,
-        keyEnc: restAPIDataSecurityServiceContext.encSymmetricKey,
-      });
-    });
-  });
-}
-
-/**
      * Prepares the request headers
      */
 function getDataEncRequestHeaders(encDataPack) {
@@ -80,6 +50,40 @@ function getDataEncRequestHeaders(encDataPack) {
   requestHeaders[restAPIDataSecurityServiceContext.SEC_KEY_HEADER] = encDataPack.keyEnc;
   requestHeaders[restAPIDataSecurityServiceContext.SEC_SECRET_HEADER] = encDataPack.secretEnc;
   return requestHeaders;
+}
+
+/**
+   * Encrypts data
+   */
+async function encryptDataES6(data) {
+  const dataStr = JSON.stringify(data);
+  const secret = restAPIDataSecurityServiceContext.crypto.getRandomValues(new Uint8Array(restAPIDataSecurityServiceContext.secretLength));
+  const dataBuf = stringToArrayBuffer(dataStr);
+
+  const dataEncBuf = await restAPIDataSecurityServiceContext.crypto.subtle.encrypt({
+    name: restAPIDataSecurityServiceContext.symmetricAlgo,
+    iv: secret,
+    tagLength: restAPIDataSecurityServiceContext.secretTagLength,
+  }, restAPIDataSecurityServiceContext.symmetricKey, dataBuf);
+
+  const dataEnc = btoa(arrayBufferToString(dataEncBuf));
+
+  const encSecretBuf = await restAPIDataSecurityServiceContext.crypto.subtle.encrypt({
+    name: restAPIDataSecurityServiceContext.aSymmetricAlgo,
+    hash: {
+      name: restAPIDataSecurityServiceContext.digestAlgo,
+    },
+  }, restAPIDataSecurityServiceContext.aSymmetricPublicKey, secret);
+
+  const encSecret = btoa(arrayBufferToString(encSecretBuf));
+
+  return {
+    dataEnc,
+    secret,
+    secretEnc: encSecret,
+    keyEnc: restAPIDataSecurityServiceContext.encSymmetricKey,
+    requestHeader: getDataEncRequestHeaders(restAPIDataSecurityServiceContext.encSymmetricKey, encSecret),
+  };
 }
 
 /**
@@ -126,10 +130,35 @@ function initRestAPIDataSecurityServiceES6() {
 /**
      * @name invokeRestAPIWithDataSecurity
      */
-function invokeRestAPIWithDataSecurity(data, successCallback) {
-  encryptDataES6(data, successCallback);
+async function invokeRestAPIWithDataSecurity(data) {
+  try {
+    const response = await encryptDataES6(data);
+    return response;
+  } catch (error) {
+    console.error('Error in invoking REST API with data security:', error);
+    throw error;
+  }
 }
 
+async function decryptDataES6(encData, secret) {
+  try {
+    const encDataBuf = stringToArrayBuffer(atob(encData));
+    const dataEncBuf = await restAPIDataSecurityServiceContext.crypto.subtle.decrypt({
+      name: restAPIDataSecurityServiceContext.symmetricAlgo,
+      iv: secret,
+      tagLength: restAPIDataSecurityServiceContext.secretTagLength,
+    }, restAPIDataSecurityServiceContext.symmetricKey, encDataBuf);
+    const decData = arrayBufferToString(dataEncBuf);
+    return decData;
+  } catch (error) {
+    console.error(error);
+    return null; // Ensure the function always returns a value
+  }
+}
+initRestAPIDataSecurityServiceES6();
 export {
-  getDataEncRequestHeaders, invokeRestAPIWithDataSecurity, initRestAPIDataSecurityServiceES6,
+  getDataEncRequestHeaders,
+  invokeRestAPIWithDataSecurity,
+  initRestAPIDataSecurityServiceES6,
+  decryptDataES6,
 };
