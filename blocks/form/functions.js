@@ -34,6 +34,8 @@ import {
   setNameOnCard,
   firstLastNameValidation,
   validateLogin,
+  sendErrorAnalytics,
+  asyncAnalytics,
   idcomUrlSet,
   idcomRedirection,
 } from '../../common/functions.js';
@@ -41,10 +43,6 @@ import {
 import { initRestAPIDataSecurityServiceES6 } from '../../common/apiDataSecurity.js';
 
 import { moveWizardView } from '../../common/formutils.js';
-import {
-  sendSubmitClickEvent,
-  sendGenericClickEvent,
-} from '../../common/analytics.js';
 import { invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
 
 const { currentFormContext } = corpCreditCardContext;
@@ -203,8 +201,6 @@ export {
   otpValHandler,
   customSetFocus,
   getFormContext,
-  sendGenericClickEvent,
-  sendSubmitClickEvent,
   getWrappedFormContext,
   hideLoaderGif,
   createJourneyId,
@@ -230,6 +226,8 @@ export {
   setNameOnCard,
   firstLastNameValidation,
   validateLogin,
+  sendErrorAnalytics,
+  asyncAnalytics,
   idcomUrlSet,
   idcomRedirection,
   initRestAPIDataSecurityServiceES6,

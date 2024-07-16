@@ -451,11 +451,12 @@ pageRedirected(aadharRedirect, idComRedirect);
  * @param {string} defaultLang - The language to show us default.
  */
 // select dropdow-aadhar
-const aadharLangChange = (adharContentDom, defaultLang) => {
+const aadharLangChange = async (adharContentDom, defaultLang) => {
   const selectOp = adharContentDom.querySelector(`[name= ${'selectLanguage'}]`);
   const findFieldSet = adharContentDom?.querySelectorAll('fieldset');
   const selectedClass = 'selected-language';
   const defaultOptionClass = `field-aadharconsent-${defaultLang?.toLowerCase()}`;
+  const { currentFormContext } = (await import('../common/journey-utils.js')).corpCreditCardContext;
   const applySelected = (fieldNode, optionClass, nameClass) => {
     fieldNode?.forEach((element) => {
       if (element?.classList?.contains(optionClass)) {
@@ -468,11 +469,13 @@ const aadharLangChange = (adharContentDom, defaultLang) => {
     });
   };
   applySelected(findFieldSet, defaultOptionClass, selectedClass);
+  currentFormContext.languageSelected = defaultLang;
   selectOp.value = defaultLang;
   selectOp?.addEventListener('change', (e) => {
     e.preventDefault();
     const { value: valueSelected } = e.target;
     selectOp.value = valueSelected;
+    currentFormContext.languageSelected = valueSelected;
     const optionClass = `field-aadharconsent-${valueSelected?.toLowerCase()}`;
     applySelected(findFieldSet, optionClass, selectedClass);
   });

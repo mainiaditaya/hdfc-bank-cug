@@ -9,7 +9,10 @@ import { fetchJsonResponse } from './makeRestAPI.js';
 import corpCreditCard from './constants.js';
 
 const { endpoints } = corpCreditCard;
-
+const corpCreditCardContext = {
+  currentFormContext: {},
+};
+const formRuntime = {};
 /**
  * generates the journeyId
  * @param {string} visitMode - The visit mode (e.g., "online", "offline").
@@ -22,12 +25,8 @@ function createJourneyId(visitMode, journeyAbbreviation, channel, globals) {
   // var dispInstance = getDispatcherInstance();
   const journeyId = `${dynamicUUID}_01_${journeyAbbreviation}_${visitMode}_${channel}`;
   globals.functions.setProperty(globals.form.runtime.journeyId, { value: journeyId });
+  corpCreditCardContext.currentFormContext.journeyID = journeyId;
 }
-
-const corpCreditCardContext = {
-  currentFormContext: {},
-};
-const formRuntime = {};
 
 const getCurrentContext = () => corpCreditCardContext.currentFormContext;
 

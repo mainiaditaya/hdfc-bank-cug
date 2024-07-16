@@ -32,6 +32,7 @@ const corpCreditCard = {
   },
   baseUrl: 'https://applyonlinedev.hdfcbank.com',
   journeyName: 'CORPORATE_CARD_JOURNEY',
+  formName: 'Corporate credit card',
   channel: 'ADOBE_WEBFORMS',
   deadPanStatus: ['D', 'ED', 'X', 'F'],
 };

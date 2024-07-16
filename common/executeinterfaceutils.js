@@ -15,6 +15,7 @@ import {
 } from './makeRestAPI.js';
 import corpCreditCard from './constants.js';
 import { finalDap } from './finaldaputils.js';
+import { sendAnalytics } from './analytics.js';
 
 const { currentFormContext } = corpCreditCardContext;
 const { endpoints, baseUrl } = corpCreditCard;
@@ -231,6 +232,7 @@ const listNameOnCard = (globals) => {
   const setDropdownField = formUtil(globals, dropDownSelectField);
   setDropdownField.setEnum(options, initialValue); // setting initial value
   moveWizardView('corporateCardWizardView', 'confirmCardPanel');
+  // sendAnalytics('page load', { errorCode: '0000', errorMessage: 'Success' }, 'CUSTOMER_BUREAU_OFFER_AVAILABLE', globals);
   debugger;
   invokeJourneyDropOffUpdate(
     'CUSTOMER_BUREAU_OFFER_AVAILABLE',
@@ -260,9 +262,11 @@ const executeInterfaceApiFinal = (globals) => {
 /**
  * @name executeInterfaceResponseHandler
  * @param {object} resPayload
+ * @param {object} globals
  */
-const executeInterfaceResponseHandler = (resPayload) => {
+const executeInterfaceResponseHandler = (resPayload, globals) => {
   currentFormContext.executeInterfaceResPayload = resPayload;
+  sendAnalytics('get this card', resPayload, 'CUSTOMER_CARD_SELECTED', globals);
 };
 
 /**
