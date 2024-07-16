@@ -34,6 +34,8 @@ import {
   setNameOnCard,
   firstLastNameValidation,
   validateLogin,
+  sendErrorAnalytics,
+  asyncAnalytics,
   idcomUrlSet,
   idcomRedirection,
 } from '../../common/functions.js';
@@ -230,6 +232,8 @@ export {
   setNameOnCard,
   firstLastNameValidation,
   validateLogin,
+  sendErrorAnalytics,
+  asyncAnalytics,
   idcomUrlSet,
   idcomRedirection,
   initRestAPIDataSecurityServiceES6,

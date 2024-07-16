@@ -105,6 +105,8 @@ function checkMode(globals) {
         globals,
       );
     }
+    currentFormContext.action = 'confirmation';
+    sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globals);
   } if (idcomVisit === 'DebitCard') {
     const resultPanel = formUtil(globals, globals.form.resultPanel);
     resultPanel.visible(false);
@@ -447,6 +449,8 @@ export {
   setNameOnCard,
   firstLastNameValidation,
   validateLogin,
+  sendErrorAnalytics,
+  asyncAnalytics,
   idcomUrlSet,
   idcomRedirection,
 };

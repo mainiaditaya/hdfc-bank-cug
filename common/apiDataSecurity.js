@@ -42,20 +42,6 @@ function arrayBufferToString(str) {
   return byteString;
 }
 
-function isStringEmpty(str) {
-  return (!str || str.length === 0);
-}
-
-/**
-     * Prepares the request headers
-     */
-function getDataEncRequestHeaders(keyEnc, secretEnc) {
-  const requestHeaders = {};
-  requestHeaders[restAPIDataSecurityServiceContext.SEC_KEY_HEADER] = keyEnc;
-  requestHeaders[restAPIDataSecurityServiceContext.SEC_SECRET_HEADER] = secretEnc;
-  return requestHeaders;
-}
-
 /**
    * Encrypts data
    */
@@ -88,17 +74,6 @@ async function encryptDataES6(data) {
     keyEnc: restAPIDataSecurityServiceContext.encSymmetricKey,
     requestHeader: getDataEncRequestHeaders(restAPIDataSecurityServiceContext.encSymmetricKey, encSecret),
   };
-}
-
-/**
-     * Adds custom headers to request headers
-     */
-function addCustomHeaders(headersObj, requestHeadersObj) {
-  // eslint-disable-next-line no-restricted-syntax, guard-for-in
-  for (const header in headersObj) {
-    requestHeadersObj[header] = headersObj[header];
-  }
-  return requestHeadersObj;
 }
 
 /**
