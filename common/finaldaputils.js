@@ -67,9 +67,9 @@ const createDapRequestObj = (globals) => {
   const radioBtnValues = globals.functions.exportData()?.currentFormContext?.radioBtnValues;
   const kycFill = {
     KYC_STATUS:
-        ((aadharEKYCVerification.$value || formData?.form?.aadharEKYCVerification || radioBtnValues.kycMethod.aadharEKYCVerification) && 'aadhaar')
-        || ((aadharBiometricVerification.$value || formData?.form?.aadharBiometricVerification || radioBtnValues.kycMethod.aadharBiometricVerification) && 'bioKYC')
-        || ((officiallyValidDocumentsMethod.$value || formData?.form?.officiallyValidDocumentsMethod || radioBtnValues.kycMethod.officiallyValidDocumentsMethod) && 'OVD')
+        ((aadharEKYCVerification.$value || formData?.form?.aadharEKYCVerification || radioBtnValues?.kycMethod?.aadharEKYCVerification) && 'aadhaar')
+        || ((aadharBiometricVerification.$value || formData?.form?.aadharBiometricVerification || radioBtnValues?.kycMethod?.aadharBiometricVerification) && 'bioKYC')
+        || ((officiallyValidDocumentsMethod.$value || formData?.form?.officiallyValidDocumentsMethod || radioBtnValues?.kycMethod?.officiallyValidDocumentsMethod) && 'OVD')
         || null,
   };
 
