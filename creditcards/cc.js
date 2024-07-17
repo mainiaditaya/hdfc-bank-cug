@@ -291,7 +291,7 @@ const successPannelMethod = async (data) => {
       offerLink.setAttribute('data-visible', true);
     } else {
       vkycProceedButton.setAttribute('data-visible', true);
-      vkycConfirmText.setAttribute('data-visible', false);
+      vkycConfirmText.setAttribute('data-visible', true);
       offerLink.setAttribute('data-visible', false);
     }
   }
