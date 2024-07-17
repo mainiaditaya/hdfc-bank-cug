@@ -82,6 +82,26 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
  */
 const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, journeyId, globals) => {
   const { currentFormContext } = corpCreditCardContext;
+  // temporary_hotfix_radioBtnValues_undefined_issue
+  if ((state === 'IDCOM_REDIRECTION_INITIATED') || (state === 'CUSTOMER_AADHAAR_PRE_AADHAR_INIT')) {
+    // CUSTOMER_AADHAAR_PRE_AADHAR_INIT
+    // CUSTOMER_AADHAR_INIT
+    const { form } = globals.functions.exportData();
+    const { selectKYCMethodOption1: { aadharEKYCVerification }, selectKYCMethodOption2: { aadharBiometricVerification }, selectKYCMethodOption3: { officiallyValidDocumentsMethod } } = globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel;
+    const deliveryPanel = globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.cardDeliveryAddressPanel;
+
+    currentFormContext.radioBtnValues = {
+      kycMethod: {
+        aadharBiometricVerification: aadharBiometricVerification.$value || form.aadharBiometricVerification,
+        aadharEKYCVerification: aadharEKYCVerification.$value || form.aadharEKYCVerification,
+        officiallyValidDocumentsMethod: officiallyValidDocumentsMethod.$value || form.officiallyValidDocumentsMethod,
+      },
+      deliveryAddress: {
+        cardDeliveryAddressOption1: deliveryPanel.cardDeliveryAddressOption1.$value || form.cardDeliveryAddressOption1,
+        cardDeliveryAddressOption2: deliveryPanel.cardDeliveryAddressOption2.$value || form.cardDeliveryAddressOption2,
+      },
+    };
+  }
   const sanitizedFormData = santizedFormDataWithContext(globals, currentFormContext);
   const journeyJSONObj = {
     RequestPayload: {

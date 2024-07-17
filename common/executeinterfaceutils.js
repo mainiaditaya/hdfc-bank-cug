@@ -371,10 +371,11 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
  */
 const comAddressType = (globals) => {
   const formData = globals.functions.exportData().form;
+  const radioBtnValues = globals.functions.exportData()?.currentFormContext?.radioBtnValues;
   const deliveryPanel = globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.cardDeliveryAddressPanel;
   const cardDelivery = {
-    current: formData?.cardDeliveryAddressOption1 || deliveryPanel.cardDeliveryAddressOption1.$value,
-    office: formData?.cardDeliveryAddressOption2 || deliveryPanel.cardDeliveryAddressOption2.$value,
+    current: formData?.cardDeliveryAddressOption1 || deliveryPanel.cardDeliveryAddressOption1.$value || radioBtnValues.deliveryAddress.cardDeliveryAddressOption1,
+    office: formData?.cardDeliveryAddressOption2 || deliveryPanel.cardDeliveryAddressOption2.$value || radioBtnValues.deliveryAddress.cardDeliveryAddressOption2,
   };
   return cardDelivery?.office ? '1' : '2';
 };
