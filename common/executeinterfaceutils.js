@@ -370,12 +370,12 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
  * @returns {string} - '1' if the office address is selected, otherwise '2'.
  */
 const comAddressType = (globals) => {
-  const formData = globals.functions.exportData().form;
-  const radioBtnValues = globals.functions.exportData()?.currentFormContext?.radioBtnValues;
-  const deliveryPanel = globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.cardDeliveryAddressPanel;
+  const formData = globals?.functions?.exportData()?.form;
+  const radioBtnValues = globals?.functions?.exportData()?.currentFormContext?.radioBtnValues;
+  const deliveryPanel = globals?.form?.corporateCardWizardView?.confirmAndSubmitPanel?.addressDeclarationPanel?.cardDeliveryAddressPanel;
   const cardDelivery = {
-    current: formData?.cardDeliveryAddressOption1 || deliveryPanel.cardDeliveryAddressOption1.$value || radioBtnValues.deliveryAddress.cardDeliveryAddressOption1,
-    office: formData?.cardDeliveryAddressOption2 || deliveryPanel.cardDeliveryAddressOption2.$value || radioBtnValues.deliveryAddress.cardDeliveryAddressOption2,
+    current: formData?.cardDeliveryAddressOption1 || deliveryPanel?.cardDeliveryAddressOption1?.$value || radioBtnValues?.deliveryAddress?.cardDeliveryAddressOption1,
+    office: formData?.cardDeliveryAddressOption2 || deliveryPanel?.cardDeliveryAddressOption2?.$value || radioBtnValues?.deliveryAddress?.cardDeliveryAddressOption2,
   };
   return cardDelivery?.office ? '1' : '2';
 };
