@@ -1,12 +1,12 @@
 /* eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 import corpCreditCard from './constants.js';
-import { corpCreditCardContext } from './journey-utils.js';
+import { corpCreditCardContext, invokeJourneyDropOffUpdate } from './journey-utils.js';
 import {
   displayLoader,
   hideLoaderGif,
   chainedFetchAsyncCall,
 } from './makeRestAPI.js';
-import { urlPath, generateUUID } from './formutils.js';
+import { urlPath, generateUUID, moveWizardView } from './formutils.js';
 
 /**
  * Creates a FormData payload for document upload.
@@ -82,6 +82,17 @@ const documentUpload = async (globals) => {
   };
   const apiEndPoint = urlPath(corpCreditCard.endpoints.docUpload);
   const method = 'POST';
+  const { currentFormContext } = corpCreditCardContext;
+  const formContextCallbackData = globals.functions.exportData()?.currentFormContext || currentFormContext;
+  const mobileNumber = globals.functions.exportData().form.login.registeredMobileNumber || globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value;
+  const leadProfileId = globals.functions.exportData().leadProifileId || globals.form.runtime.leadProifileId.$value;
+  const journeyId = formContextCallbackData.journeyID;
+
+  const {
+    AddressDeclarationAadhar, addressDeclarationOffice, addressDeclarationText1, addressDeclarationText2,
+    tandCPanelConfirmAndSubmit: { confirmAndSubmitTC2 },
+  } = globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel;
+
   try {
     displayLoader();
     const fsFilePayload = await createDocPayload(frontDoc);
@@ -93,12 +104,25 @@ const documentUpload = async (globals) => {
         [fsFilePayload, bsFilePayload],
         'formData',
       );
-      console.log(fsFileResponse, 'fs-file-1-response');
-      console.log(bsFileResponse, 'bs-file-1-response');
-      hideLoaderGif();
-    } else {
-      throw new Error('missing payload');
+      if ((fsFileResponse.value?.errorCode === '0000') && (bsFileResponse.value?.errorCode === '0000')) {
+        hideLoaderGif();
+        moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
+        invokeJourneyDropOffUpdate('DOCUMENT_UPLOAD_SUCCESS', mobileNumber, leadProfileId, journeyId, globals);
+        globals.functions.setProperty(AddressDeclarationAadhar, { visible: false });
+        globals.functions.setProperty(addressDeclarationOffice, { visible: false });
+        globals.functions.setProperty(addressDeclarationText1, { visible: false });
+        globals.functions.setProperty(addressDeclarationText2, { visible: false });
+        globals.functions.setProperty(confirmAndSubmitTC2, { visible: false });
+      } else {
+        throw new Error('file upload failed');
+      }
+      // else {
+      //   // globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: false });
+      //   // globals.functions.setProperty(globals.form.resultPanel, { visible: true });
+      //   // globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
+      // }
     }
+    throw new Error('Error in File');
   } catch (error) {
     hideLoaderGif();
     console.log('errorInFilePayload');

@@ -231,6 +231,14 @@ const listNameOnCard = (globals) => {
   const setDropdownField = formUtil(globals, dropDownSelectField);
   setDropdownField.setEnum(options, initialValue); // setting initial value
   moveWizardView('corporateCardWizardView', 'confirmCardPanel');
+  debugger;
+  invokeJourneyDropOffUpdate(
+    'CUSTOMER_BUREAU_OFFER_AVAILABLE',
+    globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
+    globals.form.runtime.leadProifileId.$value,
+    globals.form.runtime.journeyId.$value,
+    globals,
+  );
 };
 
 /**
