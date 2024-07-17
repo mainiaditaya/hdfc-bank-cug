@@ -64,11 +64,12 @@ const createDapRequestObj = (globals) => {
   // const { prefilledEmploymentDetails } = employmentDetails;
   const { selectKYCMethodOption1: { aadharEKYCVerification }, selectKYCMethodOption2: { aadharBiometricVerification }, selectKYCMethodOption3: { officiallyValidDocumentsMethod } } = globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel;
   const formData = globals.functions.exportData();
+  const radioBtnValues = globals.functions.exportData()?.currentFormContext?.radioBtnValues;
   const kycFill = {
     KYC_STATUS:
-        ((aadharEKYCVerification.$value || formData?.form?.aadharEKYCVerification) && 'aadhaar')
-        || ((aadharBiometricVerification.$value || formData?.form?.aadharBiometricVerification) && 'bioKYC')
-        || ((officiallyValidDocumentsMethod.$value || formData?.form?.officiallyValidDocumentsMethod) && 'OVD')
+        ((aadharEKYCVerification.$value || formData?.form?.aadharEKYCVerification || radioBtnValues.kycMethod.aadharEKYCVerification) && 'aadhaar')
+        || ((aadharBiometricVerification.$value || formData?.form?.aadharBiometricVerification || radioBtnValues.kycMethod.aadharBiometricVerification) && 'bioKYC')
+        || ((officiallyValidDocumentsMethod.$value || formData?.form?.officiallyValidDocumentsMethod || radioBtnValues.kycMethod.officiallyValidDocumentsMethod) && 'OVD')
         || null,
   };
 
@@ -180,7 +181,7 @@ const finalDap = (userRedirected, globals) => {
       globalObj.functions.setProperty(globalObj.form.corporateCardWizardView, { visible: false });
       globalObj.functions.setProperty(globalObj.form.resultPanel, { visible: true });
       globalObj.functions.setProperty(globalObj.form.resultPanel.errorResultPanel, { visible: true });
-      invokeJourneyDropOffUpdate('FINAL_DAP_FAILURE', mobileNumber, leadProfileId, journeyId, globalObj);
+      invokeJourneyDropOffUpdate('CUSTOMER_FINAL_DAP_FAILURE', mobileNumber, leadProfileId, journeyId, globalObj);
     },
   };
   // const res = {};
