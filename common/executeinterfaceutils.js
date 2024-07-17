@@ -232,8 +232,6 @@ const listNameOnCard = (globals) => {
   const setDropdownField = formUtil(globals, dropDownSelectField);
   setDropdownField.setEnum(options, initialValue); // setting initial value
   moveWizardView('corporateCardWizardView', 'confirmCardPanel');
-  // sendAnalytics('page load', { errorCode: '0000', errorMessage: 'Success' }, 'CUSTOMER_BUREAU_OFFER_AVAILABLE', globals);
-  debugger;
   invokeJourneyDropOffUpdate(
     'CUSTOMER_BUREAU_OFFER_AVAILABLE',
     globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,

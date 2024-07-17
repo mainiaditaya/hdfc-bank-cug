@@ -73,14 +73,14 @@ function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = 
         if (loader) hideLoaderGif();
         return response;
       }
-      // const elapsedTime = (Date.now() - startTime) / 1000;
-      // if (elapsedTime < parseInt(ipaDuration, 10) - 10) {
-      //   return new Promise((resolve) => {
-      //     setTimeout(() => {
-      //       resolve(fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, true, startTime));
-      //     }, ipaTimer * 1000);
-      //   });
-      // }
+      const elapsedTime = (Date.now() - startTime) / 1000;
+      if (elapsedTime < parseInt(ipaDuration, 10) - 10) {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, true, startTime));
+          }, ipaTimer * 1000);
+        });
+      }
       return response;
     });
 }

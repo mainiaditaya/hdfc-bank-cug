@@ -22,14 +22,14 @@ const { currentFormContext } = corpCreditCardContext;
  * @param {object} digitalData
  */
 
-function setAnalyticPageLoadProps(journeyState, formData, digitalDataEvent) {
-  digitalDataEvent.page.pageInfo.pageName = 'Identify Yourself';
-  digitalDataEvent.user.pseudoID = '';// Need to check
-  digitalDataEvent.user.journeyName = currentFormContext?.journeyName;
-  digitalDataEvent.user.journeyID = currentFormContext?.journeyID;
-  digitalDataEvent.user.journeyState = journeyState;
-  digitalDataEvent.user.casa = '';
-  digitalDataEvent.form.name = corpCreditCard.formName;
+function setAnalyticPageLoadProps(journeyState, formData, digitalData) {
+  digitalData.page.pageInfo.pageName = 'Identify Yourself';
+  digitalData.user.pseudoID = '';// Need to check
+  digitalData.user.journeyName = currentFormContext?.journeyName;
+  digitalData.user.journeyID = currentFormContext?.journeyID;
+  digitalData.user.journeyState = journeyState;
+  digitalData.user.casa = '';
+  digitalData.form.name = corpCreditCard.formName;
 }
 
 /**
@@ -41,25 +41,25 @@ function setAnalyticPageLoadProps(journeyState, formData, digitalDataEvent) {
  * @param {object} digitalData
  */
 
-function setAnalyticClickGenericProps(linkName, linkType, formData, journeyState, digitalDataEvent) {
-  digitalDataEvent.link = {
+function setAnalyticClickGenericProps(linkName, linkType, formData, journeyState, digitalData) {
+  digitalData.link = {
     linkName,
     linkType,
   };
-  digitalDataEvent.page.pageInfo.pageName = '';
-  digitalDataEvent.link.linkPosition = '';
-  digitalDataEvent.user.pseudoID = '';
-  digitalDataEvent.user.journeyName = currentFormContext?.journeyName;
-  digitalDataEvent.user.journeyID = currentFormContext?.journeyID;
-  digitalDataEvent.user.journeyState = journeyState;
+  digitalData.page.pageInfo.pageName = '';
+  digitalData.link.linkPosition = '';
+  digitalData.user.pseudoID = '';
+  digitalData.user.journeyName = currentFormContext?.journeyName;
+  digitalData.user.journeyID = currentFormContext?.journeyID;
+  digitalData.user.journeyState = journeyState;
   if (linkName === 'otp click') {
-    digitalDataEvent.form.name = corpCreditCard.formName;
-    digitalDataEvent.user.casa = '';
+    digitalData.form.name = corpCreditCard.formName;
+    digitalData.user.casa = '';
   } else {
-    digitalDataEvent.form.name = formData.etbFlowSelected === 'on' ? `${corpCreditCard.formName}-ETB` : `${corpCreditCard.formName}-NTB`;
-    digitalDataEvent.user.casa = formData.etbFlowSelected === 'on' ? 'Yes' : 'No';
+    digitalData.form.name = formData.etbFlowSelected === 'on' ? `${corpCreditCard.formName}-ETB` : `${corpCreditCard.formName}-NTB`;
+    digitalData.user.casa = formData.etbFlowSelected === 'on' ? 'Yes' : 'No';
   }
-  // window.digitalData = digitalDataEvent || {};
+  // window.digitalData = digitalData || {};
 }
 
 const getValidationMethod = (formContext) => {
@@ -76,19 +76,19 @@ const getValidationMethod = (formContext) => {
  * @param {object} formData.
  */
 function sendPageloadEvent(journeyState, globals) {
-  const digitalDataPageLoad = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
+  const digitalData = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
   const formData = santizedFormDataWithContext(globals, globals.functions.exportData().currentFormContext);
-  setAnalyticPageLoadProps(journeyState, formData, digitalDataPageLoad);
+  setAnalyticPageLoadProps(journeyState, formData, digitalData);
   switch (currentFormContext.action) {
     case 'check offers': {
-      digitalDataPageLoad.card.selectedCard = '';
-      digitalDataPageLoad.card.eligibleCard = '';
+      digitalData.card.selectedCard = '';
+      digitalData.card.eligibleCard = '';
       break;
     }
     case 'confirmation': {
       // ((mobileValid === 'n')&&aadhaar_otp_val_data?.result?.mobileValid)
       // arn_num
-      digitalDataPageLoad.formDetails.reference = formData.currentFormContext.ARN_NUM;
+      digitalData.formDetails.reference = formData.currentFormContext.ARN_NUM;
       digitalData.formDetails.isVideoKYC = 'yes'; // value - ? 'yes' or 'no' if aadhar and then applicationMismatch
       break;
     }
@@ -96,7 +96,7 @@ function sendPageloadEvent(journeyState, globals) {
       // do nothing
   }
   // if (window) {
-  //   window.digitalData = digitalDataPageLoad || {};
+  //   window.digitalData = digitalData || {};
   // }
   _satellite.track('pageload');
 }
@@ -109,11 +109,11 @@ function sendPageloadEvent(journeyState, globals) {
  * @param {object} formContext
  * @param {object} digitalData
  */
-function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState, digitalDataEvent) {
-  setAnalyticClickGenericProps(eventType, linkType, formData, journeyState, digitalDataEvent);
+function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState, digitalData) {
+  setAnalyticClickGenericProps(eventType, linkType, formData, journeyState, digitalData);
   switch (eventType) {
     case 'otp click': {
-      digitalDataEvent.event = {
+      digitalData.event = {
         phone,
         validationMethod: getValidationMethod(formData),
       };
@@ -121,23 +121,23 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       break;
     }
     case 'check offers': {
-      digitalDataEvent.user.gender = formData.form.gender;
-      digitalDataEvent.user.email = formData.form.workEmailAddress;
+      digitalData.user.gender = formData.form.gender;
+      digitalData.user.email = formData.form.workEmailAddress;
       if (formData.form.currentAddressToggle === 'off') {
-        digitalDataEvent.formDetails = {
+        digitalData.formDetails = {
           pincode: currentFormContext.breDemogResponse.VDCUSTZIPCODE,
           city: currentFormContext.breDemogResponse.VDCUSTCITY,
           state: currentFormContext.breDemogResponse.VDCUSTSTATE,
         };
       } else {
         const isETB = currentFormContext.journeyType === 'ETB';
-        digitalDataEvent.formDetails = {
+        digitalData.formDetails = {
           pincode: isETB ? formData.form.newCurentAddressPin : formData.form.currentAddresPincodeNTB,
           city: isETB ? 'hardcodedETBCity' : 'hardcodedNTBCity',
           state: isETB ? 'hardcodedETBState' : 'hardcodedNTBState',
         };
       }
-      Object.assign(digitalDataEvent.formDetails, {
+      Object.assign(digitalData.formDetails, {
         employmentType: formData.form.employmentType,
         companyName: formData.form.companyName,
         designation: formData.form.designation,
@@ -152,11 +152,11 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'get this card': {
-      digitalDataEvent.card = {
+      digitalData.card = {
         selectedCard: formData.form.productCode,
         annualFee: formData.form.joiningandRenewalFee,
       };
-      // digitalDataEvent.event = {
+      // digitalData.event = {
       //   status: formData.cardBenefitsAgreeCheckbox,
       // };
       currentFormContext.action = 'confirmation';
@@ -165,7 +165,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'address continue': {
-      digitalDataEvent.event = {
+      digitalData.event = {
         status: formData?.form?.cardDeliveryAddressOption1 || formData?.form?.cardDeliveryAddressOption2,
         validationMethod: '', // Netbanking or Debit card - validationMethod - authmode will be getting only after idcom redirected - how to use that value
       };
@@ -175,7 +175,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
 
     case 'kyc continue': {
       const kyc = (formData?.form?.aadharEKYCVerification && 'Ekyc') || (formData?.form?.aadharBiometricVerification && 'Biometric') || (formData?.form?.officiallyValidDocumentsMethod && 'Other Docs');
-      digitalDataEvent.formDetails = {
+      digitalData.formDetails = {
         KYCVerificationMethod: kyc,
       };
       _satellite.track('submit');
@@ -183,7 +183,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'i agree': {
-      digitalDataEvent.formDetails = {
+      digitalData.formDetails = {
         languageSelected: currentFormContext?.languageSelected,
       };
       _satellite.track('submit');
@@ -192,7 +192,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
 
     case 'aadhaar otp': {
       // UID OR VID  how to capture the value - aadhar in different portal.
-      digitalDataEvent.event = {
+      digitalData.event = {
         status: '',
       };
       _satellite.track('submit');
@@ -200,7 +200,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'document upload continue': {
-      digitalDataEvent.formDetails = {
+      digitalData.formDetails = {
         documentProof: formData?.docUploadDropdown, // documentType
       };
       _satellite.track('submit');
@@ -210,7 +210,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     case 'start kyc': {
       // ETB_ Capture clicks on Start vKYC CTA, Applicable only for ETB Address Change, Only in case of Aadhaar and Application no. mismatch
       // NTB_ '1'(default without any condition)
-      digitalDataEvent.event = {
+      digitalData.event = {
         status: '1', // formData?.vkycProceedButton, //  value is '1' or '0' for -e63 capture
       };
       _satellite.track('submit');
@@ -219,7 +219,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
 
     case 'submit review': {
       // common both ntb + etb
-      digitalDataEvent.event = {
+      digitalData.event = {
         rating: formData?.ratingvalue,
       };
       _satellite.track('survey');
@@ -228,22 +228,22 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     default:
       // do nothing
   }
-  // window.digitalData = digitalDataEvent || {};
+  // window.digitalData = digitalData || {};
 }
 
-function populateResponse(payload, eventType, digitalDataEvent) {
+function populateResponse(payload, eventType, digitalData) {
   switch (eventType) {
     case 'otp click': {
-      digitalDataEvent.page.pageInfo.errorCode = payload?.status?.errorCode;
-      digitalDataEvent.page.pageInfo.errorMessage = payload?.status?.errorMessage;
+      digitalData.page.pageInfo.errorCode = payload?.status?.errorCode;
+      digitalData.page.pageInfo.errorMessage = payload?.status?.errorMessage;
       break;
     }
     case 'check offers':
     case 'i agree':
     case 'document upload continue':
     case 'get this card': {
-      digitalDataEvent.page.pageInfo.errorCode = payload?.errorCode;
-      digitalDataEvent.page.pageInfo.errorMessage = payload?.errorMessage;
+      digitalData.page.pageInfo.errorCode = payload?.errorCode;
+      digitalData.page.pageInfo.errorMessage = payload?.errorMessage;
       break;
     }
     default:
@@ -260,10 +260,10 @@ function populateResponse(payload, eventType, digitalDataEvent) {
  * @param {object} currentFormContext
  */
 function sendAnalyticsEvent(eventType, payload, journeyState, formData) {
-  const digitalDataEvent = createDeepCopyFromBlueprint(ANALYTICS_CLICK_OBJECT);
+  const digitalData = createDeepCopyFromBlueprint(ANALYTICS_CLICK_OBJECT);
   const attributes = data[eventType];
-  populateResponse(payload, eventType, digitalDataEvent);
-  sendSubmitClickEvent(formData?.login?.registeredMobileNumber, eventType, attributes?.linkType, formData, journeyState, digitalDataEvent);
+  populateResponse(payload, eventType, digitalData);
+  sendSubmitClickEvent(formData?.login?.registeredMobileNumber, eventType, attributes?.linkType, formData, journeyState, digitalData);
 }
 
 /**
@@ -274,12 +274,12 @@ function sendAnalyticsEvent(eventType, payload, journeyState, formData) {
 * @param {object} globals
 */
 function sendErrorAnalytics(errorCode, errorMsg, journeyState, globals) {
-  const digitalDataPageLoad = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
-  setAnalyticPageLoadProps(journeyState, santizedFormDataWithContext(globals), digitalDataPageLoad);
-  digitalDataPageLoad.page.pageInfo.errorCode = errorCode;
-  digitalDataPageLoad.page.pageInfo.errorMessage = errorMsg;
+  const digitalData = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
+  setAnalyticPageLoadProps(journeyState, santizedFormDataWithContext(globals), digitalData);
+  digitalData.page.pageInfo.errorCode = errorCode;
+  digitalData.page.pageInfo.errorMessage = errorMsg;
   // if (window) {
-  //   window.digitalData = digitalDataPageLoad || {};
+  //   window.digitalData = digitalData || {};
   // }
   _satellite.track('pageload');
 }
