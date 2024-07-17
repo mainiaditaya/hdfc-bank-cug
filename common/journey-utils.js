@@ -20,7 +20,7 @@ const { endpoints } = corpCreditCard;
 function createJourneyId(visitMode, journeyAbbreviation, channel, globals) {
   const dynamicUUID = generateUUID();
   // var dispInstance = getDispatcherInstance();
-  const journeyId = `${dynamicUUID}_01_${journeyAbbreviation}_${visitMode}_${channel}`;
+  const journeyId = globals.functions.exportData().journeyId || `${dynamicUUID}_01_${journeyAbbreviation}_${visitMode}_${channel}`;
   globals.functions.setProperty(globals.form.runtime.journeyId, { value: journeyId });
 }
 
@@ -68,7 +68,7 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
   };
   const url = urlPath(endpoints.journeyDropOff);
   const method = 'POST';
-  return fetchJsonResponse(url, journeyJSONObj, method);
+  return globals.functions.exportData().queryParams.leadId ? fetchJsonResponse(url, journeyJSONObj, method) : null;
 };
 
 /**
@@ -88,7 +88,7 @@ const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, jo
       userAgent: (typeof window !== 'undefined') ? window.navigator.userAgent : '',
       leadProfile: {
         mobileNumber,
-        leadProfileId: leadProfileId.toString(),
+        leadProfileId: leadProfileId?.toString(),
       },
       formData: {
         channel: corpCreditCard.channel,
