@@ -83,6 +83,7 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
 const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, journeyId, globals) => {
   const { currentFormContext } = corpCreditCardContext;
   // temporary_hotfix_radioBtnValues_undefined_issue
+  /* storing the radio btn values in current form context */
   if ((state === 'IDCOM_REDIRECTION_INITIATED') || (state === 'CUSTOMER_AADHAAR_PRE_AADHAR_INIT')) {
     // CUSTOMER_AADHAAR_PRE_AADHAR_INIT
     // CUSTOMER_AADHAR_INIT
