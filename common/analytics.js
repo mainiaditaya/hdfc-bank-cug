@@ -28,8 +28,13 @@ function setAnalyticPageLoadProps(journeyState, formData, digitalData) {
   digitalData.user.journeyName = currentFormContext?.journeyName;
   digitalData.user.journeyID = currentFormContext?.journeyID;
   digitalData.user.journeyState = journeyState;
-  digitalData.user.casa = '';
-  digitalData.form.name = corpCreditCard.formName;
+  if (currentFormContext.action !== 'page load') {
+    digitalData.form.name = corpCreditCard.formName;
+    digitalData.user.casa = '';
+  } else {
+    digitalData.form.name = formData.etbFlowSelected === 'on' ? `${corpCreditCard.formName}-ETB` : `${corpCreditCard.formName}-NTB`;
+    digitalData.user.casa = formData.etbFlowSelected === 'on' ? 'Yes' : 'No';
+  }
 }
 
 /**
