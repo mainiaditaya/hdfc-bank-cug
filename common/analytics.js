@@ -94,9 +94,9 @@ function sendPageloadEvent(journeyState, formData) {
     default:
       // do nothing
   }
-  // if (window) {
-  //   window.digitalData = digitalData || {};
-  // }
+  if (window) {
+    window.digitalData = digitalData || {};
+  }
   _satellite.track('pageload');
 }
 
@@ -116,6 +116,9 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
         phone,
         validationMethod: getValidationMethod(formData),
       };
+      if (window) {
+        window.digitalData = digitalData || {};
+      }
       _satellite.track('submit');
       break;
     }
@@ -143,6 +146,9 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
         relationshipNumber: formData?.form?.relationshipNumber,
       });
       currentFormContext.action = 'check offers';
+      if (window) {
+        window.digitalData = digitalData || {};
+      }
       _satellite.track('submit');
       setTimeout(() => {
         sendPageloadEvent('CUSTOMER_BUREAU_OFFER_AVAILABLE', formData);
@@ -159,6 +165,9 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       //   status: formData.cardBenefitsAgreeCheckbox,
       // };
       currentFormContext.action = 'confirmation';
+      if (window) {
+        window.digitalData = digitalData || {};
+      }
       _satellite.track('submit');
       break;
     }
@@ -168,6 +177,9 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
         status: formData?.form?.cardDeliveryAddressOption1 || formData?.form?.cardDeliveryAddressOption2,
         validationMethod: '', // Netbanking or Debit card - validationMethod - authmode will be getting only after idcom redirected - how to use that value
       };
+      if (window) {
+        window.digitalData = digitalData || {};
+      }
       _satellite.track('submit');
       break;
     }
@@ -177,6 +189,9 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       digitalData.formDetails = {
         KYCVerificationMethod: kyc,
       };
+      if (window) {
+        window.digitalData = digitalData || {};
+      }
       _satellite.track('submit');
       break;
     }
@@ -185,6 +200,9 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       digitalData.formDetails = {
         languageSelected: currentFormContext?.languageSelected,
       };
+      if (window) {
+        window.digitalData = digitalData || {};
+      }
       _satellite.track('submit');
       break;
     }
@@ -194,6 +212,9 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       digitalData.event = {
         status: '',
       };
+      if (window) {
+        window.digitalData = digitalData || {};
+      }
       _satellite.track('submit');
       break;
     }
@@ -202,6 +223,9 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       digitalData.formDetails = {
         documentProof: formData?.docUploadDropdown, // documentType
       };
+      if (window) {
+        window.digitalData = digitalData || {};
+      }
       _satellite.track('submit');
       break;
     }
@@ -212,6 +236,9 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       digitalData.event = {
         status: '1', // formData?.vkycProceedButton, //  value is '1' or '0' for -e63 capture
       };
+      if (window) {
+        window.digitalData = digitalData || {};
+      }
       _satellite.track('submit');
       break;
     }
@@ -221,6 +248,9 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       digitalData.event = {
         rating: formData?.ratingvalue,
       };
+      if (window) {
+        window.digitalData = digitalData || {};
+      }
       _satellite.track('survey');
       break;
     }
@@ -277,9 +307,9 @@ function sendErrorAnalytics(errorCode, errorMsg, journeyState, globals) {
   setAnalyticPageLoadProps(journeyState, santizedFormDataWithContext(globals), digitalData);
   digitalData.page.pageInfo.errorCode = errorCode;
   digitalData.page.pageInfo.errorMessage = errorMsg;
-  // if (window) {
-  //   window.digitalData = digitalData || {};
-  // }
+  if (window) {
+    window.digitalData = digitalData || {};
+  }
   _satellite.track('pageload');
 }
 
