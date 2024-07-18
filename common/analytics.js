@@ -75,9 +75,8 @@ const getValidationMethod = (formContext) => {
  * @param {string} journeyState.
  * @param {object} formData.
  */
-function sendPageloadEvent(journeyState, globals) {
+function sendPageloadEvent(journeyState, formData) {
   const digitalData = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
-  const formData = santizedFormDataWithContext(globals, globals.functions.exportData().currentFormContext);
   setAnalyticPageLoadProps(journeyState, formData, digitalData);
   switch (currentFormContext.action) {
     case 'check offers': {
@@ -125,23 +124,23 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       digitalData.user.email = formData.form.workEmailAddress;
       if (formData.form.currentAddressToggle === 'off') {
         digitalData.formDetails = {
-          pincode: currentFormContext.breDemogResponse.VDCUSTZIPCODE,
-          city: currentFormContext.breDemogResponse.VDCUSTCITY,
-          state: currentFormContext.breDemogResponse.VDCUSTSTATE,
+          pincode: currentFormContext?.breDemogResponse?.VDCUSTZIPCODE,
+          city: currentFormContext?.breDemogResponse?.VDCUSTCITY,
+          state: currentFormContext?.breDemogResponse?.VDCUSTSTATE,
         };
       } else {
         const isETB = currentFormContext.journeyType === 'ETB';
         digitalData.formDetails = {
-          pincode: isETB ? formData.form.newCurentAddressPin : formData.form.currentAddresPincodeNTB,
+          pincode: isETB ? formData?.form?.newCurentAddressPin : formData?.form?.currentAddresPincodeNTB,
           city: isETB ? 'hardcodedETBCity' : 'hardcodedNTBCity',
           state: isETB ? 'hardcodedETBState' : 'hardcodedNTBState',
         };
       }
       Object.assign(digitalData.formDetails, {
-        employmentType: formData.form.employmentType,
-        companyName: formData.form.companyName,
-        designation: formData.form.designation,
-        relationshipNumber: formData.form.relationshipNumber,
+        employmentType: formData?.form?.employmentType,
+        companyName: formData?.form?.companyName,
+        designation: formData?.form?.designation,
+        relationshipNumber: formData?.form?.relationshipNumber,
       });
       currentFormContext.action = 'check offers';
       _satellite.track('submit');
@@ -153,8 +152,8 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
 
     case 'get this card': {
       digitalData.card = {
-        selectedCard: formData.form.productCode,
-        annualFee: formData.form.joiningandRenewalFee,
+        selectedCard: formData?.form?.productCode,
+        annualFee: formData?.form?.joiningandRenewalFee,
       };
       // digitalData.event = {
       //   status: formData.cardBenefitsAgreeCheckbox,
@@ -292,10 +291,11 @@ function sendErrorAnalytics(errorCode, errorMsg, journeyState, globals) {
 * @param {object} globals
 */
 function sendAnalytics(eventType, payload, journeyState, globals) {
+  const formData = santizedFormDataWithContext(globals);
   if (eventType === 'page load') {
-    sendPageloadEvent(journeyState, globals);
+    sendPageloadEvent(journeyState, formData);
   } else {
-    sendAnalyticsEvent(eventType, payload, journeyState, santizedFormDataWithContext(globals));
+    sendAnalyticsEvent(eventType, payload, journeyState, formData);
   }
 }
 

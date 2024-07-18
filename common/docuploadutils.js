@@ -1,4 +1,3 @@
-/* eslint no-console: ["error", { allow: ["warn", "error", "log"] }] */
 import corpCreditCard from './constants.js';
 import { corpCreditCardContext, invokeJourneyDropOffUpdate } from './journey-utils.js';
 import {

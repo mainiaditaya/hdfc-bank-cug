@@ -1,4 +1,3 @@
-/* eslint no-console: ["error", { allow: ["warn", "error"] }] */
 import {
   invokeJourneyDropOff,
   invokeJourneyDropOffUpdate,

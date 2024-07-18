@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import {
   getThisCard,
   prefillForm,
@@ -114,7 +113,7 @@ function checkMode(globals) {
       );
     }
     currentFormContext.action = 'confirmation';
-    sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globals);
+    sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', santizedFormDataWithContext(globals, currentFormContext));
   } if (idcomVisit === 'DebitCard') {
     const resultPanel = formUtil(globals, globals.form.resultPanel);
     resultPanel.visible(false);
@@ -129,7 +128,7 @@ function checkMode(globals) {
     const userRedirected = true;
     executeInterfacePostRedirect('idCom', userRedirected, globals);
     currentFormContext.action = 'confirmation';
-    sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globals);
+    sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', santizedFormDataWithContext(globals, currentFormContext));
   }
 }
 

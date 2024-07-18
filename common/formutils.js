@@ -353,10 +353,10 @@ const removeSpecialCharacters = (str, allowedChars) => {
 
 /**
    * Filters out all defined values from the form data using the globals object.
-   * @param {object} globaObj- Globals variables object containing form configurations.
+   * @param {object} globals- Globals variables object containing form configurations.
    * @returns {object} -Object containing only defined values.
    */
-const santizedFormData = (globaObj) => JSON.parse(JSON.stringify(globaObj.functions.exportData()));
+const santizedFormData = (globals) => JSON.parse(JSON.stringify(globals.functions.exportData()));
 /**
    * Removes all undefined keys from the form datand reduces overall size of the object.
    * @param {object} jsonObj
@@ -370,19 +370,27 @@ const removeUndefinedKeys = (jsonObj) => {
 
 /**
    * Filters out all defined values from the form data using the globals object.
-   * @param {object} globaObj- Globals variables object containing form configurations.
+   * @param {object} globals- Globals variables object containing form configurations.
    * * @param {object} currentFormContext - additional data variables object containing form configurations.
    * @returns {object} -Object containing only defined values.
    */
-const santizedFormDataWithContext = (globaObj, currentFormContext) => {
-  const formData = globaObj.functions.exportData();
-  formData.currentFormContext = currentFormContext;
-  const {
-    data, analytics, queryParams, ...formDataPayload
-  } = formData;
-  removeUndefinedKeys(formDataPayload);
-  removeUndefinedKeys(formDataPayload?.form);
-  return JSON.parse(JSON.stringify(formDataPayload));
+const santizedFormDataWithContext = (globals, currentFormContext) => {
+  try {
+    const formData = Object.prototype.hasOwnProperty.call(globals, 'form') ? globals.functions.exportData() : globals;
+    formData.currentFormContext = currentFormContext;
+    if (formData.form) {
+      const {
+        data, analytics, queryParams, ...formDataPayload
+      } = formData;
+      removeUndefinedKeys(formDataPayload);
+      removeUndefinedKeys(formDataPayload?.form);
+      return JSON.parse(JSON.stringify(formDataPayload));
+    }
+    return formData;
+  } catch (ex) {
+    console.error(ex);
+    return null;
+  }
 };
 
 /**

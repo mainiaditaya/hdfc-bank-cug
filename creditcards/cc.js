@@ -1,5 +1,4 @@
 /* eslint-disable no-tabs */
-/* eslint no-console: ["error", { allow: ["warn", "error", "debug"] }] */
 import openModal from '../blocks/modal/modal.js';
 
 const createLabelInElement = (elementSelector, labelClass) => {
@@ -375,8 +374,7 @@ const finalDapFetchRes = async () => {
     errorMethod: (err) => {
       hideLoaderGif();
       errorPannelMethod(err);
-      // eslint-disable-next-line no-console
-      console.log(err);
+      console.error(err);
     },
   };
   try {
