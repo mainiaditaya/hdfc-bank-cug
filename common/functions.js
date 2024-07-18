@@ -114,7 +114,7 @@ function checkMode(globals) {
     }
     currentFormContext.action = 'confirmation';
     sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', santizedFormDataWithContext(globals, currentFormContext));
-  } if (idcomVisit === 'DebitCard') {
+  } if ((idcomVisit === 'DebitCard') || (idcomVisit === 'CreditCard')) { // debit card or credit card flow
     const resultPanel = formUtil(globals, globals.form.resultPanel);
     resultPanel.visible(false);
     globals.functions.setProperty(globals.form.otpPanel, { visible: false });
