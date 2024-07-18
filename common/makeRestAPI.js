@@ -2,8 +2,9 @@
  * Displays a loader with optional loading text.
  * @param {string} loadingText - The loading text to display (optional).
  */
-
 import { decryptDataES6, invokeRestAPIWithDataSecurity } from './apiDataSecurity.js';
+
+const MODE = 'dev';
 
 function displayLoader(loadingText) {
   const bodyContainer = document.querySelector('.appear');
@@ -35,6 +36,22 @@ function hideLoaderGif() {
 */
 async function fetchJsonResponse(url, payload, method, loader = false) {
   try {
+    if (MODE === 'dev') {
+      return fetch(url, {
+        method,
+        body: payload ? JSON.stringify(payload) : null,
+        mode: 'cors',
+        headers: {
+          'Content-type': 'text/plain',
+          Accept: 'application/json',
+        },
+      })
+        .then((res) => {
+          if (loader) hideLoaderGif();
+          return res.json();
+        });
+    }
+
     const responseObj = await invokeRestAPIWithDataSecurity(payload);
     const response = await fetch(url, {
       method,
@@ -67,6 +84,34 @@ async function fetchJsonResponse(url, payload, method, loader = false) {
 */
 async function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = false, startTime = Date.now()) {
   try {
+    if (MODE === 'dev') {
+      return fetch(url, {
+        method,
+        body: payload ? JSON.stringify(payload) : null,
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'text/plain',
+          Accept: 'application/json',
+        },
+      })
+        .then((res) => res.json())
+        .then((response) => {
+          const ipaResult = response?.ipa?.ipaResult;
+          if (ipaResult && ipaResult !== '' && ipaResult !== 'null' && ipaResult !== 'undefined') {
+            if (loader) hideLoaderGif();
+            return response;
+          }
+          const elapsedTime = (Date.now() - startTime) / 1000;
+          if (elapsedTime < parseInt(ipaDuration, 10) - 10) {
+            return new Promise((resolve) => {
+              setTimeout(() => {
+                resolve(fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, true, startTime));
+              }, ipaTimer * 1000);
+            });
+          }
+          return response;
+        });
+    }
     const responseObj = await invokeRestAPIWithDataSecurity(payload);
     const response = await fetch(url, {
       method,
@@ -116,6 +161,21 @@ async function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loa
  */
 async function getJsonResponse(url, payload, method = 'POST') {
   try {
+    if (MODE === 'dev') {
+      return fetch(url, {
+        method,
+        body: payload ? JSON.stringify(payload) : null,
+        mode: 'cors',
+        headers: {
+          'Content-type': 'text/plain',
+          Accept: 'application/json',
+        },
+      })
+        .then((res) => res.json())
+        .catch((err) => {
+          throw err;
+        });
+    }
     const responseObj = await invokeRestAPIWithDataSecurity(payload);
     const response = await fetch(url, {
       method,
