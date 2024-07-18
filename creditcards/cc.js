@@ -291,7 +291,7 @@ const successPannelMethod = async (data) => {
       offerLink.setAttribute('data-visible', true);
     } else {
       vkycProceedButton.setAttribute('data-visible', true);
-      vkycConfirmText.setAttribute('data-visible', false);
+      vkycConfirmText.setAttribute('data-visible', true);
       offerLink.setAttribute('data-visible', false);
     }
   }
@@ -308,7 +308,7 @@ const visitTypeParam = searchParam.get('visitType');
 const authModeParam = searchParam.get('authmode');
 const journeyId = searchParam.get('journeyId');
 const aadharRedirect = visitTypeParam && (visitTypeParam === 'EKYC_AUTH');
-const idComRedirect = authModeParam && (authModeParam === 'DebitCard');
+const idComRedirect = authModeParam && ((authModeParam === 'DebitCard') || (authModeParam === 'CreditCard')); // debit card or credit card flow
 
 /**
  * @name invokeJourneyDropOffByParam
@@ -383,7 +383,7 @@ const finalDapFetchRes = async () => {
     const data = await invokeJourneyDropOffByParam('', '', journeyId);
     const journeyDropOffParamLast = data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1];
     finalDap.journeyParamState = journeyDropOffParamLast.state;
-    const checkFinalDapSuccess = (journeyDropOffParamLast.state === 'FINAL_DAP_SUCCESS');
+    const checkFinalDapSuccess = (journeyDropOffParamLast.state === 'CUSTOMER_FINAL_DAP_SUCCESS');
     if (checkFinalDapSuccess) {
       return eventHandler.successMethod(journeyDropOffParamLast);
     }
@@ -392,7 +392,7 @@ const finalDapFetchRes = async () => {
   } catch (error) {
     // "FINAL_DAP_FAILURE"
     finalDap.PROMOSE_COUNT += 1;
-    const errorCase = (finalDap.journeyParamState === 'FINAL_DAP_FAILURE' || finalDap.PROMOSE_COUNT >= finalDap.AFFORD_COUNT);
+    const errorCase = (finalDap.journeyParamState === 'CUSTOMER_FINAL_DAP_FAILURE' || finalDap.PROMOSE_COUNT >= finalDap.AFFORD_COUNT);
     if (errorCase) {
       return eventHandler.errorMethod(error);
     }

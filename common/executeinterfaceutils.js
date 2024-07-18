@@ -371,12 +371,31 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
  * @param {Object} globals - The global context object containing form and view configurations.
  * @returns {string} - '1' if the office address is selected, otherwise '2'.
  */
-const comAddressType = (globals) => {
-  const formData = globals.functions.exportData().form;
-  const deliveryPanel = globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.cardDeliveryAddressPanel;
+const comAddressType = (globals, userRedirected) => {
+  const formData = globals?.functions?.exportData()?.form;
+  const radioBtnValues = globals?.functions?.exportData()?.currentFormContext?.radioBtnValues;
+
+  /* ovd (ETB + NTB) & ETB address no change cases the radioBtnValues.cardDeliveryAdress options expression otherwise deliveryPanelAddress */
+  const { selectKYCMethodOption1: { aadharEKYCVerification }, selectKYCMethodOption2: { aadharBiometricVerification }, selectKYCMethodOption3: { officiallyValidDocumentsMethod } } = globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel;
+  const cardDeliveryAddressCase1 = {
+    cardDeliveryAddressOption1: globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.addressDeclarationOVD.currentAddressOVD.currentAddressOVDOption.$value,
+    cardDeliveryAddressOption2: globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.addressDeclarationOVD.officeAddressOVD.officeAddressOVDOption.$value,
+  };
+
+  const cardDeliveryAddressCase2 = {
+    cardDeliveryAddressOption1: globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.cardDeliveryAddressPanel.cardDeliveryAddressOption1.$value,
+    cardDeliveryAddressOption2: globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.cardDeliveryAddressPanel.cardDeliveryAddressOption2.$value,
+  };
+  const formContextCallbackData = globals.functions.exportData()?.currentFormContext || currentFormContext;
+  const journeyType = formContextCallbackData?.executeInterfaceReqObj?.requestString?.journeyFlag;
+  const biometricStatus = ((aadharBiometricVerification.$value || formData.aadharBiometricVerification) && 'bioKyc') || ((aadharEKYCVerification.$value || formData.aadharEKYCVerification) && 'aadhaar') || ((officiallyValidDocumentsMethod.$value || formData.officiallyValidDocumentsMethod) && 'OVD');
+  const etbAddressChange = formContextCallbackData?.executeInterfaceReqObj?.requestString?.addressEditFlag;
+  const ovdNtbEtbAddressNoChange = ((journeyType === 'ETB') && etbAddressChange === 'N') || ((journeyType === 'ETB') && biometricStatus === 'OVD') || ((journeyType === 'NTB' && biometricStatus === 'OVD'));
+  const deliveryPanelAddress = ovdNtbEtbAddressNoChange ? cardDeliveryAddressCase1 : cardDeliveryAddressCase2;
+
   const cardDelivery = {
-    current: formData?.cardDeliveryAddressOption1 || deliveryPanel.cardDeliveryAddressOption1.$value,
-    office: formData?.cardDeliveryAddressOption2 || deliveryPanel.cardDeliveryAddressOption2.$value,
+    current: userRedirected ? radioBtnValues?.deliveryAddress?.cardDeliveryAddressOption1 : deliveryPanelAddress?.cardDeliveryAddressOption1,
+    office: userRedirected ? radioBtnValues?.deliveryAddress?.cardDeliveryAddressOption2 : deliveryPanelAddress?.cardDeliveryAddressOption2,
   };
   return cardDelivery?.office ? '1' : '2';
 };
@@ -398,7 +417,7 @@ const executeInterfacePostRedirect = async (source, userRedirected, globals) => 
       requestObj.requestString.authMode = 'IDCOM';
     }
   }
-  requestObj.requestString.comAddressType = comAddressType(globals); // set com address type
+  requestObj.requestString.comAddressType = comAddressType(globals, userRedirected); // set com address type
   const apiEndPoint = urlPath(endpoints.executeInterface);
   const eventHandlers = {
     successCallBack: (response) => {

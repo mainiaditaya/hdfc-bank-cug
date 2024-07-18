@@ -342,13 +342,16 @@ const moveWizardView = (source, target) => {
  */
 const removeSpecialCharacters = (str, allowedChars) => {
   // Escape special characters in the allowed characters string
-  const escapedAllowedChars = allowedChars.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  if (str) {
+    const escapedAllowedChars = allowedChars.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-  // Construct regex pattern to match special characters except those in allowedChars
-  const regex = new RegExp(`[^a-zA-Z0-9,${escapedAllowedChars.replace('-', '\\-')}]`, 'g');
+    // Construct regex pattern to match special characters except those in allowedChars
+    const regex = new RegExp(`[^a-zA-Z0-9,${escapedAllowedChars.replace('-', '\\-')}]`, 'g');
 
-  // Remove special characters from the input string using the regex pattern
-  return str.replace(regex, '');
+    // Remove special characters from the input string using the regex pattern
+    return str.replace(regex, '');
+  }
+  return str;
 };
 
 /**
