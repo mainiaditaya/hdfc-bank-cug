@@ -27,4 +27,8 @@
   --font-linehight-regular: 20px;
   --font-linehight-medium: 24px;
   --font-linehight-large: 28px;
+  /* FD typography */
+  --body-fd-sm-font-size: 14px;
+  --body-fd-md-font-size: 16px;
+  --body-fd-lg-font-size: 18px;
 }

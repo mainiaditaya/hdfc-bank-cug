@@ -2,19 +2,104 @@
 .fdlien header {
     background: var(--color-interface-fd-background-primary);
 }
+
 .fdlien:has(.section.cmp-container-container) .section.cmp-container-container {
     display: none;
 }
+
 .fdlien:has(.section.form-container) .section.form-container {
     box-shadow: none;
     border-radius: 0;
     margin: 0 auto !important;
 }
+
 .fdlien:has(.section.form-container) .section.form-container {
-    form{
+    form {
         padding: 0;
+        gap: 20px;
     }
+
     .field-bannerimagepanel {
         background: var(--color-interface-fd-background-secondary);
     }
+
+    .field-loginmainpanel {
+        .field-consenttext {
+            p p {
+                font-size: var(--body-fd-sm-font-size);
+            }
+        }
+
+        .field-mobilepanel {
+            .field-wrapper {
+                p p {
+                    font-size: var(--body-md-font-size) !important;
+                    font-weight: var(--font-weight-medium);
+                }
+            }
+        }
+
+        .field-stepstofollow {
+            display: flex;
+            background: var(--color-interface-background-quinary);
+            padding: 10px;
+            border-radius: 20px;
+            width: 98%;
+            justify-content: center;
+            margin-bottom: 20px;
+
+            legend {
+                padding: 60px 0 0 20px;
+            }
+
+            fieldset {
+                flex: 0;
+                padding: 10px;
+                box-sizing: border-box;
+                display: flex;
+                img {
+                    width: 20px;
+                    height: 20px;
+                    font-size: var(--body-fd-sm-font-size);
+                }
+
+                p p {
+                    font-size: var(--body-fd-sm-font-size);
+                }
+            }
+        }
+    }
+
+    .field-identifierpanel {
+        .field-pandobselection {
+            legend {
+                font-size: var(--body-md-font-size) !important;
+                font-weight: var(--font-weight-medium);
+            }
+
+            .field-pandobselection {
+                label {
+                    font-size: var(--body-sm-font-size) !important;
+                    font-weight: var(--font-weight-medium);
+                }
+            }
+        }
+    }
+}
+
+.fdlien .button-wrapper {
+    text-align: left;
+
+    .button {
+        background: var(--color-interface-button-background);
+        border-radius: 13px;
+        font-size: var(--form-button-font-size);
+        font-weight: var(--form-button-font-weight);
+        width: auto;
+        padding: 0 50px;
+    }
+}
+
+.fdlien footer {
+    background: var(--color-interface-fd-background-primary);
 }
