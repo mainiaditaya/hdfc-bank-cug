@@ -20,6 +20,8 @@ import {
 } from '../creditcards/corporate-creditcardFunctions.js';
 
 import { invokeJourneyDropOffUpdate } from './journey-utils.js';
+import initSession from './session-service.js';
+
 import {
   validatePan,
   panAPISuccesHandler,
@@ -450,4 +452,5 @@ export {
   validateLogin,
   idcomUrlSet,
   idcomRedirection,
+  initSession,
 };

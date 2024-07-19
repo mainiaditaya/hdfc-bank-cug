@@ -36,6 +36,7 @@ import {
   validateLogin,
   idcomUrlSet,
   idcomRedirection,
+  initSession,
 } from '../../common/functions.js';
 
 import { moveWizardView } from '../../common/formutils.js';
@@ -230,4 +231,5 @@ export {
   validateLogin,
   idcomUrlSet,
   idcomRedirection,
+  initSession,
 };
