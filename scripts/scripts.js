@@ -77,6 +77,9 @@ async function loadEager(doc) {
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
+    if (main.baseURI.includes('fdlien')) {
+      document.body.classList.add('fdlien');
+    }
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
   }
@@ -104,6 +107,7 @@ async function loadLazy(doc) {
   if (hash && element) element.scrollIntoView();
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+  loadCSS(`${window.hlx.codeBasePath}/styles/fd-styles.css`);
   loadFonts();
 
   sampleRUM('lazy');

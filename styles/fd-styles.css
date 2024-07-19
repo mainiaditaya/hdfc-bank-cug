@@ -1,0 +1,20 @@
+/* add all fd realted styles */
+.fdlien header {
+    background: var(--color-interface-fd-background-primary);
+}
+.fdlien:has(.section.cmp-container-container) .section.cmp-container-container {
+    display: none;
+}
+.fdlien:has(.section.form-container) .section.form-container {
+    box-shadow: none;
+    border-radius: 0;
+    margin: 0 auto !important;
+}
+.fdlien:has(.section.form-container) .section.form-container {
+    form{
+        padding: 0;
+    }
+    .field-bannerimagepanel {
+        background: var(--color-interface-fd-background-secondary);
+    }
+}
