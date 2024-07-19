@@ -551,7 +551,7 @@ const validateEmailID = (email, globals) => {
     email,
   };
   debugger
-  globals.functions.markFieldAsInvalid('$form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.personalEmailAddress', 'HJDHSJDHJUYSHDUJHUSHDUHU', { useQualifiedName: true });
+  globals.functions.markFieldAsInvalid('$form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.personalEmailAddress', 'Invalid email Id...', { useQualifiedName: true });
   const method = 'POST';
   try {
     // const emailValid = await getJsonResponse(url, payload, method);
