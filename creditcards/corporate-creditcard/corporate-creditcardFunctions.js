@@ -543,23 +543,23 @@ const pinCodeMaster = async (globals) => {
  * validate email id in personal details screen for the NTB
  * @param {object} globals - The global object containing necessary globals form data.
  */
-const validateEmailID = async (email, globals) => {
-  const emailField = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.personalEmailAddress;
+const validateEmailID = (email, globals) => {
+// const validateEmailID = async (email, globals) => {
   const url = urlPath(ENDPOINTS.emailId);
-  const setEmailField = formUtil(globals, emailField);
-  const invalidMsg = 'Please enter valid email id.';
+  const invalidMsg = 'Please enter valid email id...';
   const payload = {
     email,
   };
-
+  debugger
+  globals.functions.markFieldAsInvalid('$form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.personalEmailAddress', 'HJDHSJDHJUYSHDUJHUSHDUHU', { useQualifiedName: true });
   const method = 'POST';
   try {
-    const emailValid = await getJsonResponse(url, payload, method);
-    if (emailValid) {
-      setEmailField.markInvalid(true);
-    } else {
-      setEmailField.markInvalid(false, invalidMsg);
-    }
+    // const emailValid = await getJsonResponse(url, payload, method);
+    // if (emailValid) {
+    //   globals.functions.markFieldAsInvalid('$form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.personalEmailAddress', '', { useQualifiedName: true });
+    // } else {
+    //   globals.functions.markFieldAsInvalid('$form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.personalEmailAddress', invalidMsg, { useQualifiedName: true }); 
+    // }
   } catch (error) {
     console.error(error, 'error in emailValid');
   }
