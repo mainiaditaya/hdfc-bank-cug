@@ -86,8 +86,6 @@
                 padding: 10px;
                 text-align: center;
                 display: inline-block;
-                width: 30%;
-                flex: 0;
 
                 img {
                     width: 20px;
@@ -97,10 +95,6 @@
 
                 p p {
                     font-size: var(--body-fd-sm-font-size);
-                }
-
-                .image-wrapper {
-                    line-height: 0;
                 }
 
                 .plain-text-wrapper {
@@ -147,4 +141,24 @@
 
 .fdlien footer {
     background: var(--color-interface-fd-background-primary);
+}
+@media (width >= 1200px) {
+    .field-loginmainpanel {
+        .field-stepstofollow {
+            fieldset.panel-wrapper {
+                flex: 0;
+            }
+        }
+    }
+}
+@media (width <= 768px) {
+    .field-loginmainpanel {
+        .field-stepstofollow {
+            fieldset {
+                .plain-text-wrapper {
+                    white-space: normal !important;
+                }
+            }
+        }
+    }
 }
