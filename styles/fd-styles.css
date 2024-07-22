@@ -60,24 +60,17 @@
         }
 
         .field-mobilepanel {
-
-            /* display: flex; */
             .field-wrapper {
                 p p {
                     font-size: var(--body-md-font-size) !important;
                     font-weight: var(--font-weight-medium);
                 }
             }
-
-            .drop-down-wrapper {
-                select {
-                    /* width: 20%; */
-                }
-            }
         }
 
         .field-stepstofollow {
             display: flex;
+            flex-direction: row;
             background: var(--color-interface-background-quinary);
             padding: 10px;
             border-radius: 20px;
@@ -90,12 +83,11 @@
             }
 
             fieldset {
-                flex: 0;
                 padding: 10px;
-                box-sizing: border-box;
-                display: flex;
                 text-align: center;
-                justify-content: center;
+                display: inline-block;
+                width: 30%;
+                flex: 0;
 
                 img {
                     width: 20px;
