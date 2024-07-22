@@ -378,7 +378,6 @@ const removeUndefinedKeys = (jsonObj) => {
    * @returns {object} -Object containing only defined values.
    */
 const santizedFormDataWithContext = (globaObj, currentFormContext) => {
-  debugger;
   const formData = globaObj.functions.exportData();
   formData.currentFormContext = currentFormContext;
   const {
