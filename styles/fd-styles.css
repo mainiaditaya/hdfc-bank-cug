@@ -1,4 +1,15 @@
 /* add all fd realted styles */
+main { padding: 0 !important; }
+
+.section > div {
+    max-width: max-content;
+    margin: 0;
+}
+
+main .section.form-container {
+    max-width: var(--form-fd-max-width) !important;
+}
+
 .fdlien header {
     background: var(--color-interface-fd-background-primary);
 }
@@ -24,11 +35,9 @@
     box-shadow: none;
     border-radius: 0;
     margin: 0 auto !important;
-}
-
-.fdlien:has(.section.form-container) .section.form-container {
+    
     form {
-        padding: 0;
+        padding: 0 !important;
         gap: 20px;
     }
 
@@ -48,22 +57,52 @@
     }
 
     .field-loginmainpanel {
+        padding: 40px 40px 40px 20px !important;
+
         .field-loginpanel {
-            width: 97%;
+            width: 100%;
             border-bottom: 1px dotted var(--color-interface-border-secondary);
         }
 
         .field-consenttext {
-            p p {
-                font-size: var(--body-fd-sm-font-size);
-            }
+            margin-top: 15px;
+
+            p p { font-size: var(--body-fd-sm-font-size); }
         }
 
         .field-mobilepanel {
+            display: grid;
+
             .field-wrapper {
+                p { margin: 0; }
+
                 p p {
                     font-size: var(--body-md-font-size) !important;
                     font-weight: var(--font-weight-medium);
+                }
+            }
+
+            .field-countrycode {
+                grid-column: span 4;
+                margin-top: -19px;
+                align-self: flex-end;
+
+                select {
+                    border-radius: var(--form-input-border-radius) 0 0 var(--form-input-border-radius) !important;
+                    padding: 0 !important;
+                    text-align: right;
+                    margin-top: 0;
+                }
+            }
+
+            .field-registeredmobilenumber {
+                grid-column: span 8;
+                margin-left: -22px;
+                align-self: flex-end;
+
+                input {
+                    border-radius: 0 var(--form-input-border-radius) var(--form-input-border-radius) 0;
+                    margin-top: 0;
                 }
             }
         }
@@ -93,6 +132,7 @@
                     font-size: var(--body-fd-sm-font-size);
                 }
 
+                /* stylelint-disable-next-line no-descending-specificity */
                 p p {
                     font-size: var(--body-fd-sm-font-size);
                 }
@@ -105,6 +145,8 @@
     }
 
     .field-identifierpanel {
+        margin: 0 !important;
+
         .field-pandobselection {
             gap: 4px;
 
@@ -142,6 +184,21 @@
 .fdlien footer {
     background: var(--color-interface-fd-background-primary);
 }
+
+@media (width <= 1280px) {
+    .fdlien:has(.section.form-container) .section.form-container {
+        margin: 0 !important;
+        width: 100%;
+
+        .field-loginmainpanel {
+            .field-loginpanel {
+                display: grid;
+                padding-bottom: 10px;
+            }
+        }
+    }
+}
+
 @media (width >= 1200px) {
     .field-loginmainpanel {
         .field-stepstofollow {
@@ -151,14 +208,32 @@
         }
     }
 }
+
+@media (width < 1020px) {
+    .field-pandobselection {
+        display: grid;
+        legend { grid-column: span 12; }
+        .field-pandobselection { width: max-content; }
+    }
+}
+
 @media (width <= 768px) {
-    .field-loginmainpanel {
-        .field-stepstofollow {
-            fieldset {
-                .plain-text-wrapper {
-                    white-space: normal !important;
+    .fdlien:has(.section.form-container) .section.form-container {
+        .field-loginmainpanel {
+            margin-top: 20px !important;
+            padding: 20px !important;
+    
+            .field-stepstofollow {
+                fieldset {
+                    .plain-text-wrapper {
+                        white-space: normal !important;
+                    }
                 }
             }
         }
     }
+}
+
+@media (width <= 480px) {
+
 }
