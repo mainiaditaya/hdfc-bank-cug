@@ -34,6 +34,17 @@
 
     .field-bannerimagepanel {
         background: var(--color-interface-fd-background-secondary);
+
+        .field-bannerimagefdlien {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .field-bannerimagefdlien picture,
+        .field-bannerimagefdlien img {
+            max-width: 100%;
+            height: auto;
+        }
     }
 
     .field-loginmainpanel {
@@ -41,6 +52,7 @@
             width: 97%;
             border-bottom: 1px dotted var(--color-interface-border-secondary);
         }
+
         .field-consenttext {
             p p {
                 font-size: var(--body-fd-sm-font-size);
@@ -48,10 +60,18 @@
         }
 
         .field-mobilepanel {
+
+            /* display: flex; */
             .field-wrapper {
                 p p {
                     font-size: var(--body-md-font-size) !important;
                     font-weight: var(--font-weight-medium);
+                }
+            }
+
+            .drop-down-wrapper {
+                select {
+                    /* width: 20%; */
                 }
             }
         }
@@ -75,6 +95,7 @@
                 box-sizing: border-box;
                 display: flex;
                 text-align: center;
+                justify-content: center;
 
                 img {
                     width: 20px;
@@ -85,6 +106,14 @@
                 p p {
                     font-size: var(--body-fd-sm-font-size);
                 }
+
+                .image-wrapper {
+                    line-height: 0;
+                }
+
+                .plain-text-wrapper {
+                    white-space: nowrap;
+                }
             }
         }
     }
@@ -92,6 +121,7 @@
     .field-identifierpanel {
         .field-pandobselection {
             gap: 4px;
+
             legend {
                 font-size: var(--body-md-font-size) !important;
                 font-weight: var(--font-weight-medium);
@@ -100,6 +130,7 @@
 
             .field-pandobselection {
                 margin-right: 6px;
+
                 label {
                     font-size: var(--body-sm-font-size) !important;
                     font-weight: var(--font-weight-medium);
