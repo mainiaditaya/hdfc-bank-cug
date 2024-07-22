@@ -113,8 +113,8 @@ function checkMode(globals) {
         globals,
       );
     }
-    currentFormContext.action = 'confirmation';
-    sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globals);
+    // currentFormContext.action = 'confirmation';
+    // sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globals);
   } if ((idcomVisit === 'DebitCard') || (idcomVisit === 'CreditCard')) { // debit card or credit card flow
     const resultPanel = formUtil(globals, globals.form.resultPanel);
     resultPanel.visible(false);
@@ -128,8 +128,8 @@ function checkMode(globals) {
     globals.functions.setProperty(globals.form.confirmResult, { visible: false });
     const userRedirected = true;
     executeInterfacePostRedirect('idCom', userRedirected, globals);
-    currentFormContext.action = 'confirmation';
-    sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globals);
+    // currentFormContext.action = 'confirmation';
+    // sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globals);
   }
 }
 

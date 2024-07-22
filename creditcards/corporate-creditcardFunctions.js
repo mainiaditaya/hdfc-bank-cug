@@ -561,6 +561,7 @@ const validateEmailID = async (email, globals) => {
  */
 const aadharConsent123 = async (globals) => {
   try {
+    await Promise.resolve(sendAnalytics('kyc continue', { errorCode: '0000', errorMessage: 'Success' }, 'JOURNEYSTATE', globals));
     if (typeof window !== 'undefined') {
       const openModal = (await import('../blocks/modal/modal.js')).default;
       const { aadharLangChange } = await import('./cc.js');

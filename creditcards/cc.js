@@ -1,6 +1,7 @@
 /* eslint-disable no-tabs */
 /* eslint no-console: ["error", { allow: ["warn", "error", "debug"] }] */
 import openModal from '../blocks/modal/modal.js';
+import { sendPageloadEvent } from '../common/analytics.js';
 
 const createLabelInElement = (elementSelector, labelClass) => {
   /**
@@ -249,7 +250,7 @@ const setArnNumberInResult = (arnNumRef) => {
   }
 };
 
-const successPannelMethod = async (data) => {
+const successPannelMethod = async (data, stateInfoData) => {
   const {
     executeInterfaceReqObj, aadharOtpValData, finalDapRequest, finalDapResponse,
   } = data;
@@ -291,6 +292,7 @@ const successPannelMethod = async (data) => {
       offerLink.setAttribute('data-visible', true);
     } else {
       vkycProceedButton.setAttribute('data-visible', true);
+      currentFormContext.isVideoKyc = true;
       vkycConfirmText.setAttribute('data-visible', true);
       offerLink.setAttribute('data-visible', false);
     }
@@ -299,7 +301,11 @@ const successPannelMethod = async (data) => {
     vkycCameraConfirmation.setAttribute('data-visible', true);
     vkycCameraPannelInstruction.setAttribute('data-visible', true);
     vkycProceedButton.setAttribute('data-visible', true);
+    currentFormContext.isVideoKyc = true;
   }
+  currentFormContext.action = 'confirmation';
+  currentFormContext.pageGotRedirected = true;
+  Promise.resolve(sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', stateInfoData));
 };
 
 // post-redirect-aadhar-or-idcom
@@ -370,7 +376,7 @@ const finalDapFetchRes = async () => {
       hideLoaderGif();
       successPannelMethod({
         executeInterfaceReqObj, aadharOtpValData, finalDapRequest, finalDapResponse,
-      });
+      }, JSON.parse(data.stateInfo));
     },
     errorMethod: (err) => {
       hideLoaderGif();

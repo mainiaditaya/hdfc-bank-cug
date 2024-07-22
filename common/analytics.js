@@ -3,6 +3,7 @@ import {
   data,
   ANALYTICS_CLICK_OBJECT,
   ANALYTICS_PAGE_LOAD_OBJECT,
+  PAGE_NAME,
 } from './analyticsConstants.js';
 import {
   createDeepCopyFromBlueprint,
@@ -46,7 +47,6 @@ function setAnalyticClickGenericProps(linkName, linkType, formData, journeyState
     linkName,
     linkType,
   };
-  digitalData.page.pageInfo.pageName = '';
   digitalData.link.linkPosition = '';
   digitalData.user.pseudoID = '';
   digitalData.user.journeyName = currentFormContext?.journeyName;
@@ -80,6 +80,7 @@ function sendPageloadEvent(journeyState, formData) {
   setAnalyticPageLoadProps(journeyState, formData, digitalData);
   switch (currentFormContext.action) {
     case 'check offers': {
+      digitalData.page.pageInfo.pageName = PAGE_NAME['get this card'];
       digitalData.card.selectedCard = '';
       digitalData.card.eligibleCard = '';
       break;
@@ -87,8 +88,12 @@ function sendPageloadEvent(journeyState, formData) {
     case 'confirmation': {
       // ((mobileValid === 'n')&&aadhaar_otp_val_data?.result?.mobileValid)
       // arn_num
-      digitalData.formDetails.reference = formData.currentFormContext.ARN_NUM;
-      digitalData.formDetails.isVideoKYC = 'yes'; // value - ? 'yes' or 'no' if aadhar and then applicationMismatch
+      digitalData.page.pageInfo.pageName = PAGE_NAME['start kyc'];
+      const formCallBackContext = currentFormContext?.pageGotRedirected ? formData?.currentFormContext : currentFormContext;
+      digitalData.formDetails = {
+        reference: formCallBackContext?.ARN_NUM,
+        isVideoKYC: formCallBackContext?.isVideoKYC ? 'Yes' : 'no', // value - ? 'yes' or 'no' if aadhar and then applicationMismatch
+      };
       break;
     }
     default:
@@ -112,6 +117,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
   setAnalyticClickGenericProps(eventType, linkType, formData, journeyState, digitalData);
   switch (eventType) {
     case 'otp click': {
+      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.event = {
         phone,
         validationMethod: getValidationMethod(formData),
@@ -123,6 +129,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       break;
     }
     case 'check offers': {
+      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.user.gender = formData.form.gender;
       digitalData.user.email = formData.form.workEmailAddress;
       if (formData.form.currentAddressToggle === 'off') {
@@ -157,6 +164,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'get this card': {
+      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.card = {
         selectedCard: formData?.form?.productCode,
         annualFee: formData?.form?.joiningandRenewalFee,
@@ -173,6 +181,10 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'address continue': {
+      // formData?.queryParams?.authmode
+      // const formData = globals.functions.exportData();
+      // const idcomVisit = formData?.queryParams?.authmode; // "DebitCard"
+      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.event = {
         status: formData?.form?.cardDeliveryAddressOption1 || formData?.form?.cardDeliveryAddressOption2,
         validationMethod: '', // Netbanking or Debit card - validationMethod - authmode will be getting only after idcom redirected - how to use that value
@@ -185,6 +197,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'kyc continue': {
+      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       const kyc = (formData?.form?.aadharEKYCVerification && 'Ekyc') || (formData?.form?.aadharBiometricVerification && 'Biometric') || (formData?.form?.officiallyValidDocumentsMethod && 'Other Docs');
       digitalData.formDetails = {
         KYCVerificationMethod: kyc,
@@ -197,6 +210,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'i agree': {
+      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.formDetails = {
         languageSelected: currentFormContext?.languageSelected,
       };
@@ -208,6 +222,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'aadhaar otp': {
+      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       // UID OR VID  how to capture the value - aadhar in different portal.
       digitalData.event = {
         status: '',
@@ -220,6 +235,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'document upload continue': {
+      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.formDetails = {
         documentProof: formData?.docUploadDropdown, // documentType
       };
@@ -231,6 +247,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'start kyc': {
+      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       // ETB_ Capture clicks on Start vKYC CTA, Applicable only for ETB Address Change, Only in case of Aadhaar and Application no. mismatch
       // NTB_ '1'(default without any condition)
       digitalData.event = {
@@ -245,6 +262,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
 
     case 'submit review': {
       // common both ntb + etb
+      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.event = {
         rating: formData?.ratingvalue,
       };

@@ -119,8 +119,22 @@ const ANALYTICS_PAGE_LOAD_OBJECT = {
   },
 };
 
+const PAGE_NAME = {
+  'otp click': 'Identify yourself',
+  'check offers': 'Your details',
+  'get this card': 'Confirm Card',
+  'kyc continue': 'Select KYC Method',
+  'i agree': 'Select KYC Method',
+  'document upload continue': 'Select KYC Method',
+  'address continue': 'Confirm & Submit',
+  'aadhaar otp': 'Aadhar portal screen',
+  'start kyc': 'Thank you screen',
+  'submit review': 'Thank you screen',
+  'thank you screen': 'Thank you screen',
+};
 export {
   data,
   ANALYTICS_CLICK_OBJECT,
   ANALYTICS_PAGE_LOAD_OBJECT,
+  PAGE_NAME,
 };
