@@ -80,6 +80,26 @@ async function loadEager(doc) {
     if (main.baseURI.includes('fdlien')) {
       document.body.classList.add('fdlien');
     }
+    if (document.body.classList.contains('fdlien')) {
+      const elements = document.querySelectorAll('.section.cmp-container-container');
+      elements.forEach((element) => {
+        if (element.dataset.sectionStatus === 'loaded') {
+          element.style.setProperty('display', 'none', 'important');
+        } else {
+          const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.type === 'attributes' && mutation.attributeName === 'data-section-status') {
+                if (element.dataset.sectionStatus === 'loaded') {
+                  element.style.setProperty('display', 'none', 'important');
+                  observer.disconnect();
+                }
+              }
+            });
+          });
+          observer.observe(element, { attributes: true });
+        }
+      });
+    }
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
   }

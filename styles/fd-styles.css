@@ -94,15 +94,20 @@ main .section.form-container {
             }
 
             .field-countrycode {
-                grid-column: span 4;
+                grid-column: span 3;
                 margin-top: -19px;
                 align-self: flex-end;
 
                 select {
+                    background: url('../icons/india-flag.png') no-repeat 10px center;
                     border-radius: var(--form-input-border-radius) 0 0 var(--form-input-border-radius) !important;
                     padding: 0 !important;
                     text-align: right;
                     margin-top: 0;
+                    pointer-events: none;
+                    &:focus{
+                        outline: none;
+                    }
                 }
             }
 
@@ -113,7 +118,7 @@ main .section.form-container {
 
                 input {
                     border-radius: 0 var(--form-input-border-radius) var(--form-input-border-radius) 0;
-                    margin-top: 0;
+                    margin-top: 5px;
                 }
             }
         }
