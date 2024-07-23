@@ -1,7 +1,9 @@
 /* add all fd realted styles */
-main { padding: 0 !important; }
+main {
+    padding: 0 !important;
+}
 
-.section > div {
+.section>div {
     max-width: max-content;
     margin: 0;
 }
@@ -12,6 +14,11 @@ main .section.form-container {
 
 .fdlien header {
     background: var(--color-interface-fd-background-primary);
+}
+
+.fdlien header>.cmp-container,
+.fdlien header>.cmp-container div:nth-child(1) {
+    max-width: 1160px;
 }
 
 .fdlien header .cmp-container>div:nth-child(n+3) {
@@ -28,14 +35,14 @@ main .section.form-container {
 }
 
 .fdlien:has(.section.cmp-container-container) .section.cmp-container-container {
-    display: none;
+    /* display: none; */
 }
 
 .fdlien:has(.section.form-container) .section.form-container {
     box-shadow: none;
     border-radius: 0;
     margin: 0 auto !important;
-    
+
     form {
         padding: 0 !important;
         gap: 20px;
@@ -67,14 +74,18 @@ main .section.form-container {
         .field-consenttext {
             margin-top: 15px;
 
-            p p { font-size: var(--body-fd-sm-font-size); }
+            p p {
+                font-size: var(--body-fd-sm-font-size);
+            }
         }
 
         .field-mobilepanel {
             display: grid;
 
             .field-wrapper {
-                p { margin: 0; }
+                p {
+                    margin: 0;
+                }
 
                 p p {
                     font-size: var(--body-md-font-size) !important;
@@ -115,7 +126,6 @@ main .section.form-container {
             border-radius: 20px;
             width: 98%;
             justify-content: center;
-            margin-bottom: 20px;
 
             legend {
                 padding: 60px 0 0 20px;
@@ -132,7 +142,6 @@ main .section.form-container {
                     font-size: var(--body-fd-sm-font-size);
                 }
 
-                /* stylelint-disable-next-line no-descending-specificity */
                 p p {
                     font-size: var(--body-fd-sm-font-size);
                 }
@@ -183,9 +192,16 @@ main .section.form-container {
 
 .fdlien footer {
     background: var(--color-interface-fd-background-primary);
+    text-align: center;
+
+    .cmp-container {
+        div>div {
+            text-align: center;
+        }
+    }
 }
 
-@media (width <= 1280px) {
+@media (width <=1280px) {
     .fdlien:has(.section.form-container) .section.form-container {
         margin: 0 !important;
         width: 100%;
@@ -199,7 +215,7 @@ main .section.form-container {
     }
 }
 
-@media (width >= 1200px) {
+@media (width >=1200px) {
     .field-loginmainpanel {
         .field-stepstofollow {
             fieldset.panel-wrapper {
@@ -212,17 +228,23 @@ main .section.form-container {
 @media (width < 1020px) {
     .field-pandobselection {
         display: grid;
-        legend { grid-column: span 12; }
-        .field-pandobselection { width: max-content; }
+
+        legend {
+            grid-column: span 12;
+        }
+
+        .field-pandobselection {
+            width: max-content;
+        }
     }
 }
 
-@media (width <= 768px) {
+@media (width <=768px) {
     .fdlien:has(.section.form-container) .section.form-container {
         .field-loginmainpanel {
             margin-top: 20px !important;
             padding: 20px !important;
-    
+
             .field-stepstofollow {
                 fieldset {
                     .plain-text-wrapper {
@@ -232,8 +254,4 @@ main .section.form-container {
             }
         }
     }
-}
-
-@media (width <= 480px) {
-
 }
