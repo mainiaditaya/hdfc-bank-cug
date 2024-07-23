@@ -5,7 +5,7 @@ main {
 
 .section>div {
     max-width: max-content;
-    margin: 0;
+    margin: 0 auto;
 }
 
 main .section.form-container {
@@ -193,6 +193,33 @@ main .section.form-container {
         font-weight: var(--form-button-font-weight);
         width: auto;
         padding: 0 50px;
+    }
+}
+
+.fdlien .field-otppanel {
+    p > b {
+        color: var(--color-interface-background-quaternary);
+        font-size: var(--body-fd-xx-lg-font-size);
+    }
+
+    .field-otphelptext{
+        p > b {
+            color: var(--color-interface-background-quaternary);
+            font-size: var(--body-fd-sm-font-size);
+        }
+    }
+    
+    .field-otpresend {
+        .button {
+            font-size: var(--body-fd-md-font-size);
+            padding: 0 0 0 5px;
+        }
+    }
+
+    .field-otpsubpanel {
+        .field-maximum, field-attempts {
+            font-size: var(--body-fd-md-font-size);
+        }
     }
 }
 
