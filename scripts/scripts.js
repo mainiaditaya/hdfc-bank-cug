@@ -9,17 +9,12 @@ import {
   waitForLCP,
   loadBlocks,
   loadCSS,
-  toClassName,
-  getMetadata,
 } from './aem.js';
 
 import {
-  // analyticsSetConsent,
-  analyticsTrackConversion,
   createInlineScript,
   getAlloyInitScript,
   setupAnalyticsTrackingWithAlloy,
-  analyticsTrackCWV,
 } from './lib-analytics.js';
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
@@ -103,31 +98,6 @@ async function loadEager(doc) {
   }
 }
 
-async function initializeConversionTracking() {
-  /*
-  const context = {
-    getMetadata,
-    toClassName,
-  };
-  // eslint-disable-next-line import/no-relative-packages
-  const { initConversionTracking } = await import('../plugins/rum-conversion/src/index.js');
-  await initConversionTracking.call(context, document);
-  */
-
-  // call upon conversion events, sends them to alloy
-  /*
-  sampleRUM.always.on('convert', async (data) => {
-    const { element } = data;
-    if (!element || !alloy) {
-      return;
-    }
-    // form tracking related logic should be added here if need be.
-    // see https://github.com/adobe/franklin-rum-conversion#integration-with-analytics-solutions
-    analyticsTrackConversion({ ...data });
-  });
-  */
-}
-
 /**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
@@ -150,9 +120,8 @@ async function loadLazy(doc) {
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
   sampleRUM.observe(main.querySelectorAll('picture > img'));
 
+  // initialize analytics
   await setupAnalyticsTrackingWithAlloy(document);
-  // await initializeConversionTracking();
-  // analyticsSetConsent(true);
 }
 
 /**
@@ -171,44 +140,5 @@ async function loadPage() {
   await loadLazy(document);
   loadDelayed();
 }
-
-const cwv = {};
-
-// Forward the RUM CWV cached measurements to edge using WebSDK before the page unloads
-window.addEventListener('beforeunload', () => {
-  if (!Object.keys(cwv).length) return;
-  analyticsTrackCWV(cwv);
-});
-
-// Callback to RUM CWV checkpoint in order to cache the measurements
-sampleRUM.always.on('cwv', async (data) => {
-  if (!data.cwv) return;
-  Object.assign(cwv, data.cwv);
-});
-
-/*
-let cwv = {};
-sampleRUM.always.on('cwv', async (data) => {
-  if (data.cwv) {
-    cwv = {
-      ...cwv,
-      ...data.cwv
-    };
-  }
-});
-
-export async function analyticsTrackCWV(cwv) {
-  // eslint-disable-next-line no-undef
-  return alloy('sendEvent', {
-    documentUnloading: true,
-    xdm: {
-      eventType: 'web.performance.measurements',
-      [CUSTOM_SCHEMA_NAMESPACE]: {
-        cwv,
-      }
-    },
-  });
-}
-*/
 
 loadPage();

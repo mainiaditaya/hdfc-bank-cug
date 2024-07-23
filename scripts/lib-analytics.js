@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Adobe. All rights reserved.
+ * Copyright 2024 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -15,22 +15,13 @@
  * Customer's XDM schema namespace
  * @type {string}
  */
-const CUSTOM_SCHEMA_NAMESPACE = '_hdfcbank';
-
-/**
- * Returns experiment id and variant running
- * @returns {{experimentVariant: *, experimentId}}
- */
-export function getExperimentDetails() {
-  let experiment;
-  if (window.hlx.experiment) {
-    experiment = {
-      experimentId: window.hlx.experiment.id,
-      experimentVariant: window.hlx.experiment.selectedVariant,
-    };
-  }
-  return experiment;
-}
+const CUSTOM_SCHEMA_NAMESPACE = '_hdfcbank'; /* your XDM schema here */
+const DEV_DATA_STREAM_ID = 'bcc54d12-a918-4471-b671-5af1141b5a55'; /* your dev datastream id here */
+const STAGE_DATA_STREAM_ID = 'bcc54d12-a918-4471-b671-5af1141b5a55'; /* your stage datastream id here */
+const PROD_DATA_STREAM_ID = 'bcc54d12-a918-4471-b671-5af1141b5a55'; /* your prod datastream id here */
+const CUSTOMER_ADOBE_ORGID = '3817033753EE89720A490D4D@AdobeOrg'; /* your ims org id here */
+const CUSTOMER_DOMAIN_NAME = 'hdfc.com'; /* your domain name here */
+const EDGE_DELIVERY_URL = 'corpuat--hdfc-bank--aemsites.hlx.page';
 
 /**
  * Returns script that initializes a queue for each alloy instance,
@@ -48,21 +39,21 @@ export function getAlloyInitScript() {
  * Returns datastream id to use as edge configuration id
  * Custom logic can be inserted here in order to support
  * different datastream ids for different environments (non-prod/prod)
- * @returns {{edgeConfigId: string, orgId: string}}
+ * @returns {{datastreamId: string, orgId: string}}
  */
 function getDatastreamConfiguration() {
   const { hostname } = window.location;
-  let edgeConfigId = 'e05f92f2-1ed5-49ae-9dda-42c0dbdaa927'; // HDFC(DEV)
-  if (hostname?.endsWith('hdfc.com')) {
-    edgeConfigId = 'e05f92f2-1ed5-49ae-9dda-42c0dbdaa927'; // HDFC(PROD)
+  let datastreamId = DEV_DATA_STREAM_ID;
+  if (hostname?.endsWith(CUSTOMER_DOMAIN_NAME)) {
+    datastreamId = PROD_DATA_STREAM_ID;
   }
   if (hostname?.endsWith('hlx.page') || hostname?.endsWith('hlx.live')) {
-    edgeConfigId = 'e05f92f2-1ed5-49ae-9dda-42c0dbdaa927'; // HDFC(STAGE)
+    datastreamId = STAGE_DATA_STREAM_ID;
   }
 
   return {
-    edgeConfigId,
-    orgId: '3817033753EE89720A490D4D@AdobeOrg', // update ORG id for HDFC
+    datastreamId,
+    orgId: CUSTOMER_ADOBE_ORGID,
   };
 }
 
@@ -72,14 +63,9 @@ function getDatastreamConfiguration() {
  * @param options event in the XDM schema format
  */
 function enhanceAnalyticsEvent(options) {
-  const experiment = getExperimentDetails();
-  options.xdm[CUSTOM_SCHEMA_NAMESPACE] = {
-    ...options.xdm[CUSTOM_SCHEMA_NAMESPACE],
-    ...(experiment ? { experiment } : {}), // add experiment details, if existing, to all events
-  };
   options.xdm.web = options.xdm.web || {};
   options.xdm.web.webPageDetails = options.xdm.web.webPageDetails || {};
-  options.xdm.web.webPageDetails.server = 'Franklin';
+  options.xdm.web.webPageDetails.server = EDGE_DELIVERY_URL;
 
   console.debug(`enhanceAnalyticsEvent complete: ${JSON.stringify(options)}`);
 }
@@ -120,24 +106,22 @@ export function createInlineScript(document, element, innerHTML, type) {
 }
 
 /**
- * Sets Adobe standard v1.0 consent for alloy based on the input
- * Documentation: https://experienceleague.adobe.com/docs/experience-platform/edge/consent/supporting-consent.html?lang=en#using-the-adobe-standard-version-1.0
- * @param approved
+ * Sends an analytics event to alloy
+ * @param xdmData - the xdm data object
  * @returns {Promise<*>}
  */
-/*
-export async function analyticsSetConsent(approved) {
-  return alloy('setConsent', {
-    consent: [{
-      standard: 'Adobe',
-      version: '1.0',
-      value: {
-        general: approved ? 'in' : 'out',
-      },
-    }],
+async function sendAnalyticsEvent(xdmData) {
+  // eslint-disable-next-line no-undef
+  if (!alloy) {
+    console.warn('alloy not initialized, cannot send analytics event');
+    return Promise.resolve();
+  }
+  // eslint-disable-next-line no-undef
+  return alloy('sendEvent', {
+    documentUnloading: false, // set 'true' if you want to use the Javascript's sendBeacon method to send data to Adobe.
+    xdm: xdmData,
   });
 }
-*/
 
 /**
  * Basic tracking for page views with alloy
@@ -146,24 +130,23 @@ export async function analyticsSetConsent(approved) {
  * @returns {Promise<*>}
  */
 export async function analyticsTrackPageViews(document, additionalXdmFields = {}) {
-  return alloy('sendEvent', {
-    documentUnloading: true,
-    xdm: {
-      eventType: 'web.webpagedetails.pageViews',
-      web: {
-        webPageDetails: {
-          pageViews: {
-            value: 1,
-          },
-          name: `${document.title}`,
-          URL: 'https://www.google.com/', // update with actual URL
+  const xdmData = {
+    eventType: 'web.webinteraction.linkClicks',
+    web: {
+      webPageDetails: {
+        pageViews: {
+          value: 1,
         },
-      },
-      [CUSTOM_SCHEMA_NAMESPACE]: {
-        ...additionalXdmFields,
+        name: `${document.title}`,
+        URL: `${document.URL}`,
       },
     },
-  });
+    [CUSTOM_SCHEMA_NAMESPACE]: {
+      ...additionalXdmFields,
+    },
+  };
+
+  return sendAnalyticsEvent(xdmData);
 }
 
 /**
@@ -181,151 +164,52 @@ export async function setupAnalyticsTrackingWithAlloy(document) {
   analyticsTrackPageViews(document);
 }
 
-/**
- * Basic tracking for link clicks with alloy
- * Documentation: https://experienceleague.adobe.com/docs/experience-platform/edge/data-collection/track-links.html
- * @param element
- * @param linkType
- * @param additionalXdmFields
- * @returns {Promise<*>}
- */
-export async function analyticsTrackLinkClicks(element, linkType = 'other', additionalXdmFields = {}) {
-  return alloy('sendEvent', {
-    documentUnloading: true,
-    xdm: {
-      eventType: 'web.webinteraction.linkClicks',
-      web: {
-        webInteraction: {
-          URL: `${element.href}`,
-          // eslint-disable-next-line no-nested-ternary
-          name: `${element.text ? element.text.trim() : (element.innerHTML ? element.innerHTML.trim() : '')}`,
-          linkClicks: {
-            value: 1,
-          },
-          type: linkType,
-        },
-      },
-      [CUSTOM_SCHEMA_NAMESPACE]: {
-        ...additionalXdmFields,
-      },
-    },
-  });
-}
-
-/**
- * Basic tracking for CWV events with alloy
- * @param cwv
- * @returns {Promise<*>}
- */
-export async function analyticsTrackCWV(cwv) {
-  const xdmData = {
-    eventType: 'web.performance.measurements',
-    [CUSTOM_SCHEMA_NAMESPACE]: {
-      cwv,
-    },
-  };
-
-  return sendAnalyticsEvent(xdmData);
-}
-
-/**
- * Basic tracking for form submissions with alloy
- * @param element
- * @param additionalXdmFields
- * @returns {Promise<*>}
- */
-export async function analyticsTrackFormSubmission(element, additionalXdmFields = {}) {
-
-  /*
-  return alloy('sendEvent', {
-    documentUnloading: true,
-    xdm: {
-      eventType: 'web.formFilledOut',
-      [CUSTOM_SCHEMA_NAMESPACE]: {
-        form: {
-          ...(formId && { formId }),
-          formComplete: 1,
-        },
-      ...additionalXdmFields,
-      },
-    },
-  });
-  */
-
-  const formId = element?.id || element?.dataset?.action;
-  const xdmData = {
-    eventType: 'web.formFilledOut',
-    [CUSTOM_SCHEMA_NAMESPACE]: {
-      form: {
-        ...(formId && { formId }),
-        formComplete: 1,
-      },
-      ...additionalXdmFields,
-    },
-  };
-
-  return sendAnalyticsEvent(xdmData);
-}
-
-/**
- * Sends an analytics event to alloy
- * @param xdmData - the xdm data object
- * @returns {Promise<*>}
- */
-async function sendAnalyticsEvent(xdmData) {
-  // eslint-disable-next-line no-undef
-  if (!alloy) {
-    console.warn('alloy not initialized, cannot send analytics event');
-    return Promise.resolve();
+const getValidationMethod = (formContext) => {
+  if (formContext && formContext?.form?.login && formContext?.form?.login?.panDobSelection) {
+    return formContext.form.login.panDobSelection === '0' ? 'DOB' : 'PAN';
   }
-  // eslint-disable-next-line no-undef
-  return alloy('sendEvent', {
-    documentUnloading: true,
-    xdm: xdmData,
-  });
-}
+  return '';
+};
 
-export async function analyticsTrackConversion(data, additionalXdmFields = {}) {
-  const { source: conversionName, target: conversionValue, element } = data;
+export async function analyticsTrackOtpClicks(eventName, payload, formData, formContext, linkType = 'button', additionalXdmFields = {}) {
+  const jsonString = JSON.stringify(payload || {});
+  const apiResponse = JSON.parse(jsonString);
 
   const xdmData = {
-    eventType: 'web.webinteraction.conversion',
-    [CUSTOM_SCHEMA_NAMESPACE]: {
-      conversion: {
-        conversionComplete: 1,
-        conversionName,
-        conversionValue,
-      },
-      ...additionalXdmFields,
-    },
-  };
-
-  if (element.tagName === 'FORM') {
-    xdmData.eventType = 'web.formFilledOut';
-    const formId = element?.id || element?.dataset?.action;
-    xdmData[CUSTOM_SCHEMA_NAMESPACE].form = {
-      ...(formId && { formId }),
-      // don't count as form complete, as this event should be tracked separately,
-      // track only the details of the form together with the conversion
-      formComplete: 0,
-    };
-  } else if (element.tagName === 'A') {
-    xdmData.eventType = 'web.webinteraction.linkClicks';
-    xdmData.web = {
+    eventType: 'web.webinteraction.linkClicks',
+    web: {
       webInteraction: {
-        URL: `${element.href}`,
         // eslint-disable-next-line no-nested-ternary
-        name: `${element.text ? element.text.trim() : (element.innerHTML ? element.innerHTML.trim() : '')}`,
+        name: eventName,
         linkClicks: {
-          // don't count as link click, as this event should be tracked separately,
-          // track only the details of the link with the conversion
-          value: 0,
+          value: 1,
         },
-        type: 'other',
+        type: linkType,
       },
-    };
-  }
+    },
+    [CUSTOM_SCHEMA_NAMESPACE]: {
+      error: {
+        errorMessage: apiResponse?.otpGenResponse?.status?.errorMsg,
+        errorCode: apiResponse?.otpGenResponse?.status?.errorCode,
+      },
+      form: {
+        name: 'Corporate credit card',
+      },
+      page: {
+        pageName: 'CORPORATE_CARD_JOURNEY',
+      },
+      journey: {
+        journeyID: formContext?.journeyID,
+        journeyName: 'CORPORATE_CARD_JOURNEY',
+        journeyState: formContext?.journeyState,
+        formloginverificationmethod: getValidationMethod(formData),
+      },
+      identifier: {
+        mobileHash: formData?.login?.registeredMobileNumber,
+      },
+      ...additionalXdmFields,
+    },
+  };
 
   return sendAnalyticsEvent(xdmData);
 }
-

@@ -17,6 +17,7 @@ import {
   setNameOnCard,
   firstLastNameValidation,
   validateLogin,
+  sendDataToRum,
 } from '../creditcards/corporate-creditcardFunctions.js';
 
 import { invokeJourneyDropOffUpdate } from './journey-utils.js';
@@ -450,4 +451,5 @@ export {
   validateLogin,
   idcomUrlSet,
   idcomRedirection,
+  sendDataToRum,
 };

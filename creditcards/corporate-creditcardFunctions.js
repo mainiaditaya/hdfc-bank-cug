@@ -28,6 +28,10 @@ import {
 import { sendAnalyticsEvent } from '../common/analytics.js';
 import corpCreditCard from '../common/constants.js';
 
+import {
+  analyticsTrackOtpClicks,
+} from '../scripts/lib-analytics.js';
+
 const { endpoints } = corpCreditCard;
 const { currentFormContext } = corpCreditCardContext;
 // Initialize all Corporate Card Journey Context Variables.
@@ -802,6 +806,16 @@ const firstLastNameValidation = (fn, ln, globals) => {
   }
   // return validStatus;
 };
+
+/**
+ * sends data to rum server.
+ * @param {object} payload
+ * @param {object} globals
+ */
+const sendDataToRum = (eventName, data, globals) => {
+  analyticsTrackOtpClicks(eventName, data, santizedFormDataWithContext(globals), currentFormContext);
+};
+
 export {
   getThisCard,
   prefillForm,
@@ -820,4 +834,5 @@ export {
   setNameOnCard,
   firstLastNameValidation,
   validateLogin,
+  sendDataToRum,
 };
