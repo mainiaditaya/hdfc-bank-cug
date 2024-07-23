@@ -1,5 +1,5 @@
 :root {
-  --font-family-default: inter, "inter-normal-400-fallback";
+  --font-family-default: inter;
 
   /* form--btn */
   --form-button-font-size: 16px;
