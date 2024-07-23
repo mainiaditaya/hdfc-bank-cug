@@ -278,11 +278,43 @@ main .section.form-container {
             margin-top: 20px !important;
             padding: 20px !important;
 
+            .field-mobilepanel {
+                .field-countrycode {
+                    grid-column: span 5;
+                }
+
+                .field-registeredmobilenumber {
+                    grid-column: span 7;
+                    overflow: hidden;
+                }
+            }
+
             .field-stepstofollow {
                 fieldset {
                     .plain-text-wrapper {
                         white-space: normal !important;
                     }
+                }
+            }
+        }
+    }
+}
+
+@media (width <=430px) {
+    .fdlien:has(.section.form-container) .section.form-container {
+        .field-loginmainpanel {
+            .field-loginpanel{
+                display: flex;
+            }
+
+            .field-mobilepanel {
+                .field-countrycode {
+                    grid-column: span 3;
+                }
+
+                .field-registeredmobilenumber {
+                    grid-column: span 9;
+                    overflow: hidden;
                 }
             }
         }
