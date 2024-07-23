@@ -638,7 +638,7 @@ const prefillForm = (globals) => {
 */
 // eslint-disable-next-line no-unused-vars
 function sendAnalytics(payload, globals) {
-  sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
+  // sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
 }
 
 /**
