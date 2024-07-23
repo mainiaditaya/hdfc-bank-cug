@@ -136,7 +136,7 @@ function sendPageloadEvent(formContext) {
     window.digitalData = digitalDataPageLoad || {};
   }
   // eslint-disable-next-line no-undef
-  _satellite.track('pageload');
+  // _satellite.track('pageload');
 }
 
 function populateResponse(payload, action, digitalDataEvent) {
