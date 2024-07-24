@@ -185,16 +185,6 @@ main img {
     }
 }
 
-.link{
-    color: var(--color-action-text-secondary-default);
-    cursor: pointer;
-    font-weight: normal;
-    
-    &:hover{
-        text-decoration: underline;
-    }
-}
-
 .field-pandobselection {
     margin-top: -7px;
 }
@@ -366,7 +356,7 @@ main .form form .panel-wrapper {
 
     main{
         background-color: var(--color-interface-background-primary);
-    }    
+    }
 
     .form-container{
         box-shadow: none;
@@ -385,7 +375,7 @@ main .form form .panel-wrapper {
             }
 
         }
-        
+
         .field-checkbox1text p{
             margin-top: 12px !important;
      }
@@ -403,7 +393,7 @@ main .form form .panel-wrapper {
 
     main{
         background-color: var(--color-interface-background-primary);
-    }    
+    }
 
     .form-container{
         box-shadow: none;
@@ -421,5 +411,5 @@ main .form form .panel-wrapper {
         .field-checkbox2text{
             margin-left: -13px;
         }
-    }    
+    }
 }
