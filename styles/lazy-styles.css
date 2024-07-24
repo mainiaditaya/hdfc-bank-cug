@@ -6,7 +6,7 @@
     src: url('../fonts/inter-woff2/Inter-ExtraLight.woff2') format('woff2');
     font-weight: 200;
     font-style: normal;
-    font-display: swap;
+    font-display: optional;
 }
 
 /* Inter - Light */
@@ -15,7 +15,7 @@
     src: url('../fonts/inter-woff2/Inter-Light.woff2') format('woff2');
     font-weight: 300;
     font-style: normal;
-    font-display: swap;
+    font-display: optional;
 }
 
 /* Inter - Regular */
@@ -24,7 +24,7 @@
     src: url('../fonts/inter-woff2/Inter-Regular.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
-    font-display: swap;
+    font-display: optional;
 }
 
 
@@ -35,7 +35,7 @@
     src: url('../fonts/inter-woff2/Inter-Medium.woff2') format('woff2');
     font-weight: 500;
     font-style: normal;
-    font-display: swap;
+    font-display: optional;
 }
 
 /* Inter - SemiBold */
@@ -44,14 +44,14 @@
     src: url('../fonts/inter-woff2/Inter-SemiBold.woff2') format('woff2');
     font-weight: 600;
     font-style: normal;
-    font-display: swap;
+    font-display: optional;
 }
 
 @font-face {
     font-family: roboto;
     font-style: normal;
     font-weight: 700;
-    font-display: swap;
+    font-display: optional;
     src: url('../fonts/roboto-bold.woff2') format('woff2');
 }
 
@@ -59,7 +59,7 @@
     font-family: roboto;
     font-style: normal;
     font-weight: 400;
-    font-display: swap;
+    font-display: optional;
     src: url('../fonts/roboto-regular.woff2') format('woff2');
 }
 
