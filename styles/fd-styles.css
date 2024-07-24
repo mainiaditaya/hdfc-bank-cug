@@ -3,6 +3,17 @@ main {
     padding: 0 !important;
 }
 
+/* Button Styling */
+.fdlien .button-wrapper {
+    text-align: left;
+
+    .button {
+        font-size: var(--form-font-size-xs);
+        max-width: 272px;
+        width: 100%;
+    }
+}
+
 .section>div {
     max-width: max-content;
     margin: 0 auto;
@@ -59,7 +70,7 @@ main .section.form-container {
         .field-bannerimagefdlien picture,
         .field-bannerimagefdlien img {
             max-width: 100%;
-            height: auto;
+            height: 100%;
         }
     }
 
@@ -68,11 +79,11 @@ main .section.form-container {
 
         .field-loginpanel {
             width: 100%;
-            border-bottom: 1px dotted var(--color-interface-border-secondary);
         }
 
         .field-consenttext {
-            margin-top: 15px;
+            border-top: 1px dotted var(--color-interface-border-secondary);
+            padding-top: 15px;
 
             p p {
                 font-size: var(--body-fd-sm-font-size);
@@ -94,7 +105,7 @@ main .section.form-container {
             }
 
             .field-countrycode {
-                grid-column: span 3;
+                grid-column: span 5;
                 margin-top: -19px;
                 align-self: flex-end;
 
@@ -113,13 +124,21 @@ main .section.form-container {
             }
 
             .field-registeredmobilenumber {
-                grid-column: span 8;
+                grid-column: span 7;
                 margin-left: -22px;
                 align-self: flex-end;
 
                 input {
                     border-radius: 0 var(--form-input-border-radius) var(--form-input-border-radius) 0;
                     margin-top: 5px;
+                }
+
+                label { margin: 18px 0 0 10px; }
+
+                .field-description {
+                    margin: -12px -10px -11px 0;
+                    position: absolute;
+                    left: -50%;
                 }
             }
         }
@@ -183,18 +202,7 @@ main .section.form-container {
     }
 }
 
-.fdlien .button-wrapper {
-    text-align: left;
-
-    .button {
-        background: var(--color-interface-button-background);
-        border-radius: 13px;
-        font-size: var(--form-button-font-size);
-        font-weight: var(--form-button-font-weight);
-        width: auto;
-        padding: 0 50px;
-    }
-}
+/* OTP Panel Styling */
 
 .fdlien .field-otppanel {
     p > b {
@@ -223,6 +231,8 @@ main .section.form-container {
     }
 }
 
+/* Footer */
+
 .fdlien footer {
     background: var(--color-interface-fd-background-primary);
     text-align: center;
@@ -234,6 +244,7 @@ main .section.form-container {
     }
 }
 
+/* For screens more than form width */
 @media (width <=1280px) {
     .fdlien:has(.section.form-container) .section.form-container {
         margin: 0 !important;
@@ -272,22 +283,24 @@ main .section.form-container {
     }
 }
 
-@media (width <=768px) {
+/* For tablets */
+@media (width <=800px) {
+    main .form form {
+        display: block;
+    }
+
+    .fdlien .button-wrapper {
+        text-align: center;
+    }
+
     .fdlien:has(.section.form-container) .section.form-container {
         .field-loginmainpanel {
             margin-top: 20px !important;
             padding: 20px !important;
 
-            .field-mobilepanel {
-                .field-countrycode {
-                    grid-column: span 5;
-                }
-
                 .field-registeredmobilenumber {
-                    grid-column: span 7;
-                    overflow: hidden;
+                   margin: -15px 0 0;
                 }
-            }
 
             .field-stepstofollow {
                 fieldset {
@@ -300,23 +313,13 @@ main .section.form-container {
     }
 }
 
-@media (width <=430px) {
-    .fdlien:has(.section.form-container) .section.form-container {
-        .field-loginmainpanel {
-            .field-loginpanel{
-                display: flex;
-            }
+/* For mobiles */
+@media (width <=500px) {
+    .fdlien .button-wrapper button {
+        max-width: none !important;
+    }
 
-            .field-mobilepanel {
-                .field-countrycode {
-                    grid-column: span 3;
-                }
-
-                .field-registeredmobilenumber {
-                    grid-column: span 9;
-                    overflow: hidden;
-                }
-            }
-        }
+    .field-loginpanel {
+        .field-mobilepanel, .field-identifierpanel { grid-column: span 12 !important; }
     }
 }
