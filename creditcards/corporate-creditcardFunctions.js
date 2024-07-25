@@ -35,6 +35,7 @@ currentFormContext.formName = 'CorporateCreditCard';
 currentFormContext.errorCode = '';
 currentFormContext.errorMessage = '';
 currentFormContext.eligibleOffers = '';
+currentFormContext.journeyId = '';
 
 formRuntime.getOtpLoader = currentFormContext.getOtpLoader || (typeof window !== 'undefined') ? displayLoader : false;
 formRuntime.otpValLoader = currentFormContext.otpValLoader || (typeof window !== 'undefined') ? displayLoader : false;
@@ -794,7 +795,6 @@ const firstLastNameValidation = (fn, ln, globals) => {
 export {
   getThisCard,
   prefillForm,
-  corpCreditCardContext,
   formRuntime,
   getAddressDetails,
   pinCodeMaster,

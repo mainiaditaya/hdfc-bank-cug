@@ -27,7 +27,7 @@ function setAnalyticPageLoadProps(journeyState, formData, digitalData) {
   digitalData.page.pageInfo.pageName = 'Identify Yourself';
   digitalData.user.pseudoID = '';// Need to check
   digitalData.user.journeyName = currentFormContext?.journeyName;
-  digitalData.user.journeyID = currentFormContext?.journeyID;
+  digitalData.user.journeyID = formData?.journeyId;
   digitalData.user.journeyState = journeyState;
   digitalData.user.casa = '';
   digitalData.form.name = corpCreditCard.formName;

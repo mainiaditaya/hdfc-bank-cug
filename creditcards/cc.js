@@ -1,7 +1,7 @@
 /* eslint-disable no-tabs */
 /* eslint no-console: ["error", { allow: ["warn", "error", "debug"] }] */
 import openModal from '../blocks/modal/modal.js';
-import { sendPageloadEvent } from '../common/analytics.js';
+import { sendPageloadEvent, sendAnalytics } from '../common/analytics.js';
 
 const createLabelInElement = (elementSelector, labelClass) => {
   /**
@@ -460,7 +460,6 @@ const aadharLangChange = async (adharContentDom, defaultLang) => {
   const findFieldSet = adharContentDom?.querySelectorAll('fieldset');
   const selectedClass = 'selected-language';
   const defaultOptionClass = `field-aadharconsent-${defaultLang?.toLowerCase()}`;
-  const { currentFormContext } = (await import('../common/journey-utils.js')).corpCreditCardContext;
   const applySelected = (fieldNode, optionClass, nameClass) => {
     fieldNode?.forEach((element) => {
       if (element?.classList?.contains(optionClass)) {
@@ -473,6 +472,7 @@ const aadharLangChange = async (adharContentDom, defaultLang) => {
     });
   };
   applySelected(findFieldSet, defaultOptionClass, selectedClass);
+  const { currentFormContext } = (await import('../common/journey-utils.js')).corpCreditCardContext;
   currentFormContext.languageSelected = defaultLang;
   selectOp.value = defaultLang;
   selectOp?.addEventListener('change', (e) => {
@@ -572,6 +572,15 @@ const validateNamesOfYourDetail = (inputName) => {
 };
 
 ['firstName', 'middleName', 'lastName'].forEach((ipName) => validateNamesOfYourDetail(ipName));
+
+const onPageLoadAnalytics = async () => {
+  const { currentFormContext } = (await import('../common/journey-utils.js')).corpCreditCardContext;
+  // eslint-disable-next-line no-underscore-dangle, no-undef
+  currentFormContext.journeyId = myForm.resolveQualifiedName('$form.runtime.journeyId')._data.$_value;
+  sendAnalytics('page load', {}, 'ACQUIRED', currentFormContext);
+};
+
+onPageLoadAnalytics();
 
 export {
   decorateStepper,

@@ -6,7 +6,6 @@ import {
   pinCodeMaster,
   validateEmailID,
   currentAddressToggleHandler,
-  corpCreditCardContext,
   otpValHandler,
   journeyResponseHandler,
   createJourneyId,
@@ -20,7 +19,10 @@ import {
 
 // import { updatePanelVisibility } from './finaldaputils.js';
 
-import { invokeJourneyDropOffUpdate } from './journey-utils.js';
+import {
+  corpCreditCardContext,
+  invokeJourneyDropOffUpdate,
+} from './journey-utils.js';
 import {
   validatePan,
   panAPISuccesHandler,
@@ -51,7 +53,6 @@ import {
   sendErrorAnalytics,
   sendAnalytics,
   asyncAnalytics,
-  sendPageloadEvent,
 } from './analytics.js';
 
 import corpCreditCard from './constants.js';
