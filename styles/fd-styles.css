@@ -1,3 +1,5 @@
+/* stylelint-disable no-descending-specificity */
+
 /* add all fd realted styles */
 main {
     padding: 0 !important;
@@ -205,6 +207,8 @@ main .section.form-container {
 /* OTP Panel Styling */
 
 .fdlien .field-otppanel {
+    legend { padding-top: 40px; }
+
     p > b {
         color: var(--color-interface-background-quaternary);
         font-size: var(--body-fd-xx-lg-font-size);
@@ -228,8 +232,13 @@ main .section.form-container {
         .field-maximum, field-attempts {
             font-size: var(--body-fd-md-font-size);
         }
-    }
+    } 
 }
+
+.fdlien .field-submitotp {
+    padding-bottom: 40px;
+    button { max-width: none !important; }
+} 
 
 /* Footer */
 
