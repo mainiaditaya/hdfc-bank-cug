@@ -2,6 +2,7 @@
 /* eslint no-console: ["error", { allow: ["warn", "error", "debug"] }] */
 import openModal from '../blocks/modal/modal.js';
 import { sendPageloadEvent, sendAnalytics } from '../common/analytics.js';
+import { invokeJourneyDropOffUpdate } from '../common/journey-utils.js';
 
 const createLabelInElement = (elementSelector, labelClass) => {
   /**
@@ -232,11 +233,15 @@ const hideLoaderGif = () => {
   }
 };
 
-const errorPannelMethod = (error) => {
+const errorPannelMethod = (error, stateInfoData) => {
   const errorPannel = document.getElementsByName('errorResultPanel')?.[0];
   const resultPanel = document.getElementsByName('resultPanel')?.[0];
   resultPanel.setAttribute('data-visible', true);
   errorPannel.setAttribute('data-visible', true);
+  const mobileNumber = stateInfoData.form.login.registeredMobileNumber;
+  const leadProfileId = stateInfoData.leadProifileId;
+  const journeyId = stateInfoData.currentFormContext.journeyID;
+  invokeJourneyDropOffUpdate('CUSTOMER_ONBOARDING_FAILURE', mobileNumber, leadProfileId, journeyId, stateInfoData);
 };
 
 const setArnNumberInResult = (arnNumRef) => {
@@ -306,6 +311,10 @@ const successPannelMethod = async (data, stateInfoData) => {
   currentFormContext.action = 'confirmation';
   currentFormContext.pageGotRedirected = true;
   Promise.resolve(sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', stateInfoData));
+  const mobileNumber = stateInfoData.form.login.registeredMobileNumber;
+  const leadProfileId = stateInfoData.leadProifileId;
+  const journeyId = stateInfoData.currentFormContext.journeyID;
+  invokeJourneyDropOffUpdate('CUSTOMER_ONBOARDING_COMPLETED', mobileNumber, leadProfileId, journeyId, stateInfoData);
 };
 
 // post-redirect-aadhar-or-idcom
@@ -357,8 +366,9 @@ const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyI
  */
 const finalDap = {
   PROMOSE_COUNT: 0,
-  AFFORD_COUNT: 15,
+  AFFORD_COUNT: 10,
   journeyParamState: null,
+  journeyParamStateInfo: null,
 };
 
 /**
@@ -378,9 +388,9 @@ const finalDapFetchRes = async () => {
         executeInterfaceReqObj, aadharOtpValData, finalDapRequest, finalDapResponse,
       }, JSON.parse(data.stateInfo));
     },
-    errorMethod: (err) => {
+    errorMethod: (err, lastStateData) => {
       hideLoaderGif();
-      errorPannelMethod(err);
+      errorPannelMethod(err, lastStateData);
       // eslint-disable-next-line no-console
       console.log(err);
     },
@@ -389,6 +399,7 @@ const finalDapFetchRes = async () => {
     const data = await invokeJourneyDropOffByParam('', '', journeyId);
     const journeyDropOffParamLast = data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1];
     finalDap.journeyParamState = journeyDropOffParamLast.state;
+    finalDap.journeyParamStateInfo = journeyDropOffParamLast.stateInfo;
     const checkFinalDapSuccess = (journeyDropOffParamLast.state === 'CUSTOMER_FINAL_DAP_SUCCESS');
     if (checkFinalDapSuccess) {
       return eventHandler.successMethod(journeyDropOffParamLast);
@@ -399,10 +410,11 @@ const finalDapFetchRes = async () => {
     // "FINAL_DAP_FAILURE"
     finalDap.PROMOSE_COUNT += 1;
     const errorCase = (finalDap.journeyParamState === 'CUSTOMER_FINAL_DAP_FAILURE' || finalDap.PROMOSE_COUNT >= finalDap.AFFORD_COUNT);
+    const stateInfoData = finalDap.journeyParamStateInfo;
     if (errorCase) {
-      return eventHandler.errorMethod(error);
+      return eventHandler.errorMethod(error, JSON.parse(stateInfoData));
     }
-    return setTimeout(() => finalDapFetchRes(), 1000);
+    return setTimeout(() => finalDapFetchRes(), 5000);
   }
 };
 
