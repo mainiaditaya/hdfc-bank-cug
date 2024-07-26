@@ -15,6 +15,7 @@ import {
 } from './makeRestAPI.js';
 import corpCreditCard from './constants.js';
 import { finalDap } from './finaldaputils.js';
+import { sendAnalytics } from './analytics.js';
 
 const { currentFormContext } = corpCreditCardContext;
 const { endpoints, baseUrl } = corpCreditCard;
@@ -231,7 +232,6 @@ const listNameOnCard = (globals) => {
   const setDropdownField = formUtil(globals, dropDownSelectField);
   setDropdownField.setEnum(options, initialValue); // setting initial value
   moveWizardView('corporateCardWizardView', 'confirmCardPanel');
-  debugger;
   invokeJourneyDropOffUpdate(
     'CUSTOMER_BUREAU_OFFER_AVAILABLE',
     globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value,
@@ -260,9 +260,11 @@ const executeInterfaceApiFinal = (globals) => {
 /**
  * @name executeInterfaceResponseHandler
  * @param {object} resPayload
+ * @param {object} globals
  */
-const executeInterfaceResponseHandler = (resPayload) => {
+const executeInterfaceResponseHandler = (resPayload, globals) => {
   currentFormContext.executeInterfaceResPayload = resPayload;
+  sendAnalytics('get this card', resPayload, 'CUSTOMER_CARD_SELECTED', globals);
 };
 
 /**
@@ -434,7 +436,7 @@ const executeInterfacePostRedirect = async (source, userRedirected, globals) => 
       console.log(response);
     },
   };
-  restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack);
+  restAPICall(globals, 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack);
 };
 
 export {
