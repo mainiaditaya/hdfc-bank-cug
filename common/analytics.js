@@ -47,7 +47,7 @@ function setAnalyticClickGenericProps(linkName, linkType, formData, journeyState
     linkName,
     linkType,
   };
-  digitalData.link.linkPosition = '';
+  digitalData.link.linkPosition = data[linkName].linkPosition;
   digitalData.user.pseudoID = '';
   digitalData.user.journeyName = currentFormContext?.journeyName;
   digitalData.user.journeyID = currentFormContext?.journeyID;

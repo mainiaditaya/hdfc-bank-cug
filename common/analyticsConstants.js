@@ -2,6 +2,7 @@ const data = {
   'otp click': {
     linkType: 'button',
     StepName: 'Identify Yourself',
+    linkPosition: 'Form',
   },
   'submit otp': {
     error: '',
@@ -9,26 +10,32 @@ const data = {
   'check offers': {
     linkType: 'button',
     linkName: 'Check Offers',
+    linkPosition: 'Form',
   },
   'get this card': {
     linkType: 'button',
     linkName: 'Get this Card',
+    linkPosition: 'Form',
   },
   'i agreee': {
     linkType: 'button',
     linkName: 'I agree',
+    linkPosition: 'Form',
   },
   'document upload continue': {
     linkType: 'button',
     linkName: 'I agree',
+    linkPosition: 'Form',
   },
   'address continue': {
     linkType: 'button',
     linkName: 'Submit',
+    linkPosition: 'Form',
   },
   'kyc continue': {
     linkType: 'button',
     linkName: 'Continue KYC',
+    linkPosition: 'Form',
   },
   // 'aadhaar otp': {
   //   linkType: '',
@@ -37,10 +44,12 @@ const data = {
   'start kyc': {
     linkType: 'button',
     linkName: 'Start KYC',
+    linkPosition: 'Form',
   },
   'submit review': {
     linkType: 'button',
     linkName: 'Submit Feedback',
+    linkPosition: 'Form',
   },
 };
 const ANALYTICS_CLICK_OBJECT = {
