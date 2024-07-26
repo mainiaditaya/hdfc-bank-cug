@@ -548,7 +548,7 @@ const validateEmailID = async (email, globals) => {
   const method = 'POST';
   try {
     const emailValid = await getJsonResponse(url, payload, method);
-    if (emailValid) {
+    if (emailValid === true) {
       setEmailField.markInvalid(true);
     } else {
       setEmailField.markInvalid(false, invalidMsg);
@@ -690,15 +690,9 @@ const resendOTP = (globals) => {
 /**
  * @name setNameOnCard
  * @param {string} name - name of the dropdow.
+ * @param globals - The global object containing necessary data for DAP request.
  */
-
-const setNameOnCard = (name) => {
-  const cardImg = document.querySelector('.field-cardimage');
-  document.querySelectorAll('span.cardNameText')?.forEach((span) => {
-    span.remove();
-  });
-  cardImg.innerHTML += `<span class='cardNameText'>${name}</span>`;
-};
+const setNameOnCard = (name, globals) => globals.functions.setProperty(globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.name, { value: name });
 
 /**
  * Validates the date of birth field to ensure the age is between 18 and 70.
