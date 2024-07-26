@@ -1,6 +1,7 @@
 /* eslint-disable no-tabs */
 /* eslint no-console: ["error", { allow: ["warn", "error", "debug"] }] */
 import openModal from '../blocks/modal/modal.js';
+import { sendPageloadEvent, sendAnalytics } from '../common/analytics.js';
 
 const createLabelInElement = (elementSelector, labelClass) => {
   /**
@@ -249,7 +250,7 @@ const setArnNumberInResult = (arnNumRef) => {
   }
 };
 
-const successPannelMethod = async (data) => {
+const successPannelMethod = async (data, stateInfoData) => {
   const {
     executeInterfaceReqObj, aadharOtpValData, finalDapRequest, finalDapResponse,
   } = data;
@@ -291,6 +292,7 @@ const successPannelMethod = async (data) => {
       offerLink.setAttribute('data-visible', true);
     } else {
       vkycProceedButton.setAttribute('data-visible', true);
+      currentFormContext.isVideoKyc = true;
       vkycConfirmText.setAttribute('data-visible', true);
       offerLink.setAttribute('data-visible', false);
     }
@@ -299,7 +301,11 @@ const successPannelMethod = async (data) => {
     vkycCameraConfirmation.setAttribute('data-visible', true);
     vkycCameraPannelInstruction.setAttribute('data-visible', true);
     vkycProceedButton.setAttribute('data-visible', true);
+    currentFormContext.isVideoKyc = true;
   }
+  currentFormContext.action = 'confirmation';
+  currentFormContext.pageGotRedirected = true;
+  Promise.resolve(sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', stateInfoData));
 };
 
 // post-redirect-aadhar-or-idcom
@@ -370,7 +376,7 @@ const finalDapFetchRes = async () => {
       hideLoaderGif();
       successPannelMethod({
         executeInterfaceReqObj, aadharOtpValData, finalDapRequest, finalDapResponse,
-      });
+      }, JSON.parse(data.stateInfo));
     },
     errorMethod: (err) => {
       hideLoaderGif();
@@ -412,7 +418,6 @@ const finalDapFetchRes = async () => {
  */
 const pageRedirected = (aadhar, idCom) => {
   if (aadhar) {
-    // debugger;
     const navigateFrom = document.getElementsByName('corporateCardWizardView')?.[0];
     const current = navigateFrom?.querySelector('.current-wizard-step');
     const currentMenuItem = navigateFrom?.querySelector('.wizard-menu-active-item');
@@ -433,7 +438,6 @@ const pageRedirected = (aadhar, idCom) => {
     navigateFrom?.dispatchEvent(event);
   }
   if (idCom) {
-    // debugger;
     /**
      * finaldapResponse starts for ETB - address change scenario.
      */
@@ -451,7 +455,7 @@ pageRedirected(aadharRedirect, idComRedirect);
  * @param {string} defaultLang - The language to show us default.
  */
 // select dropdow-aadhar
-const aadharLangChange = (adharContentDom, defaultLang) => {
+const aadharLangChange = async (adharContentDom, defaultLang) => {
   const selectOp = adharContentDom.querySelector(`[name= ${'selectLanguage'}]`);
   const findFieldSet = adharContentDom?.querySelectorAll('fieldset');
   const selectedClass = 'selected-language';
@@ -468,11 +472,14 @@ const aadharLangChange = (adharContentDom, defaultLang) => {
     });
   };
   applySelected(findFieldSet, defaultOptionClass, selectedClass);
+  const { currentFormContext } = (await import('../common/journey-utils.js')).corpCreditCardContext;
+  currentFormContext.languageSelected = defaultLang;
   selectOp.value = defaultLang;
   selectOp?.addEventListener('change', (e) => {
     e.preventDefault();
     const { value: valueSelected } = e.target;
     selectOp.value = valueSelected;
+    currentFormContext.languageSelected = valueSelected;
     const optionClass = `field-aadharconsent-${valueSelected?.toLowerCase()}`;
     applySelected(findFieldSet, optionClass, selectedClass);
   });
@@ -565,6 +572,15 @@ const validateNamesOfYourDetail = (inputName) => {
 };
 
 ['firstName', 'middleName', 'lastName'].forEach((ipName) => validateNamesOfYourDetail(ipName));
+
+const onPageLoadAnalytics = async () => {
+  const { currentFormContext } = (await import('../common/journey-utils.js')).corpCreditCardContext;
+  // eslint-disable-next-line no-underscore-dangle, no-undef
+  currentFormContext.journeyId = myForm.resolveQualifiedName('$form.runtime.journeyId')._data.$_value;
+  sendAnalytics('page load', {}, 'ACQUIRED', currentFormContext);
+};
+
+onPageLoadAnalytics();
 
 export {
   decorateStepper,

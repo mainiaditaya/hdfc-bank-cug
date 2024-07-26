@@ -377,16 +377,23 @@ const removeUndefinedKeys = (jsonObj) => {
    * * @param {object} currentFormContext - additional data variables object containing form configurations.
    * @returns {object} -Object containing only defined values.
    */
-const santizedFormDataWithContext = (globaObj, currentFormContext) => {
-  debugger;
-  const formData = globaObj.functions.exportData();
-  formData.currentFormContext = currentFormContext;
-  const {
-    data, analytics, queryParams, ...formDataPayload
-  } = formData;
-  removeUndefinedKeys(formDataPayload);
-  removeUndefinedKeys(formDataPayload?.form);
-  return JSON.parse(JSON.stringify(formDataPayload));
+const santizedFormDataWithContext = (globals, currentFormContext) => {
+  try {
+    const formData = Object.prototype.hasOwnProperty.call(globals, 'form') ? globals.functions.exportData() : globals;
+    formData.currentFormContext = currentFormContext;
+    if (formData.form) {
+      const {
+        data, analytics, queryParams, ...formDataPayload
+      } = formData;
+      removeUndefinedKeys(formDataPayload);
+      removeUndefinedKeys(formDataPayload?.form);
+      return JSON.parse(JSON.stringify(formDataPayload));
+    }
+    return formData;
+  } catch (ex) {
+    console.error(ex);
+    return null;
+  }
 };
 
 /**
@@ -410,6 +417,18 @@ const ageValidator = (minAge, maxAge, dobValue) => {
   const ageBtwMinMax = (age >= minAge && age <= maxAge);
   return ageBtwMinMax;
 };
+/**
+ * Creates a deep copy of the given blueprint object.
+ *
+ * This function returns a new object that is a deep copy of the blueprint object,
+ * ensuring that nested objects are also copied rather than referenced.
+ *
+ * @param {Object} blueprint - The blueprint object to copy.
+ * @returns {Object} A deep copy of the blueprint object.
+ */
+function createDeepCopyFromBlueprint(blueprint) {
+  return JSON.parse(JSON.stringify(blueprint));
+}
 
 export {
   urlPath,
@@ -431,4 +450,5 @@ export {
   santizedFormDataWithContext,
   generateUUID,
   ageValidator,
+  createDeepCopyFromBlueprint,
 };

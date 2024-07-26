@@ -6,11 +6,9 @@ import {
   pinCodeMaster,
   validateEmailID,
   currentAddressToggleHandler,
-  corpCreditCardContext,
   otpValHandler,
   journeyResponseHandler,
   createJourneyId,
-  sendAnalytics,
   aadharConsent123,
   resendOTP,
   formRuntime,
@@ -19,7 +17,13 @@ import {
   validateLogin,
 } from '../creditcards/corporate-creditcardFunctions.js';
 
-import { invokeJourneyDropOff, invokeJourneyDropOffUpdate } from './journey-utils.js';
+// import { invokeJourneyDropOff, updatePanelVisibility } from './finaldaputils.js';
+
+import {
+  corpCreditCardContext,
+  invokeJourneyDropOff,
+  invokeJourneyDropOffUpdate,
+} from './journey-utils.js';
 import {
   validatePan,
   panAPISuccesHandler,
@@ -46,6 +50,12 @@ import {
   fetchJsonResponse, hideLoaderGif,
 } from './makeRestAPI.js';
 
+import {
+  sendErrorAnalytics,
+  sendAnalytics,
+  asyncAnalytics,
+} from './analytics.js';
+
 import corpCreditCard from './constants.js';
 
 const { endpoints } = corpCreditCard;
@@ -57,7 +67,6 @@ const { currentFormContext } = corpCreditCardContext;
  * @return {PROMISE}
  */
 function checkMode(globals) {
-  debugger;
   const formData = globals.functions.exportData();
   const idcomVisit = formData?.queryParams?.authmode; // "DebitCard"
   const aadharVisit = formData?.queryParams?.visitType; // "EKYC_AUTH
@@ -106,6 +115,8 @@ function checkMode(globals) {
         globals,
       );
     }
+    // currentFormContext.action = 'confirmation';
+    // sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globals);
   } if ((idcomVisit === 'DebitCard') || (idcomVisit === 'CreditCard')) { // debit card or credit card flow
     const resultPanel = formUtil(globals, globals.form.resultPanel);
     resultPanel.visible(false);
@@ -119,6 +130,15 @@ function checkMode(globals) {
     globals.functions.setProperty(globals.form.confirmResult, { visible: false });
     const userRedirected = true;
     executeInterfacePostRedirect('idCom', userRedirected, globals);
+  }
+  if (!formData?.form?.login?.registeredMobileNumber) {
+    globals.functions.setProperty(globals.form.loginPanel, { visible: false });
+    globals.functions.setProperty(globals.form.welcomeText, { visible: false });
+    globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
+    globals.functions.setProperty(globals.form.consentFragment, { visible: false });
+    globals.functions.setProperty(globals.form.resultPanel, { visible: true });
+    globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
+    invokeJourneyDropOff('CRM_LEAD_FAILURE', '9999999999', globals);
   }
   if (!formData?.form?.login?.registeredMobileNumber) {
     globals.functions.setProperty(globals.form.loginPanel, { visible: false });
@@ -156,7 +176,6 @@ function customSetFocus(errorMessage, numRetries, globals) {
  * @return {PROMISE}
  */
 function getOTP(mobileNumber, pan, dob, globals) {
-  currentFormContext.action = 'getOTP';
   currentFormContext.journeyID = globals.form.runtime.journeyId.$value;
   currentFormContext.leadIdParam = globals.functions.exportData().queryParams;
   // currentFormContext.leadProfile = {};
@@ -457,6 +476,8 @@ export {
   setNameOnCard,
   firstLastNameValidation,
   validateLogin,
+  sendErrorAnalytics,
+  asyncAnalytics,
   idcomUrlSet,
   idcomRedirection,
 };

@@ -7,7 +7,6 @@ import {
   createJourneyId,
   formRuntime,
 } from '../common/journey-utils.js';
-import { executeInterfaceApiFinal } from '../common/executeinterfaceutils.js';
 import {
   formUtil,
   urlPath,
@@ -16,8 +15,6 @@ import {
   moveWizardView,
   parseCustomerAddress,
   removeSpecialCharacters,
-  // dateFormat,
-  santizedFormDataWithContext,
   ageValidator,
 } from '../common/formutils.js';
 import {
@@ -25,11 +22,12 @@ import {
   restAPICall,
   displayLoader, hideLoaderGif,
 } from '../common/makeRestAPI.js';
-import { sendAnalyticsEvent } from '../common/analytics.js';
 import corpCreditCard from '../common/constants.js';
+import { sendAnalytics } from '../common/analytics.js';
 
 const { endpoints } = corpCreditCard;
 const { currentFormContext } = corpCreditCardContext;
+currentFormContext.action = 'page load';
 // Initialize all Corporate Card Journey Context Variables.
 currentFormContext.journeyName = corpCreditCard.journeyName;
 currentFormContext.journeyType = 'NTB';
@@ -37,6 +35,7 @@ currentFormContext.formName = 'CorporateCreditCard';
 currentFormContext.errorCode = '';
 currentFormContext.errorMessage = '';
 currentFormContext.eligibleOffers = '';
+currentFormContext.journeyId = '';
 
 formRuntime.getOtpLoader = currentFormContext.getOtpLoader || (typeof window !== 'undefined') ? displayLoader : false;
 formRuntime.otpValLoader = currentFormContext.otpValLoader || (typeof window !== 'undefined') ? displayLoader : false;
@@ -397,7 +396,6 @@ const setConfirmScrAddressFields = (globalObj) => {
  */
 const getThisCard = (globals) => {
   const isAddressChanged = currentFormContext.executeInterfaceReqObj.requestString.addressEditFlag === 'Y';
-  // executeInterfaceApiFinal(globals);
   setConfirmScrAddressFields(globals);
   if (!isAddressChanged) {
     moveWizardView('corporateCardWizardView', 'confirmAndSubmitPanel');
@@ -564,6 +562,7 @@ const validateEmailID = async (email, globals) => {
  */
 const aadharConsent123 = async (globals) => {
   try {
+    await Promise.resolve(sendAnalytics('kyc continue', { errorCode: '0000', errorMessage: 'Success' }, 'JOURNEYSTATE', globals));
     if (typeof window !== 'undefined') {
       const openModal = (await import('../blocks/modal/modal.js')).default;
       const { aadharLangChange } = await import('./cc.js');
@@ -582,6 +581,7 @@ const aadharConsent123 = async (globals) => {
       config?.content?.addEventListener('modalTriggerValue', (event) => {
         const receivedData = event.detail;
         if (receivedData?.aadharConsentAgree) {
+          sendAnalytics('i agree', { errorCode: '0000', errorMessage: 'Success' }, 'JOURNEYSTATE', globals);
           globals.functions.setProperty(globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel.ckycDetailsContinueETBPanel.triggerAadharAPI, { value: 1 });
         }
       });
@@ -626,16 +626,6 @@ const prefillForm = (globals) => {
     invokeJourneyDropOff('CRM_LEAD_FAILURE', '9999999999', globals);
   }
 };
-
-/**
-* sendAnalytics
-* @param {string} payload
-* @param {object} globals
-*/
-// eslint-disable-next-line no-unused-vars
-function sendAnalytics(payload, globals) {
-  sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
-}
 
 /**
  * @name resendOTP
@@ -767,9 +757,9 @@ const validateLogin = (globals) => {
 * @param {object} globals
 */
 const firstLastNameValidation = (fn, ln, globals) => {
-  const { firstName, lastName } = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails;
-  const fNameField = formUtil(globals, firstName);
-  const lNameField = formUtil(globals, lastName);
+  // const { firstName, lastName } = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails;
+  // const fNameField = formUtil(globals, firstName);
+  // const lNameField = formUtil(globals, lastName);
   const invalidMsg = {
     fName: 'Please enter valid First Name',
     lName: 'Please enter valid Last Name',
@@ -777,7 +767,7 @@ const firstLastNameValidation = (fn, ln, globals) => {
   // fNameField.markInvalid(false, invalidMsg.fName);
   // lNameField.markInvalid(false, invalidMsg.lName);
   const MAX_LENGTH = 1;
-  let validStatus = null;
+  // let validStatus = null;
   if ((fn && ln) && (fn?.length === MAX_LENGTH) && (ln?.length === MAX_LENGTH)) {
     // temporry fix 👇//
     // fNameField.markInvalid(false, invalidMsg.fName);
@@ -788,7 +778,7 @@ const firstLastNameValidation = (fn, ln, globals) => {
     if ((ln?.length === MAX_LENGTH)) {
       globals.functions.markFieldAsInvalid('$form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.lastName', invalidMsg.lName, { useQualifiedName: true });
     }
-    validStatus = false;
+    // validStatus = false;
     // else {
     //   // temporry fix 👇//
     //   validStatus = true;
@@ -799,7 +789,6 @@ const firstLastNameValidation = (fn, ln, globals) => {
 export {
   getThisCard,
   prefillForm,
-  corpCreditCardContext,
   formRuntime,
   getAddressDetails,
   pinCodeMaster,
@@ -808,7 +797,6 @@ export {
   otpValHandler,
   journeyResponseHandler,
   createJourneyId,
-  sendAnalytics,
   aadharConsent123,
   resendOTP,
   setNameOnCard,

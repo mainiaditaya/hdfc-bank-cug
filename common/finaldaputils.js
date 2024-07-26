@@ -1,3 +1,4 @@
+import { sendPageloadEvent } from './analytics.js';
 import corpCreditCard from './constants.js';
 import { formUtil, urlPath } from './formutils.js';
 import { corpCreditCardContext, invokeJourneyDropOffUpdate } from './journey-utils.js';
@@ -146,13 +147,14 @@ const finalDap = (userRedirected, globals) => {
   const journeyName = formContextCallbackData?.executeInterfaceReqObj?.requestString?.journeyFlag || formContextCallbackData?.journeyType;
   const kycStatus = payload?.requestString.biometricStatus;
   const eventHandlers = {
-    successCallBack: (response) => {
+    successCallBack: async (response) => {
       if (response?.errorCode === '0000') {
         currentFormContext.finalDapRequest = JSON.parse(JSON.stringify(payload));
         currentFormContext.finalDapResponse = response;
         currentFormContext.VKYC_URL = response.vkycUrl;
         currentFormContext.ARN_NUM = response.applicationNumber;
-        invokeJourneyDropOffUpdate('CUSTOMER_FINAL_DAP_SUCCESS', mobileNumber, leadProfileId, journeyId, globals);
+        currentFormContext.action = 'confirmation';
+        await Promise.resolve(invokeJourneyDropOffUpdate('CUSTOMER_FINAL_DAP_SUCCESS', mobileNumber, leadProfileId, journeyId, globals));
         if (!userRedirected) {
           globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: false });
           globals.functions.setProperty(globals.form.resultPanel, { visible: true });
@@ -165,8 +167,12 @@ const finalDap = (userRedirected, globals) => {
             globals.functions.setProperty(globals.form.resultPanel.successResultPanel.vkycCameraConfirmation, { visible: true });
             globals.functions.setProperty(globals.form.resultPanel.successResultPanel.cameraConfirmationPanelInstruction, { visible: true });
             globals.functions.setProperty(globals.form.resultPanel.successResultPanel.vkycProceedButton, { visible: true });
+            currentFormContext.isVideoKyc = true;
           }
           throughDomSetArnNum(response.applicationNumber, mobileNumber, journeyId, leadProfileId, globals);
+          setTimeout(async (globalObj) => {
+            await Promise.resolve(sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globalObj));
+          }, 5000, globals);
         }
       } else {
         invokeJourneyDropOffUpdate('CUSTOMER_FINAL_DAP_FAILURE', mobileNumber, leadProfileId, journeyId, globals);
