@@ -122,9 +122,7 @@ async function loadLazy(doc) {
 function loadDelayed() {
   window.setTimeout(() => import('./delayed.js'), 3000);
   // eslint-disable-next-line import/no-unresolved
-  setTimeout(() => {
-    loadScript('https://assets.adobedtm.com/80673311e435/029b16140ccd/launch-48ec56350700-development.min.js');
-  }, 500);
+  loadScript('https://assets.adobedtm.com/80673311e435/029b16140ccd/launch-48ec56350700-development.min.js');
   window.setTimeout(() => import('../creditcards/cc.js'), 1000);
   // load anything that can be postponed to the latest here
 }
