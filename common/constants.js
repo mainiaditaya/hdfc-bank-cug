@@ -35,6 +35,7 @@ const corpCreditCard = {
   formName: 'Corporate credit card',
   channel: 'ADOBE_WEBFORMS',
   deadPanStatus: ['D', 'ED', 'X', 'F'],
+  env: 'dev',
 };
 
 export default corpCreditCard;

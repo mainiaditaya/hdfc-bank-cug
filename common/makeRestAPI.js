@@ -4,7 +4,9 @@
  */
 import { decryptDataES6, invokeRestAPIWithDataSecurity } from './apiDataSecurity.js';
 
-const MODE = 'dev';
+import corpCreditCard from './constants.js';
+
+const { env } = corpCreditCard;
 
 function displayLoader(loadingText) {
   const bodyContainer = document.querySelector('.appear');
@@ -36,7 +38,7 @@ function hideLoaderGif() {
 */
 async function fetchJsonResponse(url, payload, method, loader = false) {
   try {
-    if (MODE === 'dev') {
+    if (env === 'dev') {
       return fetch(url, {
         method,
         body: payload ? JSON.stringify(payload) : null,
@@ -84,7 +86,7 @@ async function fetchJsonResponse(url, payload, method, loader = false) {
 */
 async function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loader = false, startTime = Date.now()) {
   try {
-    if (MODE === 'dev') {
+    if (env === 'dev') {
       return fetch(url, {
         method,
         body: payload ? JSON.stringify(payload) : null,
@@ -100,14 +102,6 @@ async function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loa
           if (ipaResult && ipaResult !== '' && ipaResult !== 'null' && ipaResult !== 'undefined') {
             if (loader) hideLoaderGif();
             return response;
-          }
-          const elapsedTime = (Date.now() - startTime) / 1000;
-          if (elapsedTime < parseInt(ipaDuration, 10) - 10) {
-            return new Promise((resolve) => {
-              setTimeout(() => {
-                resolve(fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, true, startTime));
-              }, ipaTimer * 1000);
-            });
           }
           return response;
         });
@@ -161,7 +155,7 @@ async function fetchIPAResponse(url, payload, method, ipaDuration, ipaTimer, loa
  */
 async function getJsonResponse(url, payload, method = 'POST') {
   try {
-    if (MODE === 'dev') {
+    if (env === 'dev') {
       return fetch(url, {
         method,
         body: payload ? JSON.stringify(payload) : null,
