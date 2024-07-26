@@ -46,16 +46,17 @@ const setCurrentContext = (formContext) => {
  * @return {PROMISE}
  */
 const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
+  const DEFAULT_MOBILENO = '9999999999';
   const journeyJSONObj = {
     RequestPayload: {
       userAgent: (typeof window !== 'undefined') ? window.navigator.userAgent : 'onLoad',
       leadProfile: {
-        mobileNumber,
+        mobileNumber: mobileNumber || DEFAULT_MOBILENO,
       },
       formData: {
         channel: corpCreditCard.channel,
         journeyName: corpCreditCard.journeyName,
-        journeyID: globals.form.runtime.journeyId.$value,
+        journeyID: globals.form.runtime.journeyId.$value || createJourneyId('online', corpCreditCard.journeyName, corpCreditCard.channel, globals),
         journeyStateInfo: [
           {
             state,
@@ -68,7 +69,8 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
   };
   const url = urlPath(endpoints.journeyDropOff);
   const method = 'POST';
-  return globals.functions.exportData().queryParams.leadId ? fetchJsonResponse(url, journeyJSONObj, method) : null;
+  // return globals.functions.exportData().queryParams.leadId ? fetchJsonResponse(url, journeyJSONObj, method) : null;
+  return journeyJSONObj.RequestPayload.formData.journeyID ? fetchJsonResponse(url, journeyJSONObj, method) : null;
 };
 
 /**

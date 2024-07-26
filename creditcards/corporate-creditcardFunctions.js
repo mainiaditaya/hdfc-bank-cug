@@ -623,7 +623,7 @@ const prefillForm = (globals) => {
     // show error pannel if corporate credit card details not present
     showPanel?.forEach((panel) => panel.visible(true));
     hidePanel?.forEach((panel) => panel.visible(false));
-    invokeJourneyDropOff('CRM_LEAD_FAILURE', '9999999999', '', 'create', globals);
+    invokeJourneyDropOff('CRM_LEAD_FAILURE', '9999999999', globals);
   }
 };
 

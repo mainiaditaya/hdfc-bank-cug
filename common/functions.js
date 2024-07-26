@@ -19,7 +19,7 @@ import {
   validateLogin,
 } from '../creditcards/corporate-creditcardFunctions.js';
 
-import { invokeJourneyDropOffUpdate } from './journey-utils.js';
+import { invokeJourneyDropOff, invokeJourneyDropOffUpdate } from './journey-utils.js';
 import {
   validatePan,
   panAPISuccesHandler,
@@ -119,6 +119,15 @@ function checkMode(globals) {
     globals.functions.setProperty(globals.form.confirmResult, { visible: false });
     const userRedirected = true;
     executeInterfacePostRedirect('idCom', userRedirected, globals);
+  }
+  if (!formData?.form?.login?.registeredMobileNumber) {
+    globals.functions.setProperty(globals.form.loginPanel, { visible: false });
+    globals.functions.setProperty(globals.form.welcomeText, { visible: false });
+    globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
+    globals.functions.setProperty(globals.form.consentFragment, { visible: false });
+    globals.functions.setProperty(globals.form.resultPanel, { visible: true });
+    globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
+    invokeJourneyDropOff('CRM_LEAD_FAILURE', '9999999999', globals);
   }
 }
 
