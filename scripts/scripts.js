@@ -31,6 +31,33 @@ function buildHeroBlock(main) {
 /**
  * load fonts.css and set a session storage flag
  */
+async function loadFDStyles() {
+  if (document.querySelector('.fd-form-wrapper')) {
+    document.body.classList.add('fdlien');
+    const elements = document.querySelectorAll('.section.cmp-container-container');
+    elements.forEach((element) => {
+      if (element.dataset.sectionStatus === 'loaded') {
+        element.style.setProperty('display', 'none', 'important');
+      } else {
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-section-status') {
+              if (element.dataset.sectionStatus === 'loaded') {
+                element.style.setProperty('display', 'none', 'important');
+                observer.disconnect();
+              }
+            }
+          });
+        });
+        observer.observe(element, { attributes: true });
+      }
+    });
+  }
+}
+
+/**
+ * load fonts.css and set a session storage flag
+ */
 async function loadFonts() {
   await loadCSS(`${window.hlx.codeBasePath}/styles/fonts.css`);
   try {
@@ -77,29 +104,6 @@ async function loadEager(doc) {
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
-    if (main.baseURI.includes('fdlien')) {
-      document.body.classList.add('fdlien');
-    }
-    if (document.body.classList.contains('fdlien')) {
-      const elements = document.querySelectorAll('.section.cmp-container-container');
-      elements.forEach((element) => {
-        if (element.dataset.sectionStatus === 'loaded') {
-          element.style.setProperty('display', 'none', 'important');
-        } else {
-          const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-              if (mutation.type === 'attributes' && mutation.attributeName === 'data-section-status') {
-                if (element.dataset.sectionStatus === 'loaded') {
-                  element.style.setProperty('display', 'none', 'important');
-                  observer.disconnect();
-                }
-              }
-            });
-          });
-          observer.observe(element, { attributes: true });
-        }
-      });
-    }
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
   }
@@ -129,6 +133,7 @@ async function loadLazy(doc) {
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadCSS(`${window.hlx.codeBasePath}/styles/fd-styles.css`);
   loadFonts();
+  loadFDStyles();
 
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
