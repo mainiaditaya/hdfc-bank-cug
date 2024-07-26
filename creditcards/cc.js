@@ -537,24 +537,6 @@ dateFieldValidate('employedFrom');
 dateFieldValidate('dateOfBirth', true);
 dateFieldValidate('dobPersonalDetails', true);
 
-// /**
-//  *  Validates and restricts input on the OTP number field to allow only numeric characters.
-//  *  Hides the incorrect OTP text message when the user starts typing in the OTP input field.
-//  */
-// const otpFieldValidate = () => {
-//   const otpNumFormName = 'otpNumber';// constantName-otpFieldValidateName
-//   const otpNumber = document.querySelector(`[name= ${otpNumFormName}]`);
-//   const incorectOtp = document.querySelector('.field-incorrectotptext');
-//   otpNumber?.addEventListener('input', (e) => {
-//     if (e.target.value) {
-//       const input = e.target;
-//       input.value = input.value.replace(/\D/g, ''); // Replace non-numeric characters with an empty string
-//       incorectOtp.style.display = 'none';
-//     }
-//   });
-// };
-// otpFieldValidate();
-
 /**
  * Validates and sanitizes input for personal names.
  * This function binds an 'input' event listener to the input field identified by the given name attribute.
