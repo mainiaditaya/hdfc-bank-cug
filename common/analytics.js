@@ -288,7 +288,12 @@ function populateResponse(payload, eventType, digitalData) {
     case 'check offers':
     case 'i agree':
     case 'document upload continue':
-    case 'get this card': {
+    case 'aadhaar otp':
+    case 'kyc continue':
+    case 'get this card':
+    case 'submit review':
+    case 'address continue':
+    case 'start kyc': {
       digitalData.page.pageInfo.errorCode = payload?.errorCode;
       digitalData.page.pageInfo.errorMessage = payload?.errorMessage;
       break;
