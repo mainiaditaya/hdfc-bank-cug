@@ -357,7 +357,7 @@ const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyI
  */
 const finalDap = {
   PROMOSE_COUNT: 0,
-  AFFORD_COUNT: 5,
+  AFFORD_COUNT: 15,
   journeyParamState: null,
 };
 
