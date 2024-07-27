@@ -546,7 +546,7 @@ const validateEmailID = async (email, globals) => {
   const method = 'POST';
   try {
     const emailValid = await getJsonResponse(url, payload, method);
-    if (emailValid) {
+    if (emailValid === true) {
       setEmailField.markInvalid(true);
     } else {
       setEmailField.markInvalid(false, invalidMsg);
@@ -578,10 +578,10 @@ const aadharConsent123 = async (globals) => {
       }
       await openModal(formRuntime.aadharConfig);
       aadharLangChange(formRuntime.aadharConfig?.content, 'English');
-      config?.content?.addEventListener('modalTriggerValue', (event) => {
+      config?.content?.addEventListener('modalTriggerValue', async (event) => {
         const receivedData = event.detail;
         if (receivedData?.aadharConsentAgree) {
-          sendAnalytics('i agree', { errorCode: '0000', errorMessage: 'Success' }, 'JOURNEYSTATE', globals);
+          await Promise.resolve(sendAnalytics('i agree', { errorCode: '0000', errorMessage: 'Success' }, 'JOURNEYSTATE', globals));
           globals.functions.setProperty(globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel.ckycDetailsContinueETBPanel.triggerAadharAPI, { value: 1 });
         }
       });
@@ -623,7 +623,7 @@ const prefillForm = (globals) => {
     // show error pannel if corporate credit card details not present
     showPanel?.forEach((panel) => panel.visible(true));
     hidePanel?.forEach((panel) => panel.visible(false));
-    invokeJourneyDropOff('CRM_LEAD_FAILURE', '9999999999', '', 'create', globals);
+    invokeJourneyDropOff('CRM_LEAD_FAILURE', '9999999999', globals);
   }
 };
 
@@ -680,15 +680,9 @@ const resendOTP = (globals) => {
 /**
  * @name setNameOnCard
  * @param {string} name - name of the dropdow.
+ * @param globals - The global object containing necessary data for DAP request.
  */
-
-const setNameOnCard = (name) => {
-  const cardImg = document.querySelector('.field-cardimage');
-  document.querySelectorAll('span.cardNameText')?.forEach((span) => {
-    span.remove();
-  });
-  cardImg.innerHTML += `<span class='cardNameText'>${name}</span>`;
-};
+const setNameOnCard = (name, globals) => globals.functions.setProperty(globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.name, { value: name });
 
 /**
  * Validates the date of birth field to ensure the age is between 18 and 70.

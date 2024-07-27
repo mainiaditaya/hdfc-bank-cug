@@ -17,7 +17,7 @@ const data = {
     linkName: 'Get this Card',
     linkPosition: 'Form',
   },
-  'i agreee': {
+  'i agree': {
     linkType: 'button',
     linkName: 'I agree',
     linkPosition: 'Form',

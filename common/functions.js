@@ -17,10 +17,11 @@ import {
   validateLogin,
 } from '../creditcards/corporate-creditcardFunctions.js';
 
-// import { updatePanelVisibility } from './finaldaputils.js';
+// import { invokeJourneyDropOff, updatePanelVisibility } from './finaldaputils.js';
 
 import {
   corpCreditCardContext,
+  invokeJourneyDropOff,
   invokeJourneyDropOffUpdate,
 } from './journey-utils.js';
 import {
@@ -114,8 +115,6 @@ function checkMode(globals) {
         globals,
       );
     }
-    // currentFormContext.action = 'confirmation';
-    // sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globals);
   } if ((idcomVisit === 'DebitCard') || (idcomVisit === 'CreditCard')) { // debit card or credit card flow
     const resultPanel = formUtil(globals, globals.form.resultPanel);
     resultPanel.visible(false);
@@ -129,8 +128,15 @@ function checkMode(globals) {
     globals.functions.setProperty(globals.form.confirmResult, { visible: false });
     const userRedirected = true;
     executeInterfacePostRedirect('idCom', userRedirected, globals);
-    // currentFormContext.action = 'confirmation';
-    // sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globals);
+  }
+  if (!formData?.form?.login?.registeredMobileNumber) {
+    globals.functions.setProperty(globals.form.loginPanel, { visible: false });
+    globals.functions.setProperty(globals.form.welcomeText, { visible: false });
+    globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
+    globals.functions.setProperty(globals.form.consentFragment, { visible: false });
+    globals.functions.setProperty(globals.form.resultPanel, { visible: true });
+    globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
+    invokeJourneyDropOff('CRM_LEAD_FAILURE', '9999999999', globals);
   }
 }
 

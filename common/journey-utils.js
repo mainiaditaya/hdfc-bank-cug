@@ -45,16 +45,17 @@ const setCurrentContext = (formContext) => {
  * @return {PROMISE}
  */
 const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
+  const DEFAULT_MOBILENO = '9999999999';
   const journeyJSONObj = {
     RequestPayload: {
       userAgent: (typeof window !== 'undefined') ? window.navigator.userAgent : 'onLoad',
       leadProfile: {
-        mobileNumber,
+        mobileNumber: mobileNumber || DEFAULT_MOBILENO,
       },
       formData: {
         channel: corpCreditCard.channel,
         journeyName: corpCreditCard.journeyName,
-        journeyID: globals.form.runtime.journeyId.$value,
+        journeyID: globals.form.runtime.journeyId.$value || createJourneyId('online', corpCreditCard.journeyName, corpCreditCard.channel, globals),
         journeyStateInfo: [
           {
             state,
@@ -67,7 +68,8 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
   };
   const url = urlPath(endpoints.journeyDropOff);
   const method = 'POST';
-  return globals.functions.exportData().queryParams.leadId ? fetchJsonResponse(url, journeyJSONObj, method) : null;
+  // return globals.functions.exportData().queryParams.leadId ? fetchJsonResponse(url, journeyJSONObj, method) : null;
+  return journeyJSONObj.RequestPayload.formData.journeyID ? fetchJsonResponse(url, journeyJSONObj, method) : null;
 };
 
 /**
@@ -83,9 +85,7 @@ const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, jo
   const { currentFormContext } = corpCreditCardContext;
   // temporary_hotfix_radioBtnValues_undefined_issue
   /* storing the radio btn values in current form context */
-  if ((state === 'IDCOM_REDIRECTION_INITIATED') || (state === 'CUSTOMER_AADHAAR_PRE_AADHAR_INIT')) {
-    // CUSTOMER_AADHAAR_PRE_AADHAR_INIT
-    // CUSTOMER_AADHAR_INIT
+  if ((state === 'IDCOM_REDIRECTION_INITIATED') || (state === 'CUSTOMER_AADHAR_INIT')) {
     const { form } = globals.functions.exportData();
     const { selectKYCMethodOption1: { aadharEKYCVerification }, selectKYCMethodOption2: { aadharBiometricVerification }, selectKYCMethodOption3: { officiallyValidDocumentsMethod } } = globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel;
     // ETB OVD
