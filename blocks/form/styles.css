@@ -8,7 +8,7 @@
 }
 
 a:any-link, b.link, a:any-link:hover, b.link:hover {
-  font-weight: 600;
+  font-weight: var(--font-weight-bold) !important;
   font-size: var(--body-sm-font-size) !important;
 }
 
