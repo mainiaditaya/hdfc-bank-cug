@@ -1,7 +1,10 @@
-import { ENDPOINTS } from './constants.js';
-import { urlPath } from './formutils.js';
-import { corpCreditCardContext, invokeJourneyDropOffUpdate } from './journey-utils.js';
-import { restAPICall } from './makeRestAPI.js';
+import {
+  ENDPOINTS,
+  currentFormContext,
+} from '../../common/constants.js';
+import { urlPath } from '../../common/formutils.js';
+import { invokeJourneyDropOffUpdate } from './journey-utils.js';
+import { restAPICall } from '../../common/makeRestAPI.js';
 
 const getCurrentDateAndTime = (dobFormatNo) => {
   /*
@@ -33,7 +36,6 @@ const getCurrentDateAndTime = (dobFormatNo) => {
   return formatedTime;
 };
 
-const { currentFormContext } = corpCreditCardContext;
 const fetchFiller4 = (mobileMatch, kycStatus, journeyType) => {
   let filler4Value = null;
   switch (kycStatus) {

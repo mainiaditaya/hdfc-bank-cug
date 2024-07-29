@@ -44,6 +44,9 @@ function fetchJsonResponse(url, payload, method, loader = false) {
     .then((res) => {
       if (loader) hideLoaderGif();
       return res.json();
+    })
+    .catch((ex) => {
+      console.log(ex);
     });
 }
 

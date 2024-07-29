@@ -5,18 +5,21 @@ import {
   formUtil,
   composeNameOption,
   setSelectOptions,
-} from './formutils.js';
-import { corpCreditCardContext, formRuntime, invokeJourneyDropOffUpdate } from './journey-utils.js';
+} from '../../common/formutils.js';
+import { invokeJourneyDropOffUpdate } from './journey-utils.js';
 import {
   restAPICall,
   fetchJsonResponse,
   fetchIPAResponse,
   hideLoaderGif,
-} from './makeRestAPI.js';
+} from '../../common/makeRestAPI.js';
 import finalDap from './finaldaputils.js';
-import { ENDPOINTS as endpoints, BASEURL as baseUrl } from './constants.js';
-
-const { currentFormContext } = corpCreditCardContext;
+import {
+  ENDPOINTS as endpoints,
+  BASEURL as baseUrl,
+  currentFormContext,
+  formRuntime,
+} from '../../common/constants.js';
 
 const GENDER_MAP = {
   M: '1',

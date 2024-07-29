@@ -1,11 +1,9 @@
 /* eslint-disable no-console */
 import {
-  corpCreditCardContext,
   journeyResponseHandler,
   createJourneyId,
   sendAnalytics,
   resendOTP,
-  formRuntime,
   customSetFocus,
   validateLogin,
   getAddressDetails,
@@ -19,7 +17,7 @@ import {
   aadharConsent123,
 } from '../creditcards/corporate-creditcard/corporate-creditcardFunctions.js';
 
-import { invokeJourneyDropOffUpdate } from './journey-utils.js';
+import { invokeJourneyDropOffUpdate } from '../creditcards/corporate-creditcard/journey-utils.js';
 
 import {
   validatePan,
@@ -33,11 +31,11 @@ import {
   ipaSuccessHandler,
   executeInterfaceResponseHandler,
   executeInterfacePostRedirect,
-} from './executeinterfaceutils.js';
+} from '../creditcards/corporate-creditcard/executeinterfaceutils.js';
 
-import documentUpload from './docuploadutils.js';
+import documentUpload from '../creditcards/corporate-creditcard/docuploadutils.js';
 
-import fetchAuthCode from './idcomutils.js';
+import fetchAuthCode from '../creditcards/corporate-creditcard/idcomutils.js';
 
 import {
   urlPath,
@@ -54,9 +52,8 @@ import {
 import * as CONSTANT from './constants.js';
 import * as CC_CONSTANT from '../creditcards/corporate-creditcard/constant.js';
 
-const { ENDPOINTS } = CONSTANT;
+const { ENDPOINTS, currentFormContext, formRuntime } = CONSTANT;
 const { JOURNEY_NAME } = CC_CONSTANT;
-const { currentFormContext } = corpCreditCardContext;
 
 // dynamically we can change according to journey
 const journeyNameConstant = JOURNEY_NAME;
@@ -383,7 +380,8 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
  * @name redirect
  * @param {string} redirectUrl - The URL to redirect the browser to.
  */
-function redirect(redirectUrl) {
+function redirect(redirectUrl, globals) {
+  console.log(globals);
   let urlLink = redirectUrl;
   if (redirectUrl === 'VKYCURL' && currentFormContext.VKYC_URL) {
     urlLink = currentFormContext.VKYC_URL;
@@ -431,7 +429,7 @@ export {
   otpValidation,
   customSetFocus,
   journeyResponseHandler,
-  corpCreditCardContext,
+  currentFormContext,
   createJourneyId,
   sendAnalytics,
   resendOTP,

@@ -3,6 +3,7 @@
 import openModal from '../../blocks/modal/modal.js';
 import { DOM_ELEMENT } from './constant.js';
 import * as DOM_API from '../domutils/domutils.js';
+import { sendAnalyticsEvent } from '../../common/analytics.js';
 
 const { displayLoader, hideLoaderGif, moveWizardView } = DOM_API;
 
@@ -199,7 +200,7 @@ const successPannelMethod = async (data) => {
   const journeyName = executeInterfaceReqObj?.requestString?.journeyFlag;
   const addressEditFlag = executeInterfaceReqObj?.requestString?.addressEditFlag;
   const { applicationNumber, vkycUrl } = finalDapResponse;
-  const { currentFormContext } = (await import('../../common/journey-utils.js')).corpCreditCardContext;
+  const { currentFormContext } = (await import('../../common/constants.js'));
   currentFormContext.VKYC_URL = vkycUrl;
   // const { result: { mobileValid } } = aadharOtpValData;
   const mobileValid = aadharOtpValData?.result?.mobileValid;
@@ -398,3 +399,15 @@ otpFieldValidate();
  * @param {string[]} inputNames - An array of input field names to be restricted.
  */
 [yourDetails.firstName, yourDetails.middleName, yourDetails.lastName].forEach((inputField) => DOM_API.restrictToAlphabetsNoSpaces(inputField));
+
+const onPageLoadAnalytics = async () => {
+  const { currentFormContext } = (await import('../../common/constants.js'));
+  // eslint-disable-next-line no-underscore-dangle, no-undef
+  currentFormContext.journeyId = myForm.resolveQualifiedName('$form.runtime.journeyId')._data.$_value;
+  // remove if condition later
+  if (false) {
+    sendAnalyticsEvent('page load', {}, 'ACQUIRED', currentFormContext);
+  }
+};
+
+onPageLoadAnalytics();

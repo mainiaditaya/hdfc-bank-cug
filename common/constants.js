@@ -21,9 +21,15 @@ const ENDPOINTS = {
 
 const DEAD_PAN_STATUS = ['D', 'ED', 'X', 'F'];
 
+const currentFormContext = {};
+
+const formRuntime = {};
+
 export {
   BASEURL,
   CHANNEL,
   ENDPOINTS,
   DEAD_PAN_STATUS,
+  currentFormContext,
+  formRuntime,
 };
