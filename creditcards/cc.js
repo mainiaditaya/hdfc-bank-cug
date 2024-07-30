@@ -571,7 +571,10 @@ const onPageLoadAnalytics = async () => {
   const { currentFormContext } = (await import('../common/journey-utils.js')).corpCreditCardContext;
   // eslint-disable-next-line no-underscore-dangle, no-undef
   currentFormContext.journeyId = myForm.resolveQualifiedName('$form.runtime.journeyId')._data.$_value;
-  sendAnalytics('page load', {}, 'ACQUIRED', currentFormContext);
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  const paramValue = urlParams.get('authmode');
+  if (!paramValue) sendAnalytics('page load', {}, 'ACQUIRED', currentFormContext);
 };
 
 onPageLoadAnalytics();

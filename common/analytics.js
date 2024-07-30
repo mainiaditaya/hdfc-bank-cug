@@ -81,8 +81,8 @@ function sendPageloadEvent(journeyState, formData) {
   switch (currentFormContext.action) {
     case 'check offers': {
       digitalData.page.pageInfo.pageName = PAGE_NAME['get this card'];
-      digitalData.card.selectedCard = '';
-      digitalData.card.eligibleCard = '';
+      digitalData.card.selectedCard = currentFormContext?.productCode;
+      digitalData.card.eligibleCard = currentFormContext?.productCode;
       break;
     }
     case 'confirmation': {
@@ -126,6 +126,10 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
         window.digitalData = digitalData || {};
       }
       _satellite.track('submit');
+      currentFormContext.action = 'otp click';
+      setTimeout(() => {
+        sendPageloadEvent('confirm otp page load', formData);
+      }, 1000);
       break;
     }
     case 'check offers': {
@@ -176,7 +180,11 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       if (window) {
         window.digitalData = digitalData || {};
       }
+      currentFormContext.action = 'get this card';
       _satellite.track('submit');
+      setTimeout(() => {
+        sendPageloadEvent('get this card state', formData);
+      }, 1000);
       break;
     }
 
