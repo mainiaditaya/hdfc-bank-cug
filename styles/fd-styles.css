@@ -97,7 +97,7 @@ main .section.form-container {
                 }
     
                 .field-countrycode {
-                    grid-column: span 5;
+                    grid-column: span 3;
                     margin-top: -19px;
                     align-self: flex-end;
     
@@ -116,7 +116,7 @@ main .section.form-container {
                 }
     
                 .field-registeredmobilenumber {
-                    grid-column: span 7;
+                    grid-column: span 8;
                     margin-left: -22px;
                     align-self: flex-end;
     
@@ -256,6 +256,55 @@ main .section.form-container {
     }    
 }
 
+/* Multiple Customer Id  */
+.field-multiplecustidselectionpanel {
+    display: grid !important;
+
+    .field-custidproceedlabel {
+        p p {
+            font-size: var(--body-xx-lg-font-size);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-interface-background-quaternary);
+        }
+    }
+
+    .field-multiplecustidrepeatable {
+        grid-column: span 6 !important;
+
+        .repeat-wrapper {
+            display: flex;
+
+            fieldset.field-wrapper {                
+                border-radius: 16px;
+                border: 1px solid #ccc;
+                padding: 20px;
+            }
+        }
+        
+
+        .field-custidlabel p {
+            margin: 0;
+        }
+
+        .field-multiplecustidselect {
+            input[type='checkbox'] {
+                position: relative;
+            }
+        }
+
+        .field-maskedaccno input[type='text'] {
+            border: none;
+            font-size: var(--body-x-lg-font-size);
+            font-weight: var(--font-weight-extra-bold);
+            margin: 0;
+            padding: 0;
+        }
+
+        .field-eligiblefdlabel {
+            background: var(--color-interface-background-quinary);
+        }
+    }
+}
 
 /* Footer */
 .section .form-container .form-wrapper .form.block .fd-form-wrapper ~ footer {
