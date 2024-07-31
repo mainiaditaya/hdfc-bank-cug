@@ -2220,14 +2220,13 @@ class Container extends Scriptable {
             this.notifyDependents(change);
         }
     }
-    get enabled() {
-        if (this.parent?.enabled !== undefined) {
-            return !this.parent?.enabled ? false : this._jsonModel.enabled;
-        }
-        else {
-            return this._jsonModel.enabled;
-        }
+  get enabled() {
+    const parentEnabled = this.parent?.enabled;
+    if (parentEnabled !== undefined) {
+      return parentEnabled ? this._jsonModel.enabled : false;
     }
+    return this._jsonModel.enabled;
+  }
     set enabled(e) {
         this._setProperty('enabled', e, true, this.notifyChildren);
     }
