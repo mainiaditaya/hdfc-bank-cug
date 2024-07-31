@@ -101,6 +101,8 @@ const createDapRequestObj = (globals) => {
       ekycSuccess,
       VKYCConsent,
       ekycConsent: `${getCurrentDateAndTime(3)}YEnglishxeng1x0`,
+      idcom_token: formData?.queryParams?.idcom_token ?? '',
+      journeyType,
     },
   };
   return finalDapPayload;

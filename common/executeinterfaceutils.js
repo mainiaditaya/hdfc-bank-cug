@@ -400,6 +400,11 @@ const comAddressType = (globals, userRedirected) => {
   return cardDelivery?.office ? '1' : '2';
 };
 
+const addressDeclrFlag = (globals) => {
+  const aadharAdrressChange = globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.AddressDeclarationAadhar.currentAddressToggleConfirmpage.$value === '0' ? 'N' : 'Y';
+  return aadharAdrressChange;
+};
+
 /**
  * Executes an interface post request with the appropriate authentication mode based on the response.
  *
@@ -418,6 +423,7 @@ const executeInterfacePostRedirect = async (source, userRedirected, globals) => 
     }
   }
   requestObj.requestString.comAddressType = comAddressType(globals, userRedirected); // set com address type
+  requestObj.requestString.AddrDeclarationFlag = addressDeclrFlag(globals);
   const apiEndPoint = urlPath(endpoints.executeInterface);
   const eventHandlers = {
     successCallBack: (response) => {
