@@ -67,7 +67,7 @@ main .section.form-container {
         }
 
         .field-loginmainpanel {
-            padding: 40px 40px 40px 20px !important;
+            padding: 40px 40px 40px 20px;
     
             .field-loginpanel {
                 width: 100%;
@@ -211,23 +211,32 @@ main .section.form-container {
             }
 
             .field-secondspanel{
-                display: flex;
+                display: grid;
             }
             
-            .field-resendotplabel {
+            .field-resendotplabel { margin-top: 12px;
+
                 p {
-                    font-size: var(--body-fd-md-font-size);
+                    font-size: var(--body-fd-sm-font-size);
                     padding: 0 0 0 5px;
                 }
             }
 
-            .field-seconds{
+            .field-seconds{ margin: -1px 0 0 -20px;
+
                 input[type="number"] {
                     border: none;
                     width: 50px;
                     margin: 0;
-                    padding-top: 0;
+                    padding: 0;
+                    font-size: var(--body-fd-sm-font-size);
+                    pointer-events: none;
                 }
+            }
+
+            .field-sectext { 
+                margin: 12px 0 0 -79px; 
+                p { font-size: var(--body-fd-sm-font-size); }
             }
 
             .field-otpsubpanel {
@@ -235,6 +244,12 @@ main .section.form-container {
                     font-size: var(--body-fd-md-font-size);
                 }
             } 
+        }
+
+        .field-otppanel:has(.field-secondspanel:not([data-visible='false'])) {
+            .field-otpsubpanel {
+                grid-column: span 4;
+            }
         }
 
         .field-submitotp {
@@ -351,4 +366,6 @@ main .section.form-container {
     .field-loginpanel {
         .field-mobilepanel, .field-identifierpanel { grid-column: span 12 !important; }
     }
+
+    .field-otppanel { padding: 0 6px 0 2px; }
 }
