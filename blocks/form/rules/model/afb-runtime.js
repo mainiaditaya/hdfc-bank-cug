@@ -210,11 +210,13 @@ class DataValue {
     get $name() {
         return this.$_name;
     }
-    get $value() {
+
+    get disabled() {
         const enabled = this.$_fields.find(x => x.enabled !== false);
-        if (!enabled && this.$_fields.length) {
-            return undefined;
-        }
+        return (!enabled && this.$_fields.length);
+    }
+
+    get $value() {
         return this.$_value;
     }
     setValue(typedValue, originalValue, fromField) {
@@ -292,15 +294,11 @@ class DataGroup extends DataValue {
         }
     }
     get $value() {
-        const enabled = this.$_fields.find(x => x.enabled !== false);
-        if (!enabled && this.$_fields.length) {
-            return this.$type === 'array' ? [] : {};
-        }
-        else if (this.$type === 'array') {
-            return Object.values(this.$_items).filter(x => typeof x !== 'undefined').map(x => x.$value);
+        if (this.$type === 'array') {
+            return Object.values(this.$_items).filter(x => typeof x !== 'undefined' && !x.disabled).map(x => x.$value);
         }
         else {
-            return Object.fromEntries(Object.values(this.$_items).filter(x => typeof x !== 'undefined').map(x => {
+            return Object.fromEntries(Object.values(this.$_items).filter(x => typeof x !== 'undefined' && !x.disabled).map(x => {
                 return [x.$name, x.$value];
             }));
         }
