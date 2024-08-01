@@ -304,9 +304,13 @@ class DataGroup extends DataValue {
             return Object.values(this.$_items).filter(x => typeof x !== 'undefined').map(x => x.$value);
         }
         else {
-            return Object.fromEntries(Object.values(this.$_items).filter(x => typeof x !== 'undefined').map(x => {
-                return [x.$name, x.$value];
-            }));
+            const result = {};
+            for (const item of Object.values(this.$_items)) {
+                if (typeof item !== 'undefined') {
+                    result[item.$name] = item.$value;
+                }
+            }
+            return result;
         }
     }
     get $length() {
