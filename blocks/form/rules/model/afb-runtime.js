@@ -295,13 +295,23 @@ class DataGroup extends DataValue {
         }
     }
     get $value() {
+        const items = Object.values(this.$_items);
         if (this.$type === 'array') {
-            return Object.values(this.$_items).filter(x => typeof x !== 'undefined' && !x.disabled).map(x => x.$value);
-        }
-        else {
-            return Object.fromEntries(Object.values(this.$_items).filter(x => typeof x !== 'undefined' && !x.disabled).map(x => {
-                return [x.$name, x.$value];
-            }));
+            const result = [];
+            for (const item of items) {
+                if (item !== undefined && !item.disabled) {
+                    result.push(item.$value);
+                }
+            }
+            return result;
+        } else {
+            const result = {};
+            for (const item of items) {
+                if (item !== undefined && !item.disabled) {
+                    result[item.$name] = item.$value;
+                }
+            }
+            return result;
         }
     }
     get $length() {
