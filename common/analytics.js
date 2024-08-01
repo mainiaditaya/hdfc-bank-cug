@@ -24,7 +24,6 @@ const { currentFormContext } = corpCreditCardContext;
  */
 
 function setAnalyticPageLoadProps(journeyState, formData, digitalData) {
-  digitalData.page.pageInfo.pageName = 'Identify Yourself';
   digitalData.user.pseudoID = '';// Need to check
   digitalData.user.journeyName = currentFormContext?.journeyName;
   digitalData.user.journeyID = formData?.journeyId;
@@ -74,15 +73,17 @@ const getValidationMethod = (formContext) => {
  * @name sendPageloadEvent
  * @param {string} journeyState.
  * @param {object} formData.
+ * @param {string} pageName.
  */
-function sendPageloadEvent(journeyState, formData) {
+function sendPageloadEvent(journeyState, formData, pageName) {
   const digitalData = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
+  digitalData.page.pageInfo.pageName = pageName;
   setAnalyticPageLoadProps(journeyState, formData, digitalData);
   switch (currentFormContext.action) {
     case 'check offers': {
       digitalData.page.pageInfo.pageName = PAGE_NAME['get this card'];
-      digitalData.card.selectedCard = '';
-      digitalData.card.eligibleCard = '';
+      digitalData.card.selectedCard = currentFormContext?.productCode;
+      digitalData.card.eligibleCard = currentFormContext?.productCode;
       break;
     }
     case 'confirmation': {
@@ -115,9 +116,9 @@ function sendPageloadEvent(journeyState, formData) {
  */
 function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState, digitalData) {
   setAnalyticClickGenericProps(eventType, linkType, formData, journeyState, digitalData);
+  digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
   switch (eventType) {
     case 'otp click': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.event = {
         phone,
         validationMethod: getValidationMethod(formData),
@@ -126,10 +127,13 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
         window.digitalData = digitalData || {};
       }
       _satellite.track('submit');
+      currentFormContext.action = 'otp click';
+      setTimeout(() => {
+        sendPageloadEvent('CUSTOMER_IDENTITY_RESOLVED', formData, 'Enter otp page');
+      }, 1000);
       break;
     }
     case 'check offers': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.user.gender = formData.form.gender;
       digitalData.user.email = formData.form.workEmailAddress;
       if (formData.form.currentAddressToggle === 'off') {
@@ -158,13 +162,12 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       }
       _satellite.track('submit');
       setTimeout(() => {
-        sendPageloadEvent('CUSTOMER_BUREAU_OFFER_AVAILABLE', formData);
+        sendPageloadEvent('CUSTOMER_BUREAU_OFFER_AVAILABLE', formData, 'Choose card');
       }, 1000);
       break;
     }
 
     case 'get this card': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.card = {
         selectedCard: formData?.form?.productCode,
         annualFee: formData?.form?.joiningandRenewalFee,
@@ -176,7 +179,15 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       if (window) {
         window.digitalData = digitalData || {};
       }
+      currentFormContext.action = 'get this card';
       _satellite.track('submit');
+      setTimeout(() => {
+        let currentPageName = 'Select KYC Method';
+        if (formData?.etbFlowSelected === 'on' && formData?.form?.currentAddressToggle === 'off') {
+          currentPageName = 'Confirm & Submit';
+        }
+        sendPageloadEvent('get this card state', formData, currentPageName);
+      }, 1000);
       break;
     }
 
@@ -184,7 +195,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       // formData?.queryParams?.authmode
       // const formData = globals.functions.exportData();
       // const idcomVisit = formData?.queryParams?.authmode; // "DebitCard"
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.event = {
         status: formData?.form?.cardDeliveryAddressOption1 || formData?.form?.cardDeliveryAddressOption2,
         validationMethod: '', // Netbanking or Debit card - validationMethod - authmode will be getting only after idcom redirected - how to use that value
@@ -197,7 +207,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'kyc continue': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       const kyc = (formData?.form?.aadharEKYCVerification && 'Ekyc') || (formData?.form?.aadharBiometricVerification && 'Biometric') || (formData?.form?.officiallyValidDocumentsMethod && 'Other Docs');
       digitalData.formDetails = {
         KYCVerificationMethod: kyc,
@@ -209,20 +218,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       break;
     }
 
-    case 'i agree': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
-      digitalData.formDetails = {
-        languageSelected: currentFormContext?.languageSelected,
-      };
-      if (window) {
-        window.digitalData = digitalData || {};
-      }
-      _satellite.track('submit');
-      break;
-    }
-
     case 'aadhaar otp': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       // UID OR VID  how to capture the value - aadhar in different portal.
       digitalData.event = {
         status: '',
@@ -235,7 +231,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'document upload continue': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.formDetails = {
         documentProof: formData?.docUploadDropdown, // documentType
       };
@@ -247,7 +242,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'start kyc': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       // ETB_ Capture clicks on Start vKYC CTA, Applicable only for ETB Address Change, Only in case of Aadhaar and Application no. mismatch
       // NTB_ '1'(default without any condition)
       digitalData.event = {
@@ -262,7 +256,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
 
     case 'submit review': {
       // common both ntb + etb
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.event = {
         rating: formData?.ratingvalue,
       };
@@ -275,7 +268,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     default:
       // do nothing
   }
-  // window.digitalData = digitalData || {};
 }
 
 function populateResponse(payload, eventType, digitalData) {
@@ -286,7 +278,6 @@ function populateResponse(payload, eventType, digitalData) {
       break;
     }
     case 'check offers':
-    case 'i agree':
     case 'document upload continue':
     case 'aadhaar otp':
     case 'kyc continue':
@@ -345,8 +336,9 @@ function sendErrorAnalytics(errorCode, errorMsg, journeyState, globals) {
 */
 function sendAnalytics(eventType, payload, journeyState, globals) {
   const formData = santizedFormDataWithContext(globals);
-  if (eventType === 'page load') {
-    sendPageloadEvent(journeyState, formData);
+  if (eventType.includes('page load')) {
+    const pageName = eventType.split('-')[1];
+    sendPageloadEvent(journeyState, formData, pageName);
   } else {
     sendAnalyticsEvent(eventType, payload, journeyState, formData);
   }
