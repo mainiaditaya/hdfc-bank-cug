@@ -164,19 +164,20 @@ const isCaptcha = function (item) {
     return fieldType === 'captcha';
 };
 function deepClone(obj, idGenerator) {
+    if (obj === null || typeof obj !== 'object') {
+        return obj;
+    }
     let result;
-    if (obj instanceof Array) {
-        result = [];
-        result = obj.map(x => deepClone(x, idGenerator));
-    }
-    else if (typeof obj === 'object' && obj !== null) {
+    if (Array.isArray(obj)) {
+        result = new Array(obj.length);
+        for (let i = 0; i < obj.length; i++) {
+            result[i] = deepClone(obj[i], idGenerator);
+        }
+    } else {
         result = {};
-        Object.entries(obj).forEach(([key, value]) => {
-            result[key] = deepClone(value, idGenerator);
-        });
-    }
-    else {
-        result = obj;
+        for (const key of Object.keys(obj)) {
+            result[key] = deepClone(obj[key], idGenerator);
+        }
     }
     if (idGenerator && result && result.id) {
         result.id = idGenerator();
