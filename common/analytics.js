@@ -116,9 +116,9 @@ function sendPageloadEvent(journeyState, formData, pageName) {
  */
 function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState, digitalData) {
   setAnalyticClickGenericProps(eventType, linkType, formData, journeyState, digitalData);
+  digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
   switch (eventType) {
     case 'otp click': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.event = {
         phone,
         validationMethod: getValidationMethod(formData),
@@ -168,7 +168,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'get this card': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.card = {
         selectedCard: formData?.form?.productCode,
         annualFee: formData?.form?.joiningandRenewalFee,
@@ -196,7 +195,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       // formData?.queryParams?.authmode
       // const formData = globals.functions.exportData();
       // const idcomVisit = formData?.queryParams?.authmode; // "DebitCard"
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.event = {
         status: formData?.form?.cardDeliveryAddressOption1 || formData?.form?.cardDeliveryAddressOption2,
         validationMethod: '', // Netbanking or Debit card - validationMethod - authmode will be getting only after idcom redirected - how to use that value
@@ -209,7 +207,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'kyc continue': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       const kyc = (formData?.form?.aadharEKYCVerification && 'Ekyc') || (formData?.form?.aadharBiometricVerification && 'Biometric') || (formData?.form?.officiallyValidDocumentsMethod && 'Other Docs');
       digitalData.formDetails = {
         KYCVerificationMethod: kyc,
@@ -222,7 +219,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'aadhaar otp': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       // UID OR VID  how to capture the value - aadhar in different portal.
       digitalData.event = {
         status: '',
@@ -235,7 +231,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'document upload continue': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.formDetails = {
         documentProof: formData?.docUploadDropdown, // documentType
       };
@@ -247,7 +242,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     }
 
     case 'start kyc': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       // ETB_ Capture clicks on Start vKYC CTA, Applicable only for ETB Address Change, Only in case of Aadhaar and Application no. mismatch
       // NTB_ '1'(default without any condition)
       digitalData.event = {
@@ -262,7 +256,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
 
     case 'submit review': {
       // common both ntb + etb
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.event = {
         rating: formData?.ratingvalue,
       };
@@ -275,7 +268,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
     default:
       // do nothing
   }
-  // window.digitalData = digitalData || {};
 }
 
 function populateResponse(payload, eventType, digitalData) {
