@@ -404,7 +404,7 @@ const addressDeclrFlag = (globals, executeInterfaceReqObj) => {
   const aadharAdrressChanged = globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.AddressDeclarationAadhar.currentAddressToggleConfirmpage.$value === '0' ? 'N' : 'Y';
   const radioBtnValues = globals.functions.exportData()?.currentFormContext?.radioBtnValues;
   const addressChangeDeclr = (radioBtnValues?.kycMethod?.aadharEKYCVerification === 'aadhaar') && (executeInterfaceReqObj?.requestString?.addressEditFlag === 'Y');
-  return addressChangeDeclr ? aadharAdrressChanged : '';
+  return addressChangeDeclr ? aadharAdrressChanged : 'N';
 };
 
 /**
