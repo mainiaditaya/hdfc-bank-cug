@@ -24,7 +24,6 @@ const { currentFormContext } = corpCreditCardContext;
  */
 
 function setAnalyticPageLoadProps(journeyState, formData, digitalData) {
-  digitalData.page.pageInfo.pageName = 'Identify Yourself';
   digitalData.user.pseudoID = '';// Need to check
   digitalData.user.journeyName = currentFormContext?.journeyName;
   digitalData.user.journeyID = formData?.journeyId;
@@ -74,9 +73,11 @@ const getValidationMethod = (formContext) => {
  * @name sendPageloadEvent
  * @param {string} journeyState.
  * @param {object} formData.
+ * @param {string} pageName.
  */
-function sendPageloadEvent(journeyState, formData) {
+function sendPageloadEvent(journeyState, formData, pageName) {
   const digitalData = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
+  digitalData.page.pageInfo.pageName = pageName;
   setAnalyticPageLoadProps(journeyState, formData, digitalData);
   switch (currentFormContext.action) {
     case 'check offers': {
@@ -128,12 +129,11 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       _satellite.track('submit');
       currentFormContext.action = 'otp click';
       setTimeout(() => {
-        sendPageloadEvent('confirm otp page load', formData);
+        sendPageloadEvent('CUSTOMER_IDENTITY_RESOLVED', formData, 'Enter otp page');
       }, 1000);
       break;
     }
     case 'check offers': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
       digitalData.user.gender = formData.form.gender;
       digitalData.user.email = formData.form.workEmailAddress;
       if (formData.form.currentAddressToggle === 'off') {
@@ -162,7 +162,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       }
       _satellite.track('submit');
       setTimeout(() => {
-        sendPageloadEvent('CUSTOMER_BUREAU_OFFER_AVAILABLE', formData);
+        sendPageloadEvent('CUSTOMER_BUREAU_OFFER_AVAILABLE', formData, 'Choose card');
       }, 1000);
       break;
     }
@@ -183,7 +183,11 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       currentFormContext.action = 'get this card';
       _satellite.track('submit');
       setTimeout(() => {
-        sendPageloadEvent('get this card state', formData);
+        let currentPageName = 'Select KYC Method';
+        if (formData?.etbFlowSelected === 'on' && formData?.form?.currentAddressToggle === 'off') {
+          currentPageName = 'Confirm & Submit';
+        }
+        sendPageloadEvent('get this card state', formData, currentPageName);
       }, 1000);
       break;
     }
@@ -209,18 +213,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       const kyc = (formData?.form?.aadharEKYCVerification && 'Ekyc') || (formData?.form?.aadharBiometricVerification && 'Biometric') || (formData?.form?.officiallyValidDocumentsMethod && 'Other Docs');
       digitalData.formDetails = {
         KYCVerificationMethod: kyc,
-      };
-      if (window) {
-        window.digitalData = digitalData || {};
-      }
-      _satellite.track('submit');
-      break;
-    }
-
-    case 'i agree': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
-      digitalData.formDetails = {
-        languageSelected: currentFormContext?.languageSelected,
       };
       if (window) {
         window.digitalData = digitalData || {};
@@ -294,7 +286,6 @@ function populateResponse(payload, eventType, digitalData) {
       break;
     }
     case 'check offers':
-    case 'i agree':
     case 'document upload continue':
     case 'aadhaar otp':
     case 'kyc continue':
@@ -353,8 +344,9 @@ function sendErrorAnalytics(errorCode, errorMsg, journeyState, globals) {
 */
 function sendAnalytics(eventType, payload, journeyState, globals) {
   const formData = santizedFormDataWithContext(globals);
-  if (eventType === 'page load') {
-    sendPageloadEvent(journeyState, formData);
+  if (eventType.includes('page load')) {
+    const pageName = eventType.split('-')[1];
+    sendPageloadEvent(journeyState, formData, pageName);
   } else {
     sendAnalyticsEvent(eventType, payload, journeyState, formData);
   }

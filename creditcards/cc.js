@@ -310,7 +310,7 @@ const successPannelMethod = async (data, stateInfoData) => {
   }
   currentFormContext.action = 'confirmation';
   currentFormContext.pageGotRedirected = true;
-  Promise.resolve(sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', stateInfoData));
+  Promise.resolve(sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', stateInfoData, 'CONFIRMATION_Page_name'));
   const mobileNumber = stateInfoData.form.login.registeredMobileNumber;
   const leadProfileId = stateInfoData.leadProifileId;
   const journeyId = stateInfoData.currentFormContext.journeyID;
@@ -568,13 +568,14 @@ const validateNamesOfYourDetail = (inputName) => {
 ['firstName', 'middleName', 'lastName'].forEach((ipName) => validateNamesOfYourDetail(ipName));
 
 const onPageLoadAnalytics = async () => {
-  const { currentFormContext } = (await import('../common/journey-utils.js')).corpCreditCardContext;
+  const journeyData = {};
   // eslint-disable-next-line no-underscore-dangle, no-undef
-  currentFormContext.journeyId = myForm.resolveQualifiedName('$form.runtime.journeyId')._data.$_value;
+  journeyData.journeyId = myForm.resolveQualifiedName('$form.runtime.journeyId')._data.$_value;
+  journeyData.journeyName = 'CORPORATE_CARD_JOURNEY';
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   const paramValue = urlParams.get('authmode');
-  if (!paramValue) sendAnalytics('page load', {}, 'ACQUIRED', currentFormContext);
+  if (!paramValue) sendAnalytics('page load-Identify yourself', {}, 'CRM_LEAD_SUCCESS', journeyData);
 };
 
 onPageLoadAnalytics();
