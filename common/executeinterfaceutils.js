@@ -124,7 +124,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
     if (currentAddressNTB.permanentAddress.permanentAddressToggle.$value === 'on') {
       permanentAddress = { ...currentAddress };
     } else {
-      permanentAddress.address1 = permanentAddressPanel.permanentAddressAddress1.$value;
+      permanentAddress.address1 = permanentAddressPanel.permanentAddressLine1.$value;
       permanentAddress.address2 = permanentAddressPanel.permanentAddressLine2.$value;
       permanentAddress.address3 = permanentAddressPanel.permanentAddressLine3.$value;
       permanentAddress.city = permanentAddressPanel.permanentAddressCity.$value;
