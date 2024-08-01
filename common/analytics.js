@@ -186,7 +186,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
         if (formData?.etbFlowSelected === 'on' && formData?.form?.currentAddressToggle === 'off') {
           currentPageName = 'Confirm & Submit';
         }
-        sendPageloadEvent('get this card state', formData, currentPageName);
+        sendPageloadEvent('CUSTOMER_CARD_SELECTED', formData, currentPageName);
       }, 1000);
       break;
     }
