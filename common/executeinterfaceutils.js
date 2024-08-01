@@ -401,10 +401,10 @@ const comAddressType = (globals, userRedirected) => {
 };
 
 const addressDeclrFlag = (globals, executeInterfaceReqObj) => {
-  const aadharAdrressChanged = globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.AddressDeclarationAadhar.currentAddressToggleConfirmpage.$value === '0' ? 'N' : 'Y';
-  const radioBtnValues = globals.functions.exportData()?.currentFormContext?.radioBtnValues;
-  const addressChangeDeclr = (radioBtnValues?.kycMethod?.aadharEKYCVerification === 'aadhaar') && (executeInterfaceReqObj?.requestString?.addressEditFlag === 'Y');
-  return addressChangeDeclr ? aadharAdrressChanged : 'N';
+  const addressEditFlag = (executeInterfaceReqObj?.requestString?.addressEditFlag === 'Y');
+  const currentAddessToggle = (globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.AddressDeclarationAadhar.currentAddressToggleConfirmpage.$value === '1'); // check radio btn - 'yes'
+  const currentAddresCheck = (globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.CurrentAddressDeclaration.currentResidenceAddressDeclaration.$value === 'on'); // declerationCheck
+  return (addressEditFlag && currentAddessToggle && currentAddresCheck) ? 'Y' : 'N';
 };
 
 /**
@@ -425,7 +425,7 @@ const executeInterfacePostRedirect = async (source, userRedirected, globals) => 
     }
   }
   requestObj.requestString.comAddressType = comAddressType(globals, userRedirected); // set com address type
-  requestObj.requestString.AddrDeclarationFlag = addressDeclrFlag(globals, requestObj);
+  requestObj.requestString.AddrDeclarationFlag = addressDeclrFlag(globals, requestObj); // path variable set
   const apiEndPoint = urlPath(endpoints.executeInterface);
   const eventHandlers = {
     successCallBack: (response) => {
