@@ -3574,12 +3574,11 @@ class Field extends Scriptable {
         this._setProperty('readOnly', e);
     }
     get enabled() {
-        if (this.parent.enabled !== undefined) {
-            return this.parent.enabled === false ? false : this._jsonModel.enabled;
+        const parentEnabled = this.parent?.enabled;
+        if (parentEnabled !== undefined) {
+            return parentEnabled ? this._jsonModel.enabled : false;
         }
-        else {
-            return this._jsonModel.enabled;
-        }
+        return this._jsonModel.enabled;
     }
     set enabled(e) {
         this._setProperty('enabled', e);
