@@ -2224,13 +2224,12 @@ class Container extends Scriptable {
             this.notifyDependents(change);
         }
     }
-  get enabled() {
-    const parentEnabled = this.parent?.enabled;
-    if (parentEnabled !== undefined) {
-      return parentEnabled ? this._jsonModel.enabled : false;
+
+    get enabled() {
+        const parentEnabled = this.parent?.enabled;
+        return parentEnabled ? this._jsonModel.enabled : parentEnabled === undefined ? this._jsonModel.enabled : false;
     }
-    return this._jsonModel.enabled;
-  }
+
     set enabled(e) {
         this._setProperty('enabled', e, true, this.notifyChildren);
     }
@@ -3579,10 +3578,7 @@ class Field extends Scriptable {
     }
     get enabled() {
         const parentEnabled = this.parent?.enabled;
-        if (parentEnabled !== undefined) {
-            return parentEnabled ? this._jsonModel.enabled : false;
-        }
-        return this._jsonModel.enabled;
+        return parentEnabled ? this._jsonModel.enabled : parentEnabled === undefined ? this._jsonModel.enabled : false;
     }
     set enabled(e) {
         this._setProperty('enabled', e);
