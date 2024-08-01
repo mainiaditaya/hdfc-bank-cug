@@ -573,10 +573,11 @@ const onPageLoadAnalytics = async () => {
   // eslint-disable-next-line no-underscore-dangle, no-undef
   journeyData.journeyId = myForm.resolveQualifiedName('$form.runtime.journeyId')._data.$_value;
   journeyData.journeyName = 'CORPORATE_CARD_JOURNEY';
-  const queryString = window.location.search;
+  const queryString = window.location.search.toLowerCase();
   const urlParams = new URLSearchParams(queryString);
-  const paramValue = urlParams.get('authmode');
-  if (!paramValue) sendAnalytics('page load-Identify yourself', {}, 'CRM_LEAD_SUCCESS', journeyData);
+  const paramAuthMode = urlParams.get('authmode');
+  const paramVisitType = urlParams.get('visittype');
+  if (!paramAuthMode && !paramVisitType) sendAnalytics('page load-Identify yourself', {}, 'CRM_LEAD_SUCCESS', journeyData);
 };
 
 onPageLoadAnalytics();
