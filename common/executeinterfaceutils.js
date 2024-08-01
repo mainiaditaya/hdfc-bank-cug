@@ -400,9 +400,11 @@ const comAddressType = (globals, userRedirected) => {
   return cardDelivery?.office ? '1' : '2';
 };
 
-const addressDeclrFlag = (globals) => {
-  const aadharAdrressChange = globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.AddressDeclarationAadhar.currentAddressToggleConfirmpage.$value === '0' ? 'N' : 'Y';
-  return aadharAdrressChange;
+const addressDeclrFlag = (globals, executeInterfaceReqObj) => {
+  const aadharAdrressChanged = globals.form.corporateCardWizardView.confirmAndSubmitPanel.addressDeclarationPanel.AddressDeclarationAadhar.currentAddressToggleConfirmpage.$value === '0' ? 'N' : 'Y';
+  const radioBtnValues = globals.functions.exportData()?.currentFormContext?.radioBtnValues;
+  const addressChangeDeclr = (radioBtnValues?.kycMethod?.aadharEKYCVerification === 'aadhaar') && (executeInterfaceReqObj?.requestString?.addressEditFlag === 'Y');
+  return addressChangeDeclr ? aadharAdrressChanged : '';
 };
 
 /**
@@ -423,7 +425,7 @@ const executeInterfacePostRedirect = async (source, userRedirected, globals) => 
     }
   }
   requestObj.requestString.comAddressType = comAddressType(globals, userRedirected); // set com address type
-  requestObj.requestString.AddrDeclarationFlag = addressDeclrFlag(globals);
+  requestObj.requestString.AddrDeclarationFlag = addressDeclrFlag(globals, requestObj);
   const apiEndPoint = urlPath(endpoints.executeInterface);
   const eventHandlers = {
     successCallBack: (response) => {
