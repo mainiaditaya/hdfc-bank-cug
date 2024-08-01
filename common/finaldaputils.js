@@ -1,6 +1,6 @@
 import { sendPageloadEvent } from './analytics.js';
 import corpCreditCard from './constants.js';
-import { formUtil, urlPath } from './formutils.js';
+import { formUtil, santizedFormDataWithContext, urlPath } from './formutils.js';
 import { corpCreditCardContext, invokeJourneyDropOffUpdate } from './journey-utils.js';
 import { restAPICall } from './makeRestAPI.js';
 
@@ -173,7 +173,8 @@ const finalDap = (userRedirected, globals) => {
           }
           throughDomSetArnNum(response.applicationNumber, mobileNumber, journeyId, leadProfileId, globals);
           setTimeout(async (globalObj) => {
-            await Promise.resolve(sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globalObj));
+            const santizedFormData = santizedFormDataWithContext(globalObj);
+            await Promise.resolve(sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', santizedFormData, 'CONFIRMATION_PAGE_NAME'));
           }, 5000, globals);
         }
       } else {
