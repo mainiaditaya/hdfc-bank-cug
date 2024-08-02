@@ -15,13 +15,7 @@ import {
   journeyResponseHandlerUtil,
 } from '../../common/journey-utils.js';
 
-import addGaps from './fd.js';
-
-document.addEventListener('DOMContentLoaded', () => {
-  (function () {
-    addGaps();
-  }());
-});
+import addGaps from './fd-dom-functions.js';
 
 export {
   getOTP,
@@ -35,4 +29,5 @@ export {
   invokeJourneyDropOffUpdate,
   journeyResponseHandlerUtil,
   maskedMobNum,
+  addGaps,
 };
