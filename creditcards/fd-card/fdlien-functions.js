@@ -247,9 +247,8 @@ function customSetFocus(errorMessage, numRetries, globals) {
  * Reloads the current page.
  * lead idParam is been strored in current formContext after otpGen btn click
  * @name reloadPage
- * @param {object} globals
  */
-function reloadPage(globals) {
+function reloadPage() {
   window.location.reload();
 }
 
