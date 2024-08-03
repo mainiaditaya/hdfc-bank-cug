@@ -4,24 +4,22 @@ import {
   santizedFormDataWithContext,
   urlPath,
   generateUUID,
-} from './formutils.js';
-import { fetchJsonResponse } from './makeRestAPI.js';
+} from '../../common/formutils.js';
+import { fetchJsonResponse } from '../../common/makeRestAPI.js';
 
-import * as CONSTANT from './constants.js';
-import * as CC_CONSTANT from '../creditcards/corporate-creditcard/constant.js';
+import * as CONSTANT from '../../common/constants.js';
+import * as CC_CONSTANT from './constant.js';
 
-const { ENDPOINTS, CHANNEL } = CONSTANT;
+const { ENDPOINTS, CHANNEL, CURRENT_FORM_CONTEXT: currentFormContext } = CONSTANT;
 const { JOURNEY_NAME } = CC_CONSTANT;
-const journeyNameConstant = JOURNEY_NAME;
-const channelConstant = CHANNEL;
 
 /**
- * generates the journeyId
- * @param {string} visitMode - The visit mode (e.g., "online", "offline").
- * @param {string} journeyAbbreviation - The abbreviation for the journey.
- * @param {string} channel - The channel through which the journey is initiated.
- * @param {object} globals
- */
+   * generates the journeyId
+   * @param {string} visitMode - The visit mode (e.g., "online", "offline").
+   * @param {string} journeyAbbreviation - The abbreviation for the journey.
+   * @param {string} channel - The channel through which the journey is initiated.
+   * @param {object} globals
+   */
 function createJourneyId(visitMode, journeyAbbreviation, channel, globals) {
   const dynamicUUID = generateUUID();
   // var dispInstance = getDispatcherInstance();
@@ -29,38 +27,27 @@ function createJourneyId(visitMode, journeyAbbreviation, channel, globals) {
   globals.functions.setProperty(globals.form.runtime.journeyId, { value: journeyId });
 }
 
-const corpCreditCardContext = {
-  currentFormContext: {},
-};
-const formRuntime = {};
-
-const getCurrentContext = () => corpCreditCardContext.currentFormContext;
-
-const setCurrentContext = (formContext) => {
-  this.corpCreditCardContext.currentFormContext = formContext;
-  if (!this.corpCreditCardContext.currentFormContext.isSet) {
-    this.corpCreditCardContext.currentFormContext.isSet = true;
-  }
-};
+const getCurrentContext = () => currentFormContext;
 
 /**
- * @name invokeJourneyDropOff to log on success and error call backs of api calls
- * @param {state} state
- * @param {string} mobileNumber
- * @param {Object} globals - globals variables object containing form configurations.
- * @return {PROMISE}
- */
+   * @name invokeJourneyDropOff to log on success and error call backs of api calls
+   * @param {state} state
+   * @param {string} mobileNumber
+   * @param {Object} globals - globals variables object containing form configurations.
+   * @return {PROMISE}
+   */
 const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
+  const DEFAULT_MOBILENO = '9999999999';
   const journeyJSONObj = {
     RequestPayload: {
       userAgent: (typeof window !== 'undefined') ? window.navigator.userAgent : 'onLoad',
       leadProfile: {
-        mobileNumber,
+        mobileNumber: mobileNumber || DEFAULT_MOBILENO,
       },
       formData: {
-        channel: channelConstant,
-        journeyName: journeyNameConstant,
-        journeyID: globals.form.runtime.journeyId.$value,
+        channel: CHANNEL,
+        journeyName: JOURNEY_NAME,
+        journeyID: globals.form.runtime.journeyId.$value || createJourneyId('online', JOURNEY_NAME, CHANNEL, globals),
         journeyStateInfo: [
           {
             state,
@@ -73,25 +60,23 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
   };
   const url = urlPath(ENDPOINTS.journeyDropOff);
   const method = 'POST';
-  return globals.functions.exportData().queryParams.leadId ? fetchJsonResponse(url, journeyJSONObj, method) : null;
+  // return globals.functions.exportData().queryParams.leadId ? fetchJsonResponse(url, journeyJSONObj, method) : null;
+  return journeyJSONObj.RequestPayload.formData.journeyID ? fetchJsonResponse(url, journeyJSONObj, method) : null;
 };
 
 /**
- * @name invokeJourneyDropOffUpdate
- * @param {string} state
- * @param {string} mobileNumber
- * @param {string} leadProfileId
- * @param {string} journeyId
- * @param {Object} globals - globals variables object containing form configurations.
- * @return {PROMISE}
- */
+   * @name invokeJourneyDropOffUpdate
+   * @param {string} state
+   * @param {string} mobileNumber
+   * @param {string} leadProfileId
+   * @param {string} journeyId
+   * @param {Object} globals - globals variables object containing form configurations.
+   * @return {PROMISE}
+   */
 const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, journeyId, globals) => {
-  const { currentFormContext } = corpCreditCardContext;
   // temporary_hotfix_radioBtnValues_undefined_issue
   /* storing the radio btn values in current form context */
-  if ((state === 'IDCOM_REDIRECTION_INITIATED') || (state === 'CUSTOMER_AADHAAR_PRE_AADHAR_INIT')) {
-    // CUSTOMER_AADHAAR_PRE_AADHAR_INIT
-    // CUSTOMER_AADHAR_INIT
+  if ((state === 'IDCOM_REDIRECTION_INITIATED') || (state === 'CUSTOMER_AADHAR_INIT')) {
     const { form } = globals.functions.exportData();
     const { selectKYCMethodOption1: { aadharEKYCVerification }, selectKYCMethodOption2: { aadharBiometricVerification }, selectKYCMethodOption3: { officiallyValidDocumentsMethod } } = globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel;
     // ETB OVD
@@ -132,8 +117,8 @@ const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, jo
         leadProfileId: leadProfileId?.toString(),
       },
       formData: {
-        channel: channelConstant,
-        journeyName: journeyNameConstant,
+        channel: CHANNEL,
+        journeyName: JOURNEY_NAME,
         journeyID: journeyId,
         journeyStateInfo: [
           {
@@ -152,11 +137,11 @@ const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, jo
 };
 
 /**
- * @name printPayload
- * @param {string} payload.
- * @param {object} formContext.
- * @returns {object} currentFormContext.
- */
+   * @name printPayload
+   * @param {string} payload.
+   * @param {object} formContext.
+   * @returns {object} currentFormContext.
+   */
 function journeyResponseHandlerUtil(payload, formContext) {
   formContext.leadProfile = {};
   formContext.leadProfile.leadProfileId = String(payload);
@@ -164,12 +149,12 @@ function journeyResponseHandlerUtil(payload, formContext) {
 }
 
 /**
-* @name invokeJourneyDropOffByParam
-* @param {string} mobileNumber
-* @param {string} leadProfileId
-* @param {string} journeyId
-* @return {PROMISE}
-*/
+  * @name invokeJourneyDropOffByParam
+  * @param {string} mobileNumber
+  * @param {string} leadProfileId
+  * @param {string} journeyId
+  * @return {PROMISE}
+  */
 const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyID) => {
   const journeyJSONObj = {
     RequestPayload: {
@@ -191,9 +176,6 @@ export {
   invokeJourneyDropOffByParam,
   invokeJourneyDropOffUpdate,
   journeyResponseHandlerUtil,
-  corpCreditCardContext,
   getCurrentContext,
-  setCurrentContext,
   createJourneyId,
-  formRuntime,
 };
