@@ -95,12 +95,6 @@ main .form form {
   gap: var(--form-field-vert-gap) var(--form-field-horz-gap);
 }
 
-main .repeat-wrapper {
-  display: grid;
-  grid-template-columns: repeat(var(--form-columns), minmax(0, 1fr));
-  gap: var(--form-field-vert-gap) var(--form-field-horz-gap);
-}
-
 main .form form fieldset {
   border: var(--form-fieldset-border);
   margin: var(--form-fieldset-marign);
