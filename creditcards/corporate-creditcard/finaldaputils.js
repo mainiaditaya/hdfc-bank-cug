@@ -144,7 +144,7 @@ const finalDap = (userRedirected, globals) => {
           globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: true });
           // 👇 it is not setting the value.
           globals.functions.setProperty(globals.form.resultPanel.successResultPanel.arnRefNumPanel.newARNNumber, { value: response.applicationNumber });
-          // setting through DomApi using throughDomSetArnNum function.
+          // setting through DomApi using throughDomSetArnNum function
           if (journeyName === 'NTB' && (kycStatus === 'aadhaar')) {
             globals.functions.setProperty(globals.form.resultPanel.successResultPanel.vkycCameraConfirmation, { visible: true });
             globals.functions.setProperty(globals.form.resultPanel.successResultPanel.cameraConfirmationPanelInstruction, { visible: true });
