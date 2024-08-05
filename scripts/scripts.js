@@ -126,14 +126,16 @@ function loadDelayed() {
   window.setTimeout(() => import('../creditcards/cc.js'), 1000);
   // load anything that can be postponed to the latest here
   // Logo Click Event
-  const clickableLogo = document.querySelector('header .cmp-container > div:nth-child(1) > div > picture > img');
-
-  if (clickableLogo) {
-    clickableLogo.addEventListener('click', (event) => {
-      event.preventDefault();
-      window.open('https://www.hdfcbank.com/', '_blank');
-    });
+  function imageClickable(selector, url) {
+    const element = document.querySelector(selector);
+    if (element) {
+      element.addEventListener('click', (event) => {
+        event.preventDefault();
+        window.open(url, '_blank');
+      });
+    }
   }
+  imageClickable('header .cmp-container > div:nth-child(1) > div > picture > img', 'https://www.hdfcbank.com/');
 }
 
 async function loadPage() {
