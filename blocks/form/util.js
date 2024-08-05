@@ -201,12 +201,12 @@ function updateRequiredCheckboxGroup(name, htmlForm) {
   });
 }
 
-export function imageClickable(selector, url) {
+export function imageClickable(selector, url, target) {
   const element = document.querySelector(selector);
   if (element) {
     element.addEventListener('click', (event) => {
       event.preventDefault();
-      window.open(url, '_blank');
+      window.open(url, target);
     });
   }
 }

@@ -4,7 +4,7 @@ import {
 
 export default function decorate(block) {
   // Logo Clickable
-  imageClickable('header .cmp-container > div:nth-child(1) > div > picture > img', 'https://www.hdfcbank.com/');
+  imageClickable('header .cmp-container > div:nth-child(1) > div > picture > img', 'https://www.hdfcbank.com/', '_blank');
   const image = block.querySelector('picture');
   if (image) {
     document.querySelector('header').append(block);
