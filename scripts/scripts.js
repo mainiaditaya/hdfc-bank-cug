@@ -125,6 +125,15 @@ function loadDelayed() {
   loadScript('https://assets.adobedtm.com/80673311e435/029b16140ccd/launch-48ec56350700-development.min.js', { async: 'true' });
   window.setTimeout(() => import('../creditcards/cc.js'), 1000);
   // load anything that can be postponed to the latest here
+  // Logo Click Event
+  const clickableLogo = document.querySelector('header .cmp-container > div:nth-child(1) > div > picture > img');
+
+  if (clickableLogo) {
+    clickableLogo.addEventListener('click', (event) => {
+      event.preventDefault();
+      window.open('https://www.hdfcbank.com/', '_blank');
+    });
+  }
 }
 
 async function loadPage() {
