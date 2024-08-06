@@ -79,7 +79,7 @@ function sendPageloadEvent(journeyState, formData, pageName) {
   setAnalyticPageLoadProps(journeyState, formData, digitalData);
   switch (currentFormContext.action) {
     case 'check offers': {
-      digitalData.page.pageInfo.pageName = PAGE_NAME['get this card'];
+      digitalData.page.pageInfo.pageName = PAGE_NAME.ccc['get this card'];
       digitalData.card.selectedCard = currentFormContext?.productCode;
       digitalData.card.eligibleCard = currentFormContext?.productCode;
       break;
@@ -87,7 +87,7 @@ function sendPageloadEvent(journeyState, formData, pageName) {
     case 'confirmation': {
       // ((mobileValid === 'n')&&aadhaar_otp_val_data?.result?.mobileValid)
       // arn_num
-      digitalData.page.pageInfo.pageName = PAGE_NAME['start kyc'];
+      digitalData.page.pageInfo.pageName = PAGE_NAME.ccc['start kyc'];
       const formCallBackContext = currentFormContext?.pageGotRedirected ? formData?.currentFormContext : currentFormContext;
       digitalData.formDetails = {
         reference: formCallBackContext?.ARN_NUM,
@@ -114,7 +114,7 @@ function sendPageloadEvent(journeyState, formData, pageName) {
  */
 function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState, digitalData) {
   setAnalyticClickGenericProps(eventType, linkType, formData, journeyState, digitalData);
-  digitalData.page.pageInfo.pageName = PAGE_NAME[eventType];
+  digitalData.page.pageInfo.pageName = PAGE_NAME.ccc[eventType];
   switch (eventType) {
     case 'otp click': {
       digitalData.event = {
