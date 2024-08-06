@@ -357,7 +357,7 @@ function asyncAnalytics(eventType, payload, journeyState, globals) {
       sendAnalyticsEvent(eventType, payload, journeyState, santizedFormDataWithContext(globals));
       setTimeout(() => resolve({ response: 'success' }), 2000);
     } catch (ex) {
-      console.log(ex);
+      console.error(ex);
     }
   });
 }
