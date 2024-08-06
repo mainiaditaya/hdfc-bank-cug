@@ -6,7 +6,7 @@ import * as DOM_API from '../domutils/domutils.js';
 import { invokeJourneyDropOffUpdate } from './journey-utils.js';
 import { urlPath } from '../../common/formutils.js';
 import { ENDPOINTS } from '../../common/constants.js';
-import { sendPageloadEvent, sendAnalytics } from '../common/analytics.js';
+import { sendPageloadEvent, sendAnalytics } from './analytics.js';
 
 const { displayLoader, hideLoaderGif, moveWizardView } = DOM_API;
 

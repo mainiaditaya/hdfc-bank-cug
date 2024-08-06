@@ -9,7 +9,6 @@ import {
   formUtil,
   urlPath,
   clearString,
-  santizedFormDataWithContext,
   ageValidator,
   removeSpecialCharacters,
   parseCustomerAddress,
@@ -24,7 +23,7 @@ import {
   displayLoader, hideLoaderGif,
   getJsonResponse,
 } from '../../common/makeRestAPI.js';
-import { sendAnalytics } from '../common/analytics.js';
+import { sendAnalytics } from './analytics.js';
 import * as CONSTANT from '../../common/constants.js';
 import * as CC_CONSTANT from './constant.js';
 import { executeInterfacePostRedirect } from './executeinterfaceutils.js';
@@ -605,16 +604,6 @@ const prefillForm = (globals) => {
 };
 
 /**
-* sendAnalytics
-* @param {string} payload
-* @param {object} globals
-*/
-// eslint-disable-next-line no-unused-vars
-function sendAnalytics(payload, globals) {
-  sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
-}
-
-/**
  * @name resendOTP
  * @param {Object} globals - The global object containing necessary data for DAP request.
  */
@@ -868,7 +857,6 @@ export {
   formRuntime,
   journeyResponseHandler,
   createJourneyId,
-  sendAnalytics,
   resendOTP,
   customSetFocus,
   validateLogin,
