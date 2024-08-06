@@ -24,7 +24,7 @@ import {
   displayLoader, hideLoaderGif,
   getJsonResponse,
 } from '../../common/makeRestAPI.js';
-import { sendAnalyticsEvent } from '../../common/analytics.js';
+import { sendAnalytics } from '../common/analytics.js';
 import * as CONSTANT from '../../common/constants.js';
 import * as CC_CONSTANT from './constant.js';
 import { executeInterfacePostRedirect } from './executeinterfaceutils.js';
@@ -760,6 +760,7 @@ const setNameOnCard = (name, globals) => globals.functions.setProperty(globals.f
  */
 const aadharConsent123 = async (globals) => {
   try {
+    await Promise.resolve(sendAnalytics('kyc continue', { errorCode: '0000', errorMessage: 'Success' }, 'CUSTOMER_AADHAAR_INIT', globals));
     if (typeof window !== 'undefined') {
       const openModal = (await import('../../blocks/modal/modal.js')).default;
       const config = {

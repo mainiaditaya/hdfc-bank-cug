@@ -2,7 +2,6 @@
 import {
   formRuntime,
   journeyResponseHandler,
-  sendAnalytics,
   resendOTP,
   customSetFocus,
   validateLogin,
@@ -58,6 +57,10 @@ import {
   getWrappedFormContext,
   onWizardInit,
 } from '../../common/functions.js';
+
+import {
+  sendAnalytics,
+} from './analytics.js';
 
 export {
   finalDap,

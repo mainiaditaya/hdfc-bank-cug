@@ -6,6 +6,7 @@ import * as DOM_API from '../domutils/domutils.js';
 import { invokeJourneyDropOffUpdate } from './journey-utils.js';
 import { urlPath } from '../../common/formutils.js';
 import { ENDPOINTS } from '../../common/constants.js';
+import { sendPageloadEvent, sendAnalytics } from '../common/analytics.js';
 
 const { displayLoader, hideLoaderGif, moveWizardView } = DOM_API;
 
@@ -239,8 +240,7 @@ const successPannelMethod = async (data, stateInfoData) => {
   }
   currentFormContext.action = 'confirmation';
   currentFormContext.pageGotRedirected = true;
-  // temporarly commented and it will be enabled after analytics merge.
-  // Promise.resolve(sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', stateInfoData));
+  Promise.resolve(sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', stateInfoData, 'CONFIRMATION_Page_name'));
   const mobileNumber = stateInfoData.form.login.registeredMobileNumber;
   const leadProfileId = stateInfoData.leadProifileId;
   const journeyId = stateInfoData.currentFormContext.journeyID;
@@ -386,3 +386,17 @@ pageRedirected(aadharRedirect, idComRedirect);
  * @param {string[]} inputNames - An array of input field names to be restricted.
  */
 [yourDetails.firstName, yourDetails.middleName, yourDetails.lastName].forEach((inputField) => DOM_API.restrictToAlphabetsNoSpaces(inputField));
+
+const onPageLoadAnalytics = async () => {
+  const journeyData = {};
+  // eslint-disable-next-line no-underscore-dangle, no-undef
+  journeyData.journeyId = myForm.resolveQualifiedName('$form.runtime.journeyId')._data.$_value;
+  journeyData.journeyName = 'CORPORATE_CARD_JOURNEY';
+  const queryString = window.location.search.toLowerCase();
+  const urlParams = new URLSearchParams(queryString);
+  const paramAuthMode = urlParams.get('authmode');
+  const paramVisitType = urlParams.get('visittype');
+  if (!paramAuthMode && !paramVisitType) sendAnalytics('page load-Identify yourself', {}, 'CRM_LEAD_SUCCESS', journeyData);
+};
+
+onPageLoadAnalytics();
