@@ -88,7 +88,7 @@ main .section.form-container {
 
         .field-aem-mobilenum label { margin-left: -35px; }
 
-        .field-mobilepanel:has(.field-aem-mobilenum:is([data-active='true'])) {
+        .field-mobilepanel:has(.field-aem-mobilenum:is([data-active='true'])), .field-mobilepanel .field-aem-mobilenum input:focus {
             .field-aem-countrycode input::placeholder { color: var(--label-color) !important; }
         }
 
@@ -100,6 +100,10 @@ main .section.form-container {
             p {
                 margin: 0;
                 font: normal normal normal var(--body-sm-font-size) / var(--body-xx-lg-font-size) var(--font-family-secondary);
+            }
+
+            .field-aem-disclaimerflag {
+                justify-self: end;
             }
         }
     }
