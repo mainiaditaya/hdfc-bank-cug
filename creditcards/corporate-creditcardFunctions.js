@@ -654,9 +654,11 @@ const resendOTP = (globals) => {
     if (!RESEND_OTP_COUNT) errorResendOtp(res, objectGlobals);
   };
 
+  const formData = globals.functions.exportData();
   const payload = {
     requestString: {
-      mobileNumber: String(mobileNo),
+      leadId: formData.queryParams.leadId,
+      // mobileNumber: String(mobileNo),
       dateOfBith: dob || '',
       panNumber: panNo || '',
       journeyID: globals.form.runtime.journeyId.$value,
