@@ -127,7 +127,13 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       _satellite.track('submit');
       currentFormContext.action = 'otp click';
       setTimeout(() => {
-        sendPageloadEvent('CUSTOMER_IDENTITY_RESOLVED', formData, 'Enter otp page');
+        sendPageloadEvent('CUSTOMER_IDENTITY_RESOLVED', formData, PAGE_NAME.ccc['confirm otp']);
+      }, 1000);
+      break;
+    }
+    case 'confirm otp': {
+      setTimeout(() => {
+        sendPageloadEvent('CUSTOMER_IDENTITY_RESOLVED', formData, PAGE_NAME.ccc['check offers']);
       }, 1000);
       break;
     }
@@ -160,7 +166,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       }
       _satellite.track('submit');
       setTimeout(() => {
-        sendPageloadEvent('CUSTOMER_BUREAU_OFFER_AVAILABLE', formData, 'Choose card');
+        sendPageloadEvent('CUSTOMER_BUREAU_OFFER_AVAILABLE', formData, PAGE_NAME.ccc['get this card']);
       }, 1000);
       break;
     }

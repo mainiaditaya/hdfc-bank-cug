@@ -130,17 +130,18 @@ const ANALYTICS_PAGE_LOAD_OBJECT = {
 
 const PAGE_NAME = {
   ccc: {
-    'otp click': 'Identify yourself',
-    'check offers': 'Your details',
-    'get this card': 'Confirm Card',
-    'kyc continue': 'Select KYC Method',
-    'i agree': 'Select KYC Method',
-    'document upload continue': 'Select KYC Method',
-    'address continue': 'Confirm & Submit',
-    'aadhaar otp': 'Aadhar portal screen',
-    'start kyc': 'Thank you screen',
-    'submit review': 'Thank you screen',
-    'thank you screen': 'Thank you screen',
+    'otp click': 'Identify Yourself',
+    'confirm otp': 'Verify with OTP',
+    'check offers': 'Confirm your details',
+    'get this card': 'Choose Card',
+    'kyc continue': 'Select KYC',
+    'i agree': 'Select KYC',
+    'document upload continue': 'Document Upload',
+    'address continue': 'Address Details',
+    'aadhaar otp': 'Select KYC - Aadhaar OTP verification',
+    'start kyc': 'Confirmation',
+    'submit review': 'Confirmation',
+    'thank you screen': 'Confirmation',
   },
 
 };
