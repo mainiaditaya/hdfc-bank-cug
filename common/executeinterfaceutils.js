@@ -73,7 +73,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
   const formData = globals.functions.exportData().form;
   const compNameRelNum = { // companyName + companyRelationshipNumber
     // '4THLINE': formData?.companyName,
-    CCAD_Relationship_number: formData?.relationshipNumber,
+    CCAD_Relationship_number: formData?.relationshipNumber || currentFormContext?.crmLeadResponse?.relationshipNum,
   };
 
   let permanentAddress = { ...currentAddress };
@@ -176,12 +176,12 @@ const createExecuteInterfaceRequestObj = (globals) => {
       officeZipCode: employmentDetails.officeAddressPincode.$value,
       officeState: employmentDetails.officeAddressState.$value,
       productCode: '',
-      leadClosures: globals.functions.exportData().form.leadClosures,
-      leadGenerater: globals.functions.exportData().form.leadGenerator,
+      leadClosures: globals.functions.exportData().form.leadClosures || currentFormContext?.crmLeadResponse?.leadClosures,
+      leadGenerater: globals.functions.exportData().form.leadGenerator || currentFormContext?.crmLeadResponse?.leadGenerator,
       applyingBranch: 'N',
       smCode: '',
       dseCode: '',
-      lc2: globals.functions.exportData().form.lc2,
+      lc2: globals.functions.exportData().form.lc2 || currentFormContext?.crmLeadResponse?.lc2,
       filler6: '',
       branchName: '',
       branchCity: '',
@@ -250,7 +250,7 @@ const executeInterfaceApiFinal = (globals) => {
   const formCallBackContext = globals.functions.exportData()?.currentFormContext;
   const requestObj = currentFormContext.executeInterfaceReqObj || formCallBackContext?.executeInterfaceReqObj;
   requestObj.requestString.nameOnCard = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown.$value?.toUpperCase();
-  requestObj.requestString.productCode = formRuntime.productCode || formCallBackContext?.formRuntime?.productCode;
+  requestObj.requestString.productCode = formRuntime.productCode || formCallBackContext?.formRuntime?.productCode || formCallBackContext.currentFormContext.crmLeadResponse.productCode;
   const apiEndPoint = urlPath(endpoints.executeInterface);
   // restAPICall('', 'POST', requestObj, apiEndPoint, eventHandlers.successCallBack, eventHandlers.errorCallBack, 'Loading');
   formRuntime?.getOtpLoader();
@@ -305,7 +305,7 @@ const ipaRequestApi = (eRefNumber, mobileNumber, applicationRefNumber, idTokenJw
       userAgent: navigator.userAgent,
       journeyID: currentFormContext.journeyID,
       journeyName: currentFormContext.journeyName,
-      productCode: formRuntime.productCode,
+      productCode: formRuntime.productCode || currentFormContext.crmLeadResponse.productCode,
     },
   };
   const apiEndPoint = urlPath(endpoints.ipa);
@@ -326,7 +326,7 @@ const ipaSuccessHandler = (ipa, productEligibility, globals) => {
   if (firstProductDetail) {
     currentFormContext.productCode = firstProductDetail?.cardProductCode;
   } else {
-    currentFormContext.productCode = globals.functions.exportData().form.productCode;
+    currentFormContext.productCode = globals.functions.exportData().form.productCode || currentFormContext.crmLeadResponse.productCode;
   }
   currentFormContext.eRefNumber = ipa?.eRefNumber;
   currentFormContext.applRefNumber = ipa?.applRefNumber;

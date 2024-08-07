@@ -308,9 +308,10 @@ const existingCustomerCheck = (res) => {
 const otpValHandler = (response, globals) => {
   const res = {};
   res.demogResponse = response;
+  const formCallBackContext = globals.functions.exportData();
   currentFormContext.isCustomerIdentified = res?.demogResponse?.errorCode === '0' ? 'Y' : 'N';
-  formRuntime.productCode = globals.functions.exportData().form.productCode;
-  currentFormContext.promoCode = globals.functions.exportData().form.promoCode;
+  formRuntime.productCode = globals.functions.exportData().form.productCode || formCallBackContext?.currentFormContext?.crmLeadResponse?.productCode || currentFormContext?.crmLeadResponse?.productCode;
+  currentFormContext.promoCode = globals.functions.exportData().form.promoCode || formCallBackContext?.currentFormContext?.crmLeadResponse?.promoCode || currentFormContext?.crmLeadResponse?.promoCode;
   currentFormContext.jwtToken = res?.demogResponse?.Id_token_jwt;
   currentFormContext.panFromDemog = res?.demogResponse?.BRECheckAndFetchDemogResponse?.VDCUSTITNBR;
   const existingCustomer = existingCustomerCheck(res);
@@ -619,7 +620,7 @@ const prefillForm = (globals) => {
   } = globals.form;
   const showPanel = [resultPanel, errorMessageText]?.map((fieldName) => formUtil(globals, fieldName));
   const hidePanel = [loginPanel, welcomeText, consentFragment, getOTPbutton]?.map((fieldName) => formUtil(globals, fieldName));
-  if (!formData?.form?.login?.registeredMobileNumber) {
+  if (!formData.form.login.maskedMobileNumber) {
     // show error pannel if corporate credit card details not present
     showPanel?.forEach((panel) => panel.visible(true));
     hidePanel?.forEach((panel) => panel.visible(false));

@@ -129,7 +129,7 @@ function checkMode(globals) {
     const userRedirected = true;
     executeInterfacePostRedirect('idCom', userRedirected, globals);
   }
-  if (!formData?.form?.login?.registeredMobileNumber) {
+  if (!formData.form.login.maskedMobileNumber) {
     globals.functions.setProperty(globals.form.loginPanel, { visible: false });
     globals.functions.setProperty(globals.form.welcomeText, { visible: false });
     globals.functions.setProperty(globals.form.getOTPbutton, { visible: false });
@@ -157,6 +157,42 @@ function customSetFocus(errorMessage, numRetries, globals) {
 }
 
 /**
+ * @name crmResponseHandler - crm response handler
+ * @param {object} globals
+ */
+function crmResponseHandler(crmRes, globals) {
+  globals.functions.setProperty(globals.form.loginPanel.mobilePanel.registeredMobileNumber, { value: crmRes.mobileNumber }); // working // mobNo
+  globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.companyName, { value: crmRes.company }); // companyNo
+  globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.employeeCode, { value: crmRes.employeeCode }); // employeeCode
+  globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.designation, { value: crmRes.designation }); // designation
+  globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.workEmailAddress, { value: crmRes.emailId }); // emailAddress
+  currentFormContext.crmLeadResponse = {};
+  currentFormContext.crmLeadResponse.employmentType = crmRes.employmentType; // emptype - ie.salaried
+  currentFormContext.crmLeadResponse.relationshipNumber = crmRes.relationshipNum; // relationShipNo
+  currentFormContext.crmLeadResponse.productCode = crmRes.fieldId_11964; // productCode
+  currentFormContext.crmLeadResponse.promoCode = crmRes.promoCodeLevel1; // promoCode
+  currentFormContext.crmLeadResponse.leadGenerator = String(crmRes.fieldId_267); // leadGenerator
+  currentFormContext.crmLeadResponse.leadClosures = crmRes.fieldId_921; // leadClosure
+  currentFormContext.crmLeadResponse.lc2 = String(crmRes.fieldId_269); // lc2
+
+  /**
+  * below values will be availble in both forms and currentFormContext.crmLeadResponse
+  * 1.productCode - currentFormContext
+  * 2.lc2 - currentFormContext
+  * 3.leadGenerator - currentFormContext
+  * 4.employmentType - currentFormContext
+  * 5.leadClosure - currentFormContext
+  * 6.regMobNo - form
+  * 7.emailId - form
+  * 8.promoCode - currentFormContext
+  * 9.maskedMobNo - form
+  * 10.relastionNO - currentFormContext
+  * 11.companyName - form
+  * 12.designation - form
+  * 13.employeeCode - form
+  */
+}
+/**
  * generates the otp
  * @param {object} mobileNumber
  * @param {object} pan
@@ -168,9 +204,11 @@ function getOTP(mobileNumber, pan, dob, globals) {
   currentFormContext.journeyID = globals.form.runtime.journeyId.$value;
   currentFormContext.leadIdParam = globals.functions.exportData().queryParams;
   // currentFormContext.leadProfile = {};
+  const formData = globals.functions.exportData();
   const jsonObj = {
     requestString: {
-      mobileNumber: mobileNumber.$value,
+      leadId: formData.queryParams.leadId,
+      // mobileNumber: mobileNumber.$value,
       dateOfBith: dob.$value || '',
       panNumber: pan.$value || '',
       journeyID: globals.form.runtime.journeyId.$value,
@@ -182,6 +220,12 @@ function getOTP(mobileNumber, pan, dob, globals) {
   };
   const path = urlPath(endpoints.otpGen);
   formRuntime?.getOtpLoader();
+  (async () => {
+    /* this async call has to be removed  - once  function : crmResponseHandler has been added to value commit of form */
+    const response = await Promise.resolve(fetchJsonResponse(path, jsonObj, 'POST'));
+    console.log(response, 'response');
+    crmResponseHandler(response.crmLeadResponse, globals);
+  })();
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 
@@ -469,4 +513,5 @@ export {
   asyncAnalytics,
   idcomUrlSet,
   idcomRedirection,
+  crmResponseHandler,
 };

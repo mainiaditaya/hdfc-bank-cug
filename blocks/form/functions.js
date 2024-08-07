@@ -38,6 +38,7 @@ import {
   asyncAnalytics,
   idcomUrlSet,
   idcomRedirection,
+  crmResponseHandler,
 } from '../../common/functions.js';
 
 import { initRestAPIDataSecurityServiceES6 } from '../../common/apiDataSecurity.js';
@@ -231,4 +232,5 @@ export {
   idcomUrlSet,
   idcomRedirection,
   initRestAPIDataSecurityServiceES6,
+  crmResponseHandler,
 };
