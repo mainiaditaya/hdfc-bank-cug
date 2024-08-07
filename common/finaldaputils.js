@@ -35,23 +35,38 @@ const getCurrentDateAndTime = (dobFormatNo) => {
 };
 
 const { currentFormContext } = corpCreditCardContext;
-const fetchFiller4 = (mobileMatch, kycStatus, journeyType) => {
+const fetchFiller4 = (mobileMatch, kycStatus, journeyType, kycFillers) => {
   let filler4Value = null;
-  switch (kycStatus) {
-    case 'aadhaar':
-      // eslint-disable-next-line no-nested-ternary
-      filler4Value = (journeyType === 'NTB') ? `VKYC${getCurrentDateAndTime(3)}` : ((currentFormContext?.journeyType === 'ETB') && mobileMatch) ? `NVKYC${getCurrentDateAndTime(3)}` : `VKYC${getCurrentDateAndTime(3)}`;
-      break;
-    case 'bioKYC':
-      filler4Value = 'bioKYC';
-      break;
-    case 'OVD':
-      filler4Value = 'OVD';
-      break;
-    default:
-      filler4Value = null;
+  if (kycFillers === null) {
+    filler4Value = `NVKYC${getCurrentDateAndTime(3)}`;
+  } else {
+    switch (kycStatus) {
+      case 'aadhaar':
+        // eslint-disable-next-line no-nested-ternary
+        filler4Value = (journeyType === 'NTB') ? `VKYC${getCurrentDateAndTime(3)}` : ((currentFormContext?.journeyType === 'ETB') && mobileMatch) ? `NVKYC${getCurrentDateAndTime(3)}` : `VKYC${getCurrentDateAndTime(3)}`;
+        break;
+      case 'bioKYC':
+        filler4Value = 'bioKYC';
+        break;
+      case 'OVD':
+        filler4Value = 'OVD';
+        break;
+      default:
+        filler4Value = null;
+    }
   }
   return filler4Value;
+};
+
+const kycFillCheck = (customerInfo, kycFill) => {
+  let kycFillerVal;
+  if ((customerInfo.journeyFlag === 'ETB')) {
+    kycFillerVal = (customerInfo.addressEditFlag === 'Y') ? kycFill.KYC_STATUS : null;
+  }
+  if ((customerInfo.journeyFlag === 'NTB')) {
+    kycFillerVal = kycFill.KYC_STATUS;
+  }
+  return kycFillerVal;
 };
 /**
  * Creates a DAP request object based on the provided global data.
@@ -74,9 +89,12 @@ const createDapRequestObj = (globals) => {
         || null,
   };
 
+  const kycFillers = kycFillCheck(customerInfo, kycFill);
   const journeyType = (globals.functions.exportData()?.currentFormContext?.breDemogResponse?.BREFILLER2 === 'D101') ? 'ETB' : 'NTB';
   const mobileMatch = globals.functions.exportData()?.aadhaar_otp_val_data?.result?.mobileValid !== undefined;
-  const VKYCConsent = fetchFiller4(mobileMatch, kycFill.KYC_STATUS, journeyType);
+  const biometricStatus = kycFillers ?? '';
+  const ekycConsent = ((kycFillers === 'aadhaar')) ? `${getCurrentDateAndTime(3)}YEnglishxeng1x0` : '';
+  const VKYCConsent = fetchFiller4(mobileMatch, kycFill.KYC_STATUS, journeyType, kycFillers);
   const ekycSuccess = mobileMatch ? `${formData?.aadhaar_otp_val_data?.result?.ADVRefrenceKey}X${formData?.aadhaar_otp_val_data.result?.RRN}` : '';
   const finalDapPayload = {
     requestString: {
@@ -97,10 +115,10 @@ const createDapRequestObj = (globals) => {
       journeyName: currentFormContext.journeyName,
       filler7: '',
       Segment: segment,
-      biometricStatus: kycFill.KYC_STATUS,
+      biometricStatus,
       ekycSuccess,
       VKYCConsent,
-      ekycConsent: `${getCurrentDateAndTime(3)}YEnglishxeng1x0`,
+      ekycConsent,
       idcom_token: formData?.queryParams?.idcom_token ?? '',
       journeyType,
     },

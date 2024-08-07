@@ -291,6 +291,7 @@ const successPannelMethod = async (data, stateInfoData) => {
     } else if (kycStatus === 'OVD') {
       vkycProceedButton.setAttribute('data-visible', false);
       vkycConfirmText.setAttribute('data-visible', true);
+      vkycConfirmText.innerText = 'Bank representative will visit you for verification';
       offerLink.setAttribute('data-visible', false); // Adjusted assumption for offerLink
     } else if (mobileMatch && kycStatus === 'aadhaar' && addressEditFlag === 'Y') {
       vkycProceedButton.setAttribute('data-visible', false);
