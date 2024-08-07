@@ -2,9 +2,9 @@ import { getOTPV1 } from './smart-emi-functions.js';
 
 /* load SEMI Styles- for loading semi - styles - temporary fix */
 async function loadSEMIStyles() {
-    if (document.querySelector('.semi-form-wrapper')) {
-        document.body.classList.add('semi-form');
-    }
+  if (document.querySelector('.semi-form-wrapper')) {
+    document.body.classList.add('semi-form');
+  }
 }
 window.setTimeout(() => loadSEMIStyles(), 600);
 
