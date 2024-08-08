@@ -196,19 +196,20 @@ function invokeSmartPrefill(globals) {
   const attachmentData = globals.form.corporateCardWizardView.yourDetailsPanel.smartPrefillAttachment.$value.data;
 
   // prepare the payload for the smart prefill API
+  const formData = new FormData();
+  formData.append('mode', 'document');
   fetch(`${getSubmitBaseUrl()}/${window.location.pathname}/jcr:content/guideContainer.model.json`)
     .then((response) => response.json())
     .then((data) => {
-      formJson = data;
+      formJson = JSON.stringify(data);
+      formData.append('attachment', attachmentData);
+      formData.append('formJson', formJson);
     })
     .catch((error) => {
       console.error('Error fetching form JSON:', error);
     });
-  const formData = new FormData();
-  formData.append('mode', 'document');
-  formData.append('attachment', attachmentData);
-  formJson[':items'] = { wizard: formJson[':items'].wizard }; // reducing the json size by retaining only the relevant data
-  formData.append('formJson', JSON.stringify(formJson));
+
+  // formJson[':items'] = { wizard: formJson[':items'].wizard }; // reducing the json size by retaining only the relevant data
 
   displayLoader('pre-filling...');
   // invoke the smart prefill API
