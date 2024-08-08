@@ -204,6 +204,25 @@ function invokeSmartPrefill(globals) {
       formJson = JSON.stringify(data);
       formData.append('attachment', attachmentData);
       formData.append('formJson', formJson);
+
+      displayLoader('pre-filling...');
+      // invoke the smart prefill API
+      fetch('https://1o6jfrasi1.execute-api.ap-south-1.amazonaws.com/attachment', {
+        method: 'POST',
+        headers: {
+          'User-Agent': 'Insomnia/2023.5.7-adobe',
+        },
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((pData) => {
+          prefillData = pData;
+          console.log('Prefill data:', prefillData);
+        })
+        .catch((error) => console.error('Error:', error))
+        .finally(() => {
+          hideLoaderGif();
+        });
     })
     .catch((error) => {
       console.error('Error fetching form JSON:', error);
@@ -211,24 +230,7 @@ function invokeSmartPrefill(globals) {
 
   // formJson[':items'] = { wizard: formJson[':items'].wizard }; // reducing the json size by retaining only the relevant data
 
-  displayLoader('pre-filling...');
-  // invoke the smart prefill API
-  fetch('https://1o6jfrasi1.execute-api.ap-south-1.amazonaws.com/attachment', {
-    method: 'POST',
-    headers: {
-      'User-Agent': 'Insomnia/2023.5.7-adobe',
-    },
-    body: formData,
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      prefillData = data;
-      console.log('Prefill data:', prefillData);
-    })
-    .catch((error) => console.error('Error:', error))
-    .finally(() => {
-      hideLoaderGif();
-    });
+
 }
 
 // eslint-disable-next-line import/prefer-default-export
