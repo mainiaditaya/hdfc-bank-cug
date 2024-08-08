@@ -427,6 +427,19 @@ const executeInterfacePostRedirect = async (source, userRedirected, globals) => 
       requestObj.requestString.mobileMatch = 'N';
     }
   }
+  const { selectKYCMethodOption1: { aadharEKYCVerification }, selectKYCMethodOption2: { aadharBiometricVerification }, selectKYCMethodOption3: { officiallyValidDocumentsMethod } } = globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel;
+  const formData = globals.functions.exportData();
+  const radioBtnValues = globals.functions.exportData()?.currentFormContext?.radioBtnValues;
+  const kycFill = {
+    KYC_STATUS:
+        ((aadharEKYCVerification.$value || formData?.form?.aadharEKYCVerification || radioBtnValues?.kycMethod?.aadharEKYCVerification) && 'aadhaar')
+        || ((aadharBiometricVerification.$value || formData?.form?.aadharBiometricVerification || radioBtnValues?.kycMethod?.aadharBiometricVerification) && 'bioKYC')
+        || ((officiallyValidDocumentsMethod.$value || formData?.form?.officiallyValidDocumentsMethod || radioBtnValues?.kycMethod?.officiallyValidDocumentsMethod) && 'OVD')
+        || null,
+  };
+  if ((source === 'NO_IDCOM_REDIRECTION') && (kycFill.KYC_STATUS === 'bioKYC')) {
+    requestObj.requestString.authMode = 'OTP';
+  }
   requestObj.requestString.comAddressType = comAddressType(globals, userRedirected); // set com address type
   requestObj.requestString.AddrDeclarationFlag = addressDeclrFlag(globals, requestObj); // path variable set
   const apiEndPoint = urlPath(endpoints.executeInterface);
