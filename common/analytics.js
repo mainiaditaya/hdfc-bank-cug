@@ -129,7 +129,13 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       _satellite.track('submit');
       currentFormContext.action = 'otp click';
       setTimeout(() => {
-        sendPageloadEvent('CUSTOMER_IDENTITY_RESOLVED', formData, 'Enter otp page');
+        sendPageloadEvent('CUSTOMER_IDENTITY_RESOLVED', formData, PAGE_NAME['confirm otp']);
+      }, 1000);
+      break;
+    }
+    case 'confirm otp': {
+      setTimeout(() => {
+        sendPageloadEvent('CUSTOMER_IDENTITY_RESOLVED', formData, PAGE_NAME['check offers']);
       }, 1000);
       break;
     }
@@ -162,7 +168,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       }
       _satellite.track('submit');
       setTimeout(() => {
-        sendPageloadEvent('CUSTOMER_BUREAU_OFFER_AVAILABLE', formData, 'Choose card');
+        sendPageloadEvent('CUSTOMER_BUREAU_OFFER_AVAILABLE', formData, PAGE_NAME['get this card']);
       }, 1000);
       break;
     }
@@ -182,9 +188,9 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       currentFormContext.action = 'get this card';
       _satellite.track('submit');
       setTimeout(() => {
-        let currentPageName = 'Select KYC Method';
+        let currentPageName = PAGE_NAME['start kyc'];
         if (formData?.etbFlowSelected === 'on' && formData?.form?.currentAddressToggle === 'off') {
-          currentPageName = 'Confirm & Submit';
+          currentPageName = PAGE_NAME['submit review'];
         }
         sendPageloadEvent('CUSTOMER_CARD_SELECTED', formData, currentPageName);
       }, 1000);
