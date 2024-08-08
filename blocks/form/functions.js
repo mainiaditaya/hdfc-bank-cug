@@ -200,7 +200,6 @@ function invokeSmartPrefill(globals) {
     .then((response) => response.json())
     .then((data) => {
       formJson = data;
-      console.log(formJson);
     })
     .catch((error) => {
       console.error('Error fetching form JSON:', error);
@@ -208,7 +207,8 @@ function invokeSmartPrefill(globals) {
   const formData = new FormData();
   formData.append('mode', 'document');
   formData.append('attachment', attachmentData);
-  formData.append('formJson', formJson);
+  formJson[':items'] = { wizard: formJson[':items'].wizard }; // reducing the json size by retaining only the relevant data
+  formData.append('formJson', JSON.stringify(formJson));
 
   displayLoader('prefilling...');
   // invoke the smart prefill API
