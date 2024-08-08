@@ -210,6 +210,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
       annualIncomeOrItrAmount: '100000',
       comResidenceType: '2',
       ...compNameRelNum,
+      mobileMatch: '',
     },
   };
   return requestObj;
@@ -420,8 +421,10 @@ const executeInterfacePostRedirect = async (source, userRedirected, globals) => 
     const mobileMatch = globals.functions.exportData()?.aadhaar_otp_val_data?.result?.mobileValid === 'y';
     if (mobileMatch) {
       requestObj.requestString.authMode = 'EKYCIDCOM';
+      requestObj.requestString.mobileMatch = 'Y';
     } else {
       requestObj.requestString.authMode = 'IDCOM';
+      requestObj.requestString.mobileMatch = 'N';
     }
   }
   requestObj.requestString.comAddressType = comAddressType(globals, userRedirected); // set com address type
