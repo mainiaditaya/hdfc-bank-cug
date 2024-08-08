@@ -192,23 +192,42 @@ function showElement(elementName) {
 function invokeSmartPrefill(globals) {
   const smartPrefillFileAttachmentQname = '$form.corporateCardWizardView.yourDetailsPanel.smartPrefillAttachment';
   const filesMap = globals.functions.getFiles(smartPrefillFileAttachmentQname);
-  let attachmentData = null;
+  // let attachmentData = null;
   let formJson = null;
-  filesMap[smartPrefillFileAttachmentQname].then((files) => {
-    files.forEach((file) => {
-      attachmentData = file.data;
-    });
-  });
+  // filesMap[smartPrefillFileAttachmentQname].then((files) => {
+  //   files.forEach((file) => {
+  //     attachmentData = file.data;
+  //   });
+  // });
 
+  const fileInput = document.querySelector('[name="smartPrefillAttachment"]');
+  const file = fileInput.files[0];
   fetch(`${getSubmitBaseUrl()}/${window.location.pathname}/jcr:content/guideContainer.model.json`)
     .then((response) => response.json())
     .then((data) => {
-      formJson = data;
-      console.log(data);
+      formJson = JSON.stringify(data);
     })
     .catch((error) => {
       console.error('Error fetching form JSON:', error);
     });
+
+  // prepare the payload
+  const formData = new FormData();
+  formData.append('mode', 'document');
+  formData.append('attachment', file);
+  formData.append('formJson', formJson);
+
+  // invoke the smart prefill API
+  fetch('https://1o6jfrasi1.execute-api.ap-south-1.amazonaws.com/attachment', {
+    method: 'POST',
+    headers: {
+      'User-Agent': 'Insomnia/2023.5.7-adobe',
+    },
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error('Error:', error));
 }
 
 // eslint-disable-next-line import/prefer-default-export
