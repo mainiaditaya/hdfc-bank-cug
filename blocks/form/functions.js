@@ -45,6 +45,7 @@ import { initRestAPIDataSecurityServiceES6 } from '../../common/apiDataSecurity.
 
 import { moveWizardView } from '../../common/formutils.js';
 import { invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
+import { getSubmitBaseUrl } from './constant.js';
 
 const { currentFormContext } = corpCreditCardContext;
 
@@ -192,12 +193,22 @@ function invokeSmartPrefill(globals) {
   const smartPrefillFileAttachmentQname = '$form.corporateCardWizardView.yourDetailsPanel.smartPrefillAttachment';
   const filesMap = globals.functions.getFiles(smartPrefillFileAttachmentQname);
   let attachmentData = null;
+  let formJson = null;
   filesMap[smartPrefillFileAttachmentQname].then((files) => {
     files.forEach((file) => {
       attachmentData = file.data;
-      console.log(attachmentData);
     });
   });
+
+  fetch(`${getSubmitBaseUrl()}/${window.location.pathname}/jcr:content/guideContainer.model.json`)
+    .then((response) => response.json())
+    .then((data) => {
+      formJson = data;
+      console.log(data);
+    })
+    .catch((error) => {
+      console.error('Error fetching form JSON:', error);
+    });
 }
 
 // eslint-disable-next-line import/prefer-default-export
