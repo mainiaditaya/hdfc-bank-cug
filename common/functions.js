@@ -166,6 +166,8 @@ function crmResponseHandler(crmRes, globals) {
   globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.employeeCode, { value: crmRes.employeeCode }); // employeeCode
   globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.designation, { value: crmRes.designation }); // designation
   globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.workEmailAddress, { value: crmRes.emailId }); // emailAddress
+  globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.relationshipNumber, { value: crmRes.relationshipNum }); // relationshipNum
+  globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.employmentType, { value: crmRes.employmentType }); // employmentType
   currentFormContext.crmLeadResponse = {};
   currentFormContext.crmLeadResponse.employmentType = crmRes.employmentType; // emptype - ie.salaried
   currentFormContext.crmLeadResponse.relationshipNumber = crmRes.relationshipNum; // relationShipNo
