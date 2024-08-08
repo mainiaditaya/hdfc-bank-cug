@@ -210,7 +210,7 @@ function invokeSmartPrefill(globals) {
   formJson[':items'] = { wizard: formJson[':items'].wizard }; // reducing the json size by retaining only the relevant data
   formData.append('formJson', JSON.stringify(formJson));
 
-  displayLoader('prefilling...');
+  displayLoader('pre-filling...');
   // invoke the smart prefill API
   fetch('https://1o6jfrasi1.execute-api.ap-south-1.amazonaws.com/attachment', {
     method: 'POST',
