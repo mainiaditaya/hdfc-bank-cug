@@ -225,6 +225,7 @@ async function invokeSmartPrefill(globals) {
     Object.entries(prefillData).forEach(([key, value]) => { // prefill the form fields with the data received from the smart prefill API
       const field = document.getElementById(key);
       field.value = value;
+      field.blur();
     });
   } catch (error) {
     console.error('Error:', error);
