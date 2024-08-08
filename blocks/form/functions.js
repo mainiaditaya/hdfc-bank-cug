@@ -221,13 +221,13 @@ function invokeSmartPrefill(globals) {
   })
     .then((response) => response.json())
     .then((data) => {
-      prefillData = JSON.stringify(data);
+      prefillData = data;
       console.log('Prefill data:', prefillData);
     })
     .catch((error) => console.error('Error:', error))
     .finally(() => {
       hideLoaderGif();
-    })
+    });
 }
 
 // eslint-disable-next-line import/prefer-default-export
