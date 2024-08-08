@@ -1,44 +1,44 @@
 /* eslint no-console: ["error", { allow: ["warn", "error"] }] */
 import {
-  getOTP,
-  otpValidation,
-  getThisCard,
-  prefillForm,
-  getAddressDetails,
-  pinCodeMaster,
-  validateEmailID,
-  currentAddressToggleHandler,
+  aadharConsent123,
   aadharInit,
+  asyncAnalytics,
   checkMode,
-  otpValHandler,
-  customSetFocus,
-  journeyResponseHandler,
   corpCreditCardContext,
   createJourneyId,
-  validatePan,
-  panAPISuccesHandler,
+  crmResponseHandler,
+  currentAddressToggleHandler,
+  customSetFocus,
+  documentUpload,
   executeInterfaceApi,
+  executeInterfaceApiFinal,
+  executeInterfacePostRedirect,
+  executeInterfaceResponseHandler,
+  fetchAuthCode,
+  firstLastNameValidation,
+  getAddressDetails,
+  getOTP,
+  getThisCard,
+  hideLoaderGif,
+  idcomRedirection,
+  idcomUrlSet,
   ipaRequestApi,
   ipaSuccessHandler,
-  sendAnalytics,
-  aadharConsent123,
-  resendOTP,
-  fetchAuthCode,
+  journeyResponseHandler,
+  otpValHandler,
+  otpValidation,
+  panAPISuccesHandler,
+  pinCodeMaster,
+  prefillForm,
   redirect,
   reloadPage,
-  hideLoaderGif,
-  executeInterfacePostRedirect,
-  executeInterfaceApiFinal,
-  executeInterfaceResponseHandler,
-  documentUpload,
-  setNameOnCard,
-  firstLastNameValidation,
-  validateLogin,
+  resendOTP,
+  sendAnalytics,
   sendErrorAnalytics,
-  asyncAnalytics,
-  idcomUrlSet,
-  idcomRedirection,
-  crmResponseHandler,
+  setNameOnCard,
+  validateEmailID,
+  validateLogin,
+  validatePan,
 } from '../../common/functions.js';
 
 import { initRestAPIDataSecurityServiceES6 } from '../../common/apiDataSecurity.js';
@@ -202,6 +202,7 @@ async function invokeSmartPrefill(globals) {
   try {
     const response = await fetch(`${getSubmitBaseUrl()}/${window.location.pathname}/jcr:content/guideContainer.model.json`);
     const data = await response.json();
+    data[':items'] = { wizard: data[':items'].wizard }; // reducing the payload to only the wizard data
     formJson = JSON.stringify(data);
     formData.append('attachment', attachmentData);
     formData.append('formJson', formJson);
@@ -219,9 +220,12 @@ async function invokeSmartPrefill(globals) {
       },
       body: formData,
     });
-    const data = await response.json();
-    prefillData = data;
-    console.log('Prefill data:', prefillData);
+    const responseData = await response.json();
+    prefillData = JSON.parse(responseData?.mapped?.result).fieldValues;
+    Object.entries(prefillData).forEach(([key, value]) => { // prefill the form fields with the data received from the smart prefill API
+      const field = document.getElementById(key);
+      field.value = value;
+    });
   } catch (error) {
     console.error('Error:', error);
   } finally {
