@@ -190,7 +190,7 @@ function showElement(elementName) {
  * @param {scope} globals - The global object containing necessary globals form data.
  * @return {PROMISE}
  */
-function invokeSmartPrefill(globals) {
+async function invokeSmartPrefill(globals) {
   let formJson = null;
   let prefillData = null;
   const attachmentData = globals.form.corporateCardWizardView.yourDetailsPanel.smartPrefillAttachment.$value.data;
@@ -198,39 +198,35 @@ function invokeSmartPrefill(globals) {
   // prepare the payload for the smart prefill API
   const formData = new FormData();
   formData.append('mode', 'document');
-  fetch(`${getSubmitBaseUrl()}/${window.location.pathname}/jcr:content/guideContainer.model.json`)
-    .then((response) => response.json())
-    .then((data) => {
-      formJson = JSON.stringify(data);
-      formData.append('attachment', attachmentData);
-      formData.append('formJson', formJson);
 
-      displayLoader('pre-filling...');
-      // invoke the smart prefill API
-      fetch('https://1o6jfrasi1.execute-api.ap-south-1.amazonaws.com/attachment', {
-        method: 'POST',
-        headers: {
-          'User-Agent': 'Insomnia/2023.5.7-adobe',
-        },
-        body: formData,
-      })
-        .then((response) => response.json())
-        .then((pData) => {
-          prefillData = pData;
-          console.log('Prefill data:', prefillData);
-        })
-        .catch((error) => console.error('Error:', error))
-        .finally(() => {
-          hideLoaderGif();
-        });
-    })
-    .catch((error) => {
-      console.error('Error fetching form JSON:', error);
+  try {
+    const response = await fetch(`${getSubmitBaseUrl()}/${window.location.pathname}/jcr:content/guideContainer.model.json`);
+    const data = await response.json();
+    formJson = JSON.stringify(data);
+    formData.append('attachment', attachmentData);
+    formData.append('formJson', formJson);
+  } catch (error) {
+    console.error('Error fetching form JSON:', error);
+  }
+
+  displayLoader('pre-filling...');
+
+  try {
+    const response = await fetch('https://1o6jfrasi1.execute-api.ap-south-1.amazonaws.com/attachment', {
+      method: 'POST',
+      headers: {
+        'User-Agent': 'Insomnia/2023.5.7-adobe',
+      },
+      body: formData,
     });
-
-  // formJson[':items'] = { wizard: formJson[':items'].wizard }; // reducing the json size by retaining only the relevant data
-
-
+    const data = await response.json();
+    prefillData = data;
+    console.log('Prefill data:', prefillData);
+  } catch (error) {
+    console.error('Error:', error);
+  } finally {
+    hideLoaderGif();
+  }
 }
 
 // eslint-disable-next-line import/prefer-default-export
