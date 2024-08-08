@@ -46,6 +46,7 @@ import { initRestAPIDataSecurityServiceES6 } from '../../common/apiDataSecurity.
 import { moveWizardView } from '../../common/formutils.js';
 import { invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
 import { getSubmitBaseUrl } from './constant.js';
+import { displayLoader } from '../../common/makeRestAPI.js';
 
 const { currentFormContext } = corpCreditCardContext;
 
@@ -190,33 +191,26 @@ function showElement(elementName) {
  * @return {PROMISE}
  */
 function invokeSmartPrefill(globals) {
-  const smartPrefillFileAttachmentQname = '$form.corporateCardWizardView.yourDetailsPanel.smartPrefillAttachment';
-  const filesMap = globals.functions.getFiles(smartPrefillFileAttachmentQname);
-  // let attachmentData = null;
   let formJson = null;
-  // filesMap[smartPrefillFileAttachmentQname].then((files) => {
-  //   files.forEach((file) => {
-  //     attachmentData = file.data;
-  //   });
-  // });
+  let prefillData = null;
+  const attachmentData = globals.form.corporateCardWizardView.yourDetailsPanel.smartPrefillAttachment.$value.data;
 
-  const fileInput = document.querySelector('[name="smartPrefillAttachment"]');
-  const file = fileInput.files[0];
+  // prepare the payload for the smart prefill API
   fetch(`${getSubmitBaseUrl()}/${window.location.pathname}/jcr:content/guideContainer.model.json`)
     .then((response) => response.json())
     .then((data) => {
-      formJson = JSON.stringify(data);
+      formJson = data;
+      console.log(formJson);
     })
     .catch((error) => {
       console.error('Error fetching form JSON:', error);
     });
-
-  // prepare the payload
   const formData = new FormData();
   formData.append('mode', 'document');
-  formData.append('attachment', file);
+  formData.append('attachment', attachmentData);
   formData.append('formJson', formJson);
 
+  displayLoader('prefilling...');
   // invoke the smart prefill API
   fetch('https://1o6jfrasi1.execute-api.ap-south-1.amazonaws.com/attachment', {
     method: 'POST',
@@ -226,8 +220,14 @@ function invokeSmartPrefill(globals) {
     body: formData,
   })
     .then((response) => response.json())
-    .then((data) => console.log(data))
-    .catch((error) => console.error('Error:', error));
+    .then((data) => {
+      prefillData = JSON.stringify(data);
+      console.log('Prefill data:', prefillData);
+    })
+    .catch((error) => console.error('Error:', error))
+    .finally(() => {
+      hideLoaderGif();
+    })
 }
 
 // eslint-disable-next-line import/prefer-default-export
