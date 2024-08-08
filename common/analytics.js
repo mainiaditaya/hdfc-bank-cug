@@ -82,8 +82,8 @@ function sendPageloadEvent(journeyState, formData, pageName) {
   switch (currentFormContext.action) {
     case 'check offers': {
       digitalData.page.pageInfo.pageName = PAGE_NAME['get this card'];
-      digitalData.card.selectedCard = currentFormContext?.productCode;
-      digitalData.card.eligibleCard = currentFormContext?.productCode;
+      digitalData.card.selectedCard = currentFormContext?.productCode || currentFormContext.crmLeadResponse.productCode;
+      digitalData.card.eligibleCard = currentFormContext?.productCode || currentFormContext.crmLeadResponse.productCode;
       break;
     }
     case 'confirmation': {
@@ -157,10 +157,10 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
         };
       }
       Object.assign(digitalData.formDetails, {
-        employmentType: formData?.form?.employmentType,
+        employmentType: formData?.form?.employmentType || currentFormContext?.crmLeadResponse?.employmentType,
         companyName: formData?.form?.companyName,
         designation: formData?.form?.designation,
-        relationshipNumber: formData?.form?.relationshipNumber,
+        relationshipNumber: formData?.form?.relationshipNumber || currentFormContext?.crmLeadResponse?.relationshipNumber,
       });
       currentFormContext.action = 'check offers';
       if (window) {
@@ -175,7 +175,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
 
     case 'get this card': {
       digitalData.card = {
-        selectedCard: formData?.form?.productCode,
+        selectedCard: formData?.form?.productCode || currentFormContext.crmLeadResponse.productCode,
         annualFee: formData?.form?.joiningandRenewalFee,
       };
       // digitalData.event = {

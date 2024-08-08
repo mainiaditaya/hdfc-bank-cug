@@ -399,11 +399,11 @@ const finalDapFetchRes = async () => {
   };
   try {
     const data = await invokeJourneyDropOffByParam('', '', journeyId);
-    const journeyDropOffParamLast = data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1];
+    const journeyDropOffParamLast = data.formData.journeyStateInfo?.find((item) => item?.state === 'CUSTOMER_FINAL_DAP_SUCCESS');
     finalDap.journeyParamState = journeyDropOffParamLast.state;
     finalDap.journeyParamStateInfo = journeyDropOffParamLast.stateInfo;
-    const checkFinalDapSuccess = (journeyDropOffParamLast.state === 'CUSTOMER_FINAL_DAP_SUCCESS');
-    if (checkFinalDapSuccess) {
+    // const checkFinalDapSuccess = (journeyDropOffParamLast.state === 'CUSTOMER_FINAL_DAP_SUCCESS');
+    if (journeyDropOffParamLast) {
       return eventHandler.successMethod(journeyDropOffParamLast);
     }
     const err = 'Bad response';
