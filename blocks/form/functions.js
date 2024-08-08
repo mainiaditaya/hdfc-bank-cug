@@ -182,8 +182,27 @@ function showElement(elementName) {
     elm.style.display = 'block';
   }
 }
+
+/**
+ *  invokes smart prefill
+ * @param {scope} globals - The global object containing necessary globals form data.
+ * @return {PROMISE}
+ */
+function invokeSmartPrefill(globals) {
+  const smartPrefillFileAttachmentQname = '$form.corporateCardWizardView.yourDetailsPanel.smartPrefillAttachment';
+  const filesMap = globals.functions.getFiles(smartPrefillFileAttachmentQname);
+  let attachmentData = null;
+  filesMap[smartPrefillFileAttachmentQname].then((files) => {
+    files.forEach((file) => {
+      attachmentData = file.data;
+      console.log(attachmentData);
+    });
+  });
+}
+
 // eslint-disable-next-line import/prefer-default-export
 export {
+  invokeSmartPrefill,
   getFullName,
   onWizardInit,
   getOTP,
