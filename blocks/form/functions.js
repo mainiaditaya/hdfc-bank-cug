@@ -225,7 +225,7 @@ async function invokeSmartPrefill(globals) {
     Object.entries(prefillData).forEach(([key, value]) => { // prefill the form fields with the data received from the smart prefill API
       const field = window.myForm.getElement(key); // globals needs qualified name to set the value currently we have only ids in prefill data
       field.value = value;
-      globals.form.setFocus(key);
+      globals.functions.setFocus(key);
     });
   } catch (error) {
     console.error('Error:', error);
