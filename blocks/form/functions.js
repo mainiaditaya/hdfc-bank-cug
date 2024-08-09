@@ -198,20 +198,11 @@ async function invokeSmartPrefill(globals) {
   // prepare the payload for the smart prefill API
   const formData = new FormData();
   formData.append('mode', 'document');
-
-  try {
-    const response = await fetch(`${getSubmitBaseUrl()}/${window.location.pathname}/jcr:content/guideContainer.model.json`);
-    const data = await response.json();
-    data[':items'] = { wizard: data[':items'].wizard }; // reducing the payload to only the wizard data
-    formJson = JSON.stringify(data);
-    formData.append('attachment', attachmentData);
-    formData.append('formJson', formJson);
-  } catch (error) {
-    console.error('Error fetching form JSON:', error);
-  }
+  formJson = JSON.stringify(window.myForm._jsonModel);
+  formData.append('attachment', attachmentData);
+  formData.append('formJson', formJson);
 
   displayLoader('pre-filling...');
-
   try {
     const response = await fetch('https://1o6jfrasi1.execute-api.ap-south-1.amazonaws.com/attachment', {
       method: 'POST',
