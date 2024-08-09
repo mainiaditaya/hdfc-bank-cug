@@ -6,6 +6,7 @@ import * as DOM_API from '../domutils/domutils.js';
 import { invokeJourneyDropOffUpdate } from './journey-utils.js';
 import { urlPath } from '../../common/formutils.js';
 import { ENDPOINTS } from '../../common/constants.js';
+import { sendPageloadEvent } from '../../common/analytics.js';
 
 const { displayLoader, hideLoaderGif, moveWizardView } = DOM_API;
 
@@ -219,6 +220,7 @@ const successPannelMethod = async (data, stateInfoData) => {
     } else if (kycStatus === 'OVD') {
       vkycProceedButton.setAttribute('data-visible', false);
       vkycConfirmText.setAttribute('data-visible', true);
+      vkycConfirmText.innerText = 'Bank representative will visit you for verification';
       offerLink.setAttribute('data-visible', false); // Adjusted assumption for offerLink
     } else if (mobileMatch && kycStatus === 'aadhaar' && addressEditFlag === 'Y') {
       vkycProceedButton.setAttribute('data-visible', false);
@@ -239,8 +241,7 @@ const successPannelMethod = async (data, stateInfoData) => {
   }
   currentFormContext.action = 'confirmation';
   currentFormContext.pageGotRedirected = true;
-  // temporarly commented and it will be enabled after analytics merge.
-  // Promise.resolve(sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', stateInfoData));
+  Promise.resolve(sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', stateInfoData, 'CONFIRMATION_Page_name'));
   const mobileNumber = stateInfoData.form.login.registeredMobileNumber;
   const leadProfileId = stateInfoData.leadProifileId;
   const journeyId = stateInfoData.currentFormContext.journeyID;
@@ -327,12 +328,11 @@ const finalDapFetchRes = async () => {
   };
   try {
     const data = await invokeJourneyDropOffByParam('', '', journeyId);
-    const journeyDropOffParamLast = data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1];
-    finalDap.journeyParamState = journeyDropOffParamLast.state;
-    finalDap.journeyParamStateInfo = journeyDropOffParamLast.stateInfo;
-    const checkFinalDapSuccess = (journeyDropOffParamLast.state === 'CUSTOMER_FINAL_DAP_SUCCESS');
-    if (checkFinalDapSuccess) {
-      return eventHandler.successMethod(journeyDropOffParamLast);
+    const finalDapSuccessData = data.formData.journeyStateInfo?.find((item) => item?.state === 'CUSTOMER_FINAL_DAP_SUCCESS');
+    finalDap.journeyParamState = finalDapSuccessData.state;
+    finalDap.journeyParamStateInfo = finalDapSuccessData.stateInfo;
+    if (finalDapSuccessData) {
+      return eventHandler.successMethod(finalDapSuccessData);
     }
     const err = 'Bad response';
     throw err;

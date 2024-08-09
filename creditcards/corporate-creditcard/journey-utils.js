@@ -30,12 +30,12 @@ function createJourneyId(visitMode, journeyAbbreviation, channel, globals) {
 const getCurrentContext = () => currentFormContext;
 
 /**
-   * @name invokeJourneyDropOff to log on success and error call backs of api calls
-   * @param {state} state
-   * @param {string} mobileNumber
-   * @param {Object} globals - globals variables object containing form configurations.
-   * @return {PROMISE}
-   */
+ * @name invokeJourneyDropOff to log on success and error call backs of api calls
+ * @param {state} state
+ * @param {string} mobileNumber
+ * @param {Object} globals - globals variables object containing form configurations.
+ * @return {PROMISE}
+ */
 const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
   const DEFAULT_MOBILENO = '9999999999';
   const journeyJSONObj = {

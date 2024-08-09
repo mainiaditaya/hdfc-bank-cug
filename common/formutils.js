@@ -12,6 +12,7 @@ const {
   addDisableClass,
   createLabelInElement,
   decorateStepper,
+  attachRedirectOnClick,
 } = DOM_API; // DOM_MANIPULATE_CODE_FUNCTION
 
 const { BASEURL } = CONSTANT;
@@ -421,4 +422,5 @@ export {
   createLabelInElement,
   decorateStepper,
   ageValidator,
+  attachRedirectOnClick,
 };
