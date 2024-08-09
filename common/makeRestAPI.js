@@ -36,7 +36,8 @@ function hideLoaderGif() {
 * @param {object} payload - The data payload to send with the request.
 * @returns {*} - The JSON response from the server.
 */
-async function fetchJsonResponse(url, payload, method, loader = false) {
+async function fetchJsonResponse(url, payload, method, loader = false, globals) {
+  const currentDate = new Date();
   try {
     if (env === 'dev') {
       return fetch(url, {
@@ -46,6 +47,8 @@ async function fetchJsonResponse(url, payload, method, loader = false) {
         headers: {
           'Content-type': 'text/plain',
           Accept: 'application/json',
+          journeyID: globals ? (globals.form.runtime.journeyId.$value || globals.functions.exportData()?.currentFormContext.journeyId) : null,
+          iat: btoa(currentDate.getTime()),
         },
       })
         .then((res) => {
