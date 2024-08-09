@@ -143,6 +143,10 @@ main .section.form-container {
                         border-color: transparent transparent var(--color-input-border-default) transparent; 
                         outline: transparent transparent var(--color-input-border-default) transparent;
                     }
+
+                    input::placeholder {
+                        font-size: medium;
+                    }
                 }
 
                 .field-secondspanel {
@@ -196,11 +200,15 @@ main .section.form-container {
                 }
             }
         }
+
+        .field-aem-otppanel {
+            .field-aem-otpicon { margin: 0 auto 0 90px !important; }
+        }
     }
 }
 
-/* Mobile view */
-@media (350px <=width <=767px) {
+/* Small mobile view */
+@media (width < 350px) {
     .semi-form .field-aem-otppanel {
         .field-aem-otpicon { margin: 0 auto 0 90px !important; }
     }
