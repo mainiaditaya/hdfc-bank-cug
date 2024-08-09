@@ -476,6 +476,22 @@ function idcomRedirection() {
   window.location.href = currentFormContext.ID_COM_URL;
 }
 
+/**
+* Initialize form session.
+* @name formSessionInit
+* @param {string} journeyID
+* @return {PROMISE}
+*/
+function formSessionInit(journeyID) {
+  const jsonObjForSessionApi = {};
+  jsonObjForSessionApi.requestString = {};
+  jsonObjForSessionApi.requestString.jid = journeyID;
+  jsonObjForSessionApi.requestString.browserFingerPrint = '';
+  jsonObjForSessionApi.requestString.clientIp = '';
+  jsonObjForSessionApi.requestString.payloadEncrypted = '';
+  const path = urlPath(endpoints.journeyInit);
+  return fetchJsonResponse(path, jsonObjForSessionApi, 'POST', true);
+}
 export {
   getOTP,
   otpValidation,
@@ -516,4 +532,5 @@ export {
   idcomUrlSet,
   idcomRedirection,
   crmResponseHandler,
+  formSessionInit,
 };

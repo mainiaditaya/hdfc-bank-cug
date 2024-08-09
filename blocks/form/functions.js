@@ -39,6 +39,7 @@ import {
   idcomUrlSet,
   idcomRedirection,
   crmResponseHandler,
+  formSessionInit,
 } from '../../common/functions.js';
 
 import { initRestAPIDataSecurityServiceES6 } from '../../common/apiDataSecurity.js';
@@ -233,4 +234,5 @@ export {
   idcomRedirection,
   initRestAPIDataSecurityServiceES6,
   crmResponseHandler,
+  formSessionInit,
 };
