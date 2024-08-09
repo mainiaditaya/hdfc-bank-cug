@@ -2897,6 +2897,24 @@ class FunctionRuntimeImpl {
                 },
                 _signature: []
             },
+            awaitFn: {
+                _func: async (args, data, interpreter) => {
+                    const success = args[1];
+                    const currentField = interpreter.globals.$field;
+                    try {
+                        const result = await args[0];
+                        defaultFunctions.dispatchEvent._func([currentField, success, result], data, interpreter);
+                    }
+                    catch (err) {
+                        const error = args[2];
+                        if (error) {
+                            defaultFunctions.dispatchEvent._func([currentField, error, err], data, interpreter);
+                        }
+                    }
+                    return {};
+                },
+                _signature: []
+            },
             addInstance: {
                 _func: (args, data, interpreter) => {
                     const element = args[0];
