@@ -30,26 +30,33 @@ function hideLoaderGif() {
 
 /**
 * Initiates an http call with JSON payload to the specified URL using the specified method.
-*
-* @param {string} url - The URL to which the request is sent.
-* @param {string} [method='POST'] - The HTTP method to use for the request (default is 'POST').
-* @param {object} payload - The data payload to send with the request.
-* @returns {*} - The JSON response from the server.
-*/
-async function fetchJsonResponse(url, payload, method, loader = false, globals) {
+ *
+ * @param {string} url - The URL to which the request is sent.
+ * @param {object} payload - The data payload to send with the request.
+ * @param {string} [method='POST'] - The HTTP method to use for the request (default is 'POST').
+ * @param {boolean} [loader=false] - Whether to hide the loader GIF after the response is received (default is false).
+ * @param {string} [journeyID] - The journey ID, optional; only passed if including `iat` and `journeyID` in headers.
+ * @returns {Promise<*>} - A promise that resolves to the JSON response from the server.
+ */
+// eslint-disable-next-line default-param-last
+async function fetchJsonResponse(url, payload, method, loader = false, journeyID) {
   const currentDate = new Date();
+  const sessionHeader = {
+    journeyID,
+    iat: btoa(currentDate.getTime()),
+  };
+  const applicationHeader = {
+    'Content-type': 'text/plain',
+    Accept: 'application/json',
+  };
+  const headers = journeyID ? { ...applicationHeader, ...sessionHeader } : applicationHeader;
   try {
     if (env === 'dev') {
       return fetch(url, {
         method,
         body: payload ? JSON.stringify(payload) : null,
         mode: 'cors',
-        headers: {
-          'Content-type': 'text/plain',
-          Accept: 'application/json',
-          journeyID: globals ? (globals.form.runtime.journeyId.$value || globals.functions.exportData()?.currentFormContext.journeyId) : null,
-          iat: btoa(currentDate.getTime()),
-        },
+        headers,
       })
         .then((res) => {
           if (loader) hideLoaderGif();

@@ -482,7 +482,7 @@ function idcomRedirection() {
 * @param {string} journeyID
 * @return {PROMISE}
 */
-function formSessionInit(journeyID, globals) {
+function formSessionInit(journeyID) {
   const jsonObjForSessionApi = {};
   jsonObjForSessionApi.requestString = {};
   jsonObjForSessionApi.requestString.jid = journeyID;
@@ -490,7 +490,7 @@ function formSessionInit(journeyID, globals) {
   jsonObjForSessionApi.requestString.clientIp = '';
   jsonObjForSessionApi.requestString.payloadEncrypted = '';
   const path = urlPath(endpoints.journeyInit);
-  return fetchJsonResponse(path, jsonObjForSessionApi, 'POST', true, globals);
+  return fetchJsonResponse(path, jsonObjForSessionApi, 'POST', true, journeyID);
 }
 export {
   getOTP,
