@@ -2,7 +2,7 @@ import { ENDPOINTS, CURRENT_FORM_CONTEXT as currentFormContext } from '../../com
 import { santizedFormDataWithContext, urlPath } from '../../common/formutils.js';
 import { invokeJourneyDropOffUpdate } from './journey-utils.js';
 import { restAPICall } from '../../common/makeRestAPI.js';
-import { sendPageloadEvent } from '../../common/analytics.js';
+import { sendPageloadEvent } from './analytics.js';
 
 const getCurrentDateAndTime = (dobFormatNo) => {
   /*

@@ -20,6 +20,7 @@ import {
   CURRENT_FORM_CONTEXT as currentFormContext,
   FORM_RUNTIME as formRuntime,
 } from '../../common/constants.js';
+import { sendAnalytics } from './analytics.js';
 
 const GENDER_MAP = {
   M: '1',
@@ -262,9 +263,11 @@ const executeInterfaceApiFinal = (globals) => {
 /**
  * @name executeInterfaceResponseHandler
  * @param {object} resPayload
+ * @param {object} globals
  */
-const executeInterfaceResponseHandler = (resPayload) => {
+const executeInterfaceResponseHandler = (resPayload, globals) => {
   currentFormContext.executeInterfaceResPayload = resPayload;
+  sendAnalytics('get this card', resPayload, 'CUSTOMER_CARD_SELECTED', globals);
 };
 
 /**
