@@ -174,6 +174,32 @@ main .section.form-container {
     }
 }
 
+/* Tablet view */
+@media (width < 767px) {
+    .semi-form {
+        .field-aem-identifierpanel {
+            .field-mobilepanel { display: grid; 
+                
+                .field-aem-countrycode { 
+                    grid-column: span 1; 
+                    
+                    input {
+                        margin-left: 0;
+                        padding: 0;
+                        width: 242%;
+                        text-align: center;
+                    }
+                }
+
+                .field-aem-mobilenum {
+                    grid-column: span 11;
+                }
+            }
+        }
+    }
+}
+
+/* Mobile view */
 @media (350px <=width <=767px) {
     .semi-form .field-aem-otppanel {
         .field-aem-otpicon { margin: 0 auto 0 90px !important; }
