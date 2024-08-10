@@ -160,8 +160,7 @@ function customSetFocus(errorMessage, numRetries, globals) {
  * @name crmResponseHandler - crm response handler
  * @param {object} globals
  */
-function crmResponseHandler(otpRes, globals) {
-  const crmRes = otpRes?.crmLeadResponse;
+function crmResponseHandler(crmRes, globals) {
   globals.functions.setProperty(globals.form.loginPanel.mobilePanel.registeredMobileNumber, { value: crmRes.mobileNumber }); // working // mobNo
   globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.companyName, { value: crmRes.company }); // companyNo
   globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.employeeCode, { value: crmRes.employeeCode }); // employeeCode
@@ -223,8 +222,8 @@ function getOTP(mobileNumber, pan, dob, globals) {
   };
   const path = urlPath(endpoints.otpGen);
   formRuntime?.getOtpLoader();
-  return fetchJsonResponse(path, jsonObj, 'POST', true, globals); // enable iat,jid in session header
-  // return fetchJsonResponse(path, jsonObj, 'POST', true);
+  // return fetchJsonResponse(path, jsonObj, 'POST', true, globals); // enable iat,jid in session header
+  return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 
 /**
