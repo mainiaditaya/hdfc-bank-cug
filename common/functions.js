@@ -223,13 +223,8 @@ function getOTP(mobileNumber, pan, dob, globals) {
   };
   const path = urlPath(endpoints.otpGen);
   formRuntime?.getOtpLoader();
-  // (async () => {
-  //   /* this async call has to be removed  - once  function : crmResponseHandler has been added to value commit of form */
-  //   const response = await Promise.resolve(fetchJsonResponse(path, jsonObj, 'POST'));
-  //   console.log(response, 'response');
-  //   crmResponseHandler(response.crmLeadResponse, globals);
-  // })();
-  return fetchJsonResponse(path, jsonObj, 'POST', true, globals);
+  return fetchJsonResponse(path, jsonObj, 'POST', true, globals); // enable iat,jid in session header
+  // return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 
 /**
@@ -258,7 +253,8 @@ function otpValidation(mobileNumber, pan, dob, otpNumber, globals) {
   };
   const path = urlPath(endpoints.otpValFetchAssetDemog);
   formRuntime?.otpValLoader();
-  return fetchJsonResponse(path, jsonObj, 'POST', true, globals);
+  // return fetchJsonResponse(path, jsonObj, 'POST', true, globals); // enable iat,jid in session header
+  return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 
 function getOS() {
