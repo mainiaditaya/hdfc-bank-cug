@@ -39,17 +39,17 @@ function hideLoaderGif() {
  * @returns {Promise<*>} - A promise that resolves to the JSON response from the server.
  */
 // eslint-disable-next-line default-param-last
-async function fetchJsonResponse(url, payload, method, loader = false, journeyID) {
+async function fetchJsonResponse(url, payload, method, loader = false, globals) {
   const currentDate = new Date();
   const sessionHeader = {
-    journeyID,
+    journeyID: globals ? (globals.form.runtime.journeyId.$value || globals.functions.exportData()?.currentFormContext.journeyId) : null,
     iat: btoa(currentDate.getTime()),
   };
   const applicationHeader = {
     'Content-type': 'text/plain',
     Accept: 'application/json',
   };
-  const headers = journeyID ? { ...applicationHeader, ...sessionHeader } : applicationHeader;
+  const headers = globals ? { ...applicationHeader, ...sessionHeader } : applicationHeader;
   try {
     if (env === 'dev') {
       return fetch(url, {

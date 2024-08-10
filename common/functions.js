@@ -160,7 +160,8 @@ function customSetFocus(errorMessage, numRetries, globals) {
  * @name crmResponseHandler - crm response handler
  * @param {object} globals
  */
-function crmResponseHandler(crmRes, globals) {
+function crmResponseHandler(otpRes, globals) {
+  const crmRes = otpRes?.crmLeadResponse;
   globals.functions.setProperty(globals.form.loginPanel.mobilePanel.registeredMobileNumber, { value: crmRes.mobileNumber }); // working // mobNo
   globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.companyName, { value: crmRes.company }); // companyNo
   globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.employeeCode, { value: crmRes.employeeCode }); // employeeCode
@@ -222,13 +223,13 @@ function getOTP(mobileNumber, pan, dob, globals) {
   };
   const path = urlPath(endpoints.otpGen);
   formRuntime?.getOtpLoader();
-  (async () => {
-    /* this async call has to be removed  - once  function : crmResponseHandler has been added to value commit of form */
-    const response = await Promise.resolve(fetchJsonResponse(path, jsonObj, 'POST'));
-    console.log(response, 'response');
-    crmResponseHandler(response.crmLeadResponse, globals);
-  })();
-  return fetchJsonResponse(path, jsonObj, 'POST', true);
+  // (async () => {
+  //   /* this async call has to be removed  - once  function : crmResponseHandler has been added to value commit of form */
+  //   const response = await Promise.resolve(fetchJsonResponse(path, jsonObj, 'POST'));
+  //   console.log(response, 'response');
+  //   crmResponseHandler(response.crmLeadResponse, globals);
+  // })();
+  return fetchJsonResponse(path, jsonObj, 'POST', true, globals);
 }
 
 /**
@@ -238,7 +239,7 @@ function getOTP(mobileNumber, pan, dob, globals) {
  * @param {object} dob
  * @return {PROMISE}
  */
-function otpValidation(mobileNumber, pan, dob, otpNumber) {
+function otpValidation(mobileNumber, pan, dob, otpNumber, globals) {
   const referenceNumber = `AD${getTimeStamp(new Date())}` ?? '';
   currentFormContext.referenceNumber = referenceNumber;
   const jsonObj = {
@@ -257,7 +258,7 @@ function otpValidation(mobileNumber, pan, dob, otpNumber) {
   };
   const path = urlPath(endpoints.otpValFetchAssetDemog);
   formRuntime?.otpValLoader();
-  return fetchJsonResponse(path, jsonObj, 'POST', true);
+  return fetchJsonResponse(path, jsonObj, 'POST', true, globals);
 }
 
 function getOS() {
@@ -482,7 +483,7 @@ function idcomRedirection() {
 * @param {string} journeyID
 * @return {PROMISE}
 */
-function formSessionInit(journeyID) {
+function formSessionInit(journeyID, globals) {
   const jsonObjForSessionApi = {};
   jsonObjForSessionApi.requestString = {};
   jsonObjForSessionApi.requestString.jid = journeyID;
@@ -490,7 +491,7 @@ function formSessionInit(journeyID) {
   jsonObjForSessionApi.requestString.clientIp = '';
   jsonObjForSessionApi.requestString.payloadEncrypted = '';
   const path = urlPath(endpoints.journeyInit);
-  return fetchJsonResponse(path, jsonObjForSessionApi, 'POST', true, journeyID);
+  return fetchJsonResponse(path, jsonObjForSessionApi, 'POST', true, globals);
 }
 export {
   getOTP,
