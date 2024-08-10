@@ -222,7 +222,6 @@ function getOTP(mobileNumber, pan, dob, globals) {
   };
   const path = urlPath(endpoints.otpGen);
   formRuntime?.getOtpLoader();
-  // return fetchJsonResponse(path, jsonObj, 'POST', true, globals); // enable iat,jid in session header
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 
@@ -233,7 +232,7 @@ function getOTP(mobileNumber, pan, dob, globals) {
  * @param {object} dob
  * @return {PROMISE}
  */
-function otpValidation(mobileNumber, pan, dob, otpNumber, globals) {
+function otpValidation(mobileNumber, pan, dob, otpNumber) {
   const referenceNumber = `AD${getTimeStamp(new Date())}` ?? '';
   currentFormContext.referenceNumber = referenceNumber;
   const jsonObj = {
@@ -252,7 +251,6 @@ function otpValidation(mobileNumber, pan, dob, otpNumber, globals) {
   };
   const path = urlPath(endpoints.otpValFetchAssetDemog);
   formRuntime?.otpValLoader();
-  // return fetchJsonResponse(path, jsonObj, 'POST', true, globals); // enable iat,jid in session header
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 

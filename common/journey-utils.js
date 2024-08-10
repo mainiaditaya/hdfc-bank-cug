@@ -68,7 +68,6 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
   };
   const url = urlPath(endpoints.journeyDropOff);
   const method = 'POST';
-  // return journeyJSONObj.RequestPayload.formData.journeyID ? fetchJsonResponse(url, journeyJSONObj, method, false, globals) : null; // enable iat,jid in session header
   return journeyJSONObj.RequestPayload.formData.journeyID ? fetchJsonResponse(url, journeyJSONObj, method) : null;
 };
 
