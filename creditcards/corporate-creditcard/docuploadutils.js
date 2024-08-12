@@ -7,6 +7,7 @@ import {
 } from '../../common/makeRestAPI.js';
 import { urlPath, generateUUID, moveWizardView } from '../../common/formutils.js';
 import { ENDPOINTS, CURRENT_FORM_CONTEXT as currentFormContext } from '../../common/constants.js';
+import { sendAnalytics } from './analytics.js';
 /**
  * Creates a FormData payload for document upload.
  *
@@ -79,6 +80,7 @@ const documentUpload = async (globals) => {
   };
   const apiEndPoint = urlPath(ENDPOINTS.docUpload);
   const method = 'POST';
+  sendAnalytics('document upload continue', { errorCode: '0000', errorMessage: 'Success' }, 'JOURNEYSTATE', globals); // should be called in form
   const formContextCallbackData = globals.functions.exportData()?.currentFormContext || currentFormContext;
   const mobileNumber = globals.functions.exportData().form.login.registeredMobileNumber || globals.form.loginPanel.mobilePanel.registeredMobileNumber.$value;
   const leadProfileId = globals.functions.exportData().leadProifileId || globals.form.runtime.leadProifileId.$value;
@@ -116,6 +118,9 @@ const documentUpload = async (globals) => {
     throw new Error('Error in File');
   } catch (error) {
     hideLoaderGif();
+    globals.functions.setProperty(globals.form.corporateCardWizardView, { visible: false });
+    globals.functions.setProperty(globals.form.resultPanel, { visible: true });
+    globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
   }
 };
 
