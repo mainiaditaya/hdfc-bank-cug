@@ -158,7 +158,9 @@ function customSetFocus(errorMessage, numRetries, globals) {
  * @name crmResponseHandler - crm response handler
  * @param {object} globals
  */
-function crmResponseHandler(crmRes, globals) {
+function crmResponseHandler(otpRes, globals) {
+  if (!otpRes) return;
+  const crmRes = otpRes?.crmLeadResponse;
   globals.functions.setProperty(globals.form.loginPanel.mobilePanel.registeredMobileNumber, { value: crmRes.mobileNumber }); // working // mobNo
   globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.companyName, { value: crmRes.company }); // companyNo
   globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.employeeCode, { value: crmRes.employeeCode }); // employeeCode
