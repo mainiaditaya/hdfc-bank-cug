@@ -21,7 +21,6 @@ import {
 
 import {
   corpCreditCardContext,
-  invokeJourneyDropOff,
   invokeJourneyDropOffUpdate,
 } from './journey-utils.js';
 import {
@@ -136,7 +135,6 @@ function checkMode(globals) {
     globals.functions.setProperty(globals.form.consentFragment, { visible: false });
     globals.functions.setProperty(globals.form.resultPanel, { visible: true });
     globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
-    invokeJourneyDropOff('CRM_LEAD_FAILURE', '9999999999', globals);
   }
 }
 
