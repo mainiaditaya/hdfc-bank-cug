@@ -2,6 +2,8 @@
 
 const JOURNEY_NAME = 'SMART_EMI_JOURNEY';
 
+const FORM_NAME = 'Corporate Credit Card';
+
 const CHANNEL = 'ADOBE_WEB';
 
 const ERROR_MSG = {
@@ -27,4 +29,5 @@ export {
   MAX_OTP_RESEND_COUNT,
   CURRENT_FORM_CONTEXT,
   CHANNEL,
+  FORM_NAME,
 };
