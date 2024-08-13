@@ -164,23 +164,27 @@ const isCaptcha = function (item) {
     return fieldType === 'captcha';
 };
 function deepClone(obj, idGenerator) {
+    if (obj === null || typeof obj !== 'object') {
+        return obj;
+    }
+
     let result;
-    if (obj instanceof Array) {
-        result = [];
-        result = obj.map(x => deepClone(x, idGenerator));
-    }
-    else if (typeof obj === 'object' && obj !== null) {
+    if (Array.isArray(obj)) {
+        result = new Array(obj.length);
+        for (let i = 0; i < obj.length; i++) {
+            result[i] = deepClone(obj[i], idGenerator);
+        }
+    } else {
         result = {};
-        Object.entries(obj).forEach(([key, value]) => {
-            result[key] = deepClone(value, idGenerator);
-        });
+        for (const key of Object.keys(obj)) {
+            result[key] = deepClone(obj[key], idGenerator);
+        }
     }
-    else {
-        result = obj;
-    }
+
     if (idGenerator && result && result.id) {
         result.id = idGenerator();
     }
+
     return result;
 }
 const jsonString = (obj) => {
@@ -300,9 +304,13 @@ class DataGroup extends DataValue {
             return Object.values(this.$_items).filter(x => typeof x !== 'undefined').map(x => x.$value);
         }
         else {
-            return Object.fromEntries(Object.values(this.$_items).filter(x => typeof x !== 'undefined').map(x => {
-                return [x.$name, x.$value];
-            }));
+            const result = {};
+            for (const item of Object.values(this.$_items)) {
+                if (typeof item !== 'undefined') {
+                    result[item.$name] = item.$value;
+                }
+            }
+            return result;
         }
     }
     get $length() {
@@ -2216,14 +2224,12 @@ class Container extends Scriptable {
             this.notifyDependents(change);
         }
     }
+
     get enabled() {
-        if (this.parent?.enabled !== undefined) {
-            return !this.parent?.enabled ? false : this._jsonModel.enabled;
-        }
-        else {
-            return this._jsonModel.enabled;
-        }
+        const parentEnabled = this.parent?.enabled;
+        return parentEnabled ? this._jsonModel.enabled : parentEnabled === undefined ? this._jsonModel.enabled : false;
     }
+
     set enabled(e) {
         this._setProperty('enabled', e, true, this.notifyChildren);
     }
@@ -3571,12 +3577,8 @@ class Field extends Scriptable {
         this._setProperty('readOnly', e);
     }
     get enabled() {
-        if (this.parent.enabled !== undefined) {
-            return this.parent.enabled === false ? false : this._jsonModel.enabled;
-        }
-        else {
-            return this._jsonModel.enabled;
-        }
+        const parentEnabled = this.parent?.enabled;
+        return parentEnabled ? this._jsonModel.enabled : parentEnabled === undefined ? this._jsonModel.enabled : false;
     }
     set enabled(e) {
         this._setProperty('enabled', e);
