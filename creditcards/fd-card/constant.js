@@ -25,7 +25,7 @@ const FD_ENDPOINTS = {
 };
 
 const OTP_TIMER = 30;
-
+const FORM_NAME = 'FD lien card';
 const MAX_OTP_RESEND_COUNT = 3;
 
 export {
@@ -36,4 +36,5 @@ export {
   OTP_TIMER,
   FD_ENDPOINTS,
   MAX_OTP_RESEND_COUNT,
+  FORM_NAME,
 };

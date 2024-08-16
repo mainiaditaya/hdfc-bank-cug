@@ -18,13 +18,13 @@ import {
 } from './makeRestAPI.js';
 
 import * as CONSTANT from './constants.js';
-import createJourneyId from './journey-utils.js';
+// import createJourneyId from './journey-utils.js';
 
 const {
   ENDPOINTS,
   CURRENT_FORM_CONTEXT: currentFormContext,
 } = CONSTANT;
-const { JOURNEY_NAME: journeyNameConstant } = CC_CONSTANT;
+// const { JOURNEY_NAME: journeyNameConstant } = CC_CONSTANT;
 /**
  * Detects the operating system of the user's device.
  *
