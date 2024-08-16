@@ -114,13 +114,13 @@ function checkELigibilityHandler(resPayload, globals) {
   // globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_txnSelected.$value
 
   // works for single and existing one.
-  globals.functions.setProperty(billedTxnPannel[0]?.aem_TxnAmt, { value: ccBilledData[0]?.amount });
+  globals.functions.setProperty(billedTxnPannel[0]?.aem_TxnAmt, { value: `${MISC.rupeesUnicode} ${ccBilledData[0]?.amount}` });
   globals.functions.setProperty(billedTxnPannel[0]?.aem_TxnDate, { value: ccBilledData[0]?.date });
   globals.functions.setProperty(billedTxnPannel[0]?.aem_TxnID, { value: ccBilledData[0]?.id });
   globals.functions.setProperty(billedTxnPannel[0]?.billed_TxnName, { value: ccBilledData[0]?.name });
 
   globals.functions.dispatchEvent(txnList, 'addItem');
-  globals.functions.setProperty(billedTxnPannel[1]?.aem_TxnAmt, { value: ccBilledData[1]?.amount });
+  globals.functions.setProperty(billedTxnPannel[1]?.aem_TxnAmt, { value: `${MISC.rupeesUnicode} ${ccBilledData[1]?.amount}` });
   globals.functions.setProperty(billedTxnPannel[1]?.aem_TxnDate, { value: ccBilledData[1]?.date });
   globals.functions.setProperty(billedTxnPannel[1]?.aem_TxnID, { value: ccBilledData[1]?.id });
   globals.functions.setProperty(billedTxnPannel[1]?.billed_TxnName, { value: ccBilledData[1]?.name });
