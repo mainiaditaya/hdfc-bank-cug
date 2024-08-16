@@ -546,7 +546,6 @@ main .form .field-successresultpanel {
       justify-content: center;
       margin-top: -20px;
       .star { font-size: 36px; }
-      .emoji { display: none; }
     }
 
     .field-submitfeedback button {

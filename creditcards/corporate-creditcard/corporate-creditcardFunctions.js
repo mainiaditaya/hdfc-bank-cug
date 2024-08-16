@@ -9,6 +9,7 @@ import {
   formUtil,
   urlPath,
   clearString,
+  santizedFormDataWithContext,
   ageValidator,
   removeSpecialCharacters,
   parseCustomerAddress,
@@ -607,6 +608,16 @@ const prefillForm = (globals) => {
 };
 
 /**
+* sendAnalytics
+* @param {string} payload
+* @param {object} globals
+*/
+// eslint-disable-next-line no-unused-vars
+function sendAnalytics(payload, globals) {
+  sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
+}
+
+/**
  * @name resendOTP
  * @param {Object} globals - The global object containing necessary data for DAP request.
  */
@@ -753,7 +764,6 @@ const setNameOnCard = (name, globals) => globals.functions.setProperty(globals.f
  */
 const aadharConsent123 = async (globals) => {
   try {
-    await Promise.resolve(sendAnalytics('kyc continue', { errorCode: '0000', errorMessage: 'Success' }, 'CUSTOMER_AADHAAR_INIT', globals));
     if (typeof window !== 'undefined') {
       const openModal = (await import('../../blocks/modal/modal.js')).default;
       const config = {
@@ -853,7 +863,6 @@ function checkMode(globals) {
     globals.functions.setProperty(globals.form.consentFragment, { visible: false });
     globals.functions.setProperty(globals.form.resultPanel, { visible: true });
     globals.functions.setProperty(globals.form.resultPanel.errorResultPanel, { visible: true });
-    invokeJourneyDropOff('CRM_LEAD_FAILURE', '9999999999', globals);
   }
 }
 
@@ -861,7 +870,9 @@ function checkMode(globals) {
  * @name crmResponseHandler - crm response handler
  * @param {object} globals
  */
-function crmResponseHandler(crmRes, globals) {
+function crmResponseHandler(otpRes, globals) {
+  if (!otpRes) return;
+  const crmRes = otpRes?.crmLeadResponse;
   globals.functions.setProperty(globals.form.loginPanel.mobilePanel.registeredMobileNumber, { value: crmRes.mobileNumber }); // working // mobNo
   globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.companyName, { value: crmRes.company }); // companyNo
   globals.functions.setProperty(globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.employmentDetails.prefilledEmploymentDetails.employeeCode, { value: crmRes.employeeCode }); // employeeCode
@@ -922,11 +933,6 @@ function getOTP(mobileNumber, pan, dob, globals) {
   };
   const path = urlPath(ENDPOINTS.otpGen);
   formRuntime?.getOtpLoader();
-  (async () => {
-    /* this async call has to be removed  - once  function : crmResponseHandler has been added to value commit of form */
-    const response = await Promise.resolve(fetchJsonResponse(path, jsonObj, 'POST'));
-    crmResponseHandler(response.crmLeadResponse, globals);
-  })();
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 
@@ -981,6 +987,7 @@ export {
   formRuntime,
   journeyResponseHandler,
   createJourneyId,
+  sendAnalytics,
   resendOTP,
   customSetFocus,
   validateLogin,
