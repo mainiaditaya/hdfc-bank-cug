@@ -9,7 +9,6 @@ import {
   formUtil,
   urlPath,
   clearString,
-  santizedFormDataWithContext,
   ageValidator,
   removeSpecialCharacters,
   parseCustomerAddress,
@@ -31,6 +30,7 @@ import * as CONSTANT from '../../common/constants.js';
 import * as CC_CONSTANT from './constant.js';
 import { executeInterfacePostRedirect } from './executeinterfaceutils.js';
 
+setTimeout(() => import('./cc.js'), 1200);
 const {
   ENDPOINTS,
   CURRENT_FORM_CONTEXT: currentFormContext,
@@ -608,16 +608,6 @@ const prefillForm = (globals) => {
 };
 
 /**
-* sendAnalytics
-* @param {string} payload
-* @param {object} globals
-*/
-// eslint-disable-next-line no-unused-vars
-function sendAnalytics(payload, globals) {
-  sendAnalyticsEvent(payload, santizedFormDataWithContext(globals), currentFormContext);
-}
-
-/**
  * @name resendOTP
  * @param {Object} globals - The global object containing necessary data for DAP request.
  */
@@ -764,6 +754,7 @@ const setNameOnCard = (name, globals) => globals.functions.setProperty(globals.f
  */
 const aadharConsent123 = async (globals) => {
   try {
+    await Promise.resolve(sendAnalytics('kyc continue', { errorCode: '0000', errorMessage: 'Success' }, 'CUSTOMER_AADHAAR_INIT', globals));
     if (typeof window !== 'undefined') {
       const openModal = (await import('../../blocks/modal/modal.js')).default;
       const config = {
@@ -987,7 +978,6 @@ export {
   formRuntime,
   journeyResponseHandler,
   createJourneyId,
-  sendAnalytics,
   resendOTP,
   customSetFocus,
   validateLogin,
