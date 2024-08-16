@@ -220,6 +220,7 @@ const successPannelMethod = async (data, stateInfoData) => {
     } else if (kycStatus === 'OVD') {
       vkycProceedButton.setAttribute('data-visible', false);
       vkycConfirmText.setAttribute('data-visible', true);
+      vkycConfirmText.innerText = 'Bank representative will visit you for verification';
       offerLink.setAttribute('data-visible', false); // Adjusted assumption for offerLink
     } else if (mobileMatch && kycStatus === 'aadhaar' && addressEditFlag === 'Y') {
       vkycProceedButton.setAttribute('data-visible', false);
@@ -327,12 +328,11 @@ const finalDapFetchRes = async () => {
   };
   try {
     const data = await invokeJourneyDropOffByParam('', '', journeyId);
-    const journeyDropOffParamLast = data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1];
-    finalDap.journeyParamState = journeyDropOffParamLast.state;
-    finalDap.journeyParamStateInfo = journeyDropOffParamLast.stateInfo;
-    const checkFinalDapSuccess = (journeyDropOffParamLast.state === 'CUSTOMER_FINAL_DAP_SUCCESS');
-    if (checkFinalDapSuccess) {
-      return eventHandler.successMethod(journeyDropOffParamLast);
+    const finalDapSuccessData = data.formData.journeyStateInfo?.find((item) => item?.state === 'CUSTOMER_FINAL_DAP_SUCCESS');
+    finalDap.journeyParamState = finalDapSuccessData.state;
+    finalDap.journeyParamStateInfo = finalDapSuccessData.stateInfo;
+    if (finalDapSuccessData) {
+      return eventHandler.successMethod(finalDapSuccessData);
     }
     const err = 'Bad response';
     throw err;
