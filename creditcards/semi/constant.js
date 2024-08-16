@@ -12,13 +12,24 @@ const ERROR_MSG = {
 const FORM_RUNTIME = {};
 
 const SEMI_ENDPOINTS = {
-  otpGen: 'https://applyonlinestage.hdfcbank.com/content/hdfc_ccforms/api/validatecardotpgen.json',
-  otpVal: 'https://applyonlinestage.hdfcbank.com/content/hdfc_ccforms/api/eligibilitycheck.json',
+  otpGen: '/content/hdfc_ccforms/api/validatecardotpgen.json',
+  otpVal: '/content/hdfc_ccforms/api/eligibilitycheck.json',
+  ccBilled: '/content/hdfc_ccforms/api/ccbilledtransaction.json',
+  ccUnbilled: '/content/hdfc_ccforms/api/ccunbilled.json',
 };
 
 const OTP_TIMER = 30;
 const MAX_OTP_RESEND_COUNT = 3;
 const CURRENT_FORM_CONTEXT = {};
+
+const DOM_ELEMENT = {
+  semiWizard: 'aem_semiWizard',
+  chooseTransaction: 'aem_chooseTransactions',
+};
+
+const MISC = {
+  rupeesUnicode: '\u20B9',
+};
 
 export {
   JOURNEY_NAME,
@@ -30,4 +41,6 @@ export {
   CHANNEL,
   FORM_RUNTIME,
   PRO_CODE,
+  DOM_ELEMENT,
+  MISC,
 };
