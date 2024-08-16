@@ -245,6 +245,23 @@ const restrictToAlphabetsNoSpaces = (inputName) => {
 };
 
 /**
+ * Attaches a click handler to an element that redirects to a specified URL.
+ *
+ * @param {string} selector - The CSS selector for the element to make clickable.
+ * @param {string} url - The URL to navigate to when the element is clicked.
+ * @param {string} [target='_blank'] - The target window or tab for the URL (e.g., '_blank', '_self').
+ */
+const attachRedirectOnClick = (selector, url, target = '_blank') => {
+  const element = document.querySelector(selector);
+  if (element) {
+    element.addEventListener('click', (event) => {
+      event.preventDefault();
+      window?.open(url, target);
+    });
+  }
+};
+
+/**
  * Groups characters in an input field, adding a space after every specified number of characters.
  *
  * @param {HTMLInputElement} inputField - The input field element whose value is to be formatted.
@@ -342,6 +359,7 @@ export {
   hideLoaderGif,
   setMaxDateToToday,
   restrictToAlphabetsNoSpaces,
+  attachRedirectOnClick,
   groupCharacters,
   validatePhoneNumber,
   validatePanInput,
