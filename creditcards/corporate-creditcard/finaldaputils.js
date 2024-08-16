@@ -1,7 +1,8 @@
 import { ENDPOINTS, CURRENT_FORM_CONTEXT as currentFormContext } from '../../common/constants.js';
-import { urlPath } from '../../common/formutils.js';
+import { santizedFormDataWithContext, urlPath } from '../../common/formutils.js';
 import { invokeJourneyDropOffUpdate } from './journey-utils.js';
 import { restAPICall } from '../../common/makeRestAPI.js';
+import { sendPageloadEvent } from './analytics.js';
 
 const getCurrentDateAndTime = (dobFormatNo) => {
   /*
@@ -144,7 +145,7 @@ const finalDap = (userRedirected, globals) => {
           globals.functions.setProperty(globals.form.resultPanel.successResultPanel, { visible: true });
           // 👇 it is not setting the value.
           globals.functions.setProperty(globals.form.resultPanel.successResultPanel.arnRefNumPanel.newARNNumber, { value: response.applicationNumber });
-          // setting through DomApi using throughDomSetArnNum function.
+          // setting through DomApi using throughDomSetArnNum function
           if (journeyName === 'NTB' && (kycStatus === 'aadhaar')) {
             globals.functions.setProperty(globals.form.resultPanel.successResultPanel.vkycCameraConfirmation, { visible: true });
             globals.functions.setProperty(globals.form.resultPanel.successResultPanel.cameraConfirmationPanelInstruction, { visible: true });
@@ -152,10 +153,10 @@ const finalDap = (userRedirected, globals) => {
             currentFormContext.isVideoKyc = true;
           }
           throughDomSetArnNum(response.applicationNumber, mobileNumber, journeyId, leadProfileId, globals);
-          // Temporaly commented out and will be enabled after analytics changes.
-          // setTimeout(async (globalObj) => {
-          //   await Promise.resolve(sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', globalObj));
-          // }, 5000, globals);
+          setTimeout(async (globalObj) => {
+            const santizedFormData = santizedFormDataWithContext(globalObj);
+            await Promise.resolve(sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', santizedFormData, 'CONFIRMATION_PAGE_NAME'));
+          }, 5000, globals);
         }
       } else {
         invokeJourneyDropOffUpdate('CUSTOMER_FINAL_DAP_FAILURE', mobileNumber, leadProfileId, journeyId, globals);
