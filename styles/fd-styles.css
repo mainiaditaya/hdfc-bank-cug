@@ -42,6 +42,8 @@ main {
     background-color: var(--color-interface-background-quinary);
     color: var(--color-interface-background-quaternary);
     position: relative;
+    width: 100.3%;
+    left: -2px;
 }
 
 .hdfc-accordion-legend::after {
@@ -62,6 +64,47 @@ main {
     top: 23px;
 }
 
+/* Checkbox Styling */
+  .fdlien main {
+    .field-fdnumberselection input[type="checkbox"] {
+        position: relative;
+        width: 24px !important;
+        height: 24px !important;
+        margin: 0 5px 0 0;
+        cursor: pointer;
+        appearance: none;
+        border-radius: 5px;
+        background-color: var(--color-interface-background-primary);
+        border: 1px solid var(--color-interface-border-secondary);
+    }
+
+    .field-fdnumberselection input[type="checkbox"]:focus, .field-fdnumberselection input[type="checkbox"]:hover {
+        box-shadow: none;
+        border: 1px solid var(--color-interface-border-secondary) !important;
+    }
+    
+    .field-fdnumberselection input[type="checkbox"]::before{
+        content: '';
+        display: block;
+        transition: transform 200ms;
+    }
+
+    .field-fdnumberselection input[type="checkbox"]:checked {
+        background: var(--color-action-border-primary-default);
+        border: 1px solid var(--color-action-border-primary-default);
+    }
+    
+    .field-fdnumberselection input[type="checkbox"]:checked::before {
+        width: 4px;
+        height: 9px;
+        margin: -6px 0 0 -1px;
+        border-bottom: 2px solid var(--color-interface-background-primary);
+        border-right: 2px solid var(--color-interface-background-primary);
+        transform: rotate(45deg);
+    }
+}
+  
+
 /* Input box styling */
 .fdlien .field-registeredmobilenumber input, .field-pan input, .field-dateofbirth input:not([placeholder]), .field-countrycode select {
   font-size: var(--body-lg-font-size) !important;
@@ -73,6 +116,10 @@ main {
 
 body.fdlien .form-wrapper {
   max-width: 100%;
+}
+
+body.fdlien, body.fdlien main {
+  background: var( --color-interface-background-primary);
 }
 
 body.fdlien main .section.form-container {
@@ -111,6 +158,10 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
     top: 8px;
     border-left: 1px solid var(--color-interface-fd-title-border);
     padding: 0 0 0 24px;
+}
+
+.fdlien header .cmp-container > div:nth-child(2):has(div:empty) {
+    border-left: none;
 }
 
 .fdlien header .cmp-container>div:nth-child(3) {
@@ -152,6 +203,13 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
 
       .field-loginmainpanel {
           padding: 40px 40px 7px 20px;
+
+          .field-welcometext {
+            p {
+                font-size: var(--body-fd-xx-lg-font-size);
+                font-weight: var(--font-weight-bold);
+            }
+          }
   
           .field-loginpanel {
               width: 100%;
@@ -212,7 +270,7 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
                   align-self: flex-end;
   
                   input {
-                      border-radius: 0 var(--form-input-border-radius) var(--form-input-border-radius) 0;
+                      border-radius: 0 var(--form-input-border-radius) var(--form-input-border-radius) 0 !important;
                       margin-top: 5px;
                   }
 
@@ -239,9 +297,12 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
               justify-content: center;
   
               legend {
-                  padding: 60px 0 0 20px;
+                  padding: 0 0 15px;
                   font-size: var(--body-fd-xx-lg-font-size);
                   color: var(--color-interface-text-primary);
+                  position: relative;
+                  top: 25%;
+                  left: 2%;
               }
   
               fieldset {
@@ -273,7 +334,11 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
       .field-identifierpanel {
           margin: 0 !important;
           max-width: 368px;
-          .field-pan input { letter-spacing: 9px; }
+
+          .field-pan input { 
+            letter-spacing: 9px; 
+            padding: 16px, 12px, 16px, 20px; 
+        }
   
           .field-pandobselection {
               gap: 4px;
@@ -407,8 +472,144 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
               font-size: var(--form-font-size-xs);
               max-width: 272px;
               width: 100%;
+
+              &::after {
+                content: '';
+                background: url('../icons/right-arrow.png');
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                vertical-align: sub;
+              }
           }
       }
+
+      /* Error Screens */
+    .field-resultpanel:has(.field-errorresultpanel) {
+        position: absolute;
+        left: 0;
+        top: 60px;
+    }
+
+    .field-resultpanel .field-errorresultpanel .field-errormessagetext {
+        margin: -13px 0 0;
+    }
+
+    .field-errorresultpanel {
+        .field-errormessagetext {
+            border-radius: 0 !important;
+            background: var(--color-interface-fd-background-primary) !important;
+
+            p {
+                text-align: left;
+                padding: 0;
+            }
+
+            p::before {
+                width: 0;
+                height: 0;
+                background: none;
+            }
+
+            &:not(:has(p))::before {
+                width: 0;
+                height: 0;
+                background: none;
+            }        
+        }
+
+        .field-errormessagetextplaceholder p p{
+            color: var(--color-interface-background-primary);
+            margin: -135px 0 0 45px;
+            font-size: var(--body-fd-x-lg-font-size);
+            font-weight: var(--font-weight-regular);
+        }
+
+        .field-errormessagetext:has(p) {
+            text-align: left;
+            padding: 60px 275px 120px 50px;
+            background: var(--color-interface-fd-background-primary) url('../icons/log-out-sad-expression.png') no-repeat 95% 0 !important ;
+        } 
+
+        .field-errormessagetext:not(:has(p)) {
+            text-align: left;
+            padding: 60px 275px 120px 50px;
+            background: var(--color-interface-fd-background-primary) url('../icons/log-out-sad-expression.png') no-repeat 95% 0 !important ;
+            font-size: var(--body-fd-xxx-lg-font-size);
+            font-weight: var(--font-weight-bold);
+            line-height: var(--font-linehight-x-large);
+        }
+
+        .field-errresdealerpanel {
+            background: var(--color-interface-background-primary);
+            color: var(--color-interface-background-quaternary);
+            border-radius: 24px;
+            width: 92%;
+            margin: -160px auto 0;
+
+            .field-errresdealertext1 {
+                padding: 20px 20px 0;
+
+                p {
+                font-size: var(--body-fd-md-font-size);
+                font-weight: var(--font-weight-regular);                
+                }
+            }
+
+            .field-errresdealertext2 {
+                padding: 0 20px;
+                
+                p {
+                color: var(--color-interface-background-quaternary);
+                font-size: var(--body-fd-lg-font-size);
+                font-weight: var(--font-weight-bold);
+                }
+            }
+
+            .field-errresdealertext3 {
+                background: var(--color-interface-background-quinary);
+                border-bottom-left-radius: 24px;
+                border-bottom-right-radius: 24px;
+                padding: 20px;
+                border-top: 1px solid var(--color-interface-border-secondary);
+                
+                p p {
+                    font-size: var(--body-fd-md-font-size);
+                }
+            }
+        }        
+            
+        .field-errserviceslink {
+            width: 90%;
+            margin: 0 auto 140px;
+            color: var(--color-interface-background-quaternary);
+            font-size: var(--body-fd-md-font-size);
+        }
+    }
+
+    .button-wrapper.field-ntberrorpage, .button-wrapper.field-tryagainbuttonerrorpanel{
+        text-align: center;
+    }
+
+    .field-successresultpanel {
+        .field-successresulttextlabel {
+            text-align: left;
+            padding: 70px 450px 70px 85px;
+            background: var(--color-interface-fd-background-primary) url('../icons/log-out-sad.png') no-repeat 92% 0 !important ;
+        }
+
+        .field-successresulttextlabel p {
+            text-align: left;
+            font-size: var(--body-fd-xxx-lg-font-size);
+            font-weight: var(--font-weight-bold);
+            line-height: var(--font-linehight-x-large);
+            
+            &::before {
+                background: none !important;
+                content: unset !important;
+            }        
+        }
+    }
 
   }    
 }
@@ -441,7 +642,7 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
   .field-multiplecustidrepeatable:not(:has(.repeat-wrapper)), .field-multiplecustidrepeatable:has(.repeat-wrapper) fieldset {
       border-radius: 16px;
       border: 1px solid var(--color-interface-border-primary);
-      padding: 24px;
+      padding: 24px 20px;
       max-height: 160px;
       max-width: 368px;
 
@@ -460,7 +661,7 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
           
           label { 
             margin-top: -12px; 
-            font-size: var(--body-fd-md-font-size);
+            font-size: var(--body-fd-md-font-size) !important;
             font-weight: var(--font-weight-small);
             letter-spacing: -0.01em;
             text-align: left;
@@ -528,11 +729,16 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
 }
 
 /* Select FD */
+
+.field-fdnumberselection fieldset:has(.field-fdaccselect input[type="checkbox"]:checked) {
+    border: 1px solid var(--color-action-border-primary-default) !important;
+}
+
 .fdlien .field-fdbasedcreditcardwizard {  
   .wizard-menu-items {
     position: absolute;
-    left: 10%;
-    width: 80%;
+    left: 4%;
+    width: 92%;
     justify-content: center;
     margin-top: -50px;
     background: var(--color-interface-background-primary);
@@ -542,6 +748,8 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
     
     .wizard-menu-item {
       margin: 0 25px 0 0;
+      display: flex;
+      align-items: center;
     }
 
     .wizard-menu-item:first-child::after {
@@ -566,8 +774,14 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
     }
 
     li.wizard-menu-item::before{
-      border: 1px solid #ccc;
+      border: none !important;
       vertical-align: bottom;
+      height: 42px;
+      width: 42px;
+    }
+
+    li.wizard-menu-active-item::after {
+        background: var(--color-interface-button-background);
     }
 
     li.wizard-menu-active-item::before{
@@ -605,11 +819,25 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
     }
   }
 
-    .field-backlinkmultiplecust button, .field-backlinkbasicdetails button {
-        color: var(--color-action-text-secondary-default);
-        background: var(--color-interface-background-primary);
-        font-weight: var(--font-weight-regular);
-        max-width: fit-content !important;
+    .field-backlinkmultiplecust, .field-backlinkbasicdetails {
+        margin: 20px 0 0;
+
+        button, button:hover {
+            color: var(--color-action-text-secondary-default);
+            background: var(--color-interface-background-primary) !important;
+            font-weight: var(--font-weight-regular);
+            max-width: fit-content !important;
+
+            &::before{
+                content: '';
+                background: url('../icons/left-arrow.png') no-repeat;
+                display: inline-block;
+                width: 8px;
+                height: 16px;
+                vertical-align: sub;
+                margin-right: 10px;
+            }
+        }
     }
 
     .field-fdselectioninfo .field-customername label, .field-fdselectioninfo .field-customername input,
@@ -623,13 +851,18 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
         padding-top: 10px;
     }
 
-    div[class*='field-select-fd-subtext'] p, div[class*='field-pleasenotetext'] p, .field-selectfdtncpanel-title p, .field-detailssectionlabel2 p, .field-creditlimitmax p {
+    div[class*='field-select-fd-subtext'] p, div[class*='field-pleasenotetext'] p, .field-selectfdtncpanel-title p, .field-detailssectionlabel2 p {
         font-weight: var(--font-weight-regular);
         font-size: var(--body-md-font-size);
         color: var(--color-interface-text-secondary);
         margin: 0;
-        line-height: 1px;
+        line-height: 24px;
         padding-bottom: 5px;
+    }
+
+    .field-creditlimitmax p {
+        font-weight: var(--font-weight-regular);
+        font-size: var(--body-fd-sm-font-size);
     }
 
     .field-creditlimitmax { text-align: end; }
@@ -645,6 +878,7 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
           .field-selectedfdpanel {
             display: flex;
             justify-content: end;
+            border-top: 1px dashed var(--color-interface-border-secondary);
 
             .field-selectallfdbutton {
                 button {
@@ -655,14 +889,15 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
             }
 
             .field-selectedfdnum, .field-selectedfdnummax {
-                width: 30px;
+                width: 0;
 
                 input[type="number"] {
                     border: none;
                     pointer-events: none;
                     margin-top: 2px;
+                    margin-left: -8px;
                     padding: 0;
-                    width: 30px;
+                    width: 25px;
                     height: 50px !important;
 
                     &:hover {
@@ -732,7 +967,7 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
                   text-align: center;
                   margin: 0;
                   height: 50px;
-                  border-radius: 0 12px 12px 0;
+                  border-radius: 0 12px 12px 0 !important;
                   border: none;
                   background: var(--color-interface-background-quinary);
                   font-size: var(--body-fd-x-lg-font-size);
@@ -760,7 +995,7 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
 
           .field-fdnumberselection:not(:has(.repeat-wrapper)), .field-fdnumberselection:has(.repeat-wrapper) fieldset {
               padding: 20px 16px;
-              border: solid 1px var(--color-action-border-primary-default);
+              border: solid 1px var(--color-interface-border-secondary);
               border-radius: 16px;
               max-height: 196px;
               max-width: 263px;
@@ -884,7 +1119,19 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
     }
 
     .field-basicdetails {
-        padding: 0 30px;
+        input, select, option, textarea {
+            font-size: var(--body-fd-md-font-size);
+            color: var(--color-interface-text-primary);
+            font-weight: var(--font-weight-medium);
+            margin-bottom: -9px;
+        }
+
+        .field-mailingaddresstoggle, .field-employeeassistancetoggle, .field-inpersonbiokycoptions {
+            label, legend {
+                font-size: var(--body-fd-sm-font-size);
+                font-weight: var(--font-weight-medium);
+            }
+        }
 
         .field-detailssectionlabel2 p {
             line-height: inherit;
@@ -892,40 +1139,64 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
 
         .field-nameoncard .field-description p {
             font-size: var(--body-x-sm-font-size);
+            margin-top: 30px;
+        }
+
+        .field-reviewdetailsview {
+            fieldset.hdfc-accordian {
+                border: 1px solid var(--color-interface-border-secondary);
+                border-bottom-left-radius: 24px;
+                border-bottom-right-radius: 24px;
+            }
+        }
+
+        .field-reviewdetailsview > fieldset > :not(legend) {
+            padding: 20px;
+        }
+
+        .field-addressdetails {
+            .field-mailingaddresslabel p, .field-currentmailingaddresslabel p {
+                margin: 0 0 -6px 5px;
+                font-size: var(--body-x-sm-font-size);
+                font-weight: var(--font-weight-regular);
+            }
+
+            textarea { margin: 0; }
+
+            .field-addressdetailshelptag {
+                width: fit-content;
+
+                p {
+                    margin: 0;
+                    padding: 4px 8px;
+                    background-color: var(--color-interface-background-quinary);
+                    border-radius: 12px;
+                    font-size: var(--body-x-sm-font-size);
+                    font-weight: var(--font-weight-regular);
+                    color: var(--color-interface-text-primary);
+                }
+            }
+        }
+
+        .field-employeeassistancepanel .field-inpersonbiokycoptions {
+            display: flex;
+
+            .radio-wrapper {
+                width: fit-content;
+                margin-right: 15px;
+            }
+        }
+
+        .wrapper-disabled {
+            label { margin-left: 5px; }
+
+            input {
+                font-size: var(--body-fd-lg-font-size) !important;
+                border: none;
+                pointer-events: none;
+            }
         }
     }
-}
-
-
-/* Error Screens */
-.field-resultpanel:has(.field-errorresultpanel) {
-    position: absolute;
-    left: 0;
-    top: 16%;
-}
-
-.field-errorresultpanel {
-    .field-errormessagetext {
-        border-radius: 0 !important;
-        background: var(--color-interface-fd-background-primary) !important;
-
-        &:not(:has(p))::before {
-            width: 0 !important;
-            height: 0 !important;
-            background: none !important;
-        }        
-    }
-
-    .field-errormessagetext:not(:has(p)){
-        text-align: left !important;
-        display: inline-block !important;
-        padding: 80px 450px 80px 60px !important;
-        background: var(--color-interface-fd-background-primary) url('../icons/log-out-sad.png') no-repeat 95% 0 !important ;
-    }
-
-  .button-wrapper.field-ntberrorpage, .button-wrapper.field-tryagainbuttonerrorpanel{
-      text-align: center !important;
-  }
 }
 
 /* Footer */
@@ -944,21 +1215,24 @@ header:has(~ .fd-form-wrapper) {
   }
 }
 
-/* Error Screen */
-.fdlien .field-resultpanel .field-errorresultpanel .field-errormessagetext {
-    margin: -13px 0 0;
-}
 
 .fdlien {
     input, .drop-down-wrapper select { 
         height: 60px !important;
     }
 
-    .text-wrapper:is([data-active='true'], [data-empty='false']), .drop-down-wrapper:is([data-active='true'], [data-empty='false']) {
-        > label {
-            color: var(--color-input-text-placeholder-disabled) !important;
-            font-size: var(--body-fd-sm-font-size) !important;
-            font-weight: var(--font-weight-regular) !important;
+    textarea {
+        /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
+        font-family: Inter;
+        min-height: 65px !important;
+        resize: none;
+    }
+
+    .text-wrapper:is([data-active='true'], [data-empty='false']), .drop-down-wrapper:is([data-active='true'], [data-empty='false']), .multiline-wrapper.field-invalid:is([data-active='true'], [data-empty='false']) {
+        > label, label p {
+            color: var(--color-input-text-placeholder-disabled);
+            font-size: var(--body-fd-sm-font-size);
+            font-weight: var(--font-weight-regular);
         }
     }
 
@@ -990,14 +1264,14 @@ header:has(~ .fd-form-wrapper) {
         letter-spacing: normal !important;
     }
 
-    input:not([type="radio"]):focus, input:not([type="radio"]):hover, select:focus, select:hover {
+    input:not([type="radio"]):focus, input:not([type="radio"]):hover, select:focus, select:hover, textarea:focus, textarea:hover {
         border-color: var(--color-action-border-primary-default) !important;
         box-shadow: 0 0 0 2px var(--color-interface-background-box-shadow-secondary);
         outline: none;
     }
 
-    .text-wrapper:not(:focus), .drop-down-wrapper:not(:focus) {
-        > label { color: transparent; }
+    .text-wrapper:not(:focus), .drop-down-wrapper:not(:focus), .multiline-wrapper:not(:focus) {
+        > label, label p { color: transparent; }
     }
 }
 
@@ -1037,6 +1311,10 @@ header:has(~ .fd-form-wrapper) {
 
   .fdlien .button-wrapper {
       text-align: center;
+  }
+
+  .fdlien legend.hdfc-accordion-legend {
+    width: 100.5%;
   }
 
   .fdlien header>.cmp-container div:nth-child(2) {
@@ -1135,6 +1413,23 @@ header:has(~ .fd-form-wrapper) {
             }
           }
 
+          .field-basicdetails {
+            padding: 0;
+
+            .hdfc-accordian {
+                .field-wrapper:not(.field-continuetoselectfd,.field-employeeassistancetoggle, .field-employeeassistancepanel) {
+                    grid-column: span 6;
+                }
+            }
+
+            .field-addressdetails { display: block; 
+
+                .field-prefilledmailingadddress {
+                    margin: 13px 0;
+                }
+            }
+          }
+
           .wizard-menu-items {
             width: 85%;
             left: 7%;
@@ -1160,12 +1455,24 @@ header:has(~ .fd-form-wrapper) {
 
 /* For mobiles */
 @media (350px <=width <=767px) {
+    .fdlien legend.hdfc-accordion-legend {
+        width: 101%;
+    }
+
   .fdlien:has(.section.form-container) .section.form-container {
       .fd-form-wrapper{
           .field-bannerimagepanel {
               background: var(--color-interface-fd-background-secondary) url('../icons/banner_mobile.png') no-repeat center center / 100% 100%;
               min-height: 225px;
           }
+
+          .field-loginmainpanel {
+            .field-stepstofollow {
+                legend {
+                    top: 45px;
+                }
+            }
+          }     
       }    
   }
 
@@ -1225,46 +1532,67 @@ header:has(~ .fd-form-wrapper) {
     left: 2%;
 
     .field-selectfd {
-        .field-selectfddetailspanel {
-            display: grid;
-            .field-customername { grid-column: span 6; }
+        .field-selectedfdpanel {
+            flex-direction: row;
 
-            .field-creditlimit { 
-                grid-column: span 6;
-                text-align: center;
-                max-height: 52px;
+            .field-selectallfdbutton {
+                margin-top: 0 !important;
             }
 
-            .field-selectedfdpanel {
-                flex-direction: row;
+            .field-selectedfdselected {
+                margin-right: 10px;
+            }
+
+            .field-selectfddetailspanel {
+                display: grid;
+                .field-customername { grid-column: span 6; }
     
-                .field-selectallfdbutton {
-                    margin-top: 0 !important;
+                .field-creditlimit { 
+                    grid-column: span 6;
+                    text-align: center;
+                    max-height: 52px;
                 }
             }
+        }        
+    }
+
+    .field-basicdetails { padding: 0; 
+        select { margin-bottom: 20px; }
+        
+        input, option, textarea, .field-addressdetailshelptag, .field-mailingaddresslabel, .field-employeeassistancetoggle {
+            margin-bottom: 10px;
         }
+
+        .field-inpersonbiokycoptions { margin-bottom: 7px !important; }
     }
 
     .wizard-menu-items {
         flex-wrap: nowrap;
         text-align: center;
-        gap: 10px;
+        gap: 5px;
 
         .wizard-menu-item {
             font-size: var(--body-x-sm-font-size);
             margin: 0 10px;
+            display: flex;
+            flex-direction: column;
             
             &::before {
                 margin: 0 25px;
             }
 
             &::after {
-                margin: 0 0 0 -40px;
+                margin: 0 0 0 -115px;
             }
         }
     }
 
-    .field-fdnumberselection {
+    .field-fdnumberselection .repeat-wrapper { 
+        max-width: 400px;
+        margin-bottom: 20px;
+    }
+
+    .field-fdnumberselection:not(:has(.repeat-wrapper)), .field-fdnumberselection:has(.repeat-wrapper) fieldset {
         display: grid;
     }
   }

@@ -22,11 +22,16 @@ const FD_ENDPOINTS = {
   otpGen: '/content/hdfc_hafcards/api/customeridentificationotpgen.json',
   otpVal: '/content/hdfc_hafcards/api/otpvalidationandcardsinquiry.json',
   journeyDropOff: '/content/hdfc_commonforms/api/journeydropoff.json',
+  customeraccountdetailsdto: '/content/hdfc_hafcards/api/hdfccardscustomeraccountdetailsdto.json',
 };
 
 const OTP_TIMER = 30;
+const MODE = 'dev';
+// const MODE = 'prod';
 const FORM_NAME = 'FD lien card';
 const MAX_OTP_RESEND_COUNT = 3;
+const MAXIMUM_CREDIT_AMOUNT = 800000;
+const NAME_ON_CARD_LENGTH = 19;
 
 export {
   JOURNEY_NAME,
@@ -36,5 +41,8 @@ export {
   OTP_TIMER,
   FD_ENDPOINTS,
   MAX_OTP_RESEND_COUNT,
+  MODE,
+  MAXIMUM_CREDIT_AMOUNT,
+  NAME_ON_CARD_LENGTH,
   FORM_NAME,
 };
