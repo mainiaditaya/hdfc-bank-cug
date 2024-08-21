@@ -72,7 +72,7 @@ describe('Welcome Page Test', function() {
 
   // Set up the browser and page before running the tests
   before(async function() {
-    browser = await puppeteer.launch({ headless: true });
+    browser = await puppeteer.launch({ headless: false });
     console.log("Browser specs : ")
     console.info(browser);
     page = await browser.newPage();
