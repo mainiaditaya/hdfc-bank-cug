@@ -14,7 +14,7 @@ module.exports = {
     // allow reassigning param
     'no-console': 'off',
     'no-param-reassign': [2, { props: false }],
-    'linebreak-style': ['error', 'unix'],
+    'linebreak-style': ['error', 'windows'],
     'import/extensions': ['error', {
       js: 'always',
     }],
