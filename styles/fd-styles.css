@@ -1199,6 +1199,65 @@ body.fdlien:has(.fd-form-wrapper .field-fdbasedcreditcardwizard:not([data-visibl
     }
 }
 
+/* KYC Selection */
+.fdlien .field-selectkycoptionspanel {
+    width: 92%;
+    margin: 0 auto !important;
+
+    .field-selectidentityverificationlabel h3{
+        font-size: var(--body-fd-xx-lg-font-size);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-interface-background-quaternary);
+    }
+
+    .field-selectkycmethodoption1, .field-selectkycmethodoption2, .field-selectkycmethodoption3 {
+        border-radius: 12px;
+        border: 1px solid var(--color-interface-border-secondary);
+        padding: 16px;
+
+        fieldset legend {
+            width: auto;
+            border-radius: 12px;
+            background: var(--color-interface-label-background-primmary);
+            font-size: var(--body-x-sm-font-size);
+            font-weight: var(--font-weight-regular);
+            padding: 4px 6px;
+            position: absolute;
+            top: -28px;           
+        }
+
+        .field-aadharbiometricverification, .field-aadharekycverification, .field-officiallyvaliddocumentsmethod {
+            flex-direction: row-reverse;
+            position: relative;
+            
+            label {
+                color: var(--color-interface-background-quaternary);
+                font-size: var(--body-fd-md-font-size) !important;
+                font-weight: var(--font-weight-bold);
+                margin: 10px 0 0;
+            }
+        }
+
+        .field-aadharbiometricverification label, .field-officiallyvaliddocumentsmethod label{
+            background: url('../icons/KYC_Upload.png') no-repeat;
+            padding: 0 0 0 30px;
+        }
+
+        .field-aadharekycverification label{
+            background: url('../icons/aadhar-icon.svg') no-repeat top left / 25px 25px;
+            padding: 0 0 0 30px;
+        }
+
+        .field-identityverificationtext1, .field-identityverificationtext2, .field-identityverificationtext3 {
+            p {
+                font-size: var(--body-x-sm-font-size);
+                line-height: var(--font-linehight-regular);
+                color: var(--color-input-text-primary);
+            }
+        }
+    }
+}
+
 /* Footer */
 header:has(~ .fd-form-wrapper) {
   background-color: var(--color-interface-fd-background-primary)
@@ -1441,6 +1500,13 @@ header:has(~ .fd-form-wrapper) {
     left: 2%;
   }
 
+  .fdlien .field-selectkycoptionspanel {
+    .field-selectkycmethodoption1, .field-selectkycmethodoption2, .field-selectkycmethodoption3 {
+        grid-column: span 6 !important;
+        margin: 30px 0 0;
+    }
+  }
+
   .field-resultpanel:has(.field-errorresultpanel) {
     top: 8%;
   }
@@ -1594,6 +1660,19 @@ header:has(~ .fd-form-wrapper) {
 
     .field-fdnumberselection:not(:has(.repeat-wrapper)), .field-fdnumberselection:has(.repeat-wrapper) fieldset {
         display: grid;
+    }
+  }
+
+  .fdlien .field-selectkycoptionspanel {
+    .field-selectkycmethodoption1, .field-selectkycmethodoption2, .field-selectkycmethodoption3 {
+        grid-column: span 12;
+        margin: 30px 0 0;
+    }
+
+    .field-identityverificationtext1, .field-identityverificationtext2, .field-identityverificationtext3 {
+        p {
+            margin: 20px 0 0;
+        }
     }
   }
 
