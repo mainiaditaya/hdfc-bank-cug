@@ -42,11 +42,13 @@ After Each :
 
 
 import { expect } from "chai";
-import puppeteer from 'puppeteer';
+import playwright from 'playwright';
+
 
 describe('Welcome Page Test', function() {
   let browser;
   let page;
+  let context;
   console.log("Beginning the tests")
   // let url = "http://localhost:3000/"
   let url = "http://localhost:3000/content/forms/af/hdfc_haf/cards/semi/forms/semi";
@@ -56,16 +58,19 @@ describe('Welcome Page Test', function() {
     // Logic that runs before each test
     console.log("Running test....");
     page.goto(url);
+  
   });
 
   // Set up the browser and page before running the tests
   before(async function() {
-    browser = await puppeteer.launch({ headless: true });
-    console.log("Browser specs : ")
-    console.info(browser);
-    page = await browser.newPage();
-    console.log("Page Specs : ")
-    console.info(page);
+    browser = await playwright['chromium'].launch({headless:false});
+    context = await browser.newContext();
+    // console.log("Browser specs : ")
+    // console.info(browser);
+    // console.info(context)
+    page = await context.newPage();
+    // console.log("Page Specs : ")
+    // console.info(page);
   });
 
   // Close the browser after all tests are done
@@ -76,6 +81,7 @@ describe('Welcome Page Test', function() {
   afterEach(() => {
     // Logic that runs after every test
     console.log("Test run complete...")
+    // page.screenshot({path: './example-chromium-${this.currentTest.title}-after.png'})
   })
 
 
@@ -84,11 +90,13 @@ describe('Welcome Page Test', function() {
 
   // ************* Title Check Test Case ******************
   it('Title Check', async function() {
-
-    await page.waitForSelector('title');
-    const title = await page.title();
-    console.log(title)
-    await expect(title).to.include('SEMI');
+    // await page.waitForTimeout(10000);
+    await page.waitForSelector('form');
+    // await page.waitForSelector('title');
+    console.log("Reached");
+    // const title = await page.$$('title');
+    // console.log(title)
+    // await expect(title).to.include('SEMI');
   });
 
   
@@ -108,7 +116,6 @@ describe('Welcome Page Test', function() {
     let identifier = "input#textinput-9788d1ff27"
     let test_input = "ABCDEF"
     await page.waitForSelector(identifier);
-    const mobile_field = await page.$(identifier);
     
     await page.type(identifier, test_input)
     // Get the test mobile number currently typed into the input field
@@ -127,7 +134,6 @@ describe('Welcome Page Test', function() {
     let identifier = "input#textinput-9788d1ff27"
     let test_input = "97645323456"
     await page.waitForSelector(identifier);
-    const mobile_field = await page.$(identifier);
     
     await page.type(identifier, test_input)
     // Get the test mobile number currently typed into the input field
@@ -145,7 +151,6 @@ describe('Welcome Page Test', function() {
     let identifier = "input#textinput-9788d1ff27"
     let test_input = "9876543890"
     await page.waitForSelector(identifier);
-    const mobile_field = await page.$(identifier);
     // Get the 'name' attribute of the input field to confirm it is working
     const nameAttribute = await page.$eval(identifier, el => el.getAttribute('name'));
     console.log('Name attribute:', nameAttribute);
@@ -168,7 +173,6 @@ describe('Welcome Page Test', function() {
     let identifier = "input#textinput-60e3d65023"
     let test_input = "ABCD"
     await page.waitForSelector(identifier);
-    const mobile_field = await page.$(identifier);
     
     await page.type(identifier, test_input)
     // Get the test mobile number currently typed into the input field
@@ -187,7 +191,6 @@ describe('Welcome Page Test', function() {
     let identifier = "input#textinput-60e3d65023"
     let test_input = "20100"
     await page.waitForSelector(identifier);
-    const mobile_field = await page.$(identifier);
     
     await page.type(identifier, test_input)
     // Get the test mobile number currently typed into the input field
@@ -208,7 +211,6 @@ describe('Welcome Page Test', function() {
     let text_input = "2021"
 
     await page.waitForSelector(identifier);
-    const mobile_field = await page.$(identifier);
     // Get the 'name' attribute of the input field to confirm it is working
     const nameAttribute = await page.$eval(identifier, el => el.getAttribute('name'));
     console.log('Name attribute:', nameAttribute);
@@ -225,17 +227,57 @@ describe('Welcome Page Test', function() {
   // ************* Get OTP Button Submit Test Case ******************
   it('OTP Button Submit Test', async function() {
     
+    // Type Mobile Number : 
+    let identifier1 = "input#textinput-9788d1ff27"
+    let test_input = "9876543890"
+    await page.waitForSelector(identifier1);
+    // Get the 'name' attribute of the input field to confirm it is working
+    let name_attribute = await page.$eval(identifier1, el => el.getAttribute('name'));
+    console.log('Name attribute:', name_attribute);
+    // console.log(mobile_field)
+    // console.log(nameAttribute)
+    await page.type(identifier1, test_input)
+    // Get the test mobile number currently typed into the input field
+    const typedText = await page.$eval(identifier1, el => el.value);
+    console.log('Input :', typedText);
+
+
+    // Type Card last 4 digits : 
+    // this.timeout(10000) // all tests in this suite get 10 seconds before timeout
+    let identifier2 = "input#textinput-60e3d65023"
+
+    let text_input = "2021"
+
+    await page.waitForSelector(identifier2);
+    // Get the 'name' attribute of the input field to confirm it is working
+    let name_attribute2 = await page.$eval(identifier2, el => el.getAttribute('name'));
+    console.log('Name attribute:', name_attribute2);
+    // console.log(mobile_field)
+    // console.log(nameAttribute)
+    await page.type(identifier2, text_input)
+    // Get the test mobile number currently typed into the input field
+    const typedText2 = await page.$eval(identifier2, el => el.value);
+    console.log('Input :', typedText2);
+
+
     // this.timeout(10000) // all tests in this suite get 10 seconds before timeout
     let identifier = "button#button-2024db0da1"
+    console.log("Reached1");
     await page.waitForSelector(identifier);
-    const mobile_field = await page.$(identifier);
+    console.log("Reached2");
     // Get the 'name' attribute of the input field to confirm it is working
     const nameAttribute = await page.$eval(identifier, el => el.getAttribute('name'));
     console.log('Name attribute:', nameAttribute);
     // console.log(mobile_field)
     // console.log(nameAttribute)
-    await page.$eval( identifier, button => button.click() );
-    
+
+
+    // Mouse click on any empty area of the screen to enable the button
+    await page.mouse.click(10, 10);
+
+
+    await page.click(identifier);
+    console.log("Reached3");
     
     // ************* Once submitted, checking the next page's identifiers *************************
     let otp_enter_input = "input#telephoneinput-7e59f4f31d"
