@@ -348,6 +348,15 @@ main .section.form-container {
                         pointer-events: none;
                         border: none;
                     }
+
+                    input:disabled {
+                        background-color: var(--color-interface-background-primary);
+                        color: var(--color-interface-text-secondary);
+                        opacity: 0.8;
+                    }
+
+                    input[type="checkbox"]:disabled { cursor: not-allowed; }
+
                     .field-billed-txnname { margin: 2px 0 0 -32px; }
 
                     .field-aem-txndate input, .field-aem-txnamt input {
@@ -433,7 +442,7 @@ main .section.form-container {
 
                     .field-wrapper { align-self: center; }
 
-                    p, input { 
+                    p, input:not([type="radio"]) { 
                         margin: 0; padding: 0; 
                         border: none;
                         font-size: var(--body-sm-font-size);
