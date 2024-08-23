@@ -270,6 +270,81 @@ function txnSelectHandler(checkboxVal, txnType, globals) {
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation1, { visible: true });
   }
 }
+
+function numberToText(num) {
+  const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
+  const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  if ((num.toString()).length > 9) return 'overflow';
+  const n = (`000000000${num}`).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+  if (!n) return;
+  let str = '';
+  str += (n[1] != 0) ? `${a[Number(n[1])] || `${b[n[1][0]]} ${a[n[1][1]]}`}Crore ` : '';
+  str += (n[2] != 0) ? `${a[Number(n[2])] || `${b[n[2][0]]} ${a[n[2][1]]}`}Lakh ` : '';
+  str += (n[3] != 0) ? `${a[Number(n[3])] || `${b[n[3][0]]} ${a[n[3][1]]}`}Thousand ` : '';
+  str += (n[4] != 0) ? `${a[Number(n[4])] || `${b[n[4][0]]} ${a[n[4][1]]}`}Hundred ` : '';
+  str += `₹${n[5] != 0}` ? `${a[Number(n[5])] || `${b[n[5][0]]} ${a[n[5][1]]}`}Only ` : '';
+  return str;
+}
+
+function calculateEMI(loanAmount, rateOfInterest, tenure) {
+  // optmize this later - amaini
+  // [P x R x (1+R)^N]/[(1+R)^N-1]
+  const newrate = (rateOfInterest / 100);
+  const rate1 = (1 + newrate);
+  const rate2 = rate1 ** tenure;
+  const rate3 = (rate2 - 1);
+  const principle = [(loanAmount) * (newrate) * rate2];
+  const finalEMI = Math.round(principle / rate3);
+  return finalEMI;
+}
+
+/* update Options 
+const loanAmount = 11800;
+loanoptions.forEach(option => {
+  var nfObject = new Intl.NumberFormat('hi-IN');
+option.roiMonthly = (parseInt(option.interest, 10) / 100) / 12;
+  option.roiAnnually = currencyUtil(parseFloat(option.interest), 2);
+option.MonthlyEMI = nfObject.format(calculateEMI1(loanAmount, option.roiMonthly, parseInt(option.period)));
+option.period = parseInt(option.period) + " Months";
+option.procesingFee = '500'
+  console.log(option);
+
+});
+*/
+
+//var a4 = getLoanOptionsInfo(x.response.responseString.records);
+const getLoanOptionsInfo = (responseStringJsonObj) => {
+  const loanOptionsInfo = {
+    loanoptions: [],
+  };
+
+  // Loop through the periods, interests, and tids
+  for (let i = 1; i <= 5; i++) {
+    const periodKey = `period${i === 1 ? '' : i}`;
+    const interestKey = `interest${i === 1 ? '' : i}`;
+    const tidKey = `tid${i === 1 ? '' : i}`;
+
+    // Check if the keys exist to avoid pushing undefined values
+    if (responseStringJsonObj[0][periodKey] !== undefined) {
+      loanOptionsInfo.loanoptions.push({
+        period: responseStringJsonObj[0][periodKey],
+        interest: responseStringJsonObj[0][interestKey],
+        tid: responseStringJsonObj[0][tidKey],
+      });
+    }
+  }
+
+  return loanOptionsInfo.loanoptions;
+};
+
+
+/*
+function selectionTenure(globals){
+updated Array = getLoanOptionsInfo(runtime.resObj) -- >>>
+setDataTenurePanel(updated Array)
+}
+
+*/
 export {
   getOTPV1,
   otpValV1,
