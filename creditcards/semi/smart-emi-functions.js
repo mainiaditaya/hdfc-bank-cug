@@ -1,6 +1,7 @@
 import { displayLoader, fetchJsonResponse } from '../../common/makeRestAPI.js';
 import * as SEMI_CONSTANT from './constant.js';
 import {
+  clearString,
   generateUUID, moveWizardView, urlPath,
 } from '../../common/formutils.js';
 
@@ -12,6 +13,8 @@ const {
   DOM_ELEMENT: domElements,
   MISC,
 } = SEMI_CONSTANT;
+
+const runtimeData = {};
 
 /**
  * function sorts the billed / Unbilled Txn  array in ascending order based on the amount field
@@ -187,6 +190,7 @@ const setTxnPanelData = (allTxn, btxn, billedTxnPanel, unBilledTxnPanel, globals
 function checkELigibilityHandler(resPayload, globals) {
   const response = {};
   try {
+    runtimeData.checkEligibilityResponse = resPayload;
     const ccBilledData = resPayload?.ccBilledTxnResponse?.responseString || [];
     const ccUnBilledData = resPayload?.ccUnBilledTxnResponse?.responseString || [];
     currentFormContext.txnResponse = {
@@ -211,6 +215,86 @@ function checkELigibilityHandler(resPayload, globals) {
   }
 }
 
+/* */
+// var a4 = getLoanOptionsInfo(x.response.responseString.records);
+const getLoanOptionsInfo = (responseStringJsonObj) => {
+  const loanOptionsInfo = {
+    loanoptions: [],
+  };
+
+  // Loop through the periods, interests, and tids
+  for (let i = 1; i <= 5; i++) {
+    const periodKey = `period${i === 1 ? '' : i}`;
+    const interestKey = `interest${i === 1 ? '' : i}`;
+    const tidKey = `tid${i === 1 ? '' : i}`;
+
+    // Check if the keys exist to avoid pushing undefined values
+    if (responseStringJsonObj[0][periodKey] !== undefined) {
+      loanOptionsInfo.loanoptions.push({
+        period: responseStringJsonObj[0][periodKey],
+        interest: responseStringJsonObj[0][interestKey],
+        tid: responseStringJsonObj[0][tidKey],
+      });
+    }
+  }
+  return loanOptionsInfo.loanoptions;
+};
+
+function calculateEMI(loanAmount, rateOfInterest, tenure) {
+  // optmize this later - amaini
+  // [P x R x (1+R)^N]/[(1+R)^N-1]
+  const newrate = (rateOfInterest / 100);
+  const rate1 = (1 + newrate);
+  const rate2 = rate1 ** tenure;
+  const rate3 = (rate2 - 1);
+  const principle = [(loanAmount) * (newrate) * rate2];
+  const finalEMI = Math.round(principle / rate3);
+  return finalEMI;
+}
+
+function currencyUtil(number, minimumFractionDigits) {
+  if (typeof (number) !== 'number') {
+    return number;
+  }
+  number /= 100;
+  const options = {
+    minimumFractionDigits: minimumFractionDigits || 0,
+  };
+  number = number.toFixed(minimumFractionDigits || 0);
+  const newNumber = new Intl.NumberFormat('us-EN', options).format(number);
+  return newNumber;
+}
+
+/* */
+
+const LOAN_AMOUNT = 11800;
+
+const setDataTenurePanel = (globals, panel, option, i) => {
+  globals.functions.setProperty(panel[i].aem_tenureSelection, { value: option?.period });
+  globals.functions.setProperty(panel[i].aem_tenureSelectionEmi, { value: Number(clearString(option?.monthlyEMI)) });
+  globals.functions.setProperty(panel[i].aem_tenureSelectionProcessing, { value: option?.procesingFee });
+};
+
+const tenureOption = (loanOptions) => {
+  const arrayOptions = loanOptions?.map((option) => {
+    const nfObject = new Intl.NumberFormat('hi-IN');
+    const roiMonthly = (parseInt(option.interest, 10) / 100) / 12;
+    const roiAnnually = currencyUtil(parseFloat(option?.interest), 2);
+    const monthlyEMI = nfObject.format(calculateEMI(LOAN_AMOUNT, roiMonthly, parseInt(option.period, 10)));
+    const period = `${parseInt(option.period, 10)} Months`;
+    const procesingFee = '500';
+    return ({
+      ...option,
+      procesingFee,
+      period,
+      monthlyEMI,
+      roiAnnually,
+      roiMonthly,
+    });
+  });
+  return arrayOptions;
+};
+
 /**
  * Continue button on choose transactions.
  *
@@ -218,7 +302,13 @@ function checkELigibilityHandler(resPayload, globals) {
  */
 // eslint-disable-next-line no-unused-vars
 function selectTenure(globals) {
+  const loanArrayOption = getLoanOptionsInfo(runtimeData.checkEligibilityResponse?.responseString?.records);
+  const tenureArrayOption = tenureOption(loanArrayOption);
+  const tenureRepatablePanel = globals.form.aem_semiWizard.aem_selectTenure.aem_tenureSelectionMainPnl.aem_tenureSelectionRepeatablePanel;
   if (window !== undefined) moveWizardView(domElements.semiWizard, 'aem_selectTenure');
+  tenureArrayOption?.forEach((option, i) => {
+    setDataTenurePanel(globals, tenureRepatablePanel, option, i);
+  });
 }
 
 /**
@@ -288,65 +378,6 @@ function numberToText(num) {
   return str;
 }
 
-function calculateEMI(loanAmount, rateOfInterest, tenure) {
-  // optmize this later - amaini
-  // [P x R x (1+R)^N]/[(1+R)^N-1]
-  const newrate = (rateOfInterest / 100);
-  const rate1 = (1 + newrate);
-  const rate2 = rate1 ** tenure;
-  const rate3 = (rate2 - 1);
-  const principle = [(loanAmount) * (newrate) * rate2];
-  const finalEMI = Math.round(principle / rate3);
-  return finalEMI;
-}
-
-/* update Options 
-const loanAmount = 11800;
-loanoptions.forEach(option => {
-  var nfObject = new Intl.NumberFormat('hi-IN');
-option.roiMonthly = (parseInt(option.interest, 10) / 100) / 12;
-  option.roiAnnually = currencyUtil(parseFloat(option.interest), 2);
-option.MonthlyEMI = nfObject.format(calculateEMI1(loanAmount, option.roiMonthly, parseInt(option.period)));
-option.period = parseInt(option.period) + " Months";
-option.procesingFee = '500'
-  console.log(option);
-
-});
-*/
-
-//var a4 = getLoanOptionsInfo(x.response.responseString.records);
-const getLoanOptionsInfo = (responseStringJsonObj) => {
-  const loanOptionsInfo = {
-    loanoptions: [],
-  };
-
-  // Loop through the periods, interests, and tids
-  for (let i = 1; i <= 5; i++) {
-    const periodKey = `period${i === 1 ? '' : i}`;
-    const interestKey = `interest${i === 1 ? '' : i}`;
-    const tidKey = `tid${i === 1 ? '' : i}`;
-
-    // Check if the keys exist to avoid pushing undefined values
-    if (responseStringJsonObj[0][periodKey] !== undefined) {
-      loanOptionsInfo.loanoptions.push({
-        period: responseStringJsonObj[0][periodKey],
-        interest: responseStringJsonObj[0][interestKey],
-        tid: responseStringJsonObj[0][tidKey],
-      });
-    }
-  }
-
-  return loanOptionsInfo.loanoptions;
-};
-
-
-/*
-function selectionTenure(globals){
-updated Array = getLoanOptionsInfo(runtime.resObj) -- >>>
-setDataTenurePanel(updated Array)
-}
-
-*/
 export {
   getOTPV1,
   otpValV1,
