@@ -18,7 +18,7 @@
 * the terms of the Adobe license agreement accompanying it.
 *************************************************************************/
 
-import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, Valid, Invalid, SubmitSuccess, CustomEvent, SubmitError, SubmitFailure, Submit, RemoveInstance, AddInstance, Reset, AddItem, Click } from './afb-events.js';
+import { propertyChange, ExecuteRule, Initialize, RemoveItem, Change, FormLoad, FieldChanged, ValidationComplete, Valid, Invalid, SubmitSuccess, CustomEvent, SubmitError, SubmitFailure, Submit, RemoveInstance, AddInstance, Reset, AddItem, Click, SetItems } from './afb-events.js';
 import Formula from '../formula/index.js';
 import { format, parseDefaultDate, datetimeToNumber, parseDateSkeleton, formatDate, numberToDatetime } from './afb-formatters.min.js';
 
@@ -2624,6 +2624,8 @@ const createAction = (name, payload = {}) => {
             return new AddInstance(payload);
         case 'removeInstance':
             return new RemoveInstance(payload);
+        case 'setItems':
+            return new SetItems(payload);
         default:
             console.error('invalid action');
     }
