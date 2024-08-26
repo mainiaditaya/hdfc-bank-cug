@@ -534,6 +534,15 @@ const pinCodeMasterCheck = async (globals, cityField, stateField, pincodeField, 
   }
 };
 
+const getUrlParamCaseInsensitive = (param) => {
+  const urlSearchParams = new URLSearchParams(window.location.search);
+
+  const paramEntry = [...urlSearchParams.entries()]
+    .find(([key]) => key.toLowerCase() === param.toLowerCase());
+
+  return paramEntry ? paramEntry[1] : null;
+};
+
 export {
   urlPath,
   maskNumber,
@@ -564,4 +573,5 @@ export {
   attachRedirectOnClick,
   createDeepCopyFromBlueprint,
   pinCodeMasterCheck,
+  getUrlParamCaseInsensitive,
 };
