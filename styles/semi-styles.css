@@ -247,6 +247,8 @@ main .section.form-container {
 
         /* Step 2 - Wizard - Choose Transactions */
         .field-aem-choosetransactions {
+            .field-aem-eligibletxnlabel, .field-aem-txnavailable { border-right: solid 1px var(--color-interface-border-secondary); }
+
             .field-aem-eligibletxnlabel, field-aem-eligibletxnlabel p, .field-aem-txnavailable, .field-aem-txnavailable p, .field-aem-totalselectedtxt, .field-aem-totalselectedtxt p {
                 margin: 3px 0 0;
                 font-size: var(--body-lg-font-size);
@@ -291,7 +293,7 @@ main .section.form-container {
                         align-self: center;
                         padding: 0;
                         margin: -1px 0 0;
-                        border: none;
+                        border: var(--color-input-border-default);
                         pointer-events: none;
 
                         p { 
@@ -437,7 +439,13 @@ main .section.form-container {
 
                     .field-aem-tenureselection {
                         width: fit-content;
-                        .radio-wrapper label { padding-left: 35px; }
+
+                        .radio-wrapper label { 
+                            padding-left: 35px; 
+                            font-size: var(--body-sm-font-size) !important;
+                            font-weight: var(--font-weight-regular);
+                            color: var(--color-interface-text-primary);
+                        }
                     }
 
                     .field-wrapper { align-self: center; }
@@ -484,23 +492,50 @@ main .section.form-container {
                 label { font-size: var(--body-md-font-size); }
             }
 
-            .field-aem-tandc {
-                grid-column: span 2;
-                width: fit-content;
-                label p { font-size: var(--body-sm-font-size) !important; }
-                input { margin-top: 0; }
+            .field-aem-employeeassistancepanel {
+                label { margin-left: 5px;}
+                .drop-down-wrapper label { margin-left: 10px; }
+
+                select, select:focus, input, input:focus {
+                    border-width: 0 0 1px;
+                    border-style: solid;
+                    border-radius: 0 !important;
+                    border-color: transparent transparent var(--color-input-border-default) transparent !important;
+                    outline: none !important;
+                }
             }
 
-            .field-aem-tncbutton {
-                margin-left: -55px;
-                width: fit-content;
+            .field-tncpanelwrapper {
+                display: flex;
+                flex-direction: row;
 
-                button, button:hover {
-                    color: var(--form-paragraph-color);
-                    background: var(--color-interface-background-primary) !important;
-                    font-size: var(--body-sm-font-size);
-                    text-decoration: underline;
-                    font-weight: var(--font-weight-regular);
+                .field-aem-tandc {
+                    display: contents;
+                    
+                    label { 
+                        width: fit-content; 
+                        flex-basis: content;
+                    }
+
+                    label p { 
+                        font-size: var(--body-sm-font-size) !important; 
+                        margin: 15px 0 0;
+                    }
+
+                    input { margin: 15px 0 0; }
+                }
+    
+                .field-aem-tncbutton {
+                    width: fit-content;
+                    margin-left: -10px;
+    
+                    button, button:hover {
+                        color: var(--form-paragraph-color);
+                        background: var(--color-interface-background-primary) !important;
+                        font-size: var(--body-sm-font-size);
+                        text-decoration: underline;
+                        font-weight: var(--font-weight-regular);
+                    }
                 }
             }
 
@@ -668,7 +703,12 @@ main .section.form-container {
                             }
 
                             .field-aem-txnsortdd { display: none; }
-                            .field-expand-btn { margin-top: -10px !important; }
+
+                            .field-expand-btn { 
+                                margin-top: -103px !important;
+                                grid-column: span 10;
+                                justify-self: flex-end;
+                             }
                         }
 
                         .field-aem-txnslist {
@@ -695,6 +735,33 @@ main .section.form-container {
                     }
                 }
             }
+        }
+
+        .field-aem-semiwizard .field-aem-selecttenure {
+            .field-aem-tenureselectionmainpnl{
+                .field-aem-tenureselectionheaderpanel { 
+                    display: grid !important;
+                    margin-bottom: 10px;
+                    p { font-size: var(--body-sm-font-size) !important; }
+                }
+
+                .field-aem-tenureselectionrepeatablepanel {
+                    padding: 0 0 0 13px;
+
+                    > .repeat-wrapper .panel-wrapper {
+                        display: grid !important;
+                        padding-top: 11px;
+
+                        label, input { font-size: var(--body-x-sm-font-size) !important; }
+
+                        .radio-wrapper label { padding-left: 15px; }
+                        .field-aem-tenureselection { margin-bottom: 0 !important; }
+                    }
+                }
+            }
+            .field-rateofinterestperannumvalue { margin-top: -16px; }
+            .field-aem-bankassistedtoggle { margin-bottom: 20px; }
+            .field-aem-tncbutton { margin: 0 !important; }
         }
     }
 }
