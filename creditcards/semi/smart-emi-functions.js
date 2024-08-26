@@ -137,16 +137,14 @@ const DELTA_DELAY = 70;
  */
 const setTxnPanelData = (allTxn, btxn, billedTxnPanel, unBilledTxnPanel, globals) => {
   if (!allTxn?.length) return;
-  allTxn.map((txn) => {
-    const mappedTxn = {};
-    mappedTxn.aem_TxnAmt = txn?.amount;
-    mappedTxn.aem_TxnDate = txn?.date;
-    mappedTxn.aem_TxnID = txn?.id;
-    mappedTxn.aem_TxnName = txn?.name;
-    return mappedTxn;
-  });
-  const billedTxn = allTxn.slice(0, btxn);
-  const unbilledTxn = allTxn.slice(btxn);
+  const transformedTxn = allTxn.map((txn) => ({
+    aem_TxnAmt: txn?.amount,
+    aem_TxnDate: txn?.date,
+    aem_TxnID: txn?.id,
+    aem_TxnName: txn?.name,
+  }));
+  const billedTxn = transformedTxn.slice(0, btxn);
+  const unbilledTxn = transformedTxn.slice(btxn);
   globals.functions.dispatchEvent(billedTxnPanel, 'setItems', { items: billedTxn });
   globals.functions.dispatchEvent(unBilledTxnPanel, 'setItems', { items: unbilledTxn });
 };
