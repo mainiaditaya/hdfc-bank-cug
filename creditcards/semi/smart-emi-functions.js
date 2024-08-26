@@ -358,7 +358,7 @@ const changeCheckboxToToggle = () => {
  * @returns {void}
  */
 const changeWizardView = () => {
-  let completedStep = document.querySelector('.field-aem-semiwizard .wizard-menu-items .wizard-menu-active-item');
+  const completedStep = document.querySelector('.field-aem-semiwizard .wizard-menu-items .wizard-menu-active-item');
   completedStep.classList.add('wizard-completed-item');
 };
 
