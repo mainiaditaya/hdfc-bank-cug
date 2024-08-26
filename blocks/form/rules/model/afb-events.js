@@ -186,5 +186,10 @@ class RemoveInstance extends ActionImpl {
         super(payload, 'removeInstance');
     }
 }
+export class SetItems extends ActionImpl {
+    constructor(payload) {
+        super(payload, 'setItems');
+    }
+}
 
 export { AddInstance, AddItem, Blur, Change, Click, CustomEvent, ExecuteRule, FieldChanged, Focus, FormLoad, Initialize, Invalid, RemoveInstance, RemoveItem, Reset, Submit, SubmitError, SubmitFailure, SubmitSuccess, Valid, ValidationComplete, propertyChange };
