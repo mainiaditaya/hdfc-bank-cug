@@ -137,24 +137,10 @@ const DELTA_DELAY = 70;
  */
 const setTxnPanelData = (allTxn, btxn, billedTxnPanel, unBilledTxnPanel, globals) => {
   if (!allTxn?.length) return;
-  allTxn.forEach((txn, i) => {
-    const isBilled = i < btxn;
-    const isFirst = i === 0;
-    const isLast = i === allTxn.length - 1;
-    let panel = billedTxnPanel;
-    if (btxn !== undefined && unBilledTxnPanel !== undefined) {
-      // Case where we have both billed and unbilled transactions
-      panel = isBilled ? billedTxnPanel : unBilledTxnPanel;
-    }
-    const delay = DELAY + (DELTA_DELAY * i);
-    const panelIndex = isBilled ? i : i - btxn;
-    setTimeout(() => {
-      if (isFirst || !isLast) {
-        globals.functions.dispatchEvent(panel, 'addItem');
-      }
-      setData(globals, panel, txn, panelIndex);
-    }, delay);
-  });
+  const billedTxn = allTxn.slice(0, btxn);
+  const unbilledTxn = allTxn.slice(btxn);
+  globals.functions.dispatchEvent(billedTxnPanel, 'setItems', { items: billedTxn });
+  globals.functions.dispatchEvent(unBilledTxnPanel, 'setItems', { items: unbilledTxn });
 };
 
 /**
