@@ -13,6 +13,7 @@ import {
  */
 const validateOtpInput = () => {
   const otpInputField = document.querySelector('.field-otpnumber input');
+  otpInputField.placeholder = '••••••';
   otpInputField.addEventListener('input', () => {
     if (!/^\d+$/.test(otpInputField.value)) {
       otpInputField.value = otpInputField.value.slice(0, -1);
@@ -20,8 +21,8 @@ const validateOtpInput = () => {
   });
 };
 
-const addGaps = () => {
-  const panInputField = document.querySelector('.char-gap-4 input');
+const addGaps = (elSelector) => {
+  const panInputField = document.querySelector(elSelector);
   panInputField.addEventListener('input', () => {
     const vaildInput = validatePanInput(panInputField.value.replace(/\s+/g, ''));
     if (!vaildInput) {
@@ -65,7 +66,7 @@ const changeCheckboxToToggle = () => {
 };
 
 setTimeout(() => {
-  addGaps();
+  addGaps('.field-pan.char-gap-4 input');
   addMobileValidation();
 }, 1000);
 

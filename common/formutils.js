@@ -3,6 +3,7 @@
 
 import * as CONSTANT from './constants.js';
 import * as DOM_API from '../creditcards/domutils/domutils.js';
+import { getJsonResponse } from './makeRestAPI.js';
 
 const {
   setDataAttributeOnClosestAncestor,
@@ -15,7 +16,7 @@ const {
   attachRedirectOnClick,
 } = DOM_API; // DOM_MANIPULATE_CODE_FUNCTION
 
-const { BASEURL } = CONSTANT;
+const { BASEURL, PIN_CODE_LENGTH } = CONSTANT;
 
 // declare-CONSTANTS
 const DATA_ATTRIBUTE_EMPTY = 'data-empty';
@@ -195,23 +196,46 @@ const dateFormat = (dateString, format) => {
  * @param {string} fn - The first name.
  * @param {string} mn - The middle name.
  * @param {string} ln - The last name.
+ * @param {string} cardType - The card type.
+ * @param {number} ln - max name length.
  * @returns {Array<Object>} -  An array of objects representing different combinations of names using the provided first name (fn), middle name (mn), and last name (ln).
  */
-const composeNameOption = (fn, mn, ln) => {
+const composeNameOption = (fn, mn, ln, cardType, maxlength) => {
   const initial = (str) => str?.charAt(0);
   const stringify = ([a, b]) => (a && b ? `${a} ${b}` : '');
   const toOption = (a) => ({ label: a, value: a });
-  const MAX_LENGTH = 19;
-  const names = [
-    [fn, initial(mn)],
-    [fn, mn],
-    [mn, fn],
-    [mn, initial(fn)],
-    [initial(mn), fn],
-    [fn, ln],
-    [mn, ln],
-    [initial(mn), ln],
-  ]?.map(stringify)?.filter((el) => el && el?.length <= MAX_LENGTH);
+  let names = [];
+  switch (cardType) {
+    case 'ccc':
+      names = [
+        [fn, initial(mn)],
+        [fn, mn],
+        [mn, fn],
+        [mn, initial(fn)],
+        [initial(mn), fn],
+        [fn, ln],
+        [mn, ln],
+        [initial(mn), ln],
+      ]?.map(stringify)?.filter((el) => el && el?.length <= maxlength);
+      break;
+    case 'fd':
+      names = [
+        [fn, initial(mn)],
+        [fn, mn],
+        [fn, ln],
+        [mn, fn],
+        [mn, initial(fn)],
+        [mn, ln],
+        [initial(mn), fn],
+        [initial(mn), ln],
+        [fn],
+        [mn],
+        [ln],
+      ]?.map(stringify)?.filter((el) => el && el?.length <= maxlength);
+      break;
+    default:
+  }
+
   return [...new Set(names)]?.map(toOption);
 };
 
@@ -388,12 +412,23 @@ const splitName = (fullName) => {
  * @returns {Boolean} - True if the date of birth falls within the specified age range; otherwise, false.
  */
 const ageValidator = (minAge, maxAge, dobValue) => {
-  const ipDobValue = new Date(dobValue);
-  const diff = Date.now() - ipDobValue.getTime();
-  const ageDate = new Date(diff);
-  const age = Math.abs(ageDate.getUTCFullYear() - 1970); // Date.now() and the getTime() method, starts from January 1, 1970 hence 1970.
-  const ageBtwMinMax = (age >= minAge && age <= maxAge);
-  return ageBtwMinMax;
+  const birthDate = new Date(dobValue);
+
+  const today = new Date();
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+
+  const birthMonth = birthDate.getMonth();
+  const birthDay = birthDate.getDate();
+
+  const todayMonth = today.getMonth();
+  const todayDay = today.getDate();
+
+  if (todayMonth < birthMonth || (todayMonth === birthMonth && todayDay < birthDay)) {
+    age -= 1;
+  }
+
+  return age >= minAge && age < maxAge;
 };
 
 /**
@@ -444,6 +479,61 @@ function createDeepCopyFromBlueprint(blueprint) {
   return JSON.parse(JSON.stringify(blueprint));
 }
 
+/**
+ * Handles API call for validating pinCode using the pinCodeMaster function.
+ * @param {object} globalObj - The global object containing necessary globals form data.
+ * @param {object} cityField - The City field object from the global object.
+ * @param {object} stateField - The State field object from the global object.
+ * @param {object} pincodeField - The PinCode field object from the global object.
+ * @param {number} pincode - The PinCode.
+ */
+
+const pinCodeMasterCheck = async (globals, cityField, stateField, pincodeField, pincode) => {
+  const url = urlPath(`/content/hdfc_commonforms/api/mdm.CREDIT.SIX_DIGIT_PINCODE.PINCODE-${pincode}.json`);
+  if (pincodeField?.$value?.length < PIN_CODE_LENGTH) return;
+  const method = 'GET';
+  const cityFieldUtil = formUtil(globals, cityField);
+  const stateFieldUtil = formUtil(globals, stateField);
+  const resetStateCityFields = () => {
+    cityFieldUtil.resetField();
+    stateFieldUtil.resetField();
+    cityFieldUtil.enabled(false);
+    stateFieldUtil.enabled(false);
+  };
+  const errorMethod = async (errStack) => {
+    const { errorCode } = errStack;
+    const defErrMessage = 'Please enter a valid pincode';
+    if (errorCode === '500') {
+      globals.functions.markFieldAsInvalid(pincodeField.$qualifiedName, defErrMessage, { useQualifiedName: true });
+      resetStateCityFields();
+    }
+  };
+  const successMethod = async (value) => {
+    const changeDataAttrObj = { attrChange: true, value: false };
+    globals.functions.markFieldAsInvalid(pincodeField.$qualifiedName, '', { useQualifiedName: true });
+    globals.functions.setProperty(pincodeField, { valid: true });
+    cityFieldUtil.setValue(value?.CITY, changeDataAttrObj);
+    cityFieldUtil.enabled(false);
+    stateFieldUtil.setValue(value?.STATE, changeDataAttrObj);
+    stateFieldUtil.enabled(false);
+  };
+
+  try {
+    const response = await getJsonResponse(url, null, method);
+    globals.functions.setProperty(pincodeField, { valid: true });
+    const [{ CITY, STATE }] = response;
+    const [{ errorCode, errorMessage }] = response;
+    if (CITY && STATE) {
+      successMethod({ CITY, STATE });
+    } else if (errorCode) {
+      const errStack = { errorCode, errorMessage };
+      throw errStack;
+    }
+  } catch (error) {
+    errorMethod(error);
+  }
+};
+
 export {
   urlPath,
   maskNumber,
@@ -473,4 +563,5 @@ export {
   formatDateDDMMMYYY,
   attachRedirectOnClick,
   createDeepCopyFromBlueprint,
+  pinCodeMasterCheck,
 };

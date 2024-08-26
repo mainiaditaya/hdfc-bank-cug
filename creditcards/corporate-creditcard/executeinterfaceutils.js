@@ -21,6 +21,7 @@ import {
   FORM_RUNTIME as formRuntime,
 } from '../../common/constants.js';
 import { sendAnalytics } from './analytics.js';
+import { NAME_ON_CARD_MAX_LENGTH } from './constant.js';
 
 const GENDER_MAP = {
   M: '1',
@@ -230,7 +231,7 @@ const listNameOnCard = (globals) => {
   const middleName = personalDetails.middleName.$value;
   const lastName = personalDetails.lastName.$value;
   const dropDownSelectField = globals.form.corporateCardWizardView.confirmCardPanel.cardBenefitsPanel.CorporatetImageAndNamePanel.nameOnCardDropdown;
-  const options = composeNameOption(firstName, middleName, lastName);
+  const options = composeNameOption(firstName, middleName, lastName, 'ccc', NAME_ON_CARD_MAX_LENGTH);
   const initialValue = options[0]?.value;
   setSelectOptions(options, elementNameSelect);
   const setDropdownField = formUtil(globals, dropDownSelectField);
