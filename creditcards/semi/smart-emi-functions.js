@@ -71,6 +71,7 @@ currentFormContext.journeyID = generateJourneyId('a', 'b', 'c');
 currentFormContext.totalSelect = 0;
 currentFormContext.billed = 0;
 currentFormContext.unbilled = 0;
+let tnxPopupAlertOnce = false; // flag alert for the pop to show only once on click of continue
 
 /**
  * generates the otp
@@ -349,7 +350,10 @@ const tenureDisplay = (globals) => {
  */
 // eslint-disable-next-line no-unused-vars
 function selectTenure(globals) {
-  if (currentFormContext.totalSelect < DATA_LIMITS.totalSelectLimit) { // alert if the user selected less than TEN-txn
+  if (currentFormContext.totalSelect < DATA_LIMITS.totalSelectLimit) {
+    tnxPopupAlertOnce = !tnxPopupAlertOnce;
+  }
+  if (tnxPopupAlertOnce) { // alert if the user selected less than TEN-txn
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper, { visible: true });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup, { visible: true });
   } else if (window !== undefined) {
