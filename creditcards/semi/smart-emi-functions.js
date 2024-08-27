@@ -1,9 +1,10 @@
-/* eslint-disable eqeqeq */
 import { displayLoader, fetchJsonResponse, hideLoaderGif } from '../../common/makeRestAPI.js';
 import * as SEMI_CONSTANT from './constant.js';
 import {
   clearString,
-  generateUUID, moveWizardView, urlPath,
+  generateUUID,
+  moveWizardView,
+  urlPath,
 } from '../../common/formutils.js';
 import { createLabelInElement } from '../domutils/domutils.js';
 
@@ -14,6 +15,7 @@ const {
   PRO_CODE,
   DOM_ELEMENT: domElements,
   MISC,
+  DATA_LIMITS,
   // eslint-disable-next-line no-unused-vars
   RESPONSE_PAYLOAD,
 } = SEMI_CONSTANT;
@@ -69,7 +71,6 @@ currentFormContext.journeyID = generateJourneyId('a', 'b', 'c');
 currentFormContext.totalSelect = 0;
 currentFormContext.billed = 0;
 currentFormContext.unbilled = 0;
-let tnxPopupAlertOnce = true; // flag alert for the pop to show only once on click of continue
 
 /**
  * generates the otp
@@ -232,13 +233,11 @@ function checkELigibilityHandler(resPayload1, globals) {
 }
 
 /* */
-// eslint-disable-next-line no-unused-vars
 const numberToText = (num) => {
   const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
   const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
   if ((num.toString()).length > 9) return 'overflow';
   const n = (`000000000${num}`).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
-  // eslint-disable-next-line consistent-return
   if (!n) return;
   let str = '';
   str += (n[1] != 0) ? `${a[Number(n[1])] || `${b[n[1][0]]} ${a[n[1][1]]}`}Crore ` : '';
@@ -291,9 +290,14 @@ const currencyUtil = (number, minimumFractionDigits) => {
 const LOAN_AMOUNT = 11800;
 
 const setDataTenurePanel = (globals, panel, option, i) => {
-  globals.functions.setProperty(panel[i].aem_tenureSelection, { value: option?.period });
+  globals.functions.setProperty(panel[i].aem_tenureSelection, { enumNames: [option?.period] });
+  // globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.test, { enum: [0], enumNames: ['test'] });
+  // globals.functions.setProperty(panel[i].aem_tenureSelection, { enum: [0], enumNames: [option?.period] });
+  /* */
   globals.functions.setProperty(panel[i].aem_tenureSelectionEmi, { value: Number(clearString(option?.monthlyEMI)) });
   globals.functions.setProperty(panel[i].aem_tenureSelectionProcessing, { value: option?.procesingFee });
+  globals.functions.setProperty(panel[i].aem_roi_monthly, { value: option?.roiMonthly });
+  globals.functions.setProperty(panel[i].aem_roi_annually, { value: option?.roiAnnually });
 };
 
 const tenureOption = (loanOptions) => {
@@ -316,6 +320,28 @@ const tenureOption = (loanOptions) => {
   return arrayOptions;
 };
 
+const tenureDisplay = (globals) => {
+  const loanArrayOption = getLoanOptionsInfo(runtimeData.checkEligibilityResponse?.responseString?.records);
+  const tenureArrayOption = tenureOption(loanArrayOption);
+  const tenureRepatablePanel = globals.form.aem_semiWizard.aem_selectTenure.aem_tenureSelectionMainPnl.aem_tenureSelectionRepeatablePanel;
+  const semiFormData = globals.functions.exportData().smartemi;
+  const selectedTxnList = (semiFormData?.aem_billedTxn?.aem_billedTxnSelection?.concat(semiFormData?.aem_unbilledTxn?.aem_unbilledTxnSection))?.filter((txn) => txn.aem_Txn_checkBox === 'on');
+  const totalAmountOfTxn = selectedTxnList?.reduce((prev, acc) => prev + acc.aem_TxnAmt, 0);
+  const LABEL_AMT_SELCTED = 'Amount selected for SmartEMI';
+  const nfObject = new Intl.NumberFormat('hi-IN');
+  const DISPLAY_TOTAL_AMT = `${MISC.rupeesUnicode} ${nfObject.format(parseInt(totalAmountOfTxn, 10))}`;
+  const TOTAL_AMT_IN_WORDS = `${numberToText(totalAmountOfTxn)}`;
+  globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_customerNameLabel, { value: LABEL_AMT_SELCTED });
+  globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingLabel, { value: DISPLAY_TOTAL_AMT });
+  globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingAmt, { value: `${MISC.rupeesUnicode} ${TOTAL_AMT_IN_WORDS}` });
+
+  const DEFUALT_SELCT_TENURE = (tenureRepatablePanel.length > 0) ? (tenureRepatablePanel.length - 1) : 0;
+  globals.functions.setProperty(tenureRepatablePanel[DEFUALT_SELCT_TENURE].aem_tenureSelection, { value: '0' });
+
+  tenureArrayOption?.forEach((option, i) => {
+    setDataTenurePanel(globals, tenureRepatablePanel, option, i);
+  });
+};
 /**
  * Continue button on choose transactions.
  *
@@ -323,19 +349,13 @@ const tenureOption = (loanOptions) => {
  */
 // eslint-disable-next-line no-unused-vars
 function selectTenure(globals) {
-  const loanArrayOption = getLoanOptionsInfo(runtimeData.checkEligibilityResponse?.responseString?.records);
-  const tenureArrayOption = tenureOption(loanArrayOption);
-  const tenureRepatablePanel = globals.form.aem_semiWizard.aem_selectTenure.aem_tenureSelectionMainPnl.aem_tenureSelectionRepeatablePanel;
-  if (tnxPopupAlertOnce) { // flag alert for the pop to show only once on click of continue
+  if (currentFormContext.totalSelect < DATA_LIMITS.totalSelectLimit) { // alert if the user selected less than TEN-txn
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper, { visible: true });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup, { visible: true });
   } else if (window !== undefined) {
     moveWizardView(domElements.semiWizard, domElements.selectTenure);
-    tenureArrayOption?.forEach((option, i) => {
-      setDataTenurePanel(globals, tenureRepatablePanel, option, i);
-    });
+    tenureDisplay(globals);
   }
-  tnxPopupAlertOnce = !tnxPopupAlertOnce;
 }
 let selectTopTenFlag = false;
 let isUserSelection = false;
@@ -505,11 +525,30 @@ function selectTopTxn(globals) {
       globals.functions.setProperty(billedTxnSelected, { value: `${billedCounter} Selected` });
       globals.functions.setProperty(unbilledTxnSelected, { value: `${unbilledCounter} Selected` });
       currentFormContext.totalSelect = sortedTxnList.length;
-      const TOTAL_SELECT = `Total selected ${currentFormContext.totalSelect}/${sortedTxnList.length}`;
+      const TOTAL_SELECT = `Total selected ${currentFormContext.totalSelect}/${DATA_LIMITS.totalSelectLimit}`;
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_TotalSelectedTxt, { value: TOTAL_SELECT });
     });
     selectTopTenFlag = !selectTopTenFlag;
   }, 3000);
+}
+
+/**
+* @param {object} arg1
+* @param {object} globals - global object
+*/
+function radioBtnValCommit(arg1, globals) {
+  if (arg1?.$value) {
+    const selectedQlyFormValue = arg1?.$qualifiedName?.substring(1); // "form.aem_semiWizard.aem_selectTenure.aem_tenureSelectionMainPnl.aem_tenureSelectionRepeatablePanel[2].aem_tenureSelection"
+    const selectedIndex = Number(selectedQlyFormValue?.match(/\d+/g)?.[0]); // 0, 1, 2 or 3 indicates the index of the selected
+    const radioBtnOption = globals.form.aem_semiWizard.aem_selectTenure.aem_tenureSelectionMainPnl.aem_tenureSelectionRepeatablePanel;
+    radioBtnOption?.forEach((item, i) => {
+      if (selectedIndex === i) {
+        globals.functions.setProperty(item.aem_tenureSelection, { value: '0' });
+      } else {
+        globals.functions.setProperty(item.aem_tenureSelection, { value: null });
+      }
+    });
+  }
 }
 
 export {
@@ -522,4 +561,5 @@ export {
   txnSelectHandler,
   changeCheckboxToToggle,
   changeWizardView,
+  radioBtnValCommit,
 };

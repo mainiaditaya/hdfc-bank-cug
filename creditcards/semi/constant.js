@@ -23,6 +23,9 @@ const MISC = {
 const OTP_TIMER = 30;
 const MAX_OTP_RESEND_COUNT = 3;
 const CURRENT_FORM_CONTEXT = {};
+const DATA_LIMITS = {
+  totalSelectLimit: 10,
+};
 const RESPONSE_PAYLOAD = {
   response: {
     pseudoID: '',
@@ -1390,4 +1393,5 @@ export {
   DOM_ELEMENT,
   MISC,
   RESPONSE_PAYLOAD,
+  DATA_LIMITS,
 };
