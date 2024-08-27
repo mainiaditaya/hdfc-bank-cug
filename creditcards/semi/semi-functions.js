@@ -5,6 +5,9 @@ import {
   checkELigibilityHandler,
   sortData,
   txnSelectHandler,
+  changeCheckboxToToggle,
+  changeWizardView,
+  selectTopTxn,
 } from './smart-emi-functions.js';
 import { invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
 
@@ -26,4 +29,7 @@ export {
   invokeJourneyDropOffUpdate,
   sortData,
   txnSelectHandler,
+  changeCheckboxToToggle,
+  changeWizardView,
+  selectTopTxn,
 };
