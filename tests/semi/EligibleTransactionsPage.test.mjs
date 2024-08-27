@@ -44,6 +44,7 @@ After Each :
 
 import { expect } from "chai";
 import playwright from 'playwright';
+import { titleCheck, textContentCheck, visibilityCheck, radioIsChecked, radioClickAndCheck, textFieldValidation, dateFieldValidation,checkboxClickAndCheck, buttonClick, checkPageContents } from '../utils/helperFunctions.mjs';
 
 describe('Eligible Transactions Page Test', function() {
   let browser;
@@ -57,91 +58,33 @@ describe('Eligible Transactions Page Test', function() {
     console.log("Running test....");
     page.goto(url);
     
-    //------------------------ Welcome Page ---------------------------
-
-    // Type Mobile Number : 
+    // ************************************ WELCOME PAGE ***********************************************
+    // --------------------------------- MOBILE NUMBER ENTER -----------------------------------
     let identifier1 = "input#textinput-9788d1ff27"
     let test_input = "9876543890"
-    await page.waitForSelector(identifier1);
-    // Get the 'name' attribute of the input field to confirm it is working
-    let name_attribute = await page.$eval(identifier1, el => el.getAttribute('name'));
-    console.log('Name attribute:', name_attribute);
-    // console.log(mobile_field)
-    // console.log(nameAttribute)
-    await page.type(identifier1, test_input)
-    // Get the test mobile number currently typed into the input field
-    const typedText = await page.$eval(identifier1, el => el.value);
-    console.log('Input :', typedText);
+    let mobile_results = await textFieldValidation(page, identifier1, test_input, test_input, false, null, null);
 
-
-    // Type Card last 4 digits : 
-    // this.timeout(10000) // all tests in this suite get 10 seconds before timeout
+    // --------------------------------- CARD LAST 4 DIGITS ------------------------------------ 
     let identifier2 = "input#textinput-60e3d65023"
-
     let text_input = "2021"
+    let card_results = await textFieldValidation(page, identifier2, text_input, text_input, false, null, null);
 
-    await page.waitForSelector(identifier2);
-    // Get the 'name' attribute of the input field to confirm it is working
-    let name_attribute2 = await page.$eval(identifier2, el => el.getAttribute('name'));
-    console.log('Name attribute:', name_attribute2);
-    // console.log(mobile_field)
-    // console.log(nameAttribute)
-    await page.type(identifier2, text_input)
-    // Get the test mobile number currently typed into the input field
-    const typedText2 = await page.$eval(identifier2, el => el.value);
-    console.log('Input :', typedText2);
-
-
-    // this.timeout(10000) // all tests in this suite get 10 seconds before timeout
-    let identifier = "button#button-2024db0da1"
-    console.log("Reached1");
-    await page.waitForSelector(identifier);
-    console.log("Reached2");
-    // Get the 'name' attribute of the input field to confirm it is working
-    const nameAttribute = await page.$eval(identifier, el => el.getAttribute('name'));
-    console.log('Name attribute:', nameAttribute);
-    // console.log(mobile_field)
-    // console.log(nameAttribute)
-
-
-    // Mouse click on any empty area of the screen to enable the button
-    await page.mouse.click(10, 10);
-
-
-    await page.click(identifier);
-    console.log("Reached3");
-
-
-    // ---------------------------- OTP Verification Page ------------------------
-    // Enter OTP
-    let identifier_otp = "input#telephoneinput-7e59f4f31d"
-
-    let text_input_otp = "123456"
-
-    await page.waitForSelector(identifier_otp);
-    // Get the 'name' attribute of the input field to confirm it is working
-    const name_attribute_otp = await page.$eval(identifier_otp, el => el.getAttribute('name'));
-    console.log('Name attribute:', name_attribute_otp);
-
-    await page.type(identifier_otp, text_input_otp)
-    // Get the test mobile number currently typed into the input field
-    const typedText_otp = await page.$eval(identifier_otp, el => el.value);
-    console.log('Input :', typedText);
-
-
-    let identifier_otpbtn = "button#button-410c1ebf4e"
-    await page.waitForSelector(identifier_otpbtn);
-    // Get the 'name' attribute of the input field to confirm it is working
-    const nameAttribute_otpbtn = await page.$eval(identifier_otpbtn, el => el.getAttribute('name'));
-    console.log('Name attribute:', nameAttribute_otpbtn);
-    // console.log(mobile_field)
-    // console.log(nameAttribute)
-
-    // Mouse click on any empty area of the screen to enable the button
-    await page.mouse.click(10, 10);
-
-    await page.click(identifier_otpbtn);
     
+    // --------------------------------- BUTTON CLICK --------------------------------------------
+    let identifier = "button#button-2024db0da1"
+    await buttonClick(page, identifier);
+
+      
+    // ************************************ OTP VALIDATION PAGE ***********************************************
+    // --------------------------------- ENTER OTP ----------------------------------------
+    let identifier_otp_field = "input#telephoneinput-7e59f4f31d"
+    let text_input_otp = "123456"
+    await page.click(identifier_otp_field);
+    let otp_results = await textFieldValidation(page, identifier_otp_field, text_input_otp, text_input_otp, false, null, null)
+
+    // ---------------------------------- SUBMIT OTP BTN -------------------------------------
+    let submit_btn_identifier = "button#button-410c1ebf4e"
+    await buttonClick(page, submit_btn_identifier);
 
   });
 
@@ -169,27 +112,19 @@ describe('Eligible Transactions Page Test', function() {
 //   ************* Title Check Test Case ******************
   it('Title Check', async function() {
     let next_identifier1 = "#text-708fa8a7ff p p"
-    await page.waitForSelector(next_identifier1);
-    const para1 = await page.$eval(next_identifier1, b => b.textContent);
-    console.log(para1)
-    await expect(para1).to.include('Eligible Transactions');
+    let result = await textContentCheck(page, next_identifier1, 'Eligible Transactions');
+    await expect(result.inputEqual).to.include(true);
   });   
 
    // ************* Form Check Test Case ******************
    it('Form should render', async function(){
-    await page.waitForSelector('form');
-    const forms = await page.$$('form');
-    await expect(forms.length).to.equal(1);
-});
+      await visibilityCheck(page, 'form');
+    });
 
   // ************* Image Check Test Case ******************
   it('Card Facia Check', async function() {
     let imageSelector = "#panelcontainer-456e4dd868 div picture img"
-    await page.waitForSelector(imageSelector);
-    // Check if the image with the specified alt text is present
-    const imageIsVisible = await page.isVisible(imageSelector);
-    console.log("Image is visible : " , imageIsVisible);
-    await expect(imageIsVisible).to.equals(true);
+    await visibilityCheck(page, imageSelector);
   });
 
     // ************* Image Alt Check Test Case ******************
