@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 import { displayLoader, fetchJsonResponse } from '../../common/makeRestAPI.js';
 import * as SEMI_CONSTANT from './constant.js';
 import {
@@ -216,31 +217,41 @@ function checkELigibilityHandler(resPayload, globals) {
 }
 
 /* */
-// var a4 = getLoanOptionsInfo(x.response.responseString.records);
-const getLoanOptionsInfo = (responseStringJsonObj) => {
-  const loanOptionsInfo = {
-    loanoptions: [],
-  };
-
-  // Loop through the periods, interests, and tids
-  for (let i = 1; i <= 5; i++) {
-    const periodKey = `period${i === 1 ? '' : i}`;
-    const interestKey = `interest${i === 1 ? '' : i}`;
-    const tidKey = `tid${i === 1 ? '' : i}`;
-
-    // Check if the keys exist to avoid pushing undefined values
-    if (responseStringJsonObj[0][periodKey] !== undefined) {
-      loanOptionsInfo.loanoptions.push({
-        period: responseStringJsonObj[0][periodKey],
-        interest: responseStringJsonObj[0][interestKey],
-        tid: responseStringJsonObj[0][tidKey],
-      });
-    }
-  }
-  return loanOptionsInfo.loanoptions;
+// eslint-disable-next-line no-unused-vars
+const numberToText = (num) => {
+  const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
+  const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  if ((num.toString()).length > 9) return 'overflow';
+  const n = (`000000000${num}`).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+  // eslint-disable-next-line consistent-return
+  if (!n) return;
+  let str = '';
+  str += (n[1] != 0) ? `${a[Number(n[1])] || `${b[n[1][0]]} ${a[n[1][1]]}`}Crore ` : '';
+  str += (n[2] != 0) ? `${a[Number(n[2])] || `${b[n[2][0]]} ${a[n[2][1]]}`}Lakh ` : '';
+  str += (n[3] != 0) ? `${a[Number(n[3])] || `${b[n[3][0]]} ${a[n[3][1]]}`}Thousand ` : '';
+  str += (n[4] != 0) ? `${a[Number(n[4])] || `${b[n[4][0]]} ${a[n[4][1]]}`}Hundred ` : '';
+  str += `₹${n[5] != 0}` ? `${a[Number(n[5])] || `${b[n[5][0]]} ${a[n[5][1]]}`}Only ` : '';
+  return str;
 };
 
-function calculateEMI(loanAmount, rateOfInterest, tenure) {
+const getLoanOptionsInfo = (responseStringJsonObj) => {
+  // Loop through the periods, interests, and tids
+  const keyPosInResponse = [1, 2, 3, 4, 5];
+  const loanoptions = keyPosInResponse.map((el) => {
+    const periodKey = `period${el === 1 ? '' : el}`;
+    const interestKey = `interest${el === 1 ? '' : el}`;
+    const tidKey = `tid${el === 1 ? '' : el}`;
+    if (responseStringJsonObj[0][periodKey] !== undefined);
+    return {
+      period: responseStringJsonObj[0][periodKey],
+      interest: responseStringJsonObj[0][interestKey],
+      tid: responseStringJsonObj[0][tidKey],
+    };
+  });
+  return loanoptions;
+};
+
+const calculateEMI = (loanAmount, rateOfInterest, tenure) => {
   // optmize this later - amaini
   // [P x R x (1+R)^N]/[(1+R)^N-1]
   const newrate = (rateOfInterest / 100);
@@ -250,22 +261,17 @@ function calculateEMI(loanAmount, rateOfInterest, tenure) {
   const principle = [(loanAmount) * (newrate) * rate2];
   const finalEMI = Math.round(principle / rate3);
   return finalEMI;
-}
+};
 
-function currencyUtil(number, minimumFractionDigits) {
-  if (typeof (number) !== 'number') {
-    return number;
-  }
-  number /= 100;
+const currencyUtil = (number, minimumFractionDigits) => {
+  if (typeof (number) !== 'number') return number;
   const options = {
     minimumFractionDigits: minimumFractionDigits || 0,
   };
-  number = number.toFixed(minimumFractionDigits || 0);
-  const newNumber = new Intl.NumberFormat('us-EN', options).format(number);
+  const interestNumber = (number / 100).toFixed(minimumFractionDigits || 0);
+  const newNumber = new Intl.NumberFormat('us-EN', options).format(interestNumber);
   return newNumber;
-}
-
-/* */
+};
 
 const LOAN_AMOUNT = 11800;
 
@@ -361,21 +367,6 @@ function txnSelectHandler(checkboxVal, txnType, globals) {
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation, { value: CONFIRM_TXT });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation1, { visible: true });
   }
-}
-
-function numberToText(num) {
-  const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
-  const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-  if ((num.toString()).length > 9) return 'overflow';
-  const n = (`000000000${num}`).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
-  if (!n) return;
-  let str = '';
-  str += (n[1] != 0) ? `${a[Number(n[1])] || `${b[n[1][0]]} ${a[n[1][1]]}`}Crore ` : '';
-  str += (n[2] != 0) ? `${a[Number(n[2])] || `${b[n[2][0]]} ${a[n[2][1]]}`}Lakh ` : '';
-  str += (n[3] != 0) ? `${a[Number(n[3])] || `${b[n[3][0]]} ${a[n[3][1]]}`}Thousand ` : '';
-  str += (n[4] != 0) ? `${a[Number(n[4])] || `${b[n[4][0]]} ${a[n[4][1]]}`}Hundred ` : '';
-  str += `₹${n[5] != 0}` ? `${a[Number(n[5])] || `${b[n[5][0]]} ${a[n[5][1]]}`}Only ` : '';
-  return str;
 }
 
 export {
