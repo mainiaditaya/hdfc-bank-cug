@@ -8,6 +8,9 @@
 body.semi-form { 
     font-family: var(--font-family-secondary); 
     input { font-family: var(--font-family-secondary) !important; }
+    main { background-color: var(--color-interface-background-primary) !important; }
+    .section.form-container { box-shadow: none; }
+    main .form form { padding-top: 10px !important; }
 }
 
 .semi-form:has(.field-aem-txtselectionpopupwrapper[data-visible="true"], .field-aem-tnctenurewrapper[data-visible="true"]) { overflow: hidden; }
@@ -700,6 +703,8 @@ body.semi-form {
 
 /* Tablet view */
 @media (width < 767px) {
+    main .form form { padding-top: 0 !important; }
+
     .semi-form {
         .field-aem-semiwizard .field-aem-identifierpanel {
             .field-mobilepanel { display: grid; 
