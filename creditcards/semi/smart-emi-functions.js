@@ -121,7 +121,6 @@ function otpValV1(mobileNumber, cardDigits, otpNumber) {
  * @return {PROMISE}
  */
 function preExecution(mobileNumber, cardDigits) {
-  debugger;
   const jsonObj = {
     requestString: {
       mobileNo: mobileNumber,
@@ -454,7 +453,6 @@ function selectTopTxn(globals) {
 function radioBtnValCommit(arg1, globals) {
   console.log(arg1);
 }
-
 
 export {
   getOTPV1,
