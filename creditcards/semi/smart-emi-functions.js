@@ -288,8 +288,13 @@ const currencyUtil = (number, minimumFractionDigits) => {
   return newNumber;
 };
 
-const LOAN_AMOUNT = 11800;
-
+/**
+ * Sets the data for a specific tenure panel option
+ * @param {object} globals - globals form object
+ * @param {Array} panel - The array of tenure selection panels.
+ * @param {object} option - option object containing details of emi, processing fee, roi
+ * @param {number} i -The index of the current tenure
+ */
 const setDataTenurePanel = (globals, panel, option, i) => {
   globals.functions.setProperty(panel[i].aem_tenureSelection, { enumNames: [option?.period] });
   // globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.test, { enum: [0], enumNames: ['test'] });
@@ -301,12 +306,12 @@ const setDataTenurePanel = (globals, panel, option, i) => {
   globals.functions.setProperty(panel[i].aem_roi_annually, { value: option?.roiAnnually });
 };
 
-const tenureOption = (loanOptions) => {
+const tenureOption = (loanOptions, loanAmt) => {
   const arrayOptions = loanOptions?.map((option) => {
     const nfObject = new Intl.NumberFormat('hi-IN');
     const roiMonthly = (parseInt(option.interest, 10) / 100) / 12;
     const roiAnnually = currencyUtil(parseFloat(option?.interest), 2);
-    const monthlyEMI = nfObject.format(calculateEMI(LOAN_AMOUNT, roiMonthly, parseInt(option.period, 10)));
+    const monthlyEMI = nfObject.format(calculateEMI(loanAmt, roiMonthly, parseInt(option.period, 10)));
     const period = `${parseInt(option.period, 10)} Months`;
     const procesingFee = '500';
     return ({
@@ -321,28 +326,35 @@ const tenureOption = (loanOptions) => {
   return arrayOptions;
 };
 
+/**
+ * Updates the UI to display the selected transaction amount for SmartEMI and pre-selects the last tenure option.
+ * @param {object} globals - global form object
+ */
 const tenureDisplay = (globals) => {
-  const loanArrayOption = getLoanOptionsInfo(runtimeData.checkEligibilityResponse?.responseString?.records);
-  const tenureArrayOption = tenureOption(loanArrayOption);
   const tenureRepatablePanel = globals.form.aem_semiWizard.aem_selectTenure.aem_tenureSelectionMainPnl.aem_tenureSelectionRepeatablePanel;
   const semiFormData = globals.functions.exportData().smartemi;
   const selectedTxnList = (semiFormData?.aem_billedTxn?.aem_billedTxnSelection?.concat(semiFormData?.aem_unbilledTxn?.aem_unbilledTxnSection))?.filter((txn) => txn.aem_Txn_checkBox === 'on');
   const totalAmountOfTxn = selectedTxnList?.reduce((prev, acc) => prev + acc.aem_TxnAmt, 0);
+  const totalAmountSelected = (parseInt(totalAmountOfTxn, 10));
+  const loanArrayOption = getLoanOptionsInfo(runtimeData.checkEligibilityResponse?.responseString?.records);
+  const tenureArrayOption = tenureOption(loanArrayOption, totalAmountSelected);
   const LABEL_AMT_SELCTED = 'Amount selected for SmartEMI';
   const nfObject = new Intl.NumberFormat('hi-IN');
-  const DISPLAY_TOTAL_AMT = `${MISC.rupeesUnicode} ${nfObject.format(parseInt(totalAmountOfTxn, 10))}`;
+  const DISPLAY_TOTAL_AMT = `${MISC.rupeesUnicode} ${nfObject.format(totalAmountSelected)}`;
   const TOTAL_AMT_IN_WORDS = `${numberToText(totalAmountOfTxn)}`;
+  /* display amount */
   globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_customerNameLabel, { value: LABEL_AMT_SELCTED });
   globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingLabel, { value: DISPLAY_TOTAL_AMT });
   globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingAmt, { value: `${MISC.rupeesUnicode} ${TOTAL_AMT_IN_WORDS}` });
-
+  /* pre-select the last tenure option (radio btn) by default */
   const DEFUALT_SELCT_TENURE = (tenureRepatablePanel.length > 0) ? (tenureRepatablePanel.length - 1) : 0;
   globals.functions.setProperty(tenureRepatablePanel[DEFUALT_SELCT_TENURE].aem_tenureSelection, { value: '0' });
-
+  /* set data for tenure panel */
   tenureArrayOption?.forEach((option, i) => {
     setDataTenurePanel(globals, tenureRepatablePanel, option, i);
   });
 };
+
 /**
  * Continue button on choose transactions.
  *
@@ -537,6 +549,7 @@ function selectTopTxn(globals) {
 }
 
 /**
+* Commits the selected radio button value and updates the UI with the corresponding rate of interest.
 * @param {object} arg1
 * @param {object} globals - global object
 */
@@ -545,9 +558,15 @@ function radioBtnValCommit(arg1, globals) {
     const selectedQlyFormValue = arg1?.$qualifiedName?.substring(1); // "form.aem_semiWizard.aem_selectTenure.aem_tenureSelectionMainPnl.aem_tenureSelectionRepeatablePanel[2].aem_tenureSelection"
     const selectedIndex = Number(selectedQlyFormValue?.match(/\d+/g)?.[0]); // 0, 1, 2 or 3 indicates the index of the selected
     const radioBtnOption = globals.form.aem_semiWizard.aem_selectTenure.aem_tenureSelectionMainPnl.aem_tenureSelectionRepeatablePanel;
+    const tenureData = globals.functions.exportData().aem_tenureSelectionRepeatablePanel;
     radioBtnOption?.forEach((item, i) => {
       if (selectedIndex === i) {
         globals.functions.setProperty(item.aem_tenureSelection, { value: '0' });
+        /* set roi based on radio select */
+        const roiMonthly = `${Number(tenureData[i].aem_roi_monthly).toFixed(2)} %`;
+        const roiAnnually = `${tenureData[i].aem_roi_annually}% per annum`;
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.aem_ROI, { value: roiMonthly });
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.rateOfInterestPerAnnumValue, { value: roiAnnually });
       } else {
         globals.functions.setProperty(item.aem_tenureSelection, { value: null });
       }
