@@ -300,6 +300,8 @@ const setDataTenurePanel = (globals, panel, option, i) => {
   // globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.test, { enum: [0], enumNames: ['test'] });
   // globals.functions.setProperty(panel[i].aem_tenureSelection, { enum: [0], enumNames: [option?.period] });
   /* */
+  // const monthlyEmi = `${MISC.rupeesUnicode} ${Number(clearString(option?.monthlyEMI))}`;
+  // const processingFees = `${MISC.rupeesUnicode} ${option?.procesingFee}`;
   globals.functions.setProperty(panel[i].aem_tenureSelectionEmi, { value: Number(clearString(option?.monthlyEMI)) });
   globals.functions.setProperty(panel[i].aem_tenureSelectionProcessing, { value: option?.procesingFee });
   globals.functions.setProperty(panel[i].aem_roi_monthly, { value: option?.roiMonthly });
