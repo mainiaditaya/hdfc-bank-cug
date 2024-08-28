@@ -408,6 +408,9 @@ body.semi-form {
                     }
                 }
             }
+
+            .field-billedtxnfragment:has(.accordion-collapse) { .field-aem-txnheaderpanel { border-radius: 16px; } }
+            .field-unbilledtxnfragment:has(.accordion-collapse) { .field-aem-txnheaderpanel { border-radius: 16px; } }
     
             .field-unbilledtxnfragment {
                 padding-top: 30px;
