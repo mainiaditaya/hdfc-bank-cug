@@ -5,6 +5,11 @@
 }
 
 /* Popup Basic Styling */
+body.semi-form { 
+    font-family: var(--font-family-secondary); 
+    input { font-family: var(--font-family-secondary) !important; }
+}
+
 .semi-form:has(.field-aem-txtselectionpopupwrapper[data-visible="true"], .field-aem-tnctenurewrapper[data-visible="true"]) { overflow: hidden; }
 
 .field-aem-txtselectionpopupwrapper, .field-aem-tnctenurewrapper {
@@ -84,6 +89,7 @@
             gap: 0;
             font-size: var(--body-sm-font-size);
             position: relative;
+            padding-bottom: 10px;
 
             .wizard-menu-item:not(:last-child) { width: 30%; }
             .wizard-menu-item:last-child { width: 10%; }
@@ -148,6 +154,7 @@
             color: var(--color-interface-background-tertiary);
             font-weight: var(--font-weight-bold);
             font-size: var(--body-lg-font-size);
+            margin: 0;
         }
 
         .field-aem-loginpanel {
@@ -175,7 +182,6 @@
                 padding-left: 22px;
             }
         }
-        .field-getotpbutton { padding-top: 32px; }
         .field-aem-mobilenum label { margin-left: -35px; }
 
         .field-mobilepanel:has(.field-aem-mobilenum:is([data-active='true'])), .field-mobilepanel .field-aem-mobilenum input:focus {
@@ -282,7 +288,8 @@
                 margin: 3px 0 0;
                 font-size: var(--body-lg-font-size);
                 font-weight: var(--font-weight-bold);
-                color: var(--color-interface-background-quaternary)
+                color: var(--color-interface-background-quaternary);
+                align-content: center;
             }
     
             .field-aem-eligibletxnlabel p, .field-aem-txnavailable p {
@@ -304,6 +311,7 @@
             .field-aem-totalselectedtxt::before {
                 content: url('../icons/info-icon.svg');
                 align-self: center;
+                margin: 8px 6px 0;
             }
     
             .field-billedtxnfragment .field-aem-choosetransactions, .field-unbilledtxnfragment .field-aem-choosetransactions {
@@ -361,6 +369,17 @@
                             padding: 0 0 0 25px;
                             margin-bottom: -5px;
                         }
+                        .field-aem-txnname { margin-left: -30px; }
+
+                        > .panel-wrapper:has(input[type="checkbox"]:disabled) {
+                            input {
+                                background-color: var(--color-interface-background-primary);
+                                color: var(--color-interface-text-secondary);
+                                opacity: 0.8;
+                            }
+
+                            input[type="checkbox"]:disabled { cursor: not-allowed; }
+                        }
 
                         input { padding: 0; }
                     }
@@ -378,14 +397,6 @@
                         pointer-events: none;
                         border: none;
                     }
-
-                    input:disabled {
-                        background-color: var(--color-interface-background-primary);
-                        color: var(--color-interface-text-secondary);
-                        opacity: 0.8;
-                    }
-
-                    input[type="checkbox"]:disabled { cursor: not-allowed; }
 
                     .field-billed-txnname { margin: 2px 0 0 -32px; }
 
@@ -410,9 +421,9 @@
                 display: grid;
                 background-color: var(--color-interface-popup-background);
 
-                .field-aem-txtselectionpopup, p, input {
+                .field-aem-txtselectionpopup, .plain-text-wrapper, p, input {
                     margin: 0;
-                    padding: 16px;
+                    padding: 0 16px;
                     max-height: fit-content;
                     max-width: 608px;
                     text-align: center;
@@ -508,6 +519,7 @@
                     margin: 0; border: none;
                     padding: 0;
                     text-align: end;
+                    pointer-events: none;
                 }
             }
 
@@ -670,12 +682,26 @@
             }
         }
     }
+
+    /* Result Panel */
+    .field-resultpanelsemi {
+        /* Error Screen */
+        .field-errorresultpanelsemi { 
+            text-align: center;
+
+            .plain-text-wrapper, .plain-text-wrapper p {
+                color: var(--color-interface-text-primary);
+                font-size: var(--body-lg-font-size);
+                font-weight: var(--font-weight-bold);
+            }
+        }
+    }
 }
 
 /* Tablet view */
 @media (width < 767px) {
     .semi-form {
-        .field-aem-identifierpanel {
+        .field-aem-semiwizard .field-aem-identifierpanel {
             .field-mobilepanel { display: grid; 
                 
                 .field-aem-countrycode { 
@@ -693,10 +719,30 @@
                     grid-column: span 11;
                 }
             }
+            .field-consentpanel { display: grid; }
         }
 
-        .field-aem-otppanel {
+        .field-aem-semiwizard .field-aem-otppanel  {
             .field-aem-otpicon, .field-aem-otpicon2 { margin: 0 auto !important; }
+
+            .field-otppanel .field-secondspanel {
+                display: grid;
+
+                .field-wrapper { width: 100%; 
+                    p, input { font-size: var(--body-x-sm-font-size); }
+                }
+                .field-resendotplabel { grid-column: span 10; }
+
+                .field-seconds {
+                    grid-column: span 1;
+                    margin: -14px 0 0 -23px;
+                }
+
+                .field-sectext {
+                    grid-column: span 1;
+                    margin: 1px 0 0 -28px;
+                }
+            }
         }
 
         .field-aem-semicreditcarddisplay {
@@ -760,21 +806,25 @@
                         .field-aem-txnslist {
                             > .repeat-wrapper > .panel-wrapper {
                                 display: grid;
-                                .field-aem-txnname { grid-column: span 9; }
+
+                                .field-aem-txnname { 
+                                    grid-column: span 10; 
+                                    margin-left: 0;
+                                }
 
                                 .field-aem-txnid {
                                     grid-column: span 2;
-                                    margin-left: -12px;
+                                    margin: -32px 0 0 -12px;
                                 }
 
                                 .field-aem-txndate {
                                     grid-column: span 6;
-                                    margin: -40px 0 0 28px;
+                                    margin: -32px 0 0 28px;
                                 }
 
                                 .field-aem-txnamt {
                                     grid-column: span 4;
-                                    margin: -38px 0 0 -7px;                               
+                                    margin: -108px 0 0 -7px;                               
                                 }
                             }
                         }
@@ -814,6 +864,14 @@
             p { margin: 0; }
             .field-secondspanel { margin-top: 0 !important; }
         }
+    }
+}
+
+/* Intermediate breakpoints */
+@media (width <= 460px) {
+    .semi-form .field-aem-semiwizard {
+        .field-aem-loginpanel .field-aem-countrycode input { width: 337% !important; }
+        .field-aem-otppanel .field-otppanel .field-otphelptext { display: block; }
     }
 }
 
