@@ -20,8 +20,6 @@ const {
   RESPONSE_PAYLOAD,
 } = SEMI_CONSTANT;
 
-const runtimeData = {};
-
 /**
  * function sorts the billed / Unbilled Txn  array in ascending order based on the amount field
  *
@@ -227,17 +225,14 @@ function checkELigibilityHandler(resPayload1, globals) {
   const resPayload = resPayload1;
   const response = {};
   try {
+    /* continue btn disabling code added temorary, can be removed after form authoring rule */
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
     let ccBilledData = resPayload?.ccBilledTxnResponse?.responseString || [];
     ccBilledData = sortDataByAmount(ccBilledData, 'amount');
     // apply sort by amount here to ccBilledData
     let ccUnBilledData = resPayload?.ccUnBilledTxnResponse?.responseString || [];
     // apply sort by amount here to ccBilledData
     ccUnBilledData = sortDataByAmount(ccUnBilledData, 'amount');
-    runtimeData.checkEligibilityResponse = resPayload;
-    currentFormContext.txnResponse = {
-      BILLED: ccBilledData,
-      UNBILLED: ccUnBilledData,
-    };
     currentFormContext.EligibilityResponse = resPayload;
     const billedTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
     const unBilledTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_TxnsList;
@@ -362,7 +357,7 @@ const tenureDisplay = (globals) => {
   const selectedTxnList = (semiFormData?.aem_billedTxn?.aem_billedTxnSelection?.concat(semiFormData?.aem_unbilledTxn?.aem_unbilledTxnSection))?.filter((txn) => txn.aem_Txn_checkBox === 'on');
   const totalAmountOfTxn = selectedTxnList?.reduce((prev, acc) => prev + acc.aem_TxnAmt, 0);
   const totalAmountSelected = (parseInt(totalAmountOfTxn, 10));
-  const loanArrayOption = getLoanOptionsInfo(runtimeData.checkEligibilityResponse?.responseString?.records);
+  const loanArrayOption = getLoanOptionsInfo(currentFormContext.EligibilityResponse?.responseString?.records);
   const tenureArrayOption = tenureOption(loanArrayOption, totalAmountSelected);
   const LABEL_AMT_SELCTED = 'Amount selected for SmartEMI';
   const nfObject = new Intl.NumberFormat('hi-IN');
@@ -499,6 +494,12 @@ function txnSelectHandler(checkboxVal, txnType, globals) {
     /* disabling unselected checkBoxes */
     disableCheckBoxes(unbilledTxnList, false, globals);
     disableCheckBoxes(billedTxnList, false, globals);
+  }
+  /* emable disable select-tenure continue button */
+  if (currentFormContext.totalSelect === 0) {
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
+  } else if (currentFormContext.totalSelect > 0) {
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: true });
   }
 }
 
