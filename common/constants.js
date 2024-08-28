@@ -31,7 +31,7 @@ const corpCreditCard = {
       only_cc: 'OYCC',
     },
   },
-  baseUrl: 'https://applyonlinedev.hdfcbank.com',
+  baseUrl: 'https://applyonline.hdfcbank.com',
   journeyName: 'CORPORATE_CARD_JOURNEY',
   formName: 'Corporate credit card',
   channel: 'ADOBE_WEBFORMS',
