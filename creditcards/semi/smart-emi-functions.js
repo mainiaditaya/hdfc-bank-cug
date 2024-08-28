@@ -225,7 +225,7 @@ function checkELigibilityHandler(resPayload1, globals) {
   const resPayload = resPayload1;
   const response = {};
   try {
-    /* continue btn disabling code added temorary, can be removed after form authoring rule */
+    /* continue btn disabling code added temorary, can be removed after form authoring */
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
     let ccBilledData = resPayload?.ccBilledTxnResponse?.responseString || [];
     ccBilledData = sortDataByAmount(ccBilledData, 'amount');
@@ -495,7 +495,7 @@ function txnSelectHandler(checkboxVal, txnType, globals) {
     disableCheckBoxes(unbilledTxnList, false, globals);
     disableCheckBoxes(billedTxnList, false, globals);
   }
-  /* emable disable select-tenure continue button */
+  /* enable disable select-tenure continue button */
   if (currentFormContext.totalSelect === 0) {
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
   } else if (currentFormContext.totalSelect > 0) {
@@ -580,6 +580,12 @@ function selectTopTxn(globals) {
       currentFormContext.totalSelect = sortedTxnList.length;
       const TOTAL_SELECT = `Total selected ${currentFormContext.totalSelect}/${DATA_LIMITS.totalSelectLimit}`;
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_TotalSelectedTxt, { value: TOTAL_SELECT });
+      /* enable disable select-tenure continue button */
+      if (currentFormContext.totalSelect === 0) {
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
+      } else if (currentFormContext.totalSelect > 0) {
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: true });
+      }
     });
     selectTopTenFlag = !selectTopTenFlag;
   }, 3000);
