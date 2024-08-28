@@ -93,7 +93,7 @@ function getOTPV1(mobileNumber, cardDigits, globals) {
     },
   };
   const path = semiEndpoints.otpGen;
-  displayLoader();
+  if (window !== undefined) displayLoader();
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 
@@ -117,7 +117,30 @@ function otpValV1(mobileNumber, cardDigits, otpNumber) {
     },
   };
   const path = semiEndpoints.otpVal;
-  displayLoader();
+  if (window !== undefined) displayLoader();
+  return fetchJsonResponse(path, jsonObj, 'POST', true);
+}
+
+/**
+ * pre  execute loan fullfilment process, generated final otp for loan booking
+ * @param {string} mobileNumber
+ * @param {string} cardDigits
+ * @param {object} globals
+ * @return {PROMISE}
+ */
+function preExecution(mobileNumber, cardDigits) {
+  debugger;
+  const jsonObj = {
+    requestString: {
+      mobileNo: mobileNumber,
+      cardNo: cardDigits,
+      encryptedToken: currentFormContext.EligibilityResponse.responseString.records[0].encryptedToken,
+      journeyID: currentFormContext.journeyID,
+      journeyName: currentFormContext.journeyName,
+    },
+  };
+  const path = semiEndpoints.preexecution;
+  if (window !== undefined) displayLoader();
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 
@@ -215,6 +238,7 @@ function checkELigibilityHandler(resPayload1, globals) {
       BILLED: ccBilledData,
       UNBILLED: ccUnBilledData,
     };
+    currentFormContext.EligibilityResponse = resPayload;
     const billedTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
     const unBilledTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_TxnsList;
     const allTxn = ccBilledData.concat(ccUnBilledData);
@@ -501,6 +525,16 @@ const changeWizardView = () => {
 };
 
 /**
+   * @name semiWizardSwitch to switch panel visibility
+   * @param {string} currentPanel
+   * @param {string} nextPanel
+   * @returns {void}
+   */
+const semiWizardSwitch = (currentPanel, nextPanel) => {
+  moveWizardView(currentPanel, nextPanel);
+};
+
+/**
  * select top txnlist
 * @param {object} globals - global object
  */
@@ -586,5 +620,7 @@ export {
   txnSelectHandler,
   changeCheckboxToToggle,
   changeWizardView,
+  preExecution,
   radioBtnValCommit,
+  semiWizardSwitch,
 };
