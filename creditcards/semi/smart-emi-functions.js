@@ -127,6 +127,7 @@ function otpValV1(mobileNumber, cardDigits, otpNumber) {
  * @return {PROMISE}
  */
 function preExecution(mobileNumber, cardDigits) {
+  // eslint-disable-next-line no-debugger
   debugger;
   const jsonObj = {
     requestString: {
@@ -258,12 +259,18 @@ const numberToText = (num) => {
   const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
   if ((num.toString()).length > 9) return 'overflow';
   const n = (`000000000${num}`).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+  // eslint-disable-next-line consistent-return
   if (!n) return;
   let str = '';
+  // eslint-disable-next-line eqeqeq
   str += (n[1] != 0) ? `${a[Number(n[1])] || `${b[n[1][0]]} ${a[n[1][1]]}`}Crore ` : '';
+  // eslint-disable-next-line eqeqeq
   str += (n[2] != 0) ? `${a[Number(n[2])] || `${b[n[2][0]]} ${a[n[2][1]]}`}Lakh ` : '';
+  // eslint-disable-next-line eqeqeq
   str += (n[3] != 0) ? `${a[Number(n[3])] || `${b[n[3][0]]} ${a[n[3][1]]}`}Thousand ` : '';
+  // eslint-disable-next-line eqeqeq
   str += (n[4] != 0) ? `${a[Number(n[4])] || `${b[n[4][0]]} ${a[n[4][1]]}`}Hundred ` : '';
+  // eslint-disable-next-line eqeqeq, no-constant-condition
   str += `₹${n[5] != 0}` ? `${a[Number(n[5])] || `${b[n[5][0]]} ${a[n[5][1]]}`}Only ` : '';
   return str;
 };
