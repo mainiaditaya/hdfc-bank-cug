@@ -224,12 +224,12 @@ body.semi-form {
                     display: -webkit-box;
                     padding-top: 20px;
                     font-weight: var(--font-weight-bold);
-                    font-size: var(--body-md-font-size);
+                    font-size: var(--body-sm-font-size);
                     color: var(--color-interface-text-primary);
     
                     p { 
                         font-weight: var(--font-weight-bold);
-                        font-size: var(--body-md-font-size);
+                        font-size: var(--body-sm-font-size);
                         margin-right: 5px;
                     }
                 }
