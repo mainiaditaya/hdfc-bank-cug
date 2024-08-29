@@ -275,6 +275,7 @@ const existingCustomerCheck = (res) => {
     casa_asset_cc: 'ETB',
     cc_casa: 'ETB',
     cc_asset: 'ETB',
+    casa_asset: 'ETB',
   };
 
   // Extract customer information
