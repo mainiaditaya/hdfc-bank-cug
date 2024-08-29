@@ -637,6 +637,91 @@ function radioBtnValCommit(arg1, globals) {
   }
 }
 
+/* initialPseudo for ccSmartEmi */
+const getEmiArrayJson = (globals) => {
+  const objFormat = {
+    authCode: '', // fixed
+    cardSeq: '0001', // lasttxnseqno from api - field ? - 1
+    effDate: '19022021', // aem_TxnDate
+    itemNbr: '80201', // aem_TxnID
+    logicMod: '01', // logicMod from Api - field ? - 2
+    originAcct: '0001012350000002025', // fixed
+    plan: '10002', // fixed
+    tranAmt: 450000, // aem_TxnAmt
+    txnDesc: '20 BILLED TXN', // aem_TxnName
+  };
+
+  const returnFormat = [
+    {
+      cardSeq: '0001',
+      logicMod: '01',
+      effDate: '19022021',
+      authCode: '',
+      itemNbr: '80201',
+      tranAmt: 450000,
+      txnDesc: '20 BILLED TXN',
+      plan: '10002',
+      originAcct: '0001012350000002025',
+    },
+  ];
+
+  // logicMod, cardSeq,
+  // arrayOptions?.map((item,i)=>{
+
+  // })
+};
+
+/**
+ * Execurte smart Emi process
+ * @param {string} mobileNum - mobile number
+ * @param {string} cardNum - card digit number
+ * @param {string} otpNum - otp number
+ * @param {object} globals
+ * @return {PROMISE}
+ */
+const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
+  const AGENCY_CODE = 'Adobe Webforms';
+  const MEM_CATEGORY = 'Adobe Webforms';
+  const MEM_SUB_CAT = 'Adobe';
+  const MEMO_LINE_4 = 'Adobe';
+  const MEMO_LINE_5 = 'Adobe';
+  const emiConversionArray = getEmiArrayJson(globals);
+  const eligibiltyResponse = currentFormContext.EligibilityResponse;
+  // interest: "03088" -- radio repatable hidden filed.
+  // period: "003"
+  // tid:"000000106"
+  const jsonObj = {
+    cardNo: cardNum,
+    OTP: otpNum,
+    proCode: PRO_CODE,
+    prodId: eligibiltyResponse.responseString.records[0].prodId,
+    agencyCode: AGENCY_CODE,
+    tenure: '06', // hiddenfield -> parseIntwithout onu
+    interestRate: '01188', // hiddenfield -> parseIntwithout onu
+    encryptedToken: eligibiltyResponse.responseString.records[0].encryptedToken,
+    loanAmt: '450000',
+    ltrExctCode: 'Y  ',
+    caseNumber: mobileNum,
+    dept: 'IT',
+    memCategory: MEM_CATEGORY,
+    memSubCat: MEM_SUB_CAT,
+    memoLine4: MEMO_LINE_4,
+    memoLine5: MEMO_LINE_5,
+    mobileNo: mobileNum,
+    tid: '000000101', // hiddenField -
+    reqAmt: '450000',
+    procFeeWav: '000',
+    reqNbr: '01',
+    emiConversion: emiConversionArray,
+    journeyID: currentFormContext.journeyID,
+    journeyName: currentFormContext.journeyName,
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
+  };
+  const path = semiEndpoints.ccSmartEmi;
+  if (window !== undefined) displayLoader();
+  return fetchJsonResponse(path, jsonObj, 'POST', true);
+};
+
 export {
   getOTPV1,
   otpValV1,
