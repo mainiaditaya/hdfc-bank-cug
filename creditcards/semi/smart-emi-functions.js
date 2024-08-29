@@ -652,7 +652,7 @@ const assistedToggleHandler = async (globals) => {
     const channelOptions = responseOption?.length ? DEF_OPTION.concat(responseOption) : DEF_OPTION;
     const chanelEnumNames = channelOptions?.map((item) => item?.label);
     setSelectOptions(channelOptions, channelDropDown?.$name);
-    globals.functions.setProperty(channelDropDown, { enum: channelOptions, enumNames: chanelEnumNames, value: DEF_OPTION[0] });
+    globals.functions.setProperty(channelDropDown, { enum: channelOptions, enumNames: chanelEnumNames, value: DEF_OPTION[0].value });
   } catch (error) {
     console.error(error);
   }
