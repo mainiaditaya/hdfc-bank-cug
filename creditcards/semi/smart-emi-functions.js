@@ -1,4 +1,6 @@
-import { displayLoader, fetchJsonResponse, hideLoaderGif } from '../../common/makeRestAPI.js';
+import {
+  displayLoader, fetchJsonResponse, getJsonResponse, hideLoaderGif,
+} from '../../common/makeRestAPI.js';
 import * as SEMI_CONSTANT from './constant.js';
 import {
   clearString,
@@ -6,7 +8,7 @@ import {
   moveWizardView,
   urlPath,
 } from '../../common/formutils.js';
-import { createLabelInElement } from '../domutils/domutils.js';
+import { createLabelInElement, setSelectOptions } from '../domutils/domutils.js';
 
 const {
   CURRENT_FORM_CONTEXT: currentFormContext,
@@ -637,6 +639,25 @@ function radioBtnValCommit(arg1, globals) {
   }
 }
 
+/**
+ * initiate master channel api on toggle switch
+ * @param {object} globals - global form object
+ */
+const assistedToggleHandler = async (globals) => {
+  try {
+    const response = await getJsonResponse(semiEndpoints.masterChanel, null, 'GET');
+    const channelDropDown = globals.form.aem_semiWizard.aem_selectTenure.aem_employeeAssistancePanel.aem_channel;
+    const DEF_OPTION = [{ label: 'Website Download', value: 'Website Download' }];
+    const responseOption = response?.map((item) => ({ label: item?.CHANNELS, value: item?.CHANNELS }));
+    const channelOptions = responseOption?.length ? DEF_OPTION.concat(responseOption) : DEF_OPTION;
+    const chanelEnumNames = channelOptions?.map((item) => item?.label);
+    setSelectOptions(channelOptions, channelDropDown?.$name);
+    globals.functions.setProperty(channelDropDown, { enum: channelOptions, enumNames: chanelEnumNames, value: DEF_OPTION[0] });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export {
   getOTPV1,
   otpValV1,
@@ -650,4 +671,5 @@ export {
   preExecution,
   radioBtnValCommit,
   semiWizardSwitch,
+  assistedToggleHandler,
 };
