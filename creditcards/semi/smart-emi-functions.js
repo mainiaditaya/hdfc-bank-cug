@@ -172,7 +172,9 @@ const cardDisplay = (globals, response) => {
   const nfObject = new Intl.NumberFormat('hi-IN');
   // eslint-disable-next-line radix
   const totalAmt = nfObject.format(parseInt(response.responseString.creditLimit) - Math.round(parseInt(response?.blockCode?.bbvlogn_card_outst) / 100));
-  globals.functions.setProperty(creditCardDisplay.aem_semicreditCardContent.aem_outStandingAmt, { value: `${MISC.rupeesUnicode} ${totalAmt}` });
+  const TOTAL_OUTSTANDING_AMT = `${MISC.rupeesUnicode} ${totalAmt}`;
+  currentFormContext.totalOutstandingAmount = TOTAL_OUTSTANDING_AMT;
+  globals.functions.setProperty(creditCardDisplay.aem_semicreditCardContent.aem_outStandingAmt, { value: TOTAL_OUTSTANDING_AMT });
   globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_cardfacia, { value: urlPath(response.cardTypePath) });
   const imageEl = document.querySelector('.field-aem-cardfacia > picture');
   const imagePath = `${urlPath(response.cardTypePath)}?width=2000&optimize=medium`;
@@ -532,13 +534,26 @@ const changeWizardView = () => {
 };
 
 /**
+   * Switches the visibility of panels in the card wizard interface.
    * @name semiWizardSwitch to switch panel visibility
-   * @param {string} currentPanel
-   * @param {string} nextPanel
+   * @param {string} source -  The source of the card wizard (e.g., 'aem_semiWizard' - parent).
+   * @param {string} target -  The target panel to switch to (e.g., 'aem_selectTenure' or 'aem_chooseTransactions').
+   * @param {string} current-  The current view before switching.
+   * @param {object} global -  global form object
    * @returns {void}
    */
-const semiWizardSwitch = (currentPanel, nextPanel) => {
-  moveWizardView(currentPanel, nextPanel);
+const semiWizardSwitch = (source, target, globals) => {
+  /* reset the value of card display while coming back from tenure section */
+  const current = 'aem_selectTenure'; /* current param should be added in form autoring so that , it could be reused  everywhere */
+  if ((target === domElements.chooseTransaction) && (current === domElements.selectTenure)) {
+    const LABEL_OUTSTANDING_AMT = 'Your Total Outstanding Amount is';
+    const CUST_NAME_LABEL = `Dear ${currentFormContext.EligibilityResponse?.cardHolderName}`;
+    const TOTAL_OUTSTANDING_AMT = currentFormContext.totalOutstandingAmount;
+    globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_customerNameLabel, { value: CUST_NAME_LABEL });
+    globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingAmt, { value: TOTAL_OUTSTANDING_AMT });
+    globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingLabel, { value: LABEL_OUTSTANDING_AMT });
+  }
+  return (window !== undefined) && moveWizardView(source, target);
 };
 
 /**
