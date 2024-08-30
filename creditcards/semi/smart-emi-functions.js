@@ -70,6 +70,7 @@ currentFormContext.totalSelect = 0;
 currentFormContext.billed = 0;
 currentFormContext.unbilled = 0;
 let tnxPopupAlertOnce = 0; // flag alert for the pop to show only once on click of continue
+let resendOtpCount = 0;
 
 /**
  * generates the otp
@@ -79,6 +80,15 @@ let tnxPopupAlertOnce = 0; // flag alert for the pop to show only once on click 
  * @return {PROMISE}
  */
 function getOTPV1(mobileNumber, cardDigits, globals) {
+  /* restrict to show otp-resend option once it reaches max-attemt and to show otptimer */
+  const { otpPanel } = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel;
+  if (resendOtpCount < DATA_LIMITS.maxOtpResendLimit) {
+    globals.functions.setProperty(otpPanel.secondsPanel, { visible: true });
+    globals.functions.setProperty(otpPanel.aem_otpResend, { visible: false });
+  } else {
+    globals.functions.setProperty(otpPanel.secondsPanel, { visible: false });
+  }
+
   globals.functions.setProperty(globals.form.runtime.journeyId, { value: currentFormContext.journeyID });
   currentFormContext.journeyName = SEMI_CONSTANT.JOURNEY_NAME;
 
@@ -158,6 +168,7 @@ const setData = (globals, panel, txn, i) => {
   globals.functions.setProperty(panel[i]?.aem_Txn_checkBox, { value: txn?.checkbox || txn?.aem_Txn_checkBox });
   globals.functions.setProperty(panel[i]?.aem_Txn_checkBox, { enabled });// set the checbox value
   globals.functions.setProperty(panel[i]?.aem_TxnAmt, { value: `${MISC.rupeesUnicode} ${nfObject.format(txn?.amount)}` || `${MISC.rupeesUnicode} ${nfObject.format(txn?.aem_TxnAmt)}` });
+  // globals.functions.setProperty(panel[i]?.aem_TxnAmt, { value: txn?.amount || txn?.aem_TxnAmt });
   globals.functions.setProperty(panel[i]?.aem_TxnDate, { value: txn?.date || txn?.aem_TxnDate });
   globals.functions.setProperty(panel[i]?.aem_TxnID, { value: txn?.id || txn?.aem_TxnID });
   globals.functions.setProperty(panel[i]?.aem_TxnName, { value: txn?.name || txn?.aem_TxnName });
@@ -638,6 +649,57 @@ function radioBtnValCommit(arg1, globals) {
   }
 }
 
+/**
+ * otp timer logic
+ * @param {object} globals - global form object
+ */
+const otpTimer = (globals) => {
+  let sec = DATA_LIMITS.otpTimeLimit;
+  let dispSec = DATA_LIMITS.otpTimeLimit;
+  const { otpPanel } = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel;
+  const timer = setInterval(() => {
+    globals.functions.setProperty(otpPanel.secondsPanel.seconds, { value: dispSec });
+    sec -= 1;
+    dispSec = sec;
+    if (sec < 10) {
+      dispSec = `0${dispSec}`;
+    }
+    if (sec < 0) {
+      clearInterval(timer);
+      globals.functions.setProperty(otpPanel.secondsPanel, { visible: false });
+      if (resendOtpCount < DATA_LIMITS.maxOtpResendLimit) {
+        globals.functions.setProperty(
+          otpPanel.aem_otpResend,
+          { visible: true },
+        );
+      }
+    }
+  }, 1000);
+};
+
+/**
+ * @name resendOTP
+ * @param {Object} globals - The global object containing necessary data for DAP request.
+ * @return {PROMISE}
+ */
+const resendOTP = async (globals) => {
+  const mobileNumber = globals.form.aem_semiWizard.aem_identifierPanel.aem_loginPanel.mobilePanel.aem_mobileNum.$value;
+  const cardDigits = globals.form.aem_semiWizard.aem_identifierPanel.aem_loginPanel.aem_cardNo.$value;
+  const { otpPanel } = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel;
+
+  if (resendOtpCount < DATA_LIMITS.maxOtpResendLimit) {
+    resendOtpCount += 1;
+    if (resendOtpCount === DATA_LIMITS.maxOtpResendLimit) {
+      globals.functions.setProperty(otpPanel.secondsPanel, { visible: false });
+      globals.functions.setProperty(otpPanel.aem_otpResend, { visible: false });
+      globals.functions.setProperty(otpPanel.aem_maxlimitOTP, { visible: true });
+    }
+    return getOTPV1(mobileNumber, cardDigits, globals);
+  }
+
+  return null;
+};
+
 export {
   getOTPV1,
   otpValV1,
@@ -651,4 +713,6 @@ export {
   preExecution,
   radioBtnValCommit,
   semiWizardSwitch,
+  otpTimer,
+  resendOTP,
 };

@@ -241,6 +241,32 @@ body.semi-form {
                     color: var(--color-interface-background-quaternary);                
                 }
 
+                .field-aem-maxlimitotp {
+                    margin-top: -20px;
+                    p{
+                        p{
+                            font-size: var(--body-sm-font-size);
+                            font-weight: var(--font-weight-bold);
+                             color: var(--color-interface-background-tertiary);
+                        }
+                    }
+                }
+                
+                .field-aem-otpresend {
+                    margin-top: -20px;
+                    button{
+                        font-size: var(--body-md-font-size);
+                        background: var(--color-action-text-primary-default);
+                        color: var(--color-action-text-secondary-default);
+                        text-align: left;
+                    }
+                    button:hover{
+                        background: var(--color-interface-background-primary) !important;
+                        color: var(--color-action-text-secondary-default);
+                        text-align: left;
+                    }
+                }
+    
                 legend, b, p { margin-bottom: 0; }
 
                 .field-aem-otpnumber, .field-aem-otpnumber2 {
