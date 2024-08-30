@@ -243,6 +243,7 @@ body.semi-form {
 
                 .field-aem-maxlimitotp {
                     margin-top: -20px;
+                    
                     p{
                         p{
                             font-size: var(--body-sm-font-size);
@@ -254,12 +255,14 @@ body.semi-form {
                 
                 .field-aem-otpresend {
                     margin-top: -20px;
+
                     button{
                         font-size: var(--body-md-font-size);
                         background: var(--color-action-text-primary-default);
                         color: var(--color-action-text-secondary-default);
                         text-align: left;
                     }
+                    
                     button:hover{
                         background: var(--color-interface-background-primary) !important;
                         color: var(--color-action-text-secondary-default);
