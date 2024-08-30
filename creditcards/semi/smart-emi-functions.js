@@ -692,17 +692,17 @@ function radioBtnValCommit(arg1, globals) {
 
 /* initialPseudo for ccSmartEmi */
 const getEmiArrayJson = (globals) => {
-  const objFormat = {
-    authCode: '', // fixed
-    cardSeq: '0001', // lasttxnseqno from api - field ? - 1
-    effDate: '19022021', // aem_TxnDate
-    itemNbr: '80201', // aem_TxnID
-    logicMod: '01', // logicMod from Api - field ? - 2
-    originAcct: '0001012350000002025', // fixed
-    plan: '10002', // fixed
-    tranAmt: 450000, // aem_TxnAmt
-    txnDesc: '20 BILLED TXN', // aem_TxnName
-  };
+  // const objFormat = {
+  //   authCode: '', // fixed
+  //   cardSeq: '0001', // lasttxnseqno from api - field ? - 1
+  //   effDate: '19022021', // aem_TxnDate
+  //   itemNbr: '80201', // aem_TxnID
+  //   logicMod: '01', // logicMod from Api - field ? - 2
+  //   originAcct: '0001012350000002025', // fixed
+  //   plan: '10002', // fixed
+  //   tranAmt: 450000, // aem_TxnAmt
+  //   txnDesc: '20 BILLED TXN', // aem_TxnName
+  // };
 
   const semiFormData = globals.functions.exportData().smartemi;
   const selectedTxnList = (semiFormData?.aem_billedTxn?.aem_billedTxnSelection?.concat(semiFormData?.aem_unbilledTxn?.aem_unbilledTxnSection))?.filter((txn) => txn.aem_Txn_checkBox === 'on');
