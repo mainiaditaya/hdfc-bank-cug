@@ -351,8 +351,9 @@ export async function generateFormRendition(panel, container, getItems = (p) => 
       captchaField = field;
     } else {
       const element = renderField(field);
-      if (field.appliedCssClassNames) {
-        element.className += ` ${field.appliedCssClassNames}`;
+      const appliedCssClassNames = field.appliedCssClassNames || field.properties?.appliedCssClassNames;
+      if (appliedCssClassNames) {
+        element.className += ` ${appliedCssClassNames}`;
       }
       colSpanDecorator(field, element);
       const decorator = await componentDecorater(field);
