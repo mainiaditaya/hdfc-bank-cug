@@ -229,7 +229,7 @@ const setTxnPanelData = (allTxn, btxn, billedTxnPanel, unBilledTxnPanel, globals
 // eslint-disable-next-line no-unused-vars
 function checkELigibilityHandler(resPayload1, globals) {
   const resPayload = RESPONSE_PAYLOAD.response;
-  //const resPayload = resPayload1;
+  // const resPayload = resPayload1;
   const response = {};
   try {
     /* continue btn disabling code added temorary, can be removed after form authoring */
@@ -248,6 +248,8 @@ function checkELigibilityHandler(resPayload1, globals) {
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_eligibleTxnLabel, { value: `Eligible Transactions (${allTxn?.length})` });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_TxnAvailable, { value: `Billed Transaction: (${ccBilledData?.length})` });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_TxnAvailable, { value: `Unbilled Transaction: (${ccUnBilledData?.length})` });
+    // set runtime values
+    globals.functions.setProperty(globals.form.runtime.originAcct, { value: currentFormContext.EligibilityResponse.responseString.aanNumber });
     // Display card and move wizard view
     if (window !== undefined) cardDisplay(globals, resPayload);
     if (window !== undefined) moveWizardView(domElements.semiWizard, domElements.chooseTransaction);
@@ -338,6 +340,9 @@ const setDataTenurePanel = (globals, panel, option, i) => {
   globals.functions.setProperty(panel[i].aem_tenureSelectionProcessing, { value: option?.procesingFee });
   globals.functions.setProperty(panel[i].aem_roi_monthly, { value: option?.roiMonthly });
   globals.functions.setProperty(panel[i].aem_roi_annually, { value: option?.roiAnnually });
+  /* emi substance incldes tid, period, interest without parsed which required for ccSmart emi payload */
+  const emiSubstance = JSON.stringify(option?.emiSubStance);
+  globals.functions.setProperty(panel[i].aem_tenureRawData, { value: emiSubstance });
 };
 
 const tenureOption = (loanOptions, loanAmt) => {
@@ -348,6 +353,7 @@ const tenureOption = (loanOptions, loanAmt) => {
     const monthlyEMI = nfObject.format(calculateEMI(loanAmt, roiMonthly, parseInt(option.period, 10)));
     const period = `${parseInt(option.period, 10)} Months`;
     const procesingFee = '500';
+    const emiSubStance = option;
     return ({
       ...option,
       procesingFee,
@@ -355,6 +361,7 @@ const tenureOption = (loanOptions, loanAmt) => {
       monthlyEMI,
       roiAnnually,
       roiMonthly,
+      emiSubStance,
     });
   });
   return arrayOptions;
@@ -649,24 +656,23 @@ const getEmiArrayJson = (globals) => {
     txnDesc: '20 BILLED TXN', // aem_TxnName
   };
 
-  const returnFormat = [
-    {
-      cardSeq: '0001',
-      logicMod: '01',
-      effDate: '19022021',
-      authCode: '',
-      itemNbr: '80201',
-      tranAmt: 450000,
-      txnDesc: '20 BILLED TXN',
-      plan: '10002',
-      originAcct: '0001012350000002025',
-    },
-  ];
-
-  // logicMod, cardSeq,
-  // arrayOptions?.map((item,i)=>{
-
-  // })
+  const semiFormData = globals.functions.exportData().smartemi;
+  const selectedTxnList = (semiFormData?.aem_billedTxn?.aem_billedTxnSelection?.concat(semiFormData?.aem_unbilledTxn?.aem_unbilledTxnSection))?.filter((txn) => txn.aem_Txn_checkBox === 'on');
+  const CARD_SEQ = globals.form.runtime.cardSeq.$value;
+  const PLAN = globals.form.runtime.plan.$value;
+  const ORIG_ACCOUNT = globals.form.runtime.originAcct.$value || currentFormContext.EligibilityResponse.responseString.aanNumber;
+  const mappedTxnArray = selectedTxnList?.map(((el) => ({
+    cardSeq: CARD_SEQ,
+    logicMod: el?.logicMod,
+    effDate: el?.aem_TxnDate,
+    authCode: el?.authCode ?? '',
+    itemNbr: el?.aem_TxnID,
+    tranAmt: el?.aem_TxnAmt,
+    txnDesc: el?.aem_txn_type,
+    plan: PLAN,
+    originAcct: ORIG_ACCOUNT,
+  })));
+  return mappedTxnArray;
 };
 
 /**
@@ -685,6 +691,8 @@ const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
   const MEMO_LINE_5 = 'Adobe';
   const emiConversionArray = getEmiArrayJson(globals);
   const eligibiltyResponse = currentFormContext.EligibilityResponse;
+  const REQ_NBR = emiConversionArray?.length; // format '01'? or '1'
+  const PROC_FEES = '000';
   // interest: "03088" -- radio repatable hidden filed.
   // period: "003"
   // tid:"000000106"
@@ -708,8 +716,8 @@ const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
     mobileNo: mobileNum,
     tid: '000000101', // hiddenField -
     reqAmt: '450000',
-    procFeeWav: '000',
-    reqNbr: '01',
+    procFeeWav: PROC_FEES,
+    reqNbr: REQ_NBR,
     emiConversion: emiConversionArray,
     journeyID: currentFormContext.journeyID,
     journeyName: currentFormContext.journeyName,
@@ -733,4 +741,5 @@ export {
   preExecution,
   radioBtnValCommit,
   semiWizardSwitch,
+  getCCSmartEmi,
 };
