@@ -1,4 +1,4 @@
-import { displayLoader, fetchJsonResponse, hideLoaderGif } from '../../common/makeRestAPI.js';
+import { displayLoader, fetchJsonResponse } from '../../common/makeRestAPI.js';
 import * as SEMI_CONSTANT from './constant.js';
 import {
   clearString,
@@ -229,7 +229,7 @@ const setTxnPanelData = (allTxn, btxn, billedTxnPanel, unBilledTxnPanel, globals
 // eslint-disable-next-line no-unused-vars
 function checkELigibilityHandler(resPayload1, globals) {
   const resPayload = RESPONSE_PAYLOAD.response;
-  //const resPayload = resPayload1;
+  // const resPayload = resPayload1;
   const response = {};
   try {
     /* continue btn disabling code added temorary, can be removed after form authoring */
