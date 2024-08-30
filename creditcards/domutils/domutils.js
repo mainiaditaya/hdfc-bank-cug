@@ -306,7 +306,7 @@ const validatePhoneNumber = (inputField, validStartingDigits) => {
 };
 
 const validateCardDigits = (inputField) => {
-  let {value} = inputField;
+  let { value } = inputField;
 
   // Ensure the input starts with a valid digit
   if (value.length > 0 && !/\d/.test(value[0])) {
@@ -315,20 +315,19 @@ const validateCardDigits = (inputField) => {
   }
 
   // Remove invalid characters (non-digits) from the entire input
-  value = value.replace(/\D/g,'');
-  
+  value = value.replace(/\D/g, '');
+
   inputField.value = value;
 };
 
 const validateOTPInput = (inputField) => {
-  let {value} = inputField;
+  const { value } = inputField;
 
-  //Ensure the input values are digits
+  // Ensure the input values are digits
   if (!/^\d+$/.test(value)) {
     inputField.value = inputField.value.slice(0, -1);
   }
 };
-
 
 export {
   setDataAttributeOnClosestAncestor,
@@ -346,5 +345,5 @@ export {
   groupCharacters,
   validatePhoneNumber,
   validateCardDigits,
-  validateOTPInput
+  validateOTPInput,
 };

@@ -1,4 +1,4 @@
-import { displayLoader, fetchJsonResponse, hideLoaderGif } from '../../common/makeRestAPI.js';
+import { displayLoader, fetchJsonResponse } from '../../common/makeRestAPI.js';
 import * as SEMI_CONSTANT from './constant.js';
 import {
   clearString,
@@ -7,11 +7,11 @@ import {
   urlPath,
 } from '../../common/formutils.js';
 
-import { 
-        createLabelInElement,
-        validatePhoneNumber,
-        validateCardDigits,
-        validateOTPInput
+import {
+  createLabelInElement,
+  validatePhoneNumber,
+  validateCardDigits,
+  validateOTPInput,
 } from '../domutils/domutils.js';
 
 const {
@@ -25,7 +25,6 @@ const {
   // eslint-disable-next-line no-unused-vars
   RESPONSE_PAYLOAD,
 } = SEMI_CONSTANT;
-
 
 /**
  * Function validates the Mobile Input Field
@@ -46,14 +45,14 @@ const addCardFieldValidation = () => {
   inputField.addEventListener('input', () => validateCardDigits(inputField));
 };
 
-/** 
+/**
 * Function validates the OTP Input Field
 *
 */
 const addOtpFieldValidation = () => {
   const inputField = document.querySelector('.field-aem-otpnumber input');
   inputField.addEventListener('input', () => validateOTPInput(inputField));
-}
+};
 
 /**
  * function sorts the billed / Unbilled Txn  array in ascending order based on the amount field
@@ -264,7 +263,7 @@ const setTxnPanelData = (allTxn, btxn, billedTxnPanel, unBilledTxnPanel, globals
 // eslint-disable-next-line no-unused-vars
 function checkELigibilityHandler(resPayload1, globals) {
   const resPayload = RESPONSE_PAYLOAD.response;
-  //const resPayload = resPayload1;
+  // const resPayload = resPayload1;
   const response = {};
   try {
     /* continue btn disabling code added temorary, can be removed after form authoring */
@@ -691,5 +690,5 @@ export {
   semiWizardSwitch,
   addMobileValidation,
   addCardFieldValidation,
-  addOtpFieldValidation
+  addOtpFieldValidation,
 };
