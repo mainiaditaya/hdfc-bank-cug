@@ -650,13 +650,18 @@ function radioBtnValCommit(arg1, globals) {
 }
 
 /**
- * otp timer logic
+ * otp timer logic to handle based on the screen of otp
+ * @param {string} - otp pannel - firstotp or secondotp
  * @param {object} globals - global form object
  */
-const otpTimer = (globals) => {
+const otpTimerV1 = (pannelName, globals) => {
   let sec = DATA_LIMITS.otpTimeLimit;
   let dispSec = DATA_LIMITS.otpTimeLimit;
-  const { otpPanel } = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel;
+  let otpPanel;
+  const FIRST_PANNEL_OTP = 'firstotp';
+  if (pannelName === FIRST_PANNEL_OTP) {
+    otpPanel = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel.otpPanel;
+  }
   const timer = setInterval(() => {
     globals.functions.setProperty(otpPanel.secondsPanel.seconds, { value: dispSec });
     sec -= 1;
@@ -713,6 +718,6 @@ export {
   preExecution,
   radioBtnValCommit,
   semiWizardSwitch,
-  otpTimer,
+  otpTimerV1,
   resendOTP,
 };
