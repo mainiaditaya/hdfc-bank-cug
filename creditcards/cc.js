@@ -344,7 +344,7 @@ const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyI
       },
     },
   };
-  const url = 'https://applyonlinedev.hdfcbank.com/content/hdfc_commonforms/api/journeydropoffparam.json';
+  const url = 'https://hdfc-dev-04.adobecqms.net/content/hdfc_commonforms/api/journeydropoffparam.json';
   const method = 'POST';
   try {
     const res = await fetch(url, {
@@ -416,7 +416,7 @@ const finalDapFetchRes = async () => {
     if (errorCase) {
       return eventHandler.errorMethod(error, JSON.parse(stateInfoData));
     }
-    return setTimeout(() => finalDapFetchRes(), 5000);
+    return setTimeout(() => finalDapFetchRes(), 10000);
   }
 };
 
