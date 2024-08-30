@@ -152,18 +152,18 @@ function preExecution(mobileNumber, cardDigits) {
  * @param {number} i - current instance of panel row
  */
 const setData = (globals, panel, txn, i) => {
+  const nfObject = new Intl.NumberFormat('hi-IN');
   let enabled = true;
   if (currentFormContext.totalSelect === 10 && txn?.aem_Txn_checkBox !== 'on') enabled = false;
   globals.functions.setProperty(panel[i]?.aem_Txn_checkBox, { value: txn?.checkbox || txn?.aem_Txn_checkBox });
   globals.functions.setProperty(panel[i]?.aem_Txn_checkBox, { enabled });// set the checbox value
-  globals.functions.setProperty(panel[i]?.aem_TxnAmt, { value: txn?.amount || txn?.aem_TxnAmt });
+  globals.functions.setProperty(panel[i]?.aem_TxnAmt, { value: `${MISC.rupeesUnicode} ${nfObject.format(txn?.amount)}` || `${MISC.rupeesUnicode} ${nfObject.format(txn?.aem_TxnAmt)}` });
   globals.functions.setProperty(panel[i]?.aem_TxnDate, { value: txn?.date || txn?.aem_TxnDate });
   globals.functions.setProperty(panel[i]?.aem_TxnID, { value: txn?.id || txn?.aem_TxnID });
   globals.functions.setProperty(panel[i]?.aem_TxnName, { value: txn?.name || txn?.aem_TxnName });
   globals.functions.setProperty(panel[i]?.authCode, { value: txn?.AUTH_CODE || txn?.aem_TxnName });
   globals.functions.setProperty(panel[i]?.logicMod, { value: txn?.LOGICMOD || txn?.aem_TxnName });
 };
-
 /*
  * Displays card details by updating the UI with response data.
  * @param {object} globals - global object
@@ -328,14 +328,17 @@ const currencyUtil = (number, minimumFractionDigits) => {
  * @param {number} i -The index of the current tenure
  */
 const setDataTenurePanel = (globals, panel, option, i) => {
+  const nfObject = new Intl.NumberFormat('hi-IN');
   globals.functions.setProperty(panel[i].aem_tenureSelection, { enumNames: [option?.period] });
   // globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.test, { enum: [0], enumNames: ['test'] });
   // globals.functions.setProperty(panel[i].aem_tenureSelection, { enum: [0], enumNames: [option?.period] });
   /* */
   // const monthlyEmi = `${MISC.rupeesUnicode} ${Number(clearString(option?.monthlyEMI))}`;
   // const processingFees = `${MISC.rupeesUnicode} ${option?.procesingFee}`;
-  globals.functions.setProperty(panel[i].aem_tenureSelectionEmi, { value: Number(clearString(option?.monthlyEMI)) });
-  globals.functions.setProperty(panel[i].aem_tenureSelectionProcessing, { value: option?.procesingFee });
+  const emiAmt = `${MISC.rupeesUnicode} ${nfObject.format(Number(clearString(option?.monthlyEMI)))}`;
+  const procesFees = `${MISC.rupeesUnicode} ${nfObject.format(option?.procesingFee)}`;
+  globals.functions.setProperty(panel[i].aem_tenureSelectionEmi, { value: emiAmt });
+  globals.functions.setProperty(panel[i].aem_tenureSelectionProcessing, { value: procesFees });
   globals.functions.setProperty(panel[i].aem_roi_monthly, { value: option?.roiMonthly });
   globals.functions.setProperty(panel[i].aem_roi_annually, { value: option?.roiAnnually });
 };
@@ -368,7 +371,7 @@ const tenureDisplay = (globals) => {
   const tenureRepatablePanel = globals.form.aem_semiWizard.aem_selectTenure.aem_tenureSelectionMainPnl.aem_tenureSelectionRepeatablePanel;
   const semiFormData = globals.functions.exportData().smartemi;
   const selectedTxnList = (semiFormData?.aem_billedTxn?.aem_billedTxnSelection?.concat(semiFormData?.aem_unbilledTxn?.aem_unbilledTxnSection))?.filter((txn) => txn.aem_Txn_checkBox === 'on');
-  const totalAmountOfTxn = selectedTxnList?.reduce((prev, acc) => prev + acc.aem_TxnAmt, 0);
+  const totalAmountOfTxn = selectedTxnList?.reduce((prev, acc) => prev + parseFloat(acc.aem_TxnAmt.replace(/[^\d.-]/g, '')), 0);
   const totalAmountSelected = (parseInt(totalAmountOfTxn, 10));
   const loanArrayOption = getLoanOptionsInfo(currentFormContext.EligibilityResponse?.responseString?.records);
   const tenureArrayOption = tenureOption(loanArrayOption, totalAmountSelected);

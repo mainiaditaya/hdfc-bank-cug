@@ -662,7 +662,7 @@ body.semi-form {
                 margin: 0;
             }
 
-            .field-aem-customernamelabel, .field-aem-customernamelabel p {
+            .field-aem-customernamelabel, .field-aem-outstandinglabel, .field-aem-outstandinglabel p .field-aem-customernamelabel p {
                 font-size: var(--body-lg-font-size);
                 font-weight: var(--font-weight-regular);
             }
@@ -673,7 +673,7 @@ body.semi-form {
             }
 
             .field-aem-outstandingamt, .field-aem-outstandingamt p {
-                font-size: var(--body-xx-lg-font-size);
+                font-size: var(--body-lg-font-size);
                 font-weight: var(--font-weight-bold);
             }
         }
