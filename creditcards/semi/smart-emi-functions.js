@@ -703,32 +703,24 @@ function radioBtnValCommit(arg1, globals) {
   }
 }
 
-/* initialPseudo for ccSmartEmi */
-const getEmiArrayJson = (globals) => {
-  // const objFormat = {
-  //   authCode: '', // fixed
-  //   cardSeq: '0001', // lasttxnseqno from api - field ? - 1
-  //   effDate: '19022021', // aem_TxnDate
-  //   itemNbr: '80201', // aem_TxnID
-  //   logicMod: '01', // logicMod from Api - field ? - 2
-  //   originAcct: '0001012350000002025', // fixed
-  //   plan: '10002', // fixed
-  //   tranAmt: 450000, // aem_TxnAmt
-  //   txnDesc: '20 BILLED TXN', // aem_TxnName
-  // };
-
+/**
+ * Generates an EMI conversion array option for the ccsmart API payload.
+ * @param {object} globals - global form object
+ * @returns {Array<Object>}
+ */
+const getEmiArrayOption = (globals) => {
   const semiFormData = globals.functions.exportData().smartemi;
   const selectedTxnList = (semiFormData?.aem_billedTxn?.aem_billedTxnSelection?.concat(semiFormData?.aem_unbilledTxn?.aem_unbilledTxnSection))?.filter((txn) => txn.aem_Txn_checkBox === 'on');
   const CARD_SEQ = globals.form.runtime.cardSeq.$value;
   const PLAN = globals.form.runtime.plan.$value;
   const ORIG_ACCOUNT = globals.form.runtime.originAcct.$value || currentFormContext.EligibilityResponse.responseString.aanNumber;
   const mappedTxnArray = selectedTxnList?.map(((el) => ({
-    cardSeq: CARD_SEQ,
-    logicMod: el?.logicMod,
-    effDate: el?.aem_TxnDate,
     authCode: el?.authCode ?? '',
+    cardSeq: CARD_SEQ,
+    effDate: clearString(el?.aem_TxnDate),
+    logicMod: el?.logicMod,
     itemNbr: el?.aem_TxnID,
-    tranAmt: el?.aem_TxnAmt,
+    tranAmt: currencyStrToNum(el?.aem_TxnAmt),
     txnDesc: el?.aem_txn_type,
     plan: PLAN,
     originAcct: ORIG_ACCOUNT,
@@ -737,12 +729,12 @@ const getEmiArrayJson = (globals) => {
 };
 
 /**
- * Execurte smart Emi process
+ * Generates and sends an EMI conversion request payload for the ccsmart API.
  * @param {string} mobileNum - mobile number
  * @param {string} cardNum - card digit number
  * @param {string} otpNum - otp number
- * @param {object} globals
- * @return {PROMISE}
+ * @param {object} globals - globals form object
+ * @returns {Promise<Object>} - A promise that resolves to the JSON response from the ccsmart API.
  */
 const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
   const AGENCY_CODE = 'Adobe Webforms';
@@ -750,47 +742,46 @@ const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
   const MEM_SUB_CAT = 'Adobe';
   const MEMO_LINE_4 = 'Adobe';
   const MEMO_LINE_5 = 'Adobe';
-  const emiConversionArray = getEmiArrayJson(globals);
+  const LTR_EXACT_CODE = 'Y  ';
+  const DEPT = 'IT';
+  const PROC_FEES = '000'; // String(currencyStrToNum(selectedTenurePlan?.aem_tenureSelectionProcessing)) - actual process Fee in display
+  const emiConversionArray = getEmiArrayOption(globals);
+  const REQ_NBR = String(emiConversionArray?.length === 1) ? ((String(emiConversionArray?.length)).padStart(2, '0')) : (String(emiConversionArray?.length)); // format '01'? or '1'
+  const paiseDecimal = '00';
+  const LOAN_AMOUNT = String(emiConversionArray?.reduce((prev, acc) => prev + acc.tranAmt, 0)) + paiseDecimal;
   const eligibiltyResponse = currentFormContext.EligibilityResponse;
-  const REQ_NBR = emiConversionArray?.length; // format '01'? or '1'
-  const PROC_FEES = '000';
-
   const tenurePlan = globals.functions.exportData().aem_tenureSelectionRepeatablePanel;
   const selectedTenurePlan = tenurePlan?.find((emiPlan) => emiPlan.aem_tenureSelection === '0');
-  const tenureRawData = JSON.parse(selectedTenurePlan?.aem_tenureRawData);
-  const emiSubData = tenureRawData?.emiSubStance;
+  const emiSubData = JSON.parse(selectedTenurePlan?.aem_tenureRawData);
   const INTEREST = emiSubData?.interest; // '030888'
+  const TENURE = (parseInt(emiSubData?.period, 10).toString().length === 1) ? (parseInt(emiSubData?.period, 10).toString().padStart(2, '0')) : parseInt(emiSubData?.period, 10).toString(); // '003' into '03' / '18'-'18'
   const TID = emiSubData?.tid; // '000000101'
-  // const TENURE = ?.
-  // interest: "03088" -- radio repatable hidden filed.
-  // period: "003"
-  // tid:"000000106"
   const jsonObj = {
     cardNo: cardNum,
     OTP: otpNum,
     proCode: PRO_CODE,
     prodId: eligibiltyResponse.responseString.records[0].prodId,
     agencyCode: AGENCY_CODE,
-    tenure: '06', // hiddenfield -> parseIntwithout onu
-    interestRate: '01188', // hiddenfield -> parseIntwithout onu
+    tenure: TENURE,
+    interestRate: INTEREST,
     encryptedToken: eligibiltyResponse.responseString.records[0].encryptedToken,
-    loanAmt: '450000',
-    ltrExctCode: 'Y  ',
+    loanAmt: LOAN_AMOUNT,
+    ltrExctCode: LTR_EXACT_CODE,
     caseNumber: mobileNum,
-    dept: 'IT',
+    dept: DEPT,
     memCategory: MEM_CATEGORY,
     memSubCat: MEM_SUB_CAT,
     memoLine4: MEMO_LINE_4,
     memoLine5: MEMO_LINE_5,
     mobileNo: mobileNum,
-    tid: '000000101', // hiddenField -
-    reqAmt: '450000',
+    tid: TID,
+    reqAmt: LOAN_AMOUNT,
     procFeeWav: PROC_FEES,
     reqNbr: REQ_NBR,
     emiConversion: emiConversionArray,
     journeyID: currentFormContext.journeyID,
     journeyName: currentFormContext.journeyName,
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
+    userAgent: window.navigator.userAgent,
   };
   const path = semiEndpoints.ccSmartEmi;
   if (window !== undefined) displayLoader();
