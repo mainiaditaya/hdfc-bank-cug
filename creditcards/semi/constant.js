@@ -10,6 +10,7 @@ const SEMI_ENDPOINTS = {
   otpVal: 'https://applyonlinedev.hdfcbank.com/content/hdfc_ccforms/api/eligibilitycheck.json',
   preexecution: 'https://applyonlinedev.hdfcbank.com/content/hdfc_ccforms/api/preexecution.json',
   masterChanel: 'https://applyonlinedev.hdfcbank.com/content/hdfc_commonforms/api/mdm.CREDIT.POST_ISSUANCE_CHANNEL_MASTER.json',
+  ccSmartEmi: 'https://applyonlinedev.hdfcbank.com/content/hdfc_ccforms/api/ccsmartemi.json',
 };
 
 const DOM_ELEMENT = {
@@ -27,6 +28,8 @@ const MAX_OTP_RESEND_COUNT = 3;
 const CURRENT_FORM_CONTEXT = {};
 const DATA_LIMITS = {
   totalSelectLimit: 10,
+  otpTimeLimit: 30,
+  maxOtpResendLimit: 3,
 };
 const RESPONSE_PAYLOAD = {
   response: {

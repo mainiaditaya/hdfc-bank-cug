@@ -12,6 +12,9 @@ import {
   radioBtnValCommit,
   semiWizardSwitch,
   assistedToggleHandler,
+  getCCSmartEmi,
+  otpTimerV1,
+  resendOTP,
 } from './smart-emi-functions.js';
 import { invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
 
@@ -40,4 +43,7 @@ export {
   radioBtnValCommit,
   semiWizardSwitch,
   assistedToggleHandler,
+  getCCSmartEmi,
+  otpTimerV1,
+  resendOTP,
 };
