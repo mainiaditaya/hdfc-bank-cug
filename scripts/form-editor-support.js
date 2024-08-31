@@ -329,9 +329,9 @@ function attachEventListners(main) {
   });
 }
 
+const observer = new MutationObserver(instrumentForms);
+observer.observe(document, { childList: true, subtree: true, attributeFilter: ['form'] });
 loadCSS(`${window.hlx.codeBasePath}/scripts/form-editor-support.css`);
 attachEventListners(document.querySelector('main'));
 const forms = document.querySelectorAll('form');
 annotateFormsForEditing(forms);
-const observer = new MutationObserver(instrumentForms);
-observer.observe(document, { childList: true, subtree: true, attributeFilter: ['form'] });
