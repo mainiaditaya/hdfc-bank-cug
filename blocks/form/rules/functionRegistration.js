@@ -1,5 +1,9 @@
 import { registerFunctions } from './model/afb-runtime.js';
-import getCustomFunctionPath from '../functions.js';
+import { formIdPathMapping } from '../constant.js';
+
+export function getCustomFunctionPath(id) {
+  return id ? formIdPathMapping[atob(id)] : null;
+}
 
 export default async function registerCustomFunctions(id) {
   try {
