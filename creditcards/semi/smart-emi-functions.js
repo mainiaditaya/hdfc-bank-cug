@@ -1,4 +1,4 @@
-import { displayLoader, fetchJsonResponse, hideLoaderGif } from '../../common/makeRestAPI.js';
+import { displayLoader, fetchJsonResponse } from '../../common/makeRestAPI.js';
 import * as SEMI_CONSTANT from './constant.js';
 import {
   clearString,
@@ -6,7 +6,13 @@ import {
   moveWizardView,
   urlPath,
 } from '../../common/formutils.js';
-import { createLabelInElement } from '../domutils/domutils.js';
+
+import {
+  createLabelInElement,
+  validatePhoneNumber,
+  validateCardDigits,
+  validateOTPInput,
+} from '../domutils/domutils.js';
 
 const {
   CURRENT_FORM_CONTEXT: currentFormContext,
@@ -21,13 +27,50 @@ const {
 } = SEMI_CONSTANT;
 
 /**
- * function sorts the billed / Unbilled Txn  array in ascending order based on the amount field
+ * Function validates the Mobile Input Field
+ *
+ */
+const addMobileValidation = () => {
+  const validFirstDigits = ['6', '7', '8', '9'];
+  const inputField = document.querySelector('.field-aem-mobilenum input');
+  inputField.addEventListener('input', () => validatePhoneNumber(inputField, validFirstDigits));
+};
+
+/**
+ * Function validates the Card Last 4 digits Input Field
+ *
+ */
+const addCardFieldValidation = () => {
+  const inputField = document.querySelector('.field-aem-cardno input');
+  inputField.addEventListener('input', () => validateCardDigits(inputField));
+};
+
+/**
+* Function validates the OTP Input Field
+*
+*/
+const addOtpFieldValidation = () => {
+  const inputField = document.querySelector('.field-aem-otpnumber input');
+  inputField.addEventListener('input', () => validateOTPInput(inputField));
+};
+
+/**
+ * function sorts the billed / Unbilled Txn  array in descending order based on the amount field
  *
  * @param {object} data
  * @param {object} key
  * @returns {object}
  */
 const sortDataByAmount = (data, key = 'aem_TxnAmt') => data.sort((a, b) => b[key] - a[key]);
+
+/**
+ * convert a amount with unicode to Number
+ * @param {string} str - txn-amount - i.e.:'₹ 50,000'
+ * @returns {number} - number-  50000
+ */
+const currencyStrToNum = (str) => parseFloat((String(str))?.replace(/[^\d.-]/g, ''));
+
+const sortDataByAmountSymbol = (data, key = 'aem_TxnAmt') => data.sort((a, b) => currencyStrToNum(b[key]) - currencyStrToNum(a[key]));
 
 /**
  * Description placeholder
@@ -46,7 +89,7 @@ function sortByDate(data) {
     const dateB = new Date(yearB, monthB - 1, dayB);
 
     // Compare the dates
-    return dateA - dateB;
+    return dateB - dateA;
   });
 }
 
@@ -70,6 +113,7 @@ currentFormContext.totalSelect = 0;
 currentFormContext.billed = 0;
 currentFormContext.unbilled = 0;
 let tnxPopupAlertOnce = 0; // flag alert for the pop to show only once on click of continue
+let resendOtpCount = 0;
 
 /**
  * generates the otp
@@ -79,6 +123,15 @@ let tnxPopupAlertOnce = 0; // flag alert for the pop to show only once on click 
  * @return {PROMISE}
  */
 function getOTPV1(mobileNumber, cardDigits, globals) {
+  /* restrict to show otp-resend option once it reaches max-attemt and to show otptimer */
+  const { otpPanel } = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel;
+  if (resendOtpCount < DATA_LIMITS.maxOtpResendLimit) {
+    globals.functions.setProperty(otpPanel.secondsPanel, { visible: true });
+    globals.functions.setProperty(otpPanel.aem_otpResend, { visible: false });
+  } else {
+    globals.functions.setProperty(otpPanel.secondsPanel, { visible: false });
+  }
+
   globals.functions.setProperty(globals.form.runtime.journeyId, { value: currentFormContext.journeyID });
   currentFormContext.journeyName = SEMI_CONSTANT.JOURNEY_NAME;
 
@@ -152,18 +205,19 @@ function preExecution(mobileNumber, cardDigits) {
  * @param {number} i - current instance of panel row
  */
 const setData = (globals, panel, txn, i) => {
+  const nfObject = new Intl.NumberFormat('hi-IN');
   let enabled = true;
   if (currentFormContext.totalSelect === 10 && txn?.aem_Txn_checkBox !== 'on') enabled = false;
   globals.functions.setProperty(panel[i]?.aem_Txn_checkBox, { value: txn?.checkbox || txn?.aem_Txn_checkBox });
   globals.functions.setProperty(panel[i]?.aem_Txn_checkBox, { enabled });// set the checbox value
-  globals.functions.setProperty(panel[i]?.aem_TxnAmt, { value: txn?.amount || txn?.aem_TxnAmt });
+  const TXN_AMT = `${MISC.rupeesUnicode} ${nfObject.format((txn?.amount || txn?.aem_TxnAmt))}`;
+  globals.functions.setProperty(panel[i]?.aem_TxnAmt, { value: TXN_AMT });
   globals.functions.setProperty(panel[i]?.aem_TxnDate, { value: txn?.date || txn?.aem_TxnDate });
   globals.functions.setProperty(panel[i]?.aem_TxnID, { value: txn?.id || txn?.aem_TxnID });
   globals.functions.setProperty(panel[i]?.aem_TxnName, { value: txn?.name || txn?.aem_TxnName });
   globals.functions.setProperty(panel[i]?.authCode, { value: txn?.AUTH_CODE || txn?.aem_TxnName });
   globals.functions.setProperty(panel[i]?.logicMod, { value: txn?.LOGICMOD || txn?.aem_TxnName });
 };
-
 /*
  * Displays card details by updating the UI with response data.
  * @param {object} globals - global object
@@ -229,7 +283,7 @@ const setTxnPanelData = (allTxn, btxn, billedTxnPanel, unBilledTxnPanel, globals
 // eslint-disable-next-line no-unused-vars
 function checkELigibilityHandler(resPayload1, globals) {
   const resPayload = RESPONSE_PAYLOAD.response;
-  //const resPayload = resPayload1;
+  // const resPayload = resPayload1;
   const response = {};
   try {
     /* continue btn disabling code added temorary, can be removed after form authoring */
@@ -248,6 +302,8 @@ function checkELigibilityHandler(resPayload1, globals) {
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_eligibleTxnLabel, { value: `Eligible Transactions (${allTxn?.length})` });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_TxnAvailable, { value: `Billed Transaction: (${ccBilledData?.length})` });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_TxnAvailable, { value: `Unbilled Transaction: (${ccUnBilledData?.length})` });
+    // set runtime values
+    globals.functions.setProperty(globals.form.runtime.originAcct, { value: currentFormContext.EligibilityResponse.responseString.aanNumber });
     // Display card and move wizard view
     if (window !== undefined) cardDisplay(globals, resPayload);
     if (window !== undefined) moveWizardView(domElements.semiWizard, domElements.chooseTransaction);
@@ -328,16 +384,22 @@ const currencyUtil = (number, minimumFractionDigits) => {
  * @param {number} i -The index of the current tenure
  */
 const setDataTenurePanel = (globals, panel, option, i) => {
+  const nfObject = new Intl.NumberFormat('hi-IN');
   globals.functions.setProperty(panel[i].aem_tenureSelection, { enumNames: [option?.period] });
   // globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.test, { enum: [0], enumNames: ['test'] });
   // globals.functions.setProperty(panel[i].aem_tenureSelection, { enum: [0], enumNames: [option?.period] });
   /* */
   // const monthlyEmi = `${MISC.rupeesUnicode} ${Number(clearString(option?.monthlyEMI))}`;
   // const processingFees = `${MISC.rupeesUnicode} ${option?.procesingFee}`;
-  globals.functions.setProperty(panel[i].aem_tenureSelectionEmi, { value: Number(clearString(option?.monthlyEMI)) });
-  globals.functions.setProperty(panel[i].aem_tenureSelectionProcessing, { value: option?.procesingFee });
+  const emiAmt = `${MISC.rupeesUnicode} ${nfObject.format(Number(clearString(option?.monthlyEMI)))}`;
+  const procesFees = `${MISC.rupeesUnicode} ${nfObject.format(option?.procesingFee)}`;
+  globals.functions.setProperty(panel[i].aem_tenureSelectionEmi, { value: emiAmt });
+  globals.functions.setProperty(panel[i].aem_tenureSelectionProcessing, { value: procesFees });
   globals.functions.setProperty(panel[i].aem_roi_monthly, { value: option?.roiMonthly });
   globals.functions.setProperty(panel[i].aem_roi_annually, { value: option?.roiAnnually });
+  /* emi substance incldes tid, period, interest without parsed which required for ccSmart emi payload */
+  const emiSubstance = JSON.stringify(option?.emiSubStance);
+  globals.functions.setProperty(panel[i].aem_tenureRawData, { value: emiSubstance });
 };
 
 const tenureOption = (loanOptions, loanAmt) => {
@@ -348,6 +410,7 @@ const tenureOption = (loanOptions, loanAmt) => {
     const monthlyEMI = nfObject.format(calculateEMI(loanAmt, roiMonthly, parseInt(option.period, 10)));
     const period = `${parseInt(option.period, 10)} Months`;
     const procesingFee = '500';
+    const emiSubStance = option;
     return ({
       ...option,
       procesingFee,
@@ -355,6 +418,7 @@ const tenureOption = (loanOptions, loanAmt) => {
       monthlyEMI,
       roiAnnually,
       roiMonthly,
+      emiSubStance,
     });
   });
   return arrayOptions;
@@ -368,7 +432,7 @@ const tenureDisplay = (globals) => {
   const tenureRepatablePanel = globals.form.aem_semiWizard.aem_selectTenure.aem_tenureSelectionMainPnl.aem_tenureSelectionRepeatablePanel;
   const semiFormData = globals.functions.exportData().smartemi;
   const selectedTxnList = (semiFormData?.aem_billedTxn?.aem_billedTxnSelection?.concat(semiFormData?.aem_unbilledTxn?.aem_unbilledTxnSection))?.filter((txn) => txn.aem_Txn_checkBox === 'on');
-  const totalAmountOfTxn = selectedTxnList?.reduce((prev, acc) => prev + acc.aem_TxnAmt, 0);
+  const totalAmountOfTxn = selectedTxnList?.reduce((prev, acc) => prev + parseFloat(acc.aem_TxnAmt.replace(/[^\d.-]/g, '')), 0);
   const totalAmountSelected = (parseInt(totalAmountOfTxn, 10));
   const loanArrayOption = getLoanOptionsInfo(currentFormContext.EligibilityResponse?.responseString?.records);
   const tenureArrayOption = tenureOption(loanArrayOption, totalAmountSelected);
@@ -424,8 +488,12 @@ function sortData(txnType, orderBy, globals) {
   const billed = globals.functions.exportData().smartemi.aem_billedTxn.aem_billedTxnSelection;
   const unBilled = globals.functions.exportData().smartemi.aem_unbilledTxn.aem_unbilledTxnSection;
   const dataTxnList = txnType === 'BILLED' ? billed : unBilled;
-  const sortedData = (orderBy === '0') ? sortDataByAmount(dataTxnList) : sortByDate(dataTxnList);
-  sortedData?.forEach((data, i) => setData(globals, pannel, data, i));
+  const sortedData = (orderBy === '0') ? sortDataByAmountSymbol(dataTxnList) : sortByDate(dataTxnList);
+  const mapSortedDat = sortedData?.map((item) => ({
+    ...item,
+    aem_TxnAmt: (currencyStrToNum(item?.aem_TxnAmt)),
+  }));
+  mapSortedDat?.forEach((data, i) => setData(globals, pannel, data, i));
   setTimeout(() => {
     isUserSelection = !isUserSelection;
   }, 1000);
@@ -570,7 +638,7 @@ function selectTopTxn(globals) {
   const unBilled = globals.functions.exportData().smartemi.aem_unbilledTxn.aem_unbilledTxnSection;
 
   const allTxn = billed.concat(unBilled);
-  const sortedArr = sortDataByAmount(allTxn);
+  const sortedArr = sortDataByAmountSymbol(allTxn);
   const sortedTxnList = sortedArr?.slice(0, SELECT_TOP_TXN_LIMIT);
   let billedCounter = 0;
   let unbilledCounter = 0;
@@ -635,6 +703,153 @@ function radioBtnValCommit(arg1, globals) {
   }
 }
 
+/**
+ * Generates an EMI conversion array option for the ccsmart API payload.
+ * @param {object} globals - global form object
+ * @returns {Array<Object>}
+ */
+const getEmiArrayOption = (globals) => {
+  const semiFormData = globals.functions.exportData().smartemi;
+  const selectedTxnList = (semiFormData?.aem_billedTxn?.aem_billedTxnSelection?.concat(semiFormData?.aem_unbilledTxn?.aem_unbilledTxnSection))?.filter((txn) => txn.aem_Txn_checkBox === 'on');
+  const CARD_SEQ = globals.form.runtime.cardSeq.$value;
+  const PLAN = globals.form.runtime.plan.$value;
+  const ORIG_ACCOUNT = globals.form.runtime.originAcct.$value || currentFormContext.EligibilityResponse.responseString.aanNumber;
+  const mappedTxnArray = selectedTxnList?.map(((el) => ({
+    authCode: el?.authCode ?? '',
+    cardSeq: CARD_SEQ,
+    effDate: clearString(el?.aem_TxnDate),
+    logicMod: el?.logicMod,
+    itemNbr: el?.aem_TxnID,
+    tranAmt: currencyStrToNum(el?.aem_TxnAmt),
+    txnDesc: el?.aem_txn_type,
+    plan: PLAN,
+    originAcct: ORIG_ACCOUNT,
+  })));
+  return mappedTxnArray;
+};
+
+/**
+ * Generates and sends an EMI conversion request payload for the ccsmart API.
+ * @param {string} mobileNum - mobile number
+ * @param {string} cardNum - card digit number
+ * @param {string} otpNum - otp number
+ * @param {object} globals - globals form object
+ * @returns {Promise<Object>} - A promise that resolves to the JSON response from the ccsmart API.
+ */
+const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
+  const AGENCY_CODE = 'Adobe Webforms';
+  const MEM_CATEGORY = 'Adobe Webforms';
+  const MEM_SUB_CAT = 'Adobe';
+  const MEMO_LINE_4 = 'Adobe';
+  const MEMO_LINE_5 = 'Adobe';
+  const LTR_EXACT_CODE = 'Y  ';
+  const DEPT = 'IT';
+  const PROC_FEES = '000'; // String(currencyStrToNum(selectedTenurePlan?.aem_tenureSelectionProcessing)) - actual process Fee in display
+  const emiConversionArray = getEmiArrayOption(globals);
+  const REQ_NBR = String(emiConversionArray?.length === 1) ? ((String(emiConversionArray?.length)).padStart(2, '0')) : (String(emiConversionArray?.length)); // format '01'? or '1'
+  const paiseDecimal = '00';
+  const LOAN_AMOUNT = String(emiConversionArray?.reduce((prev, acc) => prev + acc.tranAmt, 0)) + paiseDecimal;
+  const eligibiltyResponse = currentFormContext.EligibilityResponse;
+  const tenurePlan = globals.functions.exportData().aem_tenureSelectionRepeatablePanel;
+  const selectedTenurePlan = tenurePlan?.find((emiPlan) => emiPlan.aem_tenureSelection === '0');
+  const emiSubData = JSON.parse(selectedTenurePlan?.aem_tenureRawData);
+  const INTEREST = emiSubData?.interest; // '030888'
+  const TENURE = (parseInt(emiSubData?.period, 10).toString().length === 1) ? (parseInt(emiSubData?.period, 10).toString().padStart(2, '0')) : parseInt(emiSubData?.period, 10).toString(); // '003' into '03' / '18'-'18'
+  const TID = emiSubData?.tid; // '000000101'
+  const jsonObj = {
+    cardNo: cardNum,
+    OTP: otpNum,
+    proCode: PRO_CODE,
+    prodId: eligibiltyResponse.responseString.records[0].prodId,
+    agencyCode: AGENCY_CODE,
+    tenure: TENURE,
+    interestRate: INTEREST,
+    encryptedToken: eligibiltyResponse.responseString.records[0].encryptedToken,
+    loanAmt: LOAN_AMOUNT,
+    ltrExctCode: LTR_EXACT_CODE,
+    caseNumber: mobileNum,
+    dept: DEPT,
+    memCategory: MEM_CATEGORY,
+    memSubCat: MEM_SUB_CAT,
+    memoLine4: MEMO_LINE_4,
+    memoLine5: MEMO_LINE_5,
+    mobileNo: mobileNum,
+    tid: TID,
+    reqAmt: LOAN_AMOUNT,
+    procFeeWav: PROC_FEES,
+    reqNbr: REQ_NBR,
+    emiConversion: emiConversionArray,
+    journeyID: currentFormContext.journeyID,
+    journeyName: currentFormContext.journeyName,
+    userAgent: window.navigator.userAgent,
+  };
+  const path = semiEndpoints.ccSmartEmi;
+  if (window !== undefined) displayLoader();
+  return fetchJsonResponse(path, jsonObj, 'POST', true);
+};
+
+setTimeout(() => {
+  addMobileValidation();
+  addCardFieldValidation();
+  addOtpFieldValidation();
+}, 500);
+
+/**
+ * otp timer logic to handle based on the screen of otp
+ * @param {string} - otp pannel - firstotp or secondotp
+ * @param {object} globals - global form object
+ */
+const otpTimerV1 = (pannelName, globals) => {
+  let sec = DATA_LIMITS.otpTimeLimit;
+  let dispSec = DATA_LIMITS.otpTimeLimit;
+  let otpPanel;
+  const FIRST_PANNEL_OTP = 'firstotp';
+  if (pannelName === FIRST_PANNEL_OTP) {
+    otpPanel = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel.otpPanel;
+  }
+  const timer = setInterval(() => {
+    globals.functions.setProperty(otpPanel.secondsPanel.seconds, { value: dispSec });
+    sec -= 1;
+    dispSec = sec;
+    if (sec < 10) {
+      dispSec = `0${dispSec}`;
+    }
+    if (sec < 0) {
+      clearInterval(timer);
+      globals.functions.setProperty(otpPanel.secondsPanel, { visible: false });
+      if (resendOtpCount < DATA_LIMITS.maxOtpResendLimit) {
+        globals.functions.setProperty(
+          otpPanel.aem_otpResend,
+          { visible: true },
+        );
+      }
+    }
+  }, 1000);
+};
+
+/**
+ * @name resendOTP
+ * @param {Object} globals - The global object containing necessary data for DAP request.
+ * @return {PROMISE}
+ */
+const resendOTP = async (globals) => {
+  const mobileNumber = globals.form.aem_semiWizard.aem_identifierPanel.aem_loginPanel.mobilePanel.aem_mobileNum.$value;
+  const cardDigits = globals.form.aem_semiWizard.aem_identifierPanel.aem_loginPanel.aem_cardNo.$value;
+  const { otpPanel } = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel;
+
+  if (resendOtpCount < DATA_LIMITS.maxOtpResendLimit) {
+    resendOtpCount += 1;
+    if (resendOtpCount === DATA_LIMITS.maxOtpResendLimit) {
+      globals.functions.setProperty(otpPanel.secondsPanel, { visible: false });
+      globals.functions.setProperty(otpPanel.aem_otpResend, { visible: false });
+      globals.functions.setProperty(otpPanel.aem_maxlimitOTP, { visible: true });
+    }
+    return getOTPV1(mobileNumber, cardDigits, globals);
+  }
+
+  return null;
+};
+
 export {
   getOTPV1,
   otpValV1,
@@ -648,4 +863,10 @@ export {
   preExecution,
   radioBtnValCommit,
   semiWizardSwitch,
+  getCCSmartEmi,
+  addMobileValidation,
+  addCardFieldValidation,
+  addOtpFieldValidation,
+  otpTimerV1,
+  resendOTP,
 };
