@@ -741,6 +741,14 @@ const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
   const eligibiltyResponse = currentFormContext.EligibilityResponse;
   const REQ_NBR = emiConversionArray?.length; // format '01'? or '1'
   const PROC_FEES = '000';
+
+  const tenurePlan = globals.functions.exportData().aem_tenureSelectionRepeatablePanel;
+  const selectedTenurePlan = tenurePlan?.find((emiPlan) => emiPlan.aem_tenureSelection === '0');
+  const tenureRawData = JSON.parse(selectedTenurePlan?.aem_tenureRawData);
+  const emiSubData = tenureRawData?.emiSubStance;
+  const INTEREST = emiSubData?.interest; // '030888'
+  const TID = emiSubData?.tid; // '000000101'
+  // const TENURE = ?.
   // interest: "03088" -- radio repatable hidden filed.
   // period: "003"
   // tid:"000000106"
