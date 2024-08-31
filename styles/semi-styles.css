@@ -253,7 +253,7 @@ body.semi-form {
                     }
                 }
                 
-                .field-aem-otpresend {
+                .field-aem-otpresend,.field-aem-otpresend2 {
                     margin-top: -20px;
 
                     button{
