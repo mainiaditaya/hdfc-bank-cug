@@ -18,8 +18,9 @@
  * the terms of the Adobe license agreement accompanying it.
  ************************************************************************ */
 
-main .form.edit-mode label [data-visible='false']{
-    display: block;
+main .form form.edit-mode label[data-visible='false'],
+main .form form.edit-mode legend[data-visible='false'] {
+  display: none !important;
 }
 
 main .form form.edit-mode .fragment-wrapper:not(.edit-mode){
