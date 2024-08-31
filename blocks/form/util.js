@@ -18,7 +18,7 @@ export function stripTags(input, allowd = allowedTags) {
  * @param {string} name The unsanitized string
  * @returns {string} The class name
  */
-function toClassName(name) {
+export function toClassName(name) {
   return typeof name === 'string'
     ? name
       .toLowerCase()
@@ -84,6 +84,7 @@ export function createFieldWrapper(fd, tagName = 'div', labelFn = createLabel) {
   const renderType = getHTMLRenderType(fd);
   const fieldId = `${renderType}-wrapper${nameStyle}`;
   fieldWrapper.className = fieldId;
+  fieldWrapper.dataset.id = fd.id;
   if (fd.visible === false) {
     fieldWrapper.dataset.visible = fd.visible;
   }
@@ -166,7 +167,7 @@ export function updateOrCreateInvalidMsg(fieldElement, msg) {
   return element;
 }
 
-function removeInvalidMsg(fieldElement) {
+export function removeInvalidMsg(fieldElement) {
   return updateOrCreateInvalidMsg(fieldElement, '');
 }
 

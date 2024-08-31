@@ -4,6 +4,7 @@ import {
   getId,
   stripTags,
   checkValidation,
+  toClassName,
 } from './util.js';
 import GoogleReCaptcha from './integrations/recaptcha.js';
 import componentDecorater from './mappings.js';
@@ -172,7 +173,7 @@ function createRadioOrCheckboxGroup(fd) {
   const wrapper = createFieldSet({ ...fd });
   const type = fd.fieldType.split('-')[0];
   fd.enum.forEach((value, index) => {
-    const label = typeof fd.enumNames?.[index] === 'object' ? fd.enumNames[index].value : fd.enumNames?.[index] || value;
+    const label = (typeof fd.enumNames?.[index] === 'object' && fd.enumNames?.[index] !== null) ? fd.enumNames[index].value : fd.enumNames?.[index] || value;
     const id = getId(fd.name);
     const field = createRadioOrCheckbox({
       name: fd.name,
@@ -182,7 +183,7 @@ function createRadioOrCheckboxGroup(fd) {
       enum: [value],
       required: fd.required,
     });
-    field.classList.remove('field-wrapper', `field-${fd.name}`);
+    field.classList.remove('field-wrapper', `field-${toClassName(fd.name)}`);
     const input = field.querySelector('input');
     input.id = id;
     input.dataset.fieldType = fd.fieldType;
@@ -251,7 +252,7 @@ async function fetchForm(pathname) {
 }
 
 function colSpanDecorator(field, element) {
-  const colSpan = field['Column Span'];
+  const colSpan = field['Column Span'] || field.properties?.colspan;
   if (colSpan && element) {
     element.classList.add(`col-${colSpan}`);
   }
@@ -341,8 +342,8 @@ function renderField(fd) {
   return field;
 }
 
-export async function generateFormRendition(panel, container) {
-  const { items = [] } = panel;
+export async function generateFormRendition(panel, container, getItems = (p) => p?.items) {
+  const items = getItems(panel) || [];
   const promises = items.map(async (field) => {
     field.value = field.value ?? '';
     const { fieldType } = field;
@@ -350,13 +351,14 @@ export async function generateFormRendition(panel, container) {
       captchaField = field;
     } else {
       const element = renderField(field);
-      if (field.appliedCssClassNames) {
-        element.className += ` ${field.appliedCssClassNames}`;
+      const appliedCssClassNames = field.appliedCssClassNames || field.properties?.appliedCssClassNames;
+      if (appliedCssClassNames) {
+        element.className += ` ${appliedCssClassNames}`;
       }
       colSpanDecorator(field, element);
       const decorator = await componentDecorater(field);
       if (field?.fieldType === 'panel') {
-        await generateFormRendition(field, element);
+        await generateFormRendition(field, element, getItems);
         return element;
       }
       if (typeof decorator === 'function') {
@@ -386,6 +388,17 @@ function enableValidation(form) {
   form.addEventListener('change', (event) => {
     checkValidation(event.target);
   });
+}
+
+async function createFormForAuthoring(formDef) {
+  const form = document.createElement('form');
+  await generateFormRendition(formDef, form, (container) => {
+    if (container[':itemsOrder'] && container[':items']) {
+      return container[':itemsOrder'].map((itemKey) => container[':items'][itemKey]);
+    }
+    return [];
+  });
+  return form;
 }
 
 export async function createForm(formDef, data) {
@@ -426,8 +439,26 @@ function isDocumentBasedForm(formDef) {
 }
 
 function cleanUp(content) {
-  const formDef = content.replaceAll('^(([^<>()\\\\[\\\\]\\\\\\\\.,;:\\\\s@\\"]+(\\\\.[^<>()\\\\[\\\\]\\\\\\\\.,;:\\\\s@\\"]+)*)|(\\".+\\"))@((\\\\[[0-9]{1,3}\\\\.[0-9]{1,3}\\\\.[0-9]{1,3}\\\\.[0-9]{1,3}])|(([a-zA-Z\\\\-0-9]+\\\\.)\\+[a-zA-Z]{2,}))$', '');
-  return formDef?.replace(/\x83\n|\n|\s\s+/g, '');
+  // replace backslashes that are not followed by valid json escape characters
+  return content.replace(/\\/g, (match, offset, string) => {
+    const prevChar = string[offset - 1];
+    const nextChar = string[offset + 1];
+    const validEscapeChars = ['b', 'f', 'n', 'r', 't', '"', '\\'];
+    if (validEscapeChars.includes(nextChar) || prevChar === '\\') {
+      return match;
+    }
+    return '';
+  });
+}
+
+function decode(rawContent) {
+  const content = rawContent.trim();
+  if (content.startsWith('"') && content.endsWith('"')) {
+    // In the new 'jsonString' context, Server side code comes as a string with escaped characters,
+    // hence the double parse
+    return JSON.parse(JSON.parse(content));
+  }
+  return JSON.parse(cleanUp(content));
 }
 
 export default async function decorate(block) {
@@ -442,7 +473,7 @@ export default async function decorate(block) {
     const codeEl = container?.querySelector('code');
     const content = codeEl?.textContent;
     if (content) {
-      formDef = JSON.parse(cleanUp(content));
+      formDef = decode(content);
     }
   }
   let source = 'aem';
@@ -460,13 +491,19 @@ export default async function decorate(block) {
       rules = false;
     } else {
       afModule = await import('./rules/index.js');
-      if (afModule && afModule.initAdaptiveForm) {
+      if (afModule && afModule.initAdaptiveForm && !block.classList.contains('edit-mode')) {
         form = await afModule.initAdaptiveForm(formDef, createForm);
+      } else {
+        form = await createFormForAuthoring(formDef);
       }
     }
+    form.dataset.id = formDef.id;
     form.dataset.action = formDef.action || pathname?.split('.json')[0];
     form.dataset.source = source;
     form.dataset.rules = rules;
+    if (source === 'aem' && formDef.properties) {
+      form.dataset.formpath = formDef.properties['fd:path'];
+    }
     container.replaceWith(form);
   }
 }
