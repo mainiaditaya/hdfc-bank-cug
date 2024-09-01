@@ -706,6 +706,25 @@ function radioBtnValCommit(arg1, globals) {
   }
 }
 
+const extractEmpAsstPannels = async (globals) => {
+  const employeeAsstPanel = globals.form.aem_semiWizard.aem_selectTenure.aem_employeeAssistancePanel;
+  const {
+    aem_channel: channel,
+    aem_bdrLc1Code: bdrLc1Code,
+    aem_branchCity: branchCity,
+    aem_branchCode: branchCode,
+    aem_branchName: branchName,
+    aem_branchTseLgCode: branchTseLgCode,
+    aem_dsaCode: dsaCode,
+    aem_lc1Code: lc1Code,
+    aem_lc2Code: lc2Code,
+    aem_lgTseCode: lgTseCode,
+    aem_smCode: smCode,
+  } = employeeAsstPanel;
+  return [channel, bdrLc1Code, branchCity, branchCode, branchName, branchTseLgCode, dsaCode, lc1Code, lc2Code, lgTseCode, smCode];
+};
+
+const chanelDdChangeVisibility = async (globals, arrayList, visible) => arrayList?.forEach((pannel) => globals.functions.setProperty(pannel, { visible }));
 /**
  * initiate master channel api on toggle switch
  * @param {object} globals - global form object
@@ -713,15 +732,47 @@ function radioBtnValCommit(arg1, globals) {
 const assistedToggleHandler = async (globals) => {
   try {
     const response = await getJsonResponse(semiEndpoints.masterChanel, null, 'GET');
-    const channelDropDown = globals.form.aem_semiWizard.aem_selectTenure.aem_employeeAssistancePanel.aem_channel;
+    const [channel, ...asstPannels] = await extractEmpAsstPannels(globals);
+    const channelDropDown = channel;
     const DEF_OPTION = [{ label: 'Website Download', value: 'Website Download' }];
     const responseOption = response?.map((item) => ({ label: item?.CHANNELS, value: item?.CHANNELS }));
     const channelOptions = responseOption?.length ? DEF_OPTION.concat(responseOption) : DEF_OPTION;
     const chanelEnumNames = channelOptions?.map((item) => item?.label);
     setSelectOptions(channelOptions, channelDropDown?.$name);
     globals.functions.setProperty(channelDropDown, { enum: channelOptions, enumNames: chanelEnumNames, value: DEF_OPTION[0].value });
+    asstPannels?.forEach((pannel) => globals.functions.setProperty(pannel, { visible: false }));
   } catch (error) {
     console.error(error);
+  }
+};
+
+/**
+ * change handler in channel dropdown
+ * @param {object} globals - global form object
+ */
+const channelDDHandler = async (globals) => {
+  const [channel, ...asstPannels] = await extractEmpAsstPannels(globals);
+  asstPannels?.forEach((item) => globals.functions.setProperty(item, { visible: false }));
+  await chanelDdChangeVisibility(globals, asstPannels, false);
+  const [bdrLc1Code, branchCity, branchCode, branchName, branchTseLgCode, dsaCode, lc1Code, lc2Code, lgTseCode, smCode] = asstPannels;
+  const pannelSetting = {
+    branch: [branchCode, branchName, branchCity, smCode, bdrLc1Code, lc2Code, branchTseLgCode],
+    dsa: [dsaCode, smCode, bdrLc1Code, lc2Code, lgTseCode],
+    defaultCase: [smCode, lc1Code, lc2Code, lgTseCode],
+  };
+  switch (channel.$value) {
+    case 'Website Download':
+      await chanelDdChangeVisibility(globals, asstPannels, false);
+      break;
+    case 'Branch':
+      await chanelDdChangeVisibility(globals, pannelSetting.branch, true);
+      break;
+    case 'DSA':
+      // dsaName ?
+      await chanelDdChangeVisibility(globals, pannelSetting.dsa, true);
+      break;
+    default:
+      await chanelDdChangeVisibility(globals, pannelSetting.defaultCase, true);
   }
 };
 
@@ -886,6 +937,7 @@ export {
   radioBtnValCommit,
   semiWizardSwitch,
   assistedToggleHandler,
+  channelDDHandler,
   getCCSmartEmi,
   addMobileValidation,
   addCardFieldValidation,
