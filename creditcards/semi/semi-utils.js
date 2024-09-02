@@ -30,7 +30,8 @@ const addCardFieldValidation = () => {
   */
 const addOtpFieldValidation = () => {
   const inputField = document.querySelector('.field-aem-otpnumber input');
-  inputField.addEventListener('input', () => validateOTPInput(inputField));
+  const inputField2 = document.querySelector('.field-aem-otpnumber2 input');
+  [inputField, inputField2].forEach((ip) => ip.addEventListener('input', () => validateOTPInput(ip)));
 };
 
 /**

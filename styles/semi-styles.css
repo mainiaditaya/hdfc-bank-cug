@@ -241,7 +241,7 @@ body.semi-form {
                     color: var(--color-interface-background-quaternary);                
                 }
 
-                .field-aem-maxlimitotp {
+                .field-aem-maxlimitotp, .field-aem-maxlimitotp2 {
                     margin-top: -20px;
                     
                     p{
@@ -253,7 +253,7 @@ body.semi-form {
                     }
                 }
                 
-                .field-aem-otpresend {
+                .field-aem-otpresend,.field-aem-otpresend2 {
                     margin-top: -20px;
 
                     button{
