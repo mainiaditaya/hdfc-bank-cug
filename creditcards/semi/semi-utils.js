@@ -134,9 +134,9 @@ const validationField = () => {
   addOtpFieldValidation();
 };
 
-// setTimeout(() => {
-//   validationField();
-// }, 1500);
+setTimeout(() => {
+  validationField();
+}, 1500);
 
 export {
   numberToText,
