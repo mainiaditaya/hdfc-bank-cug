@@ -13,7 +13,7 @@ import {
   semiWizardSwitch,
   getCCSmartEmi,
   otpTimerV1,
-  resendOTP,
+  resendOTPV1,
 } from './smart-emi-functions.js';
 import { invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
 
@@ -43,5 +43,5 @@ export {
   semiWizardSwitch,
   getCCSmartEmi,
   otpTimerV1,
-  resendOTP,
+  resendOTPV1,
 };

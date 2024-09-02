@@ -51,7 +51,8 @@ const addCardFieldValidation = () => {
 */
 const addOtpFieldValidation = () => {
   const inputField = document.querySelector('.field-aem-otpnumber input');
-  inputField.addEventListener('input', () => validateOTPInput(inputField));
+  const inputField2 = document.querySelector('.field-aem-otpnumber2 input');
+  [inputField, inputField2].forEach((ip) => ip.addEventListener('input', () => validateOTPInput(ip)));
 };
 
 /**
@@ -114,7 +115,7 @@ currentFormContext.billed = 0;
 currentFormContext.unbilled = 0;
 let tnxPopupAlertOnce = 0; // flag alert for the pop to show only once on click of continue
 let resendOtpCount = 0;
-const resendOtpCount2 = 0;
+let resendOtpCount2 = 0;
 
 /**
  * generates the otp
@@ -852,28 +853,59 @@ const otpTimerV1 = (pannelName, globals) => {
 };
 
 /**
- * @name resendOTP
- * @param {Object} globals - The global object containing necessary data for DAP request.
+ * @name resendOTPV1 - to handle resend otp for otpv1 &  preExecution
+ * @param {Object} globals - The global form object
+ * @param {string} - otp pannel - firstotp or secondotp
  * @return {PROMISE}
  */
-const resendOTP = async (globals) => {
+const resendOTPV1 = async (pannelName, globals) => {
+  const FIRST_PANNEL_OTP = 'firstotp';
+  const SECOND_PANNEL_OTP = 'secondotp';
+  const panelOtp = {
+    otpTimerPanel: null,
+    otpTimerSecond: null,
+    resendOtp: null,
+    limitCheck: null,
+    maxLimitOtp: null,
+    resendOtpCount: null,
+  };
+  if (pannelName === FIRST_PANNEL_OTP) {
+    const otp1 = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel.otpPanel;
+    panelOtp.otpTimerSecond = otp1.secondsPanel.seconds;
+    panelOtp.otpTimerPanel = otp1.secondsPanel;
+    panelOtp.resendOtp = otp1.aem_otpResend;
+    panelOtp.limitCheck = resendOtpCount < DATA_LIMITS.maxOtpResendLimit;
+    panelOtp.maxLimitOtp = otp1.aem_maxlimitOTP;
+    resendOtpCount += 1;
+    panelOtp.resendOtpCount = resendOtpCount;
+  }
+  if (pannelName === SECOND_PANNEL_OTP) {
+    const otp2 = globals.form.aem_semiWizard.aem_selectTenure.aem_otpPanelConfirmation.aem_otpPanel2;
+    panelOtp.otpTimerSecond = otp2.secondsPanel.seconds2;
+    panelOtp.otpTimerPanel = otp2.secondsPanel;
+    panelOtp.resendOtp = otp2.aem_otpResend2;
+    panelOtp.limitCheck = resendOtpCount2 < DATA_LIMITS.maxOtpResendLimit;
+    panelOtp.maxLimitOtp = otp2.aem_maxlimitOTP2;
+    resendOtpCount2 += 1;
+    panelOtp.resendOtpCount = resendOtpCount2;
+  }
   const mobileNumber = globals.form.aem_semiWizard.aem_identifierPanel.aem_loginPanel.mobilePanel.aem_mobileNum.$value;
   const cardDigits = globals.form.aem_semiWizard.aem_identifierPanel.aem_loginPanel.aem_cardNo.$value;
-  const { otpPanel } = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel;
-
-  if (resendOtpCount < DATA_LIMITS.maxOtpResendLimit) {
-    resendOtpCount += 1;
-    if (resendOtpCount === DATA_LIMITS.maxOtpResendLimit) {
-      globals.functions.setProperty(otpPanel.secondsPanel, { visible: false });
-      globals.functions.setProperty(otpPanel.aem_otpResend, { visible: false });
-      globals.functions.setProperty(otpPanel.aem_maxlimitOTP, { visible: true });
+  if (panelOtp.limitCheck) {
+    if (panelOtp.resendOtpCount === DATA_LIMITS.maxOtpResendLimit) {
+      globals.functions.setProperty(panelOtp.otpTimerPanel, { visible: false });
+      globals.functions.setProperty(panelOtp.resendOtp, { visible: false });
+      globals.functions.setProperty(panelOtp.maxLimitOtp, { visible: true });
     }
-    return getOTPV1(mobileNumber, cardDigits, globals);
+    if (pannelName === FIRST_PANNEL_OTP) {
+      return getOTPV1(mobileNumber, cardDigits, globals);
+    }
+    if (pannelName === SECOND_PANNEL_OTP) {
+      return preExecution(mobileNumber, cardDigits, globals);
+    }
   }
-
   return null;
 };
-
 export {
   getOTPV1,
   otpValV1,
@@ -892,5 +924,5 @@ export {
   addCardFieldValidation,
   addOtpFieldValidation,
   otpTimerV1,
-  resendOTP,
+  resendOTPV1,
 };
