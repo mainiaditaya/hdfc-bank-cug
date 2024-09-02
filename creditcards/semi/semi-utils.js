@@ -132,7 +132,7 @@ setTimeout(() => {
   addMobileValidation();
   addCardFieldValidation();
   addOtpFieldValidation();
-}, 500);
+}, 3000);
 
 export {
   numberToText,
