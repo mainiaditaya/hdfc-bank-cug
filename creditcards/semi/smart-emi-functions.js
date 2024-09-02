@@ -220,6 +220,17 @@ const setTxnPanelData = (allTxn, btxn, billedTxnPanel, unBilledTxnPanel, globals
 };
 
 /**
+ * calls function to add styling to completed steppers
+ *
+ * @function changeWizardView
+ * @returns {void}
+ */
+const changeWizardView = () => {
+  const completedStep = document.querySelector('.field-aem-semiwizard .wizard-menu-items .wizard-menu-active-item');
+  completedStep.classList.add('wizard-completed-item');
+};
+
+/**
 * @param {resPayload} Object - checkEligibility response.
 * @param {object} globals - global object
 * @return {PROMISE}
@@ -248,6 +259,7 @@ function checkELigibilityHandler(resPayload1, globals) {
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_TxnAvailable, { value: `Unbilled Transaction: (${ccUnBilledData?.length})` });
     // set runtime values
     globals.functions.setProperty(globals.form.runtime.originAcct, { value: currentFormContext.EligibilityResponse.responseString.aanNumber });
+    changeWizardView();
     // Display card and move wizard view
     if (window !== undefined) cardDisplay(globals, resPayload);
     if (window !== undefined) moveWizardView(domElements.semiWizard, domElements.chooseTransaction);
@@ -481,17 +493,6 @@ function txnSelectHandler(checkboxVal, txnType, globals) {
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: true });
   }
 }
-
-/**
- * calls function to add styling to completed steppers
- *
- * @function changeWizardView
- * @returns {void}
- */
-const changeWizardView = () => {
-  const completedStep = document.querySelector('.field-aem-semiwizard .wizard-menu-items .wizard-menu-active-item');
-  completedStep.classList.add('wizard-completed-item');
-};
 
 /**
    * Switches the visibility of panels in the card wizard interface.
