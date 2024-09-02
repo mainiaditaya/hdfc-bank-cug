@@ -128,11 +128,11 @@ const numberToText = (num) => {
   return str;
 };
 
-setTimeout(() => {
+const validationField = () => {
   addMobileValidation();
   addCardFieldValidation();
   addOtpFieldValidation();
-}, 3000);
+};
 
 export {
   numberToText,
@@ -143,4 +143,5 @@ export {
   sortByDate,
   changeCheckboxToToggle,
   currencyStrToNum,
+  validationField,
 };
