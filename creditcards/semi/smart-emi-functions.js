@@ -220,6 +220,17 @@ const setTxnPanelData = (allTxn, btxn, billedTxnPanel, unBilledTxnPanel, globals
 };
 
 /**
+ * calls function to add styling to completed steppers
+ *
+ * @function changeWizardView
+ * @returns {void}
+ */
+const changeWizardView = () => {
+  const completedStep = document.querySelector('.field-aem-semiwizard .wizard-menu-items .wizard-menu-active-item');
+  completedStep.classList.add('wizard-completed-item');
+};
+
+/**
 * @param {resPayload} Object - checkEligibility response.
 * @param {object} globals - global object
 * @return {PROMISE}
@@ -482,17 +493,6 @@ function txnSelectHandler(checkboxVal, txnType, globals) {
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: true });
   }
 }
-
-/**
- * calls function to add styling to completed steppers
- *
- * @function changeWizardView
- * @returns {void}
- */
-const changeWizardView = () => {
-  const completedStep = document.querySelector('.field-aem-semiwizard .wizard-menu-items .wizard-menu-active-item');
-  completedStep.classList.add('wizard-completed-item');
-};
 
 /**
    * Switches the visibility of panels in the card wizard interface.
