@@ -11,7 +11,7 @@ import {
  */
 const addMobileValidation = () => {
   const validFirstDigits = ['6', '7', '8', '9'];
-  const inputField = (window.document) ? document.querySelector('.field-aem-mobilenum input') : null;
+  const inputField = document.querySelector('.field-aem-mobilenum input');
   inputField?.addEventListener('input', () => validatePhoneNumber(inputField, validFirstDigits));
 };
 
@@ -20,7 +20,7 @@ const addMobileValidation = () => {
    *
    */
 const addCardFieldValidation = () => {
-  const inputField = (window.document) ? document.querySelector('.field-aem-cardno input') : null;
+  const inputField = document.querySelector('.field-aem-cardno input');
   inputField?.addEventListener('input', () => validateCardDigits(inputField));
 };
 
@@ -29,8 +29,8 @@ const addCardFieldValidation = () => {
   *
   */
 const addOtpFieldValidation = () => {
-  const inputField = (window.document) ? document.querySelector('.field-aem-otpnumber input') : null;
-  const inputField2 = (window.document) ? document.querySelector('.field-aem-otpnumber2 input') : null;
+  const inputField = document.querySelector('.field-aem-otpnumber input');
+  const inputField2 = document.querySelector('.field-aem-otpnumber2 input');
   [inputField, inputField2].forEach((ip) => ip?.addEventListener('input', () => validateOTPInput(ip)));
 };
 
