@@ -12,7 +12,7 @@ import {
 const addMobileValidation = () => {
   const validFirstDigits = ['6', '7', '8', '9'];
   const inputField = document.querySelector('.field-aem-mobilenum input');
-  inputField.addEventListener('input', () => validatePhoneNumber(inputField, validFirstDigits));
+  inputField?.addEventListener('input', () => validatePhoneNumber(inputField, validFirstDigits));
 };
 
 /**
@@ -21,7 +21,7 @@ const addMobileValidation = () => {
    */
 const addCardFieldValidation = () => {
   const inputField = document.querySelector('.field-aem-cardno input');
-  inputField.addEventListener('input', () => validateCardDigits(inputField));
+  inputField?.addEventListener('input', () => validateCardDigits(inputField));
 };
 
 /**
@@ -31,7 +31,7 @@ const addCardFieldValidation = () => {
 const addOtpFieldValidation = () => {
   const inputField = document.querySelector('.field-aem-otpnumber input');
   const inputField2 = document.querySelector('.field-aem-otpnumber2 input');
-  [inputField, inputField2].forEach((ip) => ip.addEventListener('input', () => validateOTPInput(ip)));
+  [inputField, inputField2].forEach((ip) => ip?.addEventListener('input', () => validateOTPInput(ip)));
 };
 
 /**
@@ -128,11 +128,15 @@ const numberToText = (num) => {
   return str;
 };
 
-setTimeout(() => {
+const validationField = () => {
   addMobileValidation();
   addCardFieldValidation();
   addOtpFieldValidation();
-}, 500);
+};
+
+setTimeout(() => {
+  validationField();
+}, 1500);
 
 export {
   numberToText,
@@ -143,4 +147,5 @@ export {
   sortByDate,
   changeCheckboxToToggle,
   currencyStrToNum,
+  validationField,
 };
