@@ -57,10 +57,11 @@ let resendOtpCount2 = 0;
  * generates the otp
  * @param {string} mobileNumber
  * @param {string} cardDigits
+ * @param {string} channel
  * @param {object} globals
  * @return {PROMISE}
  */
-function getOTPV1(mobileNumber, cardDigits, globals) {
+function getOTPV1(mobileNumber, cardDigits, channel, globals) {
   /* restrict to show otp-resend option once it reaches max-attemt and to show otptimer */
   const { otpPanel } = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel;
   if (resendOtpCount < DATA_LIMITS.maxOtpResendLimit) {
@@ -139,7 +140,7 @@ function preExecution(mobileNumber, cardDigits, globals) {
   if (window !== undefined) displayLoader();
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
-
+const nfObject = new Intl.NumberFormat('hi-IN');
 /**
  * sets the data for the instance of repetable panel
  *
@@ -149,7 +150,6 @@ function preExecution(mobileNumber, cardDigits, globals) {
  * @param {number} i - current instance of panel row
  */
 const setData = (globals, panel, txn, i) => {
-  const nfObject = new Intl.NumberFormat('hi-IN');
   let enabled = true;
   if (currentFormContext.totalSelect === 10 && txn?.aem_Txn_checkBox !== 'on') enabled = false;
   globals.functions.setProperty(panel[i]?.aem_Txn_checkBox, { value: txn?.checkbox || txn?.aem_Txn_checkBox });
@@ -171,7 +171,6 @@ const cardDisplay = (globals, response) => {
   const creditCardDisplay = globals.form.aem_semicreditCardDisplay;
   globals.functions.setProperty(creditCardDisplay, { visible: true });
   globals.functions.setProperty(creditCardDisplay.aem_semicreditCardContent.aem_customerNameLabel, { value: `Dear ${response?.cardHolderName}` });
-  const nfObject = new Intl.NumberFormat('hi-IN');
   // eslint-disable-next-line radix
   const totalAmt = nfObject.format(parseInt(response.responseString.creditLimit) - Math.round(parseInt(response?.blockCode?.bbvlogn_card_outst) / 100));
   const TOTAL_OUTSTANDING_AMT = `${MISC.rupeesUnicode} ${totalAmt}`;
@@ -237,8 +236,8 @@ const changeWizardView = () => {
 */
 // eslint-disable-next-line no-unused-vars
 function checkELigibilityHandler(resPayload1, globals) {
-  // const resPayload = RESPONSE_PAYLOAD.response;
-  const resPayload = resPayload1;
+  const resPayload = RESPONSE_PAYLOAD.response;
+  // const resPayload = resPayload1;
   const response = {};
   try {
     /* continue btn disabling code added temorary, can be removed after form authoring */
@@ -297,7 +296,6 @@ const getLoanOptionsInfo = (responseStringJsonObj) => {
  * @param {number} i -The index of the current tenure
  */
 const setDataTenurePanel = (globals, panel, option, i) => {
-  const nfObject = new Intl.NumberFormat('hi-IN');
   globals.functions.setProperty(panel[i].aem_tenureSelection, { enumNames: [option?.period] });
   // globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.test, { enum: [0], enumNames: ['test'] });
   // globals.functions.setProperty(panel[i].aem_tenureSelection, { enum: [0], enumNames: [option?.period] });
@@ -317,7 +315,6 @@ const setDataTenurePanel = (globals, panel, option, i) => {
 
 const tenureOption = (loanOptions, loanAmt) => {
   const arrayOptions = loanOptions?.map((option) => {
-    const nfObject = new Intl.NumberFormat('hi-IN');
     const roiMonthly = (parseInt(option.interest, 10) / 100) / 12;
     const roiAnnually = currencyUtil(parseFloat(option?.interest), 2);
     const monthlyEMI = nfObject.format(calculateEMI(loanAmt, roiMonthly, parseInt(option.period, 10)));
@@ -346,11 +343,12 @@ const tenureDisplay = (globals) => {
   const semiFormData = globals.functions.exportData().smartemi;
   const selectedTxnList = (semiFormData?.aem_billedTxn?.aem_billedTxnSelection?.concat(semiFormData?.aem_unbilledTxn?.aem_unbilledTxnSection))?.filter((txn) => txn.aem_Txn_checkBox === 'on');
   const totalAmountOfTxn = selectedTxnList?.reduce((prev, acc) => prev + parseFloat(acc.aem_TxnAmt.replace(/[^\d.-]/g, '')), 0);
+  // set total amount for the review screen in whatsapp.
+  globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_reviewAmount, { value: totalAmountOfTxn });
   const totalAmountSelected = (parseInt(totalAmountOfTxn, 10));
   const loanArrayOption = getLoanOptionsInfo(currentFormContext.EligibilityResponse?.responseString?.records);
   const tenureArrayOption = tenureOption(loanArrayOption, totalAmountSelected);
   const LABEL_AMT_SELCTED = 'Amount selected for SmartEMI';
-  const nfObject = new Intl.NumberFormat('hi-IN');
   const DISPLAY_TOTAL_AMT = `${MISC.rupeesUnicode} ${nfObject.format(totalAmountSelected)}`;
   const TOTAL_AMT_IN_WORDS = `${numberToText(totalAmountOfTxn)}`;
   /* display amount */
@@ -360,6 +358,10 @@ const tenureDisplay = (globals) => {
   /* pre-select the last tenure option (radio btn) by default */
   const DEFUALT_SELCT_TENURE = (tenureRepatablePanel.length > 0) ? (tenureRepatablePanel.length - 1) : 0;
   globals.functions.setProperty(tenureRepatablePanel[DEFUALT_SELCT_TENURE].aem_tenureSelection, { value: '0' });
+  /* discount */
+  // const discount = globals.form.aem_semiWizard.aem_selectTenure.discount.$value; ///
+  // const calcDiscount = ((Number().toFixed(2)) - (Number(discount) / 100));
+  // globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.discount, { value: calcDiscount });
   /* set data for tenure panel */
   tenureArrayOption?.forEach((option, i) => {
     setDataTenurePanel(globals, tenureRepatablePanel, option, i);
@@ -583,10 +585,20 @@ function radioBtnValCommit(arg1, globals) {
       if (selectedIndex === i) {
         globals.functions.setProperty(item.aem_tenureSelection, { value: '0' });
         /* set roi based on radio select */
-        const roiMonthly = `${Number(tenureData[i].aem_roi_monthly).toFixed(2)} %`;
+        /* discount */
+        const discount = globals.form.aem_semiWizard.aem_selectTenure.discount.$value; ///
+        const calcDiscount = ((Number(tenureData[i].aem_roi_monthly).toFixed(2)) - (Number(discount) / 100));
+        const roiMonthly = `${calcDiscount} %`;
         const roiAnnually = `${tenureData[i].aem_roi_annually}% per annum`;
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.aem_ROI, { value: roiMonthly });
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.rateOfInterestPerAnnumValue, { value: roiAnnually });
+        // set the same data for review panel screen - whatsapp flow.
+        const rawTenureData = JSON.parse(tenureData[i].aem_tenureRawData);
+        const duration = `${parseInt(rawTenureData.period, 10)} Months`;
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_monthlyEmi, { value: tenureData[i].aem_tenureSelectionEmi });
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_duration, { value: duration });
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_roi, { value: roiMonthly });
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_processingFee, { value: tenureData[i].aem_tenureSelectionProcessing });
       } else {
         globals.functions.setProperty(item.aem_tenureSelection, { value: null });
       }
@@ -738,6 +750,7 @@ const otpTimerV1 = (pannelName, globals) => {
  * @return {PROMISE}
  */
 const resendOTPV1 = async (pannelName, globals) => {
+  const channel = 'web';
   const FIRST_PANNEL_OTP = 'firstotp';
   const SECOND_PANNEL_OTP = 'secondotp';
   const panelOtp = {
@@ -777,7 +790,7 @@ const resendOTPV1 = async (pannelName, globals) => {
       globals.functions.setProperty(panelOtp.maxLimitOtp, { visible: true });
     }
     if (pannelName === FIRST_PANNEL_OTP) {
-      return getOTPV1(mobileNumber, cardDigits, globals);
+      return getOTPV1(mobileNumber, cardDigits, channel, globals);
     }
     if (pannelName === SECOND_PANNEL_OTP) {
       return preExecution(mobileNumber, cardDigits, globals);
