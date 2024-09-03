@@ -4,6 +4,7 @@ import {
 import * as SEMI_CONSTANT from './constant.js';
 import {
   clearString,
+  formUtil,
   generateUUID,
   moveWizardView,
   urlPath,
@@ -627,10 +628,11 @@ const extractEmpAsstPannels = async (globals) => {
     aem_lgTseCode: lgTseCode,
     aem_smCode: smCode,
   } = employeeAsstPanel;
-  return [channel, bdrLc1Code, branchCity, branchCode, branchName, branchTseLgCode, dsaCode, dsaName, lc1Code, lc2Code, lgTseCode, smCode];
+  return {
+    channel, bdrLc1Code, branchCity, branchCode, branchName, branchTseLgCode, dsaCode, dsaName, lc1Code, lc2Code, lgTseCode, smCode,
+  };
 };
 
-const chanelDdChangeVisibility = async (globals, arrayList, visible) => arrayList?.forEach((pannel) => globals.functions.setProperty(pannel, { visible }));
 /**
  * initiate master channel api on toggle switch
  * @param {object} globals - global form object
@@ -638,7 +640,8 @@ const chanelDdChangeVisibility = async (globals, arrayList, visible) => arrayLis
 const assistedToggleHandler = async (globals) => {
   try {
     const response = await getJsonResponse(semiEndpoints.masterChanel, null, 'GET');
-    const [channel, ...asstPannels] = await extractEmpAsstPannels(globals);
+    const { channel, ...asstPannels } = await extractEmpAsstPannels(globals);
+    const asstPannelArray = Object.entries(asstPannels).map(([, proxyFiels]) => proxyFiels);
     const channelDropDown = channel;
     const DEF_OPTION = [{ label: 'Website Download', value: 'Website Download' }];
     const responseOption = response?.map((item) => ({ label: item?.CHANNELS, value: item?.CHANNELS }));
@@ -646,7 +649,7 @@ const assistedToggleHandler = async (globals) => {
     const chanelEnumNames = channelOptions?.map((item) => item?.label);
     setSelectOptions(channelOptions, channelDropDown?.$name);
     globals.functions.setProperty(channelDropDown, { enum: channelOptions, enumNames: chanelEnumNames, value: DEF_OPTION[0].value });
-    asstPannels?.forEach((pannel) => globals.functions.setProperty(pannel, { visible: false }));
+    asstPannelArray?.forEach((pannel) => globals.functions.setProperty(pannel, { visible: false }));
   } catch (error) {
     console.error(error);
   }
@@ -657,28 +660,60 @@ const assistedToggleHandler = async (globals) => {
  * @param {object} globals - global form object
  */
 const channelDDHandler = async (globals) => {
-  const [channel, ...asstPannels] = await extractEmpAsstPannels(globals);
-  asstPannels?.forEach((item) => globals.functions.setProperty(item, { visible: false }));
-  await chanelDdChangeVisibility(globals, asstPannels, false);
-  const [bdrLc1Code, branchCity, branchCode, branchName, branchTseLgCode, dsaCode, dsaName, lc1Code, lc2Code, lgTseCode, smCode] = asstPannels;
+  const { channel, ...asstPannels } = await extractEmpAsstPannels(globals);
+  const asstPannelArray = Object.entries(asstPannels).map(([, proxyFiels]) => proxyFiels);
+  asstPannelArray?.forEach((item) => globals.functions.setProperty(item, { visible: false }));
+  const {
+    bdrLc1Code, branchCity, branchCode, branchName, branchTseLgCode, dsaCode, dsaName, lc1Code, lc2Code, lgTseCode, smCode,
+  } = asstPannels;
   const pannelSetting = {
+    websiteDownload: asstPannelArray,
     branch: [branchCode, branchName, branchCity, smCode, bdrLc1Code, lc2Code, branchTseLgCode],
     dsa: [dsaCode, dsaName, smCode, bdrLc1Code, lc2Code, lgTseCode],
     defaultCase: [smCode, lc1Code, lc2Code, lgTseCode],
   };
   switch (channel.$value) {
     case 'Website Download':
-      await chanelDdChangeVisibility(globals, asstPannels, false);
+      asstPannelArray?.forEach((item) => globals.functions.setProperty(item, { visible: false }));
       break;
     case 'Branch':
-      await chanelDdChangeVisibility(globals, pannelSetting.branch, true);
+      pannelSetting.branch?.forEach((item) => globals.functions.setProperty(item, { visible: true }));
       break;
     case 'DSA':
       // dsaName ?
-      await chanelDdChangeVisibility(globals, pannelSetting.dsa, true);
+      pannelSetting.dsa?.forEach((item) => globals.functions.setProperty(item, { visible: true }));
       break;
     default:
-      await chanelDdChangeVisibility(globals, pannelSetting.defaultCase, true);
+      pannelSetting.defaultCase?.forEach((item) => globals.functions.setProperty(item, { visible: true }));
+  }
+};
+
+/**
+ * branchcode handler
+ * @param {object} globals - globals form object
+ */
+const branchHandler = async (globals) => {
+  const { branchName, branchCity, branchCode } = await extractEmpAsstPannels(globals);
+  const branchNameUtil = formUtil(globals, branchName);
+  const branchCityUtil = formUtil(globals, branchCity);
+  try {
+    const branchCodeUrl = `${semiEndpoints.branchMaster}-${branchCode.$value}.json`;
+    const response = await getJsonResponse(branchCodeUrl, null, 'GET');
+    const data = response?.[0];
+    if (data?.errorCode === '500') {
+      globals.functions.markFieldAsInvalid(branchCode.$qualifiedName, 'Please enter valid Branch Code', { useQualifiedName: true });
+      throw new Error(data?.errorMessage);
+    } else {
+      const cityName = data?.CITY_NAME;
+      const branchnameVal = data?.BRANCH_NAME;
+      const changeDataAttrObj = { attrChange: true, value: false, disable: true };
+      branchNameUtil.setValue(branchnameVal, changeDataAttrObj);
+      branchCityUtil.setValue(cityName, changeDataAttrObj);
+    }
+  } catch (error) {
+    branchNameUtil.resetField();
+    branchCityUtil.resetField();
+    console.log(error, 'errro');
   }
 };
 
@@ -889,6 +924,7 @@ export {
   semiWizardSwitch,
   assistedToggleHandler,
   channelDDHandler,
+  branchHandler,
   getCCSmartEmi,
   otpTimerV1,
   resendOTPV1,

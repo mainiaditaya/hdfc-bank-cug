@@ -11,6 +11,7 @@ const SEMI_ENDPOINTS = {
   preexecution: 'https://applyonlinedev.hdfcbank.com/content/hdfc_ccforms/api/preexecution.json',
   masterChanel: 'https://applyonlinedev.hdfcbank.com/content/hdfc_commonforms/api/mdm.CREDIT.POST_ISSUANCE_CHANNEL_MASTER.json',
   ccSmartEmi: 'https://applyonlinedev.hdfcbank.com/content/hdfc_ccforms/api/ccsmartemi.json',
+  branchMaster: 'https://applyonlinedev.hdfcbank.com/content/hdfc_commonforms/api/mdm.CREDIT.POST_ISSUANCE_BRANCH_MASTER.BRANCH_CODE',
 };
 
 const DOM_ELEMENT = {
