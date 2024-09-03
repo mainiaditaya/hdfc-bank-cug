@@ -1,5 +1,6 @@
 import {
   createLabelInElement,
+  setSelectOptions,
 } from '../domutils/domutils.js';
 
 import {
@@ -122,4 +123,5 @@ export {
   changeCheckboxToToggle,
   currencyStrToNum,
   validationField,
+  setSelectOptions,
 };

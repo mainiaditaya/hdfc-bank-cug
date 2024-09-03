@@ -18,9 +18,8 @@ import {
   sortByDate,
   changeCheckboxToToggle,
   currencyStrToNum,
+  setSelectOptions,
 } from './semi-utils.js';
-
-import { setSelectOptions } from '../domutils/domutils.js';
 
 const {
   CURRENT_FORM_CONTEXT: currentFormContext,
@@ -622,12 +621,13 @@ const extractEmpAsstPannels = async (globals) => {
     aem_branchName: branchName,
     aem_branchTseLgCode: branchTseLgCode,
     aem_dsaCode: dsaCode,
+    aem_dsaName: dsaName,
     aem_lc1Code: lc1Code,
     aem_lc2Code: lc2Code,
     aem_lgTseCode: lgTseCode,
     aem_smCode: smCode,
   } = employeeAsstPanel;
-  return [channel, bdrLc1Code, branchCity, branchCode, branchName, branchTseLgCode, dsaCode, lc1Code, lc2Code, lgTseCode, smCode];
+  return [channel, bdrLc1Code, branchCity, branchCode, branchName, branchTseLgCode, dsaCode, dsaName, lc1Code, lc2Code, lgTseCode, smCode];
 };
 
 const chanelDdChangeVisibility = async (globals, arrayList, visible) => arrayList?.forEach((pannel) => globals.functions.setProperty(pannel, { visible }));
@@ -660,10 +660,10 @@ const channelDDHandler = async (globals) => {
   const [channel, ...asstPannels] = await extractEmpAsstPannels(globals);
   asstPannels?.forEach((item) => globals.functions.setProperty(item, { visible: false }));
   await chanelDdChangeVisibility(globals, asstPannels, false);
-  const [bdrLc1Code, branchCity, branchCode, branchName, branchTseLgCode, dsaCode, lc1Code, lc2Code, lgTseCode, smCode] = asstPannels;
+  const [bdrLc1Code, branchCity, branchCode, branchName, branchTseLgCode, dsaCode, dsaName, lc1Code, lc2Code, lgTseCode, smCode] = asstPannels;
   const pannelSetting = {
     branch: [branchCode, branchName, branchCity, smCode, bdrLc1Code, lc2Code, branchTseLgCode],
-    dsa: [dsaCode, smCode, bdrLc1Code, lc2Code, lgTseCode],
+    dsa: [dsaCode, dsaName, smCode, bdrLc1Code, lc2Code, lgTseCode],
     defaultCase: [smCode, lc1Code, lc2Code, lgTseCode],
   };
   switch (channel.$value) {
