@@ -358,12 +358,6 @@ const tenureDisplay = (globals) => {
   /* pre-select the last tenure option (radio btn) by default */
   const DEFUALT_SELCT_TENURE = (tenureRepatablePanel.length > 0) ? (tenureRepatablePanel.length - 1) : 0;
   globals.functions.setProperty(tenureRepatablePanel[DEFUALT_SELCT_TENURE].aem_tenureSelection, { value: '0' });
-  /* discount */
-  const discount = globals.form.aem_semiWizard.aem_selectTenure.discount.$value; ///
-  const calcDiscount = ((Number().toFixed(2)) - (Number(discount) / 100));
-  const roi = parseFloat(globals.form.aem_semiWizard.aem_selectTenure.aem_ROI.$value) + calcDiscount;
-  const roiPercentage = `${roi.toFixed(2)}%`;
-  globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.aem_ROI, { value: roiPercentage });
   /* set data for tenure panel */
   tenureArrayOption?.forEach((option, i) => {
     setDataTenurePanel(globals, tenureRepatablePanel, option, i);
@@ -588,9 +582,10 @@ function radioBtnValCommit(arg1, globals) {
         globals.functions.setProperty(item.aem_tenureSelection, { value: '0' });
         /* set roi based on radio select */
         /* discount */
-        const discount = globals.form.aem_semiWizard.aem_selectTenure.discount.$value; ///
-        const calcDiscount = ((Number(tenureData[i].aem_roi_monthly).toFixed(2)) - (Number(discount) / 100));
-        const roiMonthly = `${calcDiscount.toFixed(2)} %`;
+        // const discount = globals.form.aem_semiWizard.aem_selectTenure.discount.$value; ///
+        // const calcDiscount = ((Number(tenureData[i].aem_roi_monthly).toFixed(2)) - (Number(discount) / 100));
+        // const roiMonthly = `${calcDiscount.toFixed(2)} %`;
+        const roiMonthly = `${Number(tenureData[i].aem_roi_monthly).toFixed(2)} %`;
         const roiAnnually = `${tenureData[i].aem_roi_annually}% per annum`;
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.aem_ROI, { value: roiMonthly });
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.rateOfInterestPerAnnumValue, { value: roiAnnually });
@@ -625,7 +620,7 @@ const getEmiArrayOption = (globals) => {
     effDate: clearString(el?.aem_TxnDate),
     logicMod: el?.logicMod,
     itemNbr: el?.aem_TxnID,
-    tranAmt: currencyStrToNum(el?.aem_TxnAmt),
+    tranAmt: Number(`${currencyStrToNum(el?.aem_TxnAmt)}00`),
     txnDesc: el?.aem_txn_type,
     plan: PLAN,
     originAcct: ORIG_ACCOUNT,
@@ -651,8 +646,8 @@ const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
   const DEPT = 'IT';
   const emiConversionArray = getEmiArrayOption(globals);
   const REQ_NBR = String(emiConversionArray?.length === 1) ? ((String(emiConversionArray?.length)).padStart(2, '0')) : (String(emiConversionArray?.length)); // format '01'? or '1'
-  const paiseDecimal = '00';
-  const LOAN_AMOUNT = String(emiConversionArray?.reduce((prev, acc) => prev + acc.tranAmt, 0)) + paiseDecimal;
+ // const paiseDecimal = '00';
+  const LOAN_AMOUNT = String(emiConversionArray?.reduce((prev, acc) => prev + acc.tranAmt, 0));
   const eligibiltyResponse = currentFormContext.EligibilityResponse;
   const tenurePlan = globals.functions.exportData().aem_tenureSelectionRepeatablePanel;
   const selectedTenurePlan = tenurePlan?.find((emiPlan) => emiPlan.aem_tenureSelection === '0');
