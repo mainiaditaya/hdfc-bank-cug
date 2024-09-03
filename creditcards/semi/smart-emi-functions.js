@@ -10,12 +10,17 @@ import {
 } from '../../common/formutils.js';
 
 import {
-  createLabelInElement,
-  setSelectOptions,
-  validatePhoneNumber,
-  validateCardDigits,
-  validateOTPInput,
-} from '../domutils/domutils.js';
+  numberToText,
+  currencyUtil,
+  calculateEMI,
+  sortDataByAmount,
+  sortDataByAmountSymbol,
+  sortByDate,
+  changeCheckboxToToggle,
+  currencyStrToNum,
+} from './semi-utils.js';
+
+import { setSelectOptions } from '../domutils/domutils.js';
 
 const {
   CURRENT_FORM_CONTEXT: currentFormContext,
@@ -28,73 +33,6 @@ const {
   // eslint-disable-next-line no-unused-vars
   RESPONSE_PAYLOAD,
 } = SEMI_CONSTANT;
-
-/**
- * Function validates the Mobile Input Field
- *
- */
-const addMobileValidation = () => {
-  const validFirstDigits = ['6', '7', '8', '9'];
-  const inputField = document.querySelector('.field-aem-mobilenum input');
-  inputField.addEventListener('input', () => validatePhoneNumber(inputField, validFirstDigits));
-};
-
-/**
- * Function validates the Card Last 4 digits Input Field
- *
- */
-const addCardFieldValidation = () => {
-  const inputField = document.querySelector('.field-aem-cardno input');
-  inputField.addEventListener('input', () => validateCardDigits(inputField));
-};
-
-/**
-* Function validates the OTP Input Field
-*
-*/
-const addOtpFieldValidation = () => {
-  const inputField = document.querySelector('.field-aem-otpnumber input');
-  inputField.addEventListener('input', () => validateOTPInput(inputField));
-};
-
-/**
- * function sorts the billed / Unbilled Txn  array in descending order based on the amount field
- *
- * @param {object} data
- * @param {object} key
- * @returns {object}
- */
-const sortDataByAmount = (data, key = 'aem_TxnAmt') => data.sort((a, b) => b[key] - a[key]);
-
-/**
- * convert a amount with unicode to Number
- * @param {string} str - txn-amount - i.e.:'₹ 50,000'
- * @returns {number} - number-  50000
- */
-const currencyStrToNum = (str) => parseFloat((String(str))?.replace(/[^\d.-]/g, ''));
-
-const sortDataByAmountSymbol = (data, key = 'aem_TxnAmt') => data.sort((a, b) => currencyStrToNum(b[key]) - currencyStrToNum(a[key]));
-
-/**
- * Description placeholder
- *
- * @param {*} data
- * @returns {*}
- */
-function sortByDate(data) {
-  return data.sort((a, b) => {
-    // Split the date strings into day, month, and year
-    const [dayA, monthA, yearA] = a.aem_TxnDate.split('-').map(Number);
-    const [dayB, monthB, yearB] = b.aem_TxnDate.split('-').map(Number);
-
-    // Create Date objects from the components
-    const dateA = new Date(yearA, monthA - 1, dayA);
-    const dateB = new Date(yearB, monthB - 1, dayB);
-
-    // Compare the dates
-    return dateB - dateA;
-  });
-}
 
 /**
    * generates the journeyId
@@ -117,15 +55,17 @@ currentFormContext.billed = 0;
 currentFormContext.unbilled = 0;
 let tnxPopupAlertOnce = 0; // flag alert for the pop to show only once on click of continue
 let resendOtpCount = 0;
+let resendOtpCount2 = 0;
 
 /**
  * generates the otp
  * @param {string} mobileNumber
  * @param {string} cardDigits
+ * @param {string} channel
  * @param {object} globals
  * @return {PROMISE}
  */
-function getOTPV1(mobileNumber, cardDigits, globals) {
+function getOTPV1(mobileNumber, cardDigits, channel, globals) {
   /* restrict to show otp-resend option once it reaches max-attemt and to show otptimer */
   const { otpPanel } = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel;
   if (resendOtpCount < DATA_LIMITS.maxOtpResendLimit) {
@@ -182,9 +122,15 @@ function otpValV1(mobileNumber, cardDigits, otpNumber) {
  * @param {object} globals
  * @return {PROMISE}
  */
-function preExecution(mobileNumber, cardDigits) {
-  // eslint-disable-next-line no-debugger
-  debugger;
+function preExecution(mobileNumber, cardDigits, globals) {
+  /* restrict to show otp-resend option once it reaches max-attemt and to show otptimer */
+  const otpPanel = globals.form.aem_semiWizard.aem_selectTenure.aem_otpPanelConfirmation.aem_otpPanel2;
+  if (resendOtpCount2 < DATA_LIMITS.maxOtpResendLimit) {
+    globals.functions.setProperty(otpPanel.secondsPanel, { visible: true });
+    globals.functions.setProperty(otpPanel.aem_otpResend2, { visible: false });
+  } else {
+    globals.functions.setProperty(otpPanel.secondsPanel, { visible: false });
+  }
   const jsonObj = {
     requestString: {
       mobileNo: mobileNumber,
@@ -198,7 +144,7 @@ function preExecution(mobileNumber, cardDigits) {
   if (window !== undefined) displayLoader();
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
-
+const nfObject = new Intl.NumberFormat('hi-IN');
 /**
  * sets the data for the instance of repetable panel
  *
@@ -208,7 +154,6 @@ function preExecution(mobileNumber, cardDigits) {
  * @param {number} i - current instance of panel row
  */
 const setData = (globals, panel, txn, i) => {
-  const nfObject = new Intl.NumberFormat('hi-IN');
   let enabled = true;
   if (currentFormContext.totalSelect === 10 && txn?.aem_Txn_checkBox !== 'on') enabled = false;
   globals.functions.setProperty(panel[i]?.aem_Txn_checkBox, { value: txn?.checkbox || txn?.aem_Txn_checkBox });
@@ -230,7 +175,6 @@ const cardDisplay = (globals, response) => {
   const creditCardDisplay = globals.form.aem_semicreditCardDisplay;
   globals.functions.setProperty(creditCardDisplay, { visible: true });
   globals.functions.setProperty(creditCardDisplay.aem_semicreditCardContent.aem_customerNameLabel, { value: `Dear ${response?.cardHolderName}` });
-  const nfObject = new Intl.NumberFormat('hi-IN');
   // eslint-disable-next-line radix
   const totalAmt = nfObject.format(parseInt(response.responseString.creditLimit) - Math.round(parseInt(response?.blockCode?.bbvlogn_card_outst) / 100));
   const TOTAL_OUTSTANDING_AMT = `${MISC.rupeesUnicode} ${totalAmt}`;
@@ -279,6 +223,17 @@ const setTxnPanelData = (allTxn, btxn, billedTxnPanel, unBilledTxnPanel, globals
 };
 
 /**
+ * calls function to add styling to completed steppers
+ *
+ * @function changeWizardView
+ * @returns {void}
+ */
+const changeWizardView = () => {
+  const completedStep = document.querySelector('.field-aem-semiwizard .wizard-menu-items .wizard-menu-active-item');
+  completedStep.classList.add('wizard-completed-item');
+};
+
+/**
 * @param {resPayload} Object - checkEligibility response.
 * @param {object} globals - global object
 * @return {PROMISE}
@@ -307,6 +262,7 @@ function checkELigibilityHandler(resPayload1, globals) {
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_TxnAvailable, { value: `Unbilled Transaction: (${ccUnBilledData?.length})` });
     // set runtime values
     globals.functions.setProperty(globals.form.runtime.originAcct, { value: currentFormContext.EligibilityResponse.responseString.aanNumber });
+    changeWizardView();
     // Display card and move wizard view
     if (window !== undefined) cardDisplay(globals, resPayload);
     if (window !== undefined) moveWizardView(domElements.semiWizard, domElements.chooseTransaction);
@@ -317,28 +273,6 @@ function checkELigibilityHandler(resPayload1, globals) {
     return response;
   }
 }
-
-/* */
-const numberToText = (num) => {
-  const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
-  const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-  if ((num.toString()).length > 9) return 'overflow';
-  const n = (`000000000${num}`).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
-  // eslint-disable-next-line consistent-return
-  if (!n) return;
-  let str = '';
-  // eslint-disable-next-line eqeqeq
-  str += (n[1] != 0) ? `${a[Number(n[1])] || `${b[n[1][0]]} ${a[n[1][1]]}`}Crore ` : '';
-  // eslint-disable-next-line eqeqeq
-  str += (n[2] != 0) ? `${a[Number(n[2])] || `${b[n[2][0]]} ${a[n[2][1]]}`}Lakh ` : '';
-  // eslint-disable-next-line eqeqeq
-  str += (n[3] != 0) ? `${a[Number(n[3])] || `${b[n[3][0]]} ${a[n[3][1]]}`}Thousand ` : '';
-  // eslint-disable-next-line eqeqeq
-  str += (n[4] != 0) ? `${a[Number(n[4])] || `${b[n[4][0]]} ${a[n[4][1]]}`}Hundred ` : '';
-  // eslint-disable-next-line eqeqeq, no-constant-condition
-  str += `₹${n[5] != 0}` ? `${a[Number(n[5])] || `${b[n[5][0]]} ${a[n[5][1]]}`}Only ` : '';
-  return str;
-};
 
 const getLoanOptionsInfo = (responseStringJsonObj) => {
   // Loop through the periods, interests, and tids
@@ -352,31 +286,10 @@ const getLoanOptionsInfo = (responseStringJsonObj) => {
       period: responseStringJsonObj[0][periodKey],
       interest: responseStringJsonObj[0][interestKey],
       tid: responseStringJsonObj[0][tidKey],
+      processingFee: responseStringJsonObj[0].memoLine1,
     };
   });
   return loanoptions;
-};
-
-const calculateEMI = (loanAmount, rateOfInterest, tenure) => {
-  // optmize this later - amaini
-  // [P x R x (1+R)^N]/[(1+R)^N-1]
-  const newrate = (rateOfInterest / 100);
-  const rate1 = (1 + newrate);
-  const rate2 = rate1 ** tenure;
-  const rate3 = (rate2 - 1);
-  const principle = [(loanAmount) * (newrate) * rate2];
-  const finalEMI = Math.round(principle / rate3);
-  return finalEMI;
-};
-
-const currencyUtil = (number, minimumFractionDigits) => {
-  if (typeof (number) !== 'number') return number;
-  const options = {
-    minimumFractionDigits: minimumFractionDigits || 0,
-  };
-  const interestNumber = (number / 100).toFixed(minimumFractionDigits || 0);
-  const newNumber = new Intl.NumberFormat('us-EN', options).format(interestNumber);
-  return newNumber;
 };
 
 /**
@@ -387,7 +300,6 @@ const currencyUtil = (number, minimumFractionDigits) => {
  * @param {number} i -The index of the current tenure
  */
 const setDataTenurePanel = (globals, panel, option, i) => {
-  const nfObject = new Intl.NumberFormat('hi-IN');
   globals.functions.setProperty(panel[i].aem_tenureSelection, { enumNames: [option?.period] });
   // globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.test, { enum: [0], enumNames: ['test'] });
   // globals.functions.setProperty(panel[i].aem_tenureSelection, { enum: [0], enumNames: [option?.period] });
@@ -407,12 +319,11 @@ const setDataTenurePanel = (globals, panel, option, i) => {
 
 const tenureOption = (loanOptions, loanAmt) => {
   const arrayOptions = loanOptions?.map((option) => {
-    const nfObject = new Intl.NumberFormat('hi-IN');
     const roiMonthly = (parseInt(option.interest, 10) / 100) / 12;
     const roiAnnually = currencyUtil(parseFloat(option?.interest), 2);
     const monthlyEMI = nfObject.format(calculateEMI(loanAmt, roiMonthly, parseInt(option.period, 10)));
     const period = `${parseInt(option.period, 10)} Months`;
-    const procesingFee = '500';
+    const procesingFee = nfObject.format(option.processingFee);
     const emiSubStance = option;
     return ({
       ...option,
@@ -436,11 +347,12 @@ const tenureDisplay = (globals) => {
   const semiFormData = globals.functions.exportData().smartemi;
   const selectedTxnList = (semiFormData?.aem_billedTxn?.aem_billedTxnSelection?.concat(semiFormData?.aem_unbilledTxn?.aem_unbilledTxnSection))?.filter((txn) => txn.aem_Txn_checkBox === 'on');
   const totalAmountOfTxn = selectedTxnList?.reduce((prev, acc) => prev + parseFloat(acc.aem_TxnAmt.replace(/[^\d.-]/g, '')), 0);
+  // set total amount for the review screen in whatsapp.
+  globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_reviewAmount, { value: totalAmountOfTxn });
   const totalAmountSelected = (parseInt(totalAmountOfTxn, 10));
   const loanArrayOption = getLoanOptionsInfo(currentFormContext.EligibilityResponse?.responseString?.records);
   const tenureArrayOption = tenureOption(loanArrayOption, totalAmountSelected);
   const LABEL_AMT_SELCTED = 'Amount selected for SmartEMI';
-  const nfObject = new Intl.NumberFormat('hi-IN');
   const DISPLAY_TOTAL_AMT = `${MISC.rupeesUnicode} ${nfObject.format(totalAmountSelected)}`;
   const TOTAL_AMT_IN_WORDS = `${numberToText(totalAmountOfTxn)}`;
   /* display amount */
@@ -450,6 +362,12 @@ const tenureDisplay = (globals) => {
   /* pre-select the last tenure option (radio btn) by default */
   const DEFUALT_SELCT_TENURE = (tenureRepatablePanel.length > 0) ? (tenureRepatablePanel.length - 1) : 0;
   globals.functions.setProperty(tenureRepatablePanel[DEFUALT_SELCT_TENURE].aem_tenureSelection, { value: '0' });
+  /* discount */
+  const discount = globals.form.aem_semiWizard.aem_selectTenure.discount.$value; ///
+  const calcDiscount = ((Number().toFixed(2)) - (Number(discount) / 100));
+  const roi = parseFloat(globals.form.aem_semiWizard.aem_selectTenure.aem_ROI.$value) + calcDiscount;
+  const roiPercentage = `${roi.toFixed(2)}%`;
+  globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.aem_ROI, { value: roiPercentage });
   /* set data for tenure panel */
   tenureArrayOption?.forEach((option, i) => {
     setDataTenurePanel(globals, tenureRepatablePanel, option, i);
@@ -585,28 +503,6 @@ function txnSelectHandler(checkboxVal, txnType, globals) {
 }
 
 /**
- * calls function to update checkbox to label
- *
- * @function changeCheckboxToToggle
- * @returns {void}
- */
-const changeCheckboxToToggle = () => {
-  createLabelInElement('.field-employeeassistancetoggle', 'employee-assistance-toggle__label');
-  createLabelInElement('.field-mailingaddresstoggle', 'mailing-address-toggle__label');
-};
-
-/**
- * calls function to add styling to completed steppers
- *
- * @function changeWizardView
- * @returns {void}
- */
-const changeWizardView = () => {
-  const completedStep = document.querySelector('.field-aem-semiwizard .wizard-menu-items .wizard-menu-active-item');
-  completedStep.classList.add('wizard-completed-item');
-};
-
-/**
    * Switches the visibility of panels in the card wizard interface.
    * @name semiWizardSwitch to switch panel visibility
    * @param {string} source -  The source of the card wizard (e.g., 'aem_semiWizard' - parent).
@@ -695,10 +591,20 @@ function radioBtnValCommit(arg1, globals) {
       if (selectedIndex === i) {
         globals.functions.setProperty(item.aem_tenureSelection, { value: '0' });
         /* set roi based on radio select */
-        const roiMonthly = `${Number(tenureData[i].aem_roi_monthly).toFixed(2)} %`;
+        /* discount */
+        const discount = globals.form.aem_semiWizard.aem_selectTenure.discount.$value; ///
+        const calcDiscount = ((Number(tenureData[i].aem_roi_monthly).toFixed(2)) - (Number(discount) / 100));
+        const roiMonthly = `${calcDiscount.toFixed(2)} %`;
         const roiAnnually = `${tenureData[i].aem_roi_annually}% per annum`;
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.aem_ROI, { value: roiMonthly });
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.rateOfInterestPerAnnumValue, { value: roiAnnually });
+        // set the same data for review panel screen - whatsapp flow.
+        const rawTenureData = JSON.parse(tenureData[i].aem_tenureRawData);
+        const duration = `${parseInt(rawTenureData.period, 10)} Months`;
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_monthlyEmi, { value: tenureData[i].aem_tenureSelectionEmi });
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_duration, { value: duration });
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_roi, { value: roiMonthly });
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_processingFee, { value: tenureData[i].aem_tenureSelectionProcessing });
       } else {
         globals.functions.setProperty(item.aem_tenureSelection, { value: null });
       }
@@ -817,7 +723,6 @@ const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
   const MEMO_LINE_5 = 'Adobe';
   const LTR_EXACT_CODE = 'Y  ';
   const DEPT = 'IT';
-  const PROC_FEES = '000'; // String(currencyStrToNum(selectedTenurePlan?.aem_tenureSelectionProcessing)) - actual process Fee in display
   const emiConversionArray = getEmiArrayOption(globals);
   const REQ_NBR = String(emiConversionArray?.length === 1) ? ((String(emiConversionArray?.length)).padStart(2, '0')) : (String(emiConversionArray?.length)); // format '01'? or '1'
   const paiseDecimal = '00';
@@ -826,46 +731,43 @@ const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
   const tenurePlan = globals.functions.exportData().aem_tenureSelectionRepeatablePanel;
   const selectedTenurePlan = tenurePlan?.find((emiPlan) => emiPlan.aem_tenureSelection === '0');
   const emiSubData = JSON.parse(selectedTenurePlan?.aem_tenureRawData);
+  const PROC_FEES = String(currencyStrToNum(selectedTenurePlan?.aem_tenureSelectionProcessing));
   const INTEREST = emiSubData?.interest; // '030888'
   const TENURE = (parseInt(emiSubData?.period, 10).toString().length === 1) ? (parseInt(emiSubData?.period, 10).toString().padStart(2, '0')) : parseInt(emiSubData?.period, 10).toString(); // '003' into '03' / '18'-'18'
   const TID = emiSubData?.tid; // '000000101'
   const jsonObj = {
-    cardNo: cardNum,
-    OTP: otpNum,
-    proCode: PRO_CODE,
-    prodId: eligibiltyResponse.responseString.records[0].prodId,
-    agencyCode: AGENCY_CODE,
-    tenure: TENURE,
-    interestRate: INTEREST,
-    encryptedToken: eligibiltyResponse.responseString.records[0].encryptedToken,
-    loanAmt: LOAN_AMOUNT,
-    ltrExctCode: LTR_EXACT_CODE,
-    caseNumber: mobileNum,
-    dept: DEPT,
-    memCategory: MEM_CATEGORY,
-    memSubCat: MEM_SUB_CAT,
-    memoLine4: MEMO_LINE_4,
-    memoLine5: MEMO_LINE_5,
-    mobileNo: mobileNum,
-    tid: TID,
-    reqAmt: LOAN_AMOUNT,
-    procFeeWav: PROC_FEES,
-    reqNbr: REQ_NBR,
-    emiConversion: emiConversionArray,
-    journeyID: currentFormContext.journeyID,
-    journeyName: currentFormContext.journeyName,
-    userAgent: window.navigator.userAgent,
+    requestString: {
+      cardNo: cardNum,
+      OTP: otpNum,
+      proCode: PRO_CODE,
+      prodId: eligibiltyResponse.responseString.records[0].prodId,
+      agencyCode: AGENCY_CODE,
+      tenure: TENURE,
+      interestRate: INTEREST,
+      encryptedToken: eligibiltyResponse.responseString.records[0].encryptedToken,
+      loanAmt: LOAN_AMOUNT,
+      ltrExctCode: LTR_EXACT_CODE,
+      caseNumber: mobileNum,
+      dept: DEPT,
+      memCategory: MEM_CATEGORY,
+      memSubCat: MEM_SUB_CAT,
+      memoLine4: MEMO_LINE_4,
+      memoLine5: MEMO_LINE_5,
+      mobileNo: mobileNum,
+      tid: TID,
+      reqAmt: LOAN_AMOUNT,
+      procFeeWav: PROC_FEES,
+      reqNbr: REQ_NBR,
+      emiConversion: emiConversionArray,
+      journeyID: currentFormContext.journeyID,
+      journeyName: currentFormContext.journeyName,
+      userAgent: window.navigator.userAgent,
+    },
   };
   const path = semiEndpoints.ccSmartEmi;
   if (window !== undefined) displayLoader();
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 };
-
-setTimeout(() => {
-  addMobileValidation();
-  addCardFieldValidation();
-  addOtpFieldValidation();
-}, 500);
 
 /**
  * otp timer logic to handle based on the screen of otp
@@ -875,13 +777,30 @@ setTimeout(() => {
 const otpTimerV1 = (pannelName, globals) => {
   let sec = DATA_LIMITS.otpTimeLimit;
   let dispSec = DATA_LIMITS.otpTimeLimit;
-  let otpPanel;
   const FIRST_PANNEL_OTP = 'firstotp';
+  const SECOND_PANNEL_OTP = 'secondotp';
+  const panelOtp = {
+    otpTimerPanel: null,
+    otpTimerSecond: null,
+    resendOtp: null,
+    limitCheck: null,
+  };
   if (pannelName === FIRST_PANNEL_OTP) {
-    otpPanel = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel.otpPanel;
+    const otp1 = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel.otpPanel;
+    panelOtp.otpTimerSecond = otp1.secondsPanel.seconds;
+    panelOtp.otpTimerPanel = otp1.secondsPanel;
+    panelOtp.resendOtp = otp1.aem_otpResend;
+    panelOtp.limitCheck = resendOtpCount < DATA_LIMITS.maxOtpResendLimit;
+  }
+  if (pannelName === SECOND_PANNEL_OTP) {
+    const otp2 = globals.form.aem_semiWizard.aem_selectTenure.aem_otpPanelConfirmation.aem_otpPanel2;
+    panelOtp.otpTimerSecond = otp2.secondsPanel.seconds2;
+    panelOtp.otpTimerPanel = otp2.secondsPanel;
+    panelOtp.resendOtp = otp2.aem_otpResend2;
+    panelOtp.limitCheck = resendOtpCount2 < DATA_LIMITS.maxOtpResendLimit;
   }
   const timer = setInterval(() => {
-    globals.functions.setProperty(otpPanel.secondsPanel.seconds, { value: dispSec });
+    globals.functions.setProperty(panelOtp.otpTimerSecond, { value: dispSec });
     sec -= 1;
     dispSec = sec;
     if (sec < 10) {
@@ -889,10 +808,10 @@ const otpTimerV1 = (pannelName, globals) => {
     }
     if (sec < 0) {
       clearInterval(timer);
-      globals.functions.setProperty(otpPanel.secondsPanel, { visible: false });
-      if (resendOtpCount < DATA_LIMITS.maxOtpResendLimit) {
+      globals.functions.setProperty(panelOtp.otpTimerPanel, { visible: false });
+      if (panelOtp.limitCheck) {
         globals.functions.setProperty(
-          otpPanel.aem_otpResend,
+          panelOtp.resendOtp,
           { visible: true },
         );
       }
@@ -901,28 +820,60 @@ const otpTimerV1 = (pannelName, globals) => {
 };
 
 /**
- * @name resendOTP
- * @param {Object} globals - The global object containing necessary data for DAP request.
+ * @name resendOTPV1 - to handle resend otp for otpv1 &  preExecution
+ * @param {Object} globals - The global form object
+ * @param {string} - otp pannel - firstotp or secondotp
  * @return {PROMISE}
  */
-const resendOTP = async (globals) => {
+const resendOTPV1 = async (pannelName, globals) => {
+  const channel = 'web';
+  const FIRST_PANNEL_OTP = 'firstotp';
+  const SECOND_PANNEL_OTP = 'secondotp';
+  const panelOtp = {
+    otpTimerPanel: null,
+    otpTimerSecond: null,
+    resendOtp: null,
+    limitCheck: null,
+    maxLimitOtp: null,
+    resendOtpCount: null,
+  };
+  if (pannelName === FIRST_PANNEL_OTP) {
+    const otp1 = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel.otpPanel;
+    panelOtp.otpTimerSecond = otp1.secondsPanel.seconds;
+    panelOtp.otpTimerPanel = otp1.secondsPanel;
+    panelOtp.resendOtp = otp1.aem_otpResend;
+    panelOtp.limitCheck = resendOtpCount < DATA_LIMITS.maxOtpResendLimit;
+    panelOtp.maxLimitOtp = otp1.aem_maxlimitOTP;
+    resendOtpCount += 1;
+    panelOtp.resendOtpCount = resendOtpCount;
+  }
+  if (pannelName === SECOND_PANNEL_OTP) {
+    const otp2 = globals.form.aem_semiWizard.aem_selectTenure.aem_otpPanelConfirmation.aem_otpPanel2;
+    panelOtp.otpTimerSecond = otp2.secondsPanel.seconds2;
+    panelOtp.otpTimerPanel = otp2.secondsPanel;
+    panelOtp.resendOtp = otp2.aem_otpResend2;
+    panelOtp.limitCheck = resendOtpCount2 < DATA_LIMITS.maxOtpResendLimit;
+    panelOtp.maxLimitOtp = otp2.aem_maxlimitOTP2;
+    resendOtpCount2 += 1;
+    panelOtp.resendOtpCount = resendOtpCount2;
+  }
   const mobileNumber = globals.form.aem_semiWizard.aem_identifierPanel.aem_loginPanel.mobilePanel.aem_mobileNum.$value;
   const cardDigits = globals.form.aem_semiWizard.aem_identifierPanel.aem_loginPanel.aem_cardNo.$value;
-  const { otpPanel } = globals.form.aem_semiWizard.aem_identifierPanel.aem_otpPanel;
-
-  if (resendOtpCount < DATA_LIMITS.maxOtpResendLimit) {
-    resendOtpCount += 1;
-    if (resendOtpCount === DATA_LIMITS.maxOtpResendLimit) {
-      globals.functions.setProperty(otpPanel.secondsPanel, { visible: false });
-      globals.functions.setProperty(otpPanel.aem_otpResend, { visible: false });
-      globals.functions.setProperty(otpPanel.aem_maxlimitOTP, { visible: true });
+  if (panelOtp.limitCheck) {
+    if (panelOtp.resendOtpCount === DATA_LIMITS.maxOtpResendLimit) {
+      globals.functions.setProperty(panelOtp.otpTimerPanel, { visible: false });
+      globals.functions.setProperty(panelOtp.resendOtp, { visible: false });
+      globals.functions.setProperty(panelOtp.maxLimitOtp, { visible: true });
     }
-    return getOTPV1(mobileNumber, cardDigits, globals);
+    if (pannelName === FIRST_PANNEL_OTP) {
+      return getOTPV1(mobileNumber, cardDigits, channel, globals);
+    }
+    if (pannelName === SECOND_PANNEL_OTP) {
+      return preExecution(mobileNumber, cardDigits, globals);
+    }
   }
-
   return null;
 };
-
 export {
   getOTPV1,
   otpValV1,
@@ -939,9 +890,6 @@ export {
   assistedToggleHandler,
   channelDDHandler,
   getCCSmartEmi,
-  addMobileValidation,
-  addCardFieldValidation,
-  addOtpFieldValidation,
   otpTimerV1,
-  resendOTP,
+  resendOTPV1,
 };
