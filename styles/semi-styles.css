@@ -533,6 +533,7 @@ body.semi-form {
                             font-size: var(--body-sm-font-size) !important;
                             font-weight: var(--font-weight-regular);
                             color: var(--color-interface-text-primary);
+                            display: none; /* temprarily made to visible none*/
                         }
                     }
 

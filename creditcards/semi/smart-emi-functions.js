@@ -322,6 +322,7 @@ const getLoanOptionsInfo = (responseStringJsonObj) => {
  */
 const setDataTenurePanel = (globals, panel, option, i) => {
   globals.functions.setProperty(panel[i].aem_tenureSelection, { enumNames: [option?.period] });
+  globals.functions.setProperty(panel[i].aem_tenure_display, { value: option?.period }); // - > temporray fix
   // globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.test, { enum: [0], enumNames: ['test'] });
   // globals.functions.setProperty(panel[i].aem_tenureSelection, { enum: [0], enumNames: [option?.period] });
   /* */
