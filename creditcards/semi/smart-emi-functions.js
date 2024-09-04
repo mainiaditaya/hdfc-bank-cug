@@ -682,6 +682,7 @@ const assistedToggleHandler = async (globals) => {
     globals.functions.setProperty(channelDropDown, { enum: channelOptions, enumNames: chanelEnumNames, value: DEF_OPTION[0].value });
     asstPannelArray?.forEach((pannel) => globals.functions.setProperty(pannel, { visible: false }));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(error);
   }
 };
@@ -727,6 +728,7 @@ const branchHandler = async (globals) => {
   const { branchName, branchCity, branchCode } = await extractEmpAsstPannels(globals);
   const branchNameUtil = formUtil(globals, branchName);
   const branchCityUtil = formUtil(globals, branchCity);
+  // eslint-disable-next-line no-unused-vars
   const INVALID_MSG = 'Please enter valid Branch Code';
   globals.functions.markFieldAsInvalid(branchCode.$qualifiedName, '', { useQualifiedName: true });
   try {
@@ -757,6 +759,7 @@ const dsaHandler = async (globals) => {
   //  'XKSD' //BSDG003
   const { dsaCode, dsaName } = await extractEmpAsstPannels(globals);
   const dsaNameUtil = formUtil(globals, dsaName);
+  // eslint-disable-next-line no-unused-vars
   const INVALID_MSG = 'Please enter valid DSA Code';
   try {
     const dsaCodeUrl = `${semiEndpoints.dsaCode}-${dsaCode.$value?.toLowerCase()}.json`;
@@ -772,6 +775,7 @@ const dsaHandler = async (globals) => {
   } catch (error) {
     // globals.functions.markFieldAsInvalid(dsaCode.$qualifiedName, INVALID_MSG, { useQualifiedName: true });
     dsaNameUtil.resetField();
+    // eslint-disable-next-line no-console
     console.log(error);
   }
 };
