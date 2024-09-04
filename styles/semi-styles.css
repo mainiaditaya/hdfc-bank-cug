@@ -527,13 +527,16 @@ body.semi-form {
                     padding: 0 0 0 25px;
                     margin-top: -20px;
 
-                    .field-aem-tenureselection {
+                    .field-aem-tenureselection { 
+                        width: fit-content;
+                        grid-column: span 1;
+
                         .radio-wrapper label { 
                             padding-left: 35px; 
                             font-size: var(--body-sm-font-size) !important;
                             font-weight: var(--font-weight-regular);
                             color: var(--color-interface-text-primary);
-                            display: none; /* temprarily made to visible none*/
+                            display: none;
                         }
                     }
 
@@ -541,6 +544,8 @@ body.semi-form {
                         align-self: center; 
                         display: grid;
                     }
+
+                    .field-aem-tenureselectionprocessing { grid-column: span 3; }
 
                     p, input:not([type="radio"]) { 
                         margin: 0; padding: 0; 
