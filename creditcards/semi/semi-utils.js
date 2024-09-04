@@ -7,6 +7,7 @@ import {
   addCardFieldValidation,
   addMobileValidation,
   addOtpFieldValidation,
+  getUrlParamCaseInsensitive,
 } from './semi-dom-utils.js';
 
 /**
@@ -124,4 +125,5 @@ export {
   currencyStrToNum,
   validationField,
   setSelectOptions,
+  getUrlParamCaseInsensitive,
 };

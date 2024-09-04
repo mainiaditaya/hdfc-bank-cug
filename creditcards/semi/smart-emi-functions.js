@@ -727,12 +727,13 @@ const branchHandler = async (globals) => {
   const { branchName, branchCity, branchCode } = await extractEmpAsstPannels(globals);
   const branchNameUtil = formUtil(globals, branchName);
   const branchCityUtil = formUtil(globals, branchCity);
+  const INVALID_MSG = 'Please enter valid Branch Code';
+  globals.functions.markFieldAsInvalid(branchCode.$qualifiedName, '', { useQualifiedName: true });
   try {
     const branchCodeUrl = `${semiEndpoints.branchMaster}-${branchCode.$value}.json`;
     const response = await getJsonResponse(branchCodeUrl, null, 'GET');
     const data = response?.[0];
     if (data?.errorCode === '500') {
-      globals.functions.markFieldAsInvalid(branchCode.$qualifiedName, 'Please enter valid Branch Code', { useQualifiedName: true });
       throw new Error(data?.errorMessage);
     } else {
       const cityName = data?.CITY_NAME;
@@ -742,12 +743,38 @@ const branchHandler = async (globals) => {
       branchCityUtil.setValue(cityName, changeDataAttrObj);
     }
   } catch (error) {
+    // globals.functions.markFieldAsInvalid(branchCode.$qualifiedName, INVALID_MSG, { useQualifiedName: true });
     branchNameUtil.resetField();
     branchCityUtil.resetField();
-    console.log(error, 'errro');
   }
 };
 
+/**
+ * dsa code change handler
+ * @param {globals} globals - globals - form object
+ */
+const dsaHandler = async (globals) => {
+  //  'XKSD' //BSDG003
+  const { dsaCode, dsaName } = await extractEmpAsstPannels(globals);
+  const dsaNameUtil = formUtil(globals, dsaName);
+  const INVALID_MSG = 'Please enter valid DSA Code';
+  try {
+    const dsaCodeUrl = `${semiEndpoints.dsaCode}-${dsaCode.$value?.toLowerCase()}.json`;
+    const response = await getJsonResponse(dsaCodeUrl, null, 'GET');
+    const data = response?.[0];
+    if (data?.errorCode === '500') {
+      throw new Error(data?.errorMessage);
+    } else {
+      const dsaNameVal = data?.DSANAME;
+      const changeDataAttrObj = { attrChange: true, value: false, disable: true };
+      dsaNameUtil.setValue(dsaNameVal, changeDataAttrObj);
+    }
+  } catch (error) {
+    // globals.functions.markFieldAsInvalid(dsaCode.$qualifiedName, INVALID_MSG, { useQualifiedName: true });
+    dsaNameUtil.resetField();
+    console.log(error);
+  }
+};
 /**
  * Generates an EMI conversion array option for the ccsmart API payload.
  * @param {object} globals - global form object
@@ -955,6 +982,7 @@ export {
   assistedToggleHandler,
   channelDDHandler,
   branchHandler,
+  dsaHandler,
   getCCSmartEmi,
   otpTimerV1,
   resendOTPV1,
