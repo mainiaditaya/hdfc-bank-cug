@@ -1,11 +1,13 @@
 import {
   createLabelInElement,
+  setSelectOptions,
 } from '../domutils/domutils.js';
 
 import {
   addCardFieldValidation,
   addMobileValidation,
   addOtpFieldValidation,
+  getUrlParamCaseInsensitive,
 } from './semi-dom-utils.js';
 
 /**
@@ -122,4 +124,6 @@ export {
   changeCheckboxToToggle,
   currencyStrToNum,
   validationField,
+  setSelectOptions,
+  getUrlParamCaseInsensitive,
 };

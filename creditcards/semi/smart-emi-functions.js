@@ -1,4 +1,6 @@
-import { displayLoader, fetchJsonResponse } from '../../common/makeRestAPI.js';
+import {
+  displayLoader, fetchJsonResponse,
+} from '../../common/makeRestAPI.js';
 import * as SEMI_CONSTANT from './constant.js';
 import {
   clearString,
@@ -17,6 +19,13 @@ import {
   changeCheckboxToToggle,
   currencyStrToNum,
 } from './semi-utils.js';
+
+import {
+  assistedToggleHandler,
+  channelDDHandler,
+  branchHandler,
+  dsaHandler,
+} from './semi-mdm-utils.js';
 
 const {
   CURRENT_FORM_CONTEXT: currentFormContext,
@@ -844,6 +853,10 @@ export {
   preExecution,
   radioBtnValCommit,
   semiWizardSwitch,
+  assistedToggleHandler,
+  channelDDHandler,
+  branchHandler,
+  dsaHandler,
   getCCSmartEmi,
   otpTimerV1,
   resendOTPV1,
