@@ -1,9 +1,26 @@
+/* eslint-disable no-unused-vars */
 import * as SEMI_CONSTANT from './constant.js';
 import { getJsonResponse } from '../../common/makeRestAPI.js';
-import { setSelectOptions } from './semi-utils.js';
+import { getUrlParamCaseInsensitive, setSelectOptions } from './semi-utils.js';
 import { formUtil } from '../../common/formutils.js';
 
 const { SEMI_ENDPOINTS: semiEndpoints } = SEMI_CONSTANT;
+/* Utp-Params */
+const UTM_PARAMS = {
+  channel: null,
+  lccode: null,
+  lgcode: null,
+  smcode: null,
+  lc2: null,
+  dsacode: null,
+  branchcode: null,
+};
+
+/**
+ * extract all the asst panal form object by passing globals
+ * @param {object} globals - global form object;
+ * @returns {object} - All pannel object present inside employee asst pannel
+ */
 
 const extractEmpAsstPannels = async (globals) => {
   const employeeAsstPanel = globals.form.aem_semiWizard.aem_selectTenure.aem_employeeAssistancePanel;
@@ -142,6 +159,23 @@ const dsaHandler = async (globals) => {
     dsaNameUtil.resetField();
     // eslint-disable-next-line no-console
     console.log(error);
+  }
+};
+
+/**
+ * To handle utm parameter
+ */
+const handleMdmUtmParam = async (globals) => {
+  const {
+    channel, bdrLc1Code, branchCity, branchCode, branchName, branchTseLgCode, dsaCode, dsaName, lc1Code, lc2Code, lgTseCode, smCode,
+  } = await extractEmpAsstPannels(globals);
+
+  if (window !== undefined) {
+    Object.entries(UTM_PARAMS).forEach(([key]) => {
+      UTM_PARAMS[key] = getUrlParamCaseInsensitive(key);
+    });
+
+    const paramFound = Object.entries(UTM_PARAMS).some(([, val]) => val);
   }
 };
 
