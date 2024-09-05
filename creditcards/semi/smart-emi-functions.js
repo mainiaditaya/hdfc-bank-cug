@@ -58,6 +58,7 @@ currentFormContext.journeyID = generateJourneyId('a', 'b', 'c');
 currentFormContext.totalSelect = 0;
 currentFormContext.billed = 0;
 currentFormContext.unbilled = 0;
+currentFormContext.billedMaxSelect = 0;
 let tnxPopupAlertOnce = 0; // flag alert for the pop to show only once on click of continue
 let resendOtpCount = 0;
 let resendOtpCount2 = 0;
@@ -274,6 +275,8 @@ function checkELigibilityHandler(resPayload1, globals) {
   const resPayload = resPayload1;
   const response = {};
   try {
+    /* billed txn maximum amount select limt */
+    currentFormContext.billedMaxSelect = ((parseFloat(resPayload.blockCode.tad) / 100) - (parseFloat(resPayload.blockCode.mad) / 100));
     /* continue btn disabling code added temorary, can be removed after form authoring */
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
     let ccBilledData = resPayload?.ccBilledTxnResponse?.responseString || [];
@@ -415,8 +418,10 @@ function selectTenure(globals) {
     tnxPopupAlertOnce += 1;
   }
   if ((tnxPopupAlertOnce === 1)) { // option of selecting ten txn alert should be occured only once.
+    const MSG = 'Great news! You can enjoy the flexibility of converting up to 10 transactions into EMI.';
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper, { visible: true });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup, { visible: true });
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation, { value: MSG });
   } else if (window !== undefined) {
     moveWizardView(domElements.semiWizard, domElements.selectTenure);
     tenureDisplay(globals);
@@ -483,6 +488,17 @@ const enableAllTxnFields = (txnList, globals) => txnList?.forEach((list) => glob
 * @param {object} globals - globals form object
  */
 function txnSelectHandler(checkboxVal, txnType, globals) {
+  /* enable-popup once it reaches BILLED-MAX-AMT-LIMIT */
+  const totalSelectBilledTxnAmt = globals.functions.exportData().smartemi.aem_billedTxn.aem_billedTxnSelection.filter((el) => el.aem_Txn_checkBox).map((el) => (Number((String(el?.aem_TxnAmt))?.replace(/[^\d]/g, '')) / 100)).reduce((prev, acc) => prev + acc, 0);
+  if (totalSelectBilledTxnAmt > currentFormContext.billedMaxSelect) {
+    /* popup alert hanldles */
+    const SELECTED_MAX_BILL = ` Please select Billed Transactions Amount Max up to Rs.${nfObject.format(currentFormContext.billedMaxSelect)}`;
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper, { visible: true });
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup, { visible: true });
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation, { value: SELECTED_MAX_BILL });
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
+    return;
+  }
   // null || ON
   if (selectTopTenFlag || isUserSelection) return;
   const MAX_SELECT = 10;
