@@ -390,6 +390,8 @@ const tenureDisplay = (globals) => {
   const LABEL_AMT_SELCTED = 'Amount selected for SmartEMI';
   const DISPLAY_TOTAL_AMT = `${MISC.rupeesUnicode} ${nfObject.format(totalAmountSelected)}`;
   const TOTAL_AMT_IN_WORDS = `${numberToText(totalAmountOfTxn)}`;
+  /* set the total amount in hidden field - thank u scrren */
+  globals.functions.setProperty(globals.form.aem_semiWizard.aem_success.aem_hiddenTotalAmt, { value: DISPLAY_TOTAL_AMT });
   /* display amount */
   globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_customerNameLabel, { value: LABEL_AMT_SELCTED });
   globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingLabel, { value: DISPLAY_TOTAL_AMT });
