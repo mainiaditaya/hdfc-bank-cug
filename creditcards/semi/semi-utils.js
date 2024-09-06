@@ -112,7 +112,7 @@ const validationField = () => {
 
 setTimeout(() => {
   validationField();
-}, 5000);
+}, 1000);
 
 export {
   numberToText,
