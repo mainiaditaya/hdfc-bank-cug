@@ -25,6 +25,7 @@ import {
   channelDDHandler,
   branchHandler,
   dsaHandler,
+  handleMdmUtmParam,
 } from './semi-mdm-utils.js';
 
 const {
@@ -425,6 +426,7 @@ function selectTenure(globals) {
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation, { value: MSG });
   } else if (window !== undefined) {
     moveWizardView(domElements.semiWizard, domElements.selectTenure);
+    handleMdmUtmParam(globals);
     tenureDisplay(globals);
   }
 }
