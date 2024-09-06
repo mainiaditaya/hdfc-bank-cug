@@ -691,7 +691,7 @@ body.semi-form {
 
             .field-aem-backlinktenure {
                 text-align: left;
-                margin-top: -35px;
+                margin-top: -35px !important;
 
                 button, button:hover { 
                     width: fit-content;
@@ -962,8 +962,8 @@ body.semi-form {
                 .field-aem-tenureselectionmainpnl{
                     .field-aem-tenureselectionheaderpanel { 
                         display: grid !important;
-                        margin-bottom: 10px;
-                        p { font-size: var(--body-md-font-size) !important; }
+                        margin-bottom: -10px;
+                        p { font-size: var(--body-x-sm-font-size) !important; }
                     }
 
                     .field-aem-tenureselectionrepeatablepanel {
@@ -974,7 +974,12 @@ body.semi-form {
 
                         > .repeat-wrapper .panel-wrapper {
                             display: grid !important;
-                            label, input { font-size: var(--body-sm-font-size) !important; }
+                            label, input { font-size: var(--body-x-sm-font-size) !important; }
+                            
+                            input[type="radio"] {
+                                width: 18px !important;
+                                height: 18px !important;
+                            }
                             .radio-wrapper label { padding-left: 15px; }
                             .field-aem-tenureselection { margin-bottom: 0 !important; }
                         }
