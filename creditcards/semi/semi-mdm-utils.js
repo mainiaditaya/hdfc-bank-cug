@@ -1,19 +1,19 @@
-/* eslint-disable no-unused-vars */
 import * as SEMI_CONSTANT from './constant.js';
 import { getJsonResponse } from '../../common/makeRestAPI.js';
 import { getUrlParamCaseInsensitive, setSelectOptions } from './semi-utils.js';
-import { formUtil } from '../../common/formutils.js';
+import { clearString, formUtil } from '../../common/formutils.js';
 
 const { SEMI_ENDPOINTS: semiEndpoints } = SEMI_CONSTANT;
+
 /* Utp-Params */
 const UTM_PARAMS = {
-  channel: null,
-  lccode: null,
-  lgcode: null,
-  smcode: null,
-  lc2: null,
-  dsacode: null,
-  branchcode: null,
+  channel: null, // CHANNEL
+  lgcode: null, // LGCODE
+  smcode: null, // SMCODE
+  lc2: null, // LC1
+  lc1: null, // LC2
+  dsacode: null, // DSACODE
+  branchcode: null, // BRANCHCODE
 };
 
 /**
@@ -44,6 +44,46 @@ const extractEmpAsstPannels = async (globals) => {
 };
 
 /**
+ * Sets the value of a form field using the provided globals and field.
+ * @param {Object} globals - The global state object.
+ * @param {string} field - The name of the field to set.
+ * @param {string|null} value - The value to set for the field.
+ */
+const setFieldsValue = (globals, field, value) => {
+  const fieldUtil = formUtil(globals, field);
+  const changeDataAttrObj = { attrChange: true, value: false, disable: true };
+  const valueInUC = (String(value))?.toUpperCase();
+  fieldUtil.setValue(valueInUC, changeDataAttrObj);
+};
+
+/**
+ * Pre-fills form fields based on UTM parameters if they exist.
+ * The function maps UTM parameters to their respective fields and sets their values.
+ * @async
+ * @param {Object} globals - The global state object used for fetching fields and values.
+ */
+const preFillFromUtm = async (globals) => {
+  const {
+    branchCode, dsaCode, lc1Code, lc2Code, smCode, lgTseCode,
+  } = await extractEmpAsstPannels(globals);
+  // Mapping UTM params to field names
+  const fieldMapping = {
+    dsacode: dsaCode,
+    lc1: lc1Code,
+    lc2: lc2Code,
+    branchcode: branchCode,
+    smcode: smCode,
+    lgcode: lgTseCode,
+  };
+    // Iterate over the UTM_PARAMS object
+  Object.entries(UTM_PARAMS).forEach(([key, value]) => {
+    if (value && fieldMapping[key]) {
+      setFieldsValue(globals, fieldMapping[key], value);
+    }
+  });
+};
+
+/**
    * initiate master channel api on toggle switch
    * @param {object} globals - global form object
    */
@@ -58,8 +98,14 @@ const assistedToggleHandler = async (globals) => {
     const channelOptions = responseOption?.length ? DEF_OPTION.concat(responseOption) : DEF_OPTION;
     const chanelEnumNames = channelOptions?.map((item) => item?.label);
     setSelectOptions(channelOptions, channelDropDown?.$name);
-    globals.functions.setProperty(channelDropDown, { enum: channelOptions, enumNames: chanelEnumNames, value: DEF_OPTION[0].value });
-    asstPannelArray?.forEach((pannel) => globals.functions.setProperty(pannel, { visible: false }));
+    if (UTM_PARAMS.channel) {
+      const findParamChanelValue = channelOptions?.find((el) => clearString(el.value)?.toLocaleLowerCase() === clearString(UTM_PARAMS.channel)?.toLocaleLowerCase());
+      globals.functions.setProperty(channelDropDown, { enum: channelOptions, enumNames: chanelEnumNames, value: findParamChanelValue.value });
+      await preFillFromUtm(globals);
+    } else {
+      globals.functions.setProperty(channelDropDown, { enum: channelOptions, enumNames: chanelEnumNames, value: DEF_OPTION[0].value });
+      asstPannelArray?.forEach((pannel) => globals.functions.setProperty(pannel, { visible: false }));
+    }
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -83,15 +129,15 @@ const channelDDHandler = async (globals) => {
     dsa: [dsaCode, dsaName, smCode, bdrLc1Code, lc2Code, lgTseCode],
     defaultCase: [smCode, lc1Code, lc2Code, lgTseCode],
   };
-  switch (channel.$value) {
-    case 'Website Download':
+  const CHANNEL_VALUE = clearString(channel.$value)?.toLowerCase();
+  switch (CHANNEL_VALUE) {
+    case 'websitedownload':
       asstPannelArray?.forEach((item) => globals.functions.setProperty(item, { visible: false }));
       break;
-    case 'Branch':
+    case 'branch':
       pannelSetting.branch?.forEach((item) => globals.functions.setProperty(item, { visible: true }));
       break;
-    case 'DSA':
-      // dsaName ?
+    case 'dsa':
       pannelSetting.dsa?.forEach((item) => globals.functions.setProperty(item, { visible: true }));
       break;
     default:
@@ -166,16 +212,14 @@ const dsaHandler = async (globals) => {
  * To handle utm parameter
  */
 const handleMdmUtmParam = async (globals) => {
-  const {
-    channel, bdrLc1Code, branchCity, branchCode, branchName, branchTseLgCode, dsaCode, dsaName, lc1Code, lc2Code, lgTseCode, smCode,
-  } = await extractEmpAsstPannels(globals);
-
   if (window !== undefined) {
     Object.entries(UTM_PARAMS).forEach(([key]) => {
       UTM_PARAMS[key] = getUrlParamCaseInsensitive(key);
     });
-
     const paramFound = Object.entries(UTM_PARAMS).some(([, val]) => val);
+    if (paramFound) {
+      globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.aem_bankAssistedToggle, { value: 'Yes' });
+    }
   }
 };
 
@@ -184,4 +228,5 @@ export {
   channelDDHandler,
   branchHandler,
   dsaHandler,
+  handleMdmUtmParam,
 };
