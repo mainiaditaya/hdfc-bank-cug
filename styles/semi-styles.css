@@ -789,11 +789,9 @@ body.semi-form {
             .field-errormessagetext {
                 background-color: var(--color-interface-background-primary);
                 padding: 30px 0 10px;
-
-                p::before {
-                    display: none;
-                }
             }
+
+            .field-errormessagetext::before, .field-errormessagetext p::before { display: none; }
 
             .plain-text-wrapper, .plain-text-wrapper p {
                 color: var(--color-interface-text-primary);
