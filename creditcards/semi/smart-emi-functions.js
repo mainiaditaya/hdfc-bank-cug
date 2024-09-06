@@ -292,8 +292,8 @@ function checkELigibilityHandler(resPayload1, globals) {
     const allTxn = ccBilledData.concat(ccUnBilledData);
     setTxnPanelData(allTxn, ccBilledData.length, billedTxnPanel, unBilledTxnPanel, globals);
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_eligibleTxnLabel, { value: `Eligible Transactions (${allTxn?.length})` });
-    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_TxnAvailable, { value: `Billed Transaction: (${ccBilledData?.length})` });
-    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_TxnAvailable, { value: `Unbilled Transaction: (${ccUnBilledData?.length})` });
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_TxnAvailable, { value: `Billed Transaction (${ccBilledData?.length})` });
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_TxnAvailable, { value: `Unbilled Transaction (${ccUnBilledData?.length})` });
     // set runtime values
     globals.functions.setProperty(globals.form.runtime.originAcct, { value: currentFormContext.EligibilityResponse.responseString.aanNumber });
     changeWizardView();
@@ -391,6 +391,8 @@ const tenureDisplay = (globals) => {
   const LABEL_AMT_SELCTED = 'Amount selected for SmartEMI';
   const DISPLAY_TOTAL_AMT = `${MISC.rupeesUnicode} ${nfObject.format(totalAmountSelected)}`;
   const TOTAL_AMT_IN_WORDS = `${numberToText(totalAmountOfTxn)}`;
+  /* set the total amount in hidden field - thank u scrren */
+  globals.functions.setProperty(globals.form.aem_semiWizard.aem_success.aem_hiddenTotalAmt, { value: DISPLAY_TOTAL_AMT });
   /* display amount */
   globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_customerNameLabel, { value: LABEL_AMT_SELCTED });
   globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingLabel, { value: DISPLAY_TOTAL_AMT });
@@ -858,6 +860,17 @@ const resendOTPV1 = async (pannelName, globals) => {
   }
   return null;
 };
+
+/**
+ * on click of t&c navigation, open Url in new tab
+ */
+const tAndCNavigation = () => {
+  const TNC_LINK = 'https://www.hdfcbank.com/personal/borrow/loan-against-assets/smartemi';
+  if (window !== undefined) {
+    window.open(TNC_LINK, '_blank');
+  }
+};
+
 export {
   getOTPV1,
   otpValV1,
@@ -878,4 +891,5 @@ export {
   getCCSmartEmi,
   otpTimerV1,
   resendOTPV1,
+  tAndCNavigation,
 };

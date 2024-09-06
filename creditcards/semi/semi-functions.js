@@ -18,6 +18,7 @@ import {
   getCCSmartEmi,
   otpTimerV1,
   resendOTPV1,
+  tAndCNavigation,
 } from './smart-emi-functions.js';
 import { invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
 
@@ -44,4 +45,5 @@ export {
   getCCSmartEmi,
   otpTimerV1,
   resendOTPV1,
+  tAndCNavigation,
 };
