@@ -56,7 +56,16 @@ import {
 
 import confirmCardClickHandler from './confirmcardutil.js';
 
+/**
+ * test
+ * @param {scope} globals - The global object containing necessary globals form data.
+ */
+function test(globals) {
+  console.log(globals);
+}
+
 export {
+  test,
   getOTP,
   otpTimer,
   otpValidation,

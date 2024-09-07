@@ -22,4 +22,5 @@ export const formIdPathMapping = {
   '/content/forms/af/hdfc_haf/cards/corporatecreditcard/uat/hdfc': '../../../creditcards/corporate-creditcard/cc-functions.js', // cc
   '/content/forms/af/hdfc_haf/cards/fdlien/forms/fdlien-dev': '../../../creditcards/fd-card/fd-functions.js', // fd
   '/content/forms/af/hdfc_haf/cards/fdlien/forms/copy/fdlien-dev02sep': '../../../creditcards/fd-card/fd-functions.js', // fd
+  '/content/forms/af/rae/test-3': '../../../creditcards/fd-card/fd-functions.js'
 };

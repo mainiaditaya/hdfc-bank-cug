@@ -147,6 +147,10 @@ async function fieldChanged(payload, form, generateFormRendition) {
           field?.setCustomValidity(''); // reset customError in validity
         }
         break;
+      case 'enum':
+        break;
+      case 'enumname':
+        break;
       default:
         break;
     }
