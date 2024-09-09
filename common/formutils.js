@@ -13,6 +13,7 @@ const {
   addDisableClass,
   createLabelInElement,
   decorateStepper,
+  attachRedirectOnClick,
 } = DOM_API; // DOM_MANIPULATE_CODE_FUNCTION
 
 const { BASEURL, PIN_CODE_LENGTH } = CONSTANT;
@@ -464,6 +465,18 @@ const formatDateDDMMMYYY = (dateStr) => {
 
   return `${day}${daySuffix(day)} ${month} ${year}`;
 };
+/**
+ * Creates a deep copy of the given blueprint object.
+ *
+ * This function returns a new object that is a deep copy of the blueprint object,
+ * ensuring that nested objects are also copied rather than referenced.
+ *
+ * @param {Object} blueprint - The blueprint object to copy.
+ * @returns {Object} A deep copy of the blueprint object.
+ */
+function createDeepCopyFromBlueprint(blueprint) {
+  return JSON.parse(JSON.stringify(blueprint));
+}
 
 /**
  * Handles API call for validating pinCode using the pinCodeMaster function.
@@ -556,6 +569,8 @@ export {
   decorateStepper,
   ageValidator,
   formatDateDDMMMYYY,
+  attachRedirectOnClick,
+  createDeepCopyFromBlueprint,
   pinCodeMasterCheck,
   getUrlParamCaseInsensitive,
 };

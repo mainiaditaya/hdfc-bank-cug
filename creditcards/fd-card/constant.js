@@ -36,6 +36,7 @@ const FD_ENDPOINTS = {
 const OTP_TIMER = 30;
 const MODE = 'dev';
 // const MODE = 'prod';
+const FORM_NAME = 'FD lien card';
 const MAX_OTP_RESEND_COUNT = 3;
 const MAXIMUM_CREDIT_AMOUNT = 800000;
 const NAME_ON_CARD_LENGTH = 19;
@@ -51,4 +52,5 @@ export {
   MODE,
   MAXIMUM_CREDIT_AMOUNT,
   NAME_ON_CARD_LENGTH,
+  FORM_NAME,
 };
