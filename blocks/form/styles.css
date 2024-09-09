@@ -266,10 +266,7 @@ main .form .bi-eye-slash {
 }
 
 .date-wrapper:is([data-empty="true"]) {
-  input[type='date'] {
-      width: 89vw;
-  
-  }
+  input[type='date'] { width: 89vw; }
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
@@ -293,6 +290,7 @@ input[type="date"] {
     position: absolute;
     right: 5px;
     bottom: 10px;
+    background-color: var(--color-interface-background-primary);
   }
 }
 
