@@ -747,6 +747,36 @@ const validateLogin = (globals) => {
   }
 };
 
+const validateDOB = (globals) => {
+  const { $value } = globals.form.nre_nro_loginPanel.identifierPanel.dateOfBirth;
+  const dobValue = globals.form.nre_nro_loginPanel.identifierPanel.dateOfBirth.$value;
+  const panDobSelection = globals.form.nre_nro_loginPanel.identifierPanel.panDobSelection.$value;
+  const radioSelect = (panDobSelection === '0') ? 'DOB' : 'PAN';
+  globals.functions.setProperty(globals.form.getOTPbutton, { enabled: false });
+
+  switch (radioSelect) {
+    case 'DOB':
+      if (dobValue && String(new Date(dobValue).getFullYear()).length === 4) {
+        const minAge = 18;
+        const maxAge = 120;
+        const dobErrorText = `Age should be between ${minAge} to ${maxAge}`;
+        const ageValid = ageValidator(minAge, maxAge, $value);
+
+        if (ageValid) {
+          globals.functions.markFieldAsInvalid('$form.nre_nro_loginPanel.identifierPanel.dateOfBirth', '', { useQualifiedName: true });
+          globals.functions.setProperty(globals.form.nre_nro_loginPanel.identifierPanel.dateOfBirth, { valid: true });
+        }
+        if (!ageValid) {
+          globals.functions.markFieldAsInvalid('$form.nre_nro_loginPanel.identifierPanel.dateOfBirth', dobErrorText, { useQualifiedName: true });
+          globals.functions.setProperty(globals.form.getOTPbutton, { enabled: false });
+        }
+      }
+      break;
+    default:
+      globals.functions.setProperty(globals.form.getOTPbutton, { enabled: false });
+  }
+};
+
 /**
  * @name setNameOnCard
  * @param {string} name - name of the dropdow.
@@ -881,4 +911,5 @@ export {
   getThisCard,
   aadharConsent123,
   checkMode,
+  validateDOB,
 };
