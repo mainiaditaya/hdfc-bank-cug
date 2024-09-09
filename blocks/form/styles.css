@@ -265,6 +265,37 @@ main .form .bi-eye-slash {
   width: 21px;
 }
 
+.date-wrapper:is([data-empty="true"]) {
+  input[type='date'] {
+      width: 89vw;
+  
+  }
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
+  bottom: 0;
+  width: auto;
+  height: auto;
+  color: transparent;
+  background: transparent;
+}
+
+input[type="date"] {
+  position: relative;
+
+  &::after {
+    content: url('../../icons/date-picker.svg');
+    position: absolute;
+    right: 5px;
+    bottom: 10px;
+  }
+}
+
 /* Style for labels when input is active or not empty */
 main .form :is([data-active='true'], [data-empty='false'], .date-wrapper):not(.field-joiningrenewalfee) > label{
   color: var(--label-color);
