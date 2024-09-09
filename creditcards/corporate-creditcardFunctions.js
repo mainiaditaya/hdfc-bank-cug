@@ -760,34 +760,18 @@ const validateLogin = (globals) => {
 * @param {object} globals
 */
 const firstLastNameValidation = (fn, ln, globals) => {
-  // const { firstName, lastName } = globals.form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails;
-  // const fNameField = formUtil(globals, firstName);
-  // const lNameField = formUtil(globals, lastName);
   const invalidMsg = {
-    fName: 'Please enter valid First Name',
-    lName: 'Please enter valid Last Name',
+    fName: 'Please enter a valid First Name',
+    lName: 'Please enter a valid Last Name',
   };
-  // fNameField.markInvalid(false, invalidMsg.fName);
-  // lNameField.markInvalid(false, invalidMsg.lName);
-  const MAX_LENGTH = 1;
-  // let validStatus = null;
-  if ((fn && ln) && (fn?.length === MAX_LENGTH) && (ln?.length === MAX_LENGTH)) {
-    // temporry fix 👇//
-    // fNameField.markInvalid(false, invalidMsg.fName);
-    // lNameField.markInvalid(false, invalidMsg.lName);
-    if ((fn?.length === MAX_LENGTH)) {
-      globals.functions.markFieldAsInvalid('$form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.firstName', invalidMsg.fName, { useQualifiedName: true });
-    }
-    if ((ln?.length === MAX_LENGTH)) {
-      globals.functions.markFieldAsInvalid('$form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.lastName', invalidMsg.lName, { useQualifiedName: true });
-    }
-    // validStatus = false;
-    // else {
-    //   // temporry fix 👇//
-    //   validStatus = true;
-    // }
+  const MAX_LENGTH = 23;
+  const MIN_LENGTH = 3;
+  if (fn && (!((fn?.length <= MAX_LENGTH) && (fn?.length > MIN_LENGTH)))) {
+    globals.functions.markFieldAsInvalid('$form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.firstName', invalidMsg.fName, { useQualifiedName: true });
   }
-  // return validStatus;
+  if (ln && (!((ln?.length <= MAX_LENGTH) && (ln?.length > MIN_LENGTH)))) {
+    globals.functions.markFieldAsInvalid('$form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.lastName', invalidMsg.lName, { useQualifiedName: true });
+  }
 };
 export {
   getThisCard,
