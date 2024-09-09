@@ -2,6 +2,7 @@
 // impoted as CONSTANT key name in all files
 const BASEURL = 'https://applyonlinedev.hdfcbank.com';
 const CHANNEL = 'ADOBE_WEBFORMS';
+const CUSTOM_SCHEMA_NAMESPACE = '_hdfc';
 const ENDPOINTS = {
   aadharCallback: '/content/hdfc_etb_wo_pacc/api/aadharCallback.json',
   aadharInit: '/content/hdfc_haf/api/aadhaarInit.json',
@@ -52,4 +53,5 @@ export {
   FORM_RUNTIME,
   ID_COM,
   PIN_CODE_LENGTH,
+  CUSTOM_SCHEMA_NAMESPACE,
 };

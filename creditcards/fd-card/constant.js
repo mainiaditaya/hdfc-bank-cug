@@ -41,6 +41,8 @@ const MAX_OTP_RESEND_COUNT = 3;
 const MAXIMUM_CREDIT_AMOUNT = 800000;
 const NAME_ON_CARD_LENGTH = 19;
 
+const EDGE_DELIVERY_URL = 'fd-develop2--hdfc-bank--aemsites.hlx.page';
+
 export {
   JOURNEY_NAME,
   ERROR_MSG,
@@ -53,4 +55,5 @@ export {
   MAXIMUM_CREDIT_AMOUNT,
   NAME_ON_CARD_LENGTH,
   FORM_NAME,
+  EDGE_DELIVERY_URL,
 };

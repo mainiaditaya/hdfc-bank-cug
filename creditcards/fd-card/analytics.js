@@ -1,87 +1,82 @@
-/* eslint-disable no-undef */
-import { ANALYTICS_PAGE_LOAD_OBJECT } from '../../common/analyticsConstants.js';
-import { CURRENT_FORM_CONTEXT } from '../../common/constants.js';
-import { setAnalyticPageLoadProps, setAnalyticClickGenericProps } from '../../common/formanalytics.js';
-import { createDeepCopyFromBlueprint, santizedFormDataWithContext } from '../../common/formutils.js';
-import { FORM_NAME } from './constant.js';
+import { CUSTOM_SCHEMA_NAMESPACE } from '../../common/constants.js';
+import { sendAnalyticsEvent } from '../../scripts/lib-analytics.js';
+
+const getValidationMethod = (formContext) => {
+  if (formContext && formContext?.form?.login && formContext?.form?.login?.panDobSelection) {
+    return formContext.form.login.panDobSelection === '0' ? 'DOB' : 'PAN';
+  }
+  return '';
+};
 
 /**
- * Sends analytics event on page load.
- * @name sendPageloadEvent
- * @param {string} journeyState.
- * @param {object} formData.
- * @param {string} pageName.
+ * Basic tracking for page views with alloy
+ * @param document
+ * @param additionalXdmFields
+ * @returns {Promise<*>}
  */
-function sendPageloadEvent(journeyState, formData, pageName) {
-  const digitalData = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
-  digitalData.page.pageInfo.pageName = pageName;
-  setAnalyticPageLoadProps(journeyState, formData, digitalData, FORM_NAME);
-  switch (CURRENT_FORM_CONTEXT.action) {
-    default:
-      // do nothing
-  }
-  if (window) {
-    window.digitalData = digitalData || {};
-  }
-  _satellite.track('pageload');
-}
+const analyticsTrackPageLoad = async (document, additionalXdmFields = {}) => {
+  const xdmData = {
+    eventType: 'web.webinteraction.linkClicks',
+    web: {
+      webPageDetails: {
+        pageViews: {
+          value: 1,
+        },
+        name: `${document.title}`,
+        URL: `${document.URL}`,
+      },
+    },
+    [CUSTOM_SCHEMA_NAMESPACE]: {
+      ...additionalXdmFields,
+    },
+  };
 
-const populateResponse = (payload, eventType, digitalData) => {
-  console.log(digitalData);
-  switch (eventType) {
-    default:
-    // do nothing
-  }
+  return sendAnalyticsEvent(xdmData);
 };
 
-/**
- *Creates digital data for otp click event.
- * @param {string} phone
- * @param {string} validationType
- * @param {string} eventType
- * @param {object} formContext
- * @param {object} digitalData
- */
-const sendSubmitClickEvent = (phone, eventType, linkType, formData, journeyState, digitalData) => {
-  setAnalyticClickGenericProps(eventType, linkType, formData, journeyState, digitalData, FORM_NAME);
-  digitalData.page.pageInfo.pageName = PAGE_NAME.ccc[eventType];
-  switch (eventType) {
-    default:
-      // do nothing
-  }
+const analyticsTrackButtonClick = async (eventName, payload, formData, formContext, linkType = 'button', additionalXdmFields = {}) => {
+  const jsonString = JSON.stringify(payload || {});
+  const apiResponse = JSON.parse(jsonString);
+
+  const xdmData = {
+    eventType: 'web.webinteraction.linkClicks',
+    web: {
+      webInteraction: {
+        name: eventName,
+        linkClicks: {
+          value: 1,
+        },
+        type: linkType,
+      },
+    },
+    [CUSTOM_SCHEMA_NAMESPACE]: {
+      error: {
+        errorMessage: apiResponse?.otpGenResponse?.status?.errorMsg,
+        errorCode: apiResponse?.otpGenResponse?.status?.errorCode,
+      },
+      form: {
+        name: 'Corporate credit card',
+      },
+      page: {
+        pageName: 'CORPORATE_CARD_JOURNEY',
+      },
+      journey: {
+        journeyID: formContext?.journeyID,
+        journeyName: 'CORPORATE_CARD_JOURNEY',
+        journeyState: formContext?.journeyState,
+        formloginverificationmethod: getValidationMethod(formData),
+      },
+      identifier: {
+        mobileHash: formData?.login?.registeredMobileNumber,
+      },
+      ...additionalXdmFields,
+    },
+  };
+
+  return sendAnalyticsEvent(xdmData);
 };
 
-/**
- * Send analytics events.
- * @param {string} eventType
- * @param {object} payload
- * @param {string} journeyState
- * @param {object} formData
- * @param {object} currentFormContext
- */
-const sendAnalyticsClickEvent = (eventType, payload, journeyState, formData) => {
-  const digitalData = createDeepCopyFromBlueprint(ANALYTICS_CLICK_OBJECT);
-  const attributes = data[eventType];
-  populateResponse(payload, eventType, digitalData);
-  sendSubmitClickEvent(formData?.login?.registeredMobileNumber, eventType, attributes?.linkType, formData, journeyState, digitalData);
+export {
+  analyticsTrackPageLoad,
+  analyticsTrackButtonClick,
 };
-
-/**
-* sendAnalytics
-* @param {string} eventType
-* @param {string} eventName
-* @param {string} pageName
-* @param {string} payload
-* @param {string} journeyState
-* @param {object} globals
-*/
-const sendAnalytics = (eventType, eventName, pageName, payload, journeyState, globals) => {
-  const formData = santizedFormDataWithContext(globals);
-  if (eventName.toLowerCase() === 'page load') {
-    sendPageloadEvent(journeyState, formData, pageName);
-  } else {
-    sendAnalyticsClickEvent(eventType, payload, journeyState, formData);
-  }
-};
-
-export default sendAnalytics;

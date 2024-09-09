@@ -1,4 +1,9 @@
 import {
+  createInlineScript,
+  getAlloyInitScript,
+  setupAnalyticsTrackingWithAlloy,
+} from './lib-analytics.js';
+import {
   sampleRUM,
   buildBlock,
   decorateButtons,
@@ -9,7 +14,6 @@ import {
   waitForLCP,
   loadBlocks,
   loadCSS,
-  loadScript,
 } from './aem.js';
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
@@ -79,6 +83,7 @@ async function loadEager(doc) {
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
+    createInlineScript(document, document.body, getAlloyInitScript(), 'text/javascript');
     decorateMain(main);
     document.body.classList.add('appear');
     await waitForLCP(LCP_BLOCKS);
@@ -120,6 +125,7 @@ async function loadLazy(doc) {
   sampleRUM('lazy');
   sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
   sampleRUM.observe(main.querySelectorAll('picture > img'));
+  await setupAnalyticsTrackingWithAlloy(document);
 }
 
 /**
@@ -129,7 +135,7 @@ async function loadLazy(doc) {
 function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
-  loadScript('https://assets.adobedtm.com/80673311e435/029b16140ccd/launch-48ec56350700-development.min.js', { async: 'true' });
+  // loadScript('https://assets.adobedtm.com/80673311e435/029b16140ccd/launch-48ec56350700-development.min.js', { async: 'true' });
   // load anything that can be postponed to the latest here
 }
 
