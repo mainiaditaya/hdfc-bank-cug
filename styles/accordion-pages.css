@@ -153,6 +153,7 @@ main .form form .field-corporatecardwizardview.wizard {
     background: var(--color-interface-background-quinary);
     padding: 20px;
     border-radius: 10px;
+    display: block;
 
     .field-cardimage {
       position: relative;
@@ -166,7 +167,7 @@ main .form form .field-corporatecardwizardview.wizard {
 
     .cardNameText {
       position: absolute;
-      bottom: 115px;
+      top: 145px;
       left: 45px;
       font-size: var(--body-x-sm-font-size);
       font-weight: var(--font-weight-medium);
@@ -176,6 +177,7 @@ main .form form .field-corporatecardwizardview.wizard {
     .field-nameoncarddropdown {
       display: flex;
       flex-direction: column-reverse;
+      margin-top: 30px;
 
       label {
         margin: 13px;
