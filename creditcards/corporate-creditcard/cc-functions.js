@@ -20,6 +20,7 @@ import {
   otpValidation,
   getFormContext,
   getWrappedFormContext,
+  firstLastNameValidation,
 } from './corporate-creditcardFunctions.js';
 
 import {
@@ -111,4 +112,5 @@ export {
   getWrappedFormContext,
   onWizardInit,
   crmResponseHandler,
+  firstLastNameValidation,
 };

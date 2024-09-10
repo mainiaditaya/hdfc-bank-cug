@@ -833,7 +833,7 @@ function checkMode(globals) {
         globals,
       );
     }
-  } if ((idcomVisit === 'DebitCard') || (idcomVisit === 'CreditCard')) { // debit card or credit card flow
+  } if ((idcomVisit === 'DebitCard') || (idcomVisit === 'CreditCard') || (idcomVisit === 'NetBanking')) { // debit card or credit card or net banking flow
     const resultPanel = formUtil(globals, globals.form.resultPanel);
     resultPanel.visible(false);
     globals.functions.setProperty(globals.form.otpPanel, { visible: false });
@@ -974,6 +974,27 @@ function getWrappedFormContext() {
   return formContext;
 }
 
+/**
+* @name firstLastNameValidation - validate first name and last name in personal details
+* @param {string} firstName
+* @param {string} lastName
+* @param {object} globals
+*/
+const firstLastNameValidation = (fn, ln, globals) => {
+  const invalidMsg = {
+    fName: 'Please enter a valid First Name',
+    lName: 'Please enter a valid Last Name',
+  };
+  const MAX_LENGTH = 23;
+  const MIN_LENGTH = 3;
+  if (fn && (!((fn?.length <= MAX_LENGTH) && (fn?.length > MIN_LENGTH)))) {
+    globals.functions.markFieldAsInvalid('$form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.firstName', invalidMsg.fName, { useQualifiedName: true });
+  }
+  if (ln && (!((ln?.length <= MAX_LENGTH) && (ln?.length > MIN_LENGTH)))) {
+    globals.functions.markFieldAsInvalid('$form.corporateCardWizardView.yourDetailsPanel.yourDetailsPage.personalDetails.lastName', invalidMsg.lName, { useQualifiedName: true });
+  }
+};
+
 export {
   formRuntime,
   journeyResponseHandler,
@@ -996,4 +1017,5 @@ export {
   otpValidation,
   getFormContext,
   getWrappedFormContext,
+  firstLastNameValidation,
 };
