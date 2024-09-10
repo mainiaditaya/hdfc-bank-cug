@@ -684,10 +684,10 @@ function customSetFocus(errorMessage, numRetries, globals) {
  * @param {Object} globals - The global object containing necessary data for DAP request.
 */
 const validateLogin = (globals) => {
-  const { $value } = globals.form.loginPanel.identifierPanel.dateOfBirth;
-  const dobValue = globals.form.loginPanel.identifierPanel.dateOfBirth.$value;
-  const panValue = globals.form.loginPanel.identifierPanel.pan.$value;
-  const panDobSelection = globals.form.loginPanel.identifierPanel.panDobSelection.$value;
+  const { $value } = globals.form.nre_nro_loginPanel.identifierPanel.dateOfBirth;
+  const dobValue = globals.form.nre_nro_loginPanel.identifierPanel.dateOfBirth.$value;
+  const panValue = globals.form.nre_nro_loginPanel.identifierPanel.pan.$value;
+  const panDobSelection = globals.form.nre_nro_loginPanel.identifierPanel.panDobSelection.$value;
   const radioSelect = (panDobSelection === '0') ? 'DOB' : 'PAN';
   const regexPan = /^[a-zA-Z]{3}[Pp][a-zA-Z][0-9]{4}[a-zA-Z]{1}/g;
   const consentFirst = globals.form.consentFragment.checkboxConsent1Label.$value;
@@ -709,7 +709,7 @@ const validateLogin = (globals) => {
         }
         if (ageValid) {
           globals.functions.markFieldAsInvalid('$form.loginPanel.identifierPanel.dateOfBirth', '', { useQualifiedName: true });
-          globals.functions.setProperty(globals.form.loginPanel.identifierPanel.dateOfBirth, { valid: true });
+          globals.functions.setProperty(globals.form.nre_nro_loginPanel.identifierPanel.dateOfBirth, { valid: true });
         }
         if (!ageValid) {
           globals.functions.markFieldAsInvalid('$form.loginPanel.identifierPanel.dateOfBirth', dobErrorText, { useQualifiedName: true });
@@ -731,7 +731,7 @@ const validateLogin = (globals) => {
         }
         if (validPan) {
           globals.functions.markFieldAsInvalid('$form.loginPanel.identifierPanel.pan', '', { useQualifiedName: true });
-          globals.functions.setProperty(globals.form.loginPanel.identifierPanel.pan, { valid: true });
+          globals.functions.setProperty(globals.form.nre_nro_loginPanel.identifierPanel.pan, { valid: true });
         }
         if (!validPan) {
           globals.functions.markFieldAsInvalid('$form.loginPanel.identifierPanel.pan', panErrorText, { useQualifiedName: true });
@@ -750,30 +750,22 @@ const validateLogin = (globals) => {
 const validateDOB = (globals) => {
   const { $value } = globals.form.nre_nro_loginPanel.identifierPanel.dateOfBirth;
   const dobValue = globals.form.nre_nro_loginPanel.identifierPanel.dateOfBirth.$value;
-  const panDobSelection = globals.form.nre_nro_loginPanel.identifierPanel.panDobSelection.$value;
-  const radioSelect = (panDobSelection === '0') ? 'DOB' : 'PAN';
   globals.functions.setProperty(globals.form.getOTPbutton, { enabled: false });
 
-  switch (radioSelect) {
-    case 'DOB':
-      if (dobValue && String(new Date(dobValue).getFullYear()).length === 4) {
-        const minAge = 18;
-        const maxAge = 120;
-        const dobErrorText = `Age should be between ${minAge} to ${maxAge}`;
-        const ageValid = ageValidator(minAge, maxAge, $value);
+  if (dobValue && String(new Date(dobValue).getFullYear()).length === 4) {
+    const minAge = 18;
+    const maxAge = 120;
+    const dobErrorText = `Age should be between ${minAge} to ${maxAge}`;
+    const ageValid = ageValidator(minAge, maxAge, $value);
 
-        if (ageValid) {
-          globals.functions.markFieldAsInvalid('$form.nre_nro_loginPanel.identifierPanel.dateOfBirth', '', { useQualifiedName: true });
-          globals.functions.setProperty(globals.form.nre_nro_loginPanel.identifierPanel.dateOfBirth, { valid: true });
-        }
-        if (!ageValid) {
-          globals.functions.markFieldAsInvalid('$form.nre_nro_loginPanel.identifierPanel.dateOfBirth', dobErrorText, { useQualifiedName: true });
-          globals.functions.setProperty(globals.form.getOTPbutton, { enabled: false });
-        }
-      }
-      break;
-    default:
+    if (ageValid) {
+      globals.functions.markFieldAsInvalid('$form.nre_nro_loginPanel.identifierPanel.dateOfBirth', '', { useQualifiedName: true });
+      globals.functions.setProperty(globals.form.nre_nro_loginPanel.identifierPanel.dateOfBirth, { valid: true });
+    }
+    if (!ageValid) {
+      globals.functions.markFieldAsInvalid('$form.nre_nro_loginPanel.identifierPanel.dateOfBirth', dobErrorText, { useQualifiedName: true });
       globals.functions.setProperty(globals.form.getOTPbutton, { enabled: false });
+    }
   }
 };
 

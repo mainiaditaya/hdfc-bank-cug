@@ -16,7 +16,8 @@ import {
   getThisCard,
   aadharConsent123,
   checkMode,
-} from './corporate-creditcardFunctions.js';
+  validateDOB,
+} from './nre-nroFunctions.js';
 
 import {
   invokeJourneyDropOff,
@@ -106,4 +107,5 @@ export {
   getFullName,
   getWrappedFormContext,
   onWizardInit,
+  validateDOB,
 };
