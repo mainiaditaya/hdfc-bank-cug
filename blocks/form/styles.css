@@ -266,7 +266,11 @@ main .form .bi-eye-slash {
 }
 
 .date-wrapper:is([data-empty="true"]) {
-  input[type='date'] { width: 89vw; }
+  input[type='date'] { 
+    /* stylelint-disable-next-line value-no-vendor-prefix */
+    width: -webkit-calc(100% - 1px);
+    box-sizing: border-box; 
+  }
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
