@@ -114,7 +114,7 @@ function checkMode(globals) {
         globals,
       );
     }
-  } if ((idcomVisit === 'DebitCard') || (idcomVisit === 'CreditCard')) { // debit card or credit card flow
+  } if ((idcomVisit === 'DebitCard') || (idcomVisit === 'CreditCard') || (idcomVisit === 'NetBanking')) { // debit card or credit card flow
     const resultPanel = formUtil(globals, globals.form.resultPanel);
     resultPanel.visible(false);
     globals.functions.setProperty(globals.form.otpPanel, { visible: false });
