@@ -340,8 +340,8 @@ const changeWizardView = () => {
 */
 // eslint-disable-next-line no-unused-vars
 function checkELigibilityHandler(resPayload1, globals) {
-  const resPayload = RESPONSE_PAYLOAD.response;
-  // const resPayload = resPayload1;
+  // const resPayload = RESPONSE_PAYLOAD.response;
+  const resPayload = resPayload1;
   const response = {};
   try {
     /* billed txn maximum amount select limt */
