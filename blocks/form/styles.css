@@ -265,37 +265,32 @@ main .form .bi-eye-slash {
   width: 21px;
 }
 
-.date-wrapper:is([data-empty="true"]) {
-  input[type='date'] { 
-    /* stylelint-disable-next-line value-no-vendor-prefix */
-    width: -webkit-calc(100% - 1px);
-    box-sizing: border-box; 
-  }
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
-  bottom: 0;
-  width: auto;
-  height: auto;
-  color: transparent;
-  background: transparent;
-}
-
-input[type="date"] {
-  position: relative;
-
-  &::after {
-    content: url('../../icons/date-picker.svg');
+/* Date picker for only iOS devices */
+@supports (-webkit-touch-callout: none) {
+  input[type="date"]::-webkit-calendar-picker-indicator {
     position: absolute;
-    right: 5px;
-    bottom: 10px;
-    background-color: var(--color-interface-background-primary);
+    top: 0;
+    left: 0;
+    right: 0;
+    /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
+    bottom: 0;
+    width: auto;
+    height: auto;
+    color: transparent;
+    background: transparent;
   }
+
+  input[type="date"] {
+    position: relative;
+
+    &::after {
+      content: url('../../icons/date-picker.svg');
+      position: absolute;
+      right: 5px;
+      bottom: 10px;
+      background-color: var(--color-interface-background-primary);
+    }
+  }    
 }
 
 /* Style for labels when input is active or not empty */
