@@ -29,6 +29,9 @@ import {
   handleMdmUtmParam,
 } from './semi-mdm-utils.js';
 
+import { invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
+import { reloadPage } from '../../common/functions.js';
+
 // import { getContextStorage } from '../../../conversational-service/src/request-utils'
 
 const {
@@ -66,6 +69,7 @@ currentFormContext.totalSelect = 0;
 currentFormContext.billed = 0;
 currentFormContext.unbilled = 0;
 currentFormContext.billedMaxSelect = 0;
+currentFormContext.txnSelectExceedLimit = 1000000; // ten lakhs txn's select exceeding limit
 let tnxPopupAlertOnce = 0; // flag alert for the pop to show only once on click of continue
 let resendOtpCount = 0;
 let resendOtpCount2 = 0;
@@ -336,8 +340,8 @@ const changeWizardView = () => {
 */
 // eslint-disable-next-line no-unused-vars
 function checkELigibilityHandler(resPayload1, globals) {
-  // const resPayload = RESPONSE_PAYLOAD.response;
-  const resPayload = resPayload1;
+  const resPayload = RESPONSE_PAYLOAD.response;
+  // const resPayload = resPayload1;
   const response = {};
   try {
     /* billed txn maximum amount select limt */
@@ -587,7 +591,7 @@ const enableAllTxnFields = (txnList, globals) => txnList?.forEach((list) => glob
  */
 function txnSelectHandler(checkboxVal, txnType, globals) {
   /* enable-popup once it reaches BILLED-MAX-AMT-LIMIT */
-  const totalSelectBilledTxnAmt = globals.functions.exportData().smartemi.aem_billedTxn.aem_billedTxnSelection.filter((el) => el.aem_Txn_checkBox).map((el) => (Number((String(el?.aem_TxnAmt))?.replace(/[^\d]/g, '')) / 100)).reduce((prev, acc) => prev + acc, 0);
+  const totalSelectBilledTxnAmt = getTotalAmount(globals);
   if (totalSelectBilledTxnAmt > currentFormContext.billedMaxSelect) {
     /* popup alert hanldles */
     const SELECTED_MAX_BILL = ` Please select Billed Transactions Amount Max up to Rs.${nfObject.format(currentFormContext.billedMaxSelect)}`;
@@ -596,6 +600,17 @@ function txnSelectHandler(checkboxVal, txnType, globals) {
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation, { value: SELECTED_MAX_BILL });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
     return;
+  }
+
+  /* enable alert message if the user exceed selecting the txn above 10 laksh. */
+  const emiProceedCheck = (totalSelectBilledTxnAmt <= currentFormContext.txnSelectExceedLimit);
+  if (!emiProceedCheck) {
+    const alertMsg = 'You can select up to Rs 10 lacs. To proceed further please unselect some transaction.';
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper, { visible: true });
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup, { visible: true });
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation, { value: alertMsg });
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation1, { visible: false });
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
   }
   // null || ON
   if (selectTopTenFlag || isUserSelection) return;
@@ -640,9 +655,9 @@ function txnSelectHandler(checkboxVal, txnType, globals) {
     disableCheckBoxes(billedTxnList, false, globals);
   }
   /* enable disable select-tenure continue button */
-  if (currentFormContext.totalSelect === 0) {
+  if ((currentFormContext.totalSelect === 0) || (!emiProceedCheck)) {
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
-  } else if (currentFormContext.totalSelect > 0) {
+  } else if ((currentFormContext.totalSelect > 0) || (emiProceedCheck)) {
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: true });
   }
 }
@@ -690,31 +705,35 @@ function selectTopTxn(globals) {
   let billedCheckedItems = 0;
   let value = 'on';
   let enabled = true;
-
-  sortedArr?.forEach((txn, i) => {
-    if (i > 9) {
-      value = undefined;
-      enabled = false;
-    }
-    if (txn.aem_txn_type === 'UNBILLED') {
-      globals.functions.setProperty(unBilledTxnPanel[unbilledCounter].aem_Txn_checkBox, { enabled });
-      globals.functions.setProperty(unBilledTxnPanel[unbilledCounter].aem_Txn_checkBox, { value });
-      if (i <= 9) unbilledCheckedItems += 1;
-      unbilledCounter += 1;
-    } else {
-      globals.functions.setProperty(billedTxnPanel[billedCounter].aem_Txn_checkBox, { enabled });
-      globals.functions.setProperty(billedTxnPanel[billedCounter].aem_Txn_checkBox, { value });
-      if (i <= 9) billedCheckedItems += 1;
-      billedCounter += 1;
-    }
-    const billedTxnSelected = globals.form.aem_semiWizard.aem_chooseTransactions?.billedTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_txnSelected;
-    const unbilledTxnSelected = globals.form.aem_semiWizard.aem_chooseTransactions?.unbilledTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_txnSelected;
-    globals.functions.setProperty(billedTxnSelected, { value: `${billedCheckedItems} Selected` });
-    globals.functions.setProperty(unbilledTxnSelected, { value: `${unbilledCheckedItems} Selected` });
-    currentFormContext.totalSelect = sortedTxnList.length;
-    const TOTAL_SELECT = `Total selected ${currentFormContext.totalSelect}/${sortedTxnList.length}`;
-    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_TotalSelectedTxt, { value: TOTAL_SELECT });
-  });
+  try {
+    sortedArr?.forEach((txn, i) => {
+      if (i > 9) {
+        value = undefined;
+        enabled = false;
+      }
+      if (txn.aem_txn_type === 'UNBILLED') {
+        globals.functions.setProperty(unBilledTxnPanel[unbilledCounter].aem_Txn_checkBox, { enabled });
+        globals.functions.setProperty(unBilledTxnPanel[unbilledCounter].aem_Txn_checkBox, { value });
+        if (i <= 9) unbilledCheckedItems += 1;
+        unbilledCounter += 1;
+      } else {
+        globals.functions.setProperty(billedTxnPanel[billedCounter].aem_Txn_checkBox, { enabled });
+        globals.functions.setProperty(billedTxnPanel[billedCounter].aem_Txn_checkBox, { value });
+        if (i <= 9) billedCheckedItems += 1;
+        billedCounter += 1;
+      }
+      const billedTxnSelected = globals.form.aem_semiWizard.aem_chooseTransactions?.billedTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_txnSelected;
+      const unbilledTxnSelected = globals.form.aem_semiWizard.aem_chooseTransactions?.unbilledTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_txnSelected;
+      globals.functions.setProperty(billedTxnSelected, { value: `${billedCheckedItems} Selected` });
+      globals.functions.setProperty(unbilledTxnSelected, { value: `${unbilledCheckedItems} Selected` });
+      currentFormContext.totalSelect = sortedTxnList.length;
+      const TOTAL_SELECT = `Total selected ${currentFormContext.totalSelect}/${sortedTxnList.length}`;
+      globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_TotalSelectedTxt, { value: TOTAL_SELECT });
+    });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(error, 'errr');
+  }
   globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: true });
   setTimeout(() => {
     selectTopTenFlag = !selectTopTenFlag;
@@ -1029,4 +1048,8 @@ export {
   tAndCNavigation,
   customDispatchEvent,
   getFlowSuccessPayload,
+  reloadPage,
+  invokeJourneyDropOff,
+  invokeJourneyDropOffByParam,
+  invokeJourneyDropOffUpdate,
 };
