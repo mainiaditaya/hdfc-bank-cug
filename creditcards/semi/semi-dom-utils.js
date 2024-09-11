@@ -39,23 +39,23 @@ const addOtpFieldValidation = () => {
   * Function validates the OTP Input Field
   *
   */
-const linkToPopupToggle = (hyperLink, popupOverlay, popupContent, closeBtn=false, redirectBtn=false) => {
+const linkToPopupToggle = (hyperLink, popupOverlay, popupContent, closeBtn = false, redirectBtn = false) => {
   const links = document.querySelectorAll(hyperLink);
-  [...links].forEach(link => {
+  [...links].forEach((link) => {
     link.addEventListener('click', (event) => {
       event.preventDefault();
-      document.querySelector(popupOverlay).setAttribute("data-visible", "true");
-      document.querySelector(popupContent).setAttribute("data-visible", "true");
+      document.querySelector(popupOverlay).setAttribute('data-visible', 'true');
+      document.querySelector(popupContent).setAttribute('data-visible', 'true');
     });
   });
   if(closeBtn) {
-    document.querySelector(closeBtn).addEventListener('click', (event) => {
-      document.querySelector(popupOverlay).setAttribute("data-visible", "false");
-      document.querySelector(popupContent).setAttribute("data-visible", "false");
+    document.querySelector(closeBtn).addEventListener('click', () => {
+      document.querySelector(popupOverlay).setAttribute('data-visible', 'false');
+      document.querySelector(popupContent).setAttribute('data-visible', 'false');
     });
   }
   if(redirectBtn) {
-    document.querySelector(redirectBtn).addEventListener('click', (event) => {
+    document.querySelector(redirectBtn).addEventListener('click', () => {
       window.open(semitcRedirectURI, '_blank').focus();
     });
   }
