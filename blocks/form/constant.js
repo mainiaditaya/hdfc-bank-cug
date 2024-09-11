@@ -24,4 +24,4 @@ export const formIdPathMapping = {
   '/content/forms/af/hdfc_haf/cards/semi/forms/semi': '../../../creditcards/semi/semi-functions.js', // semi
 };
 
-export const semitcRedirectURI = "https://www.hdfcbank.com/personal/useful-links/privacy";
+export const semitcRedirectURI = 'https://www.hdfcbank.com/personal/useful-links/privacy';
