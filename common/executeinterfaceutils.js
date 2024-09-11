@@ -75,7 +75,6 @@ const createExecuteInterfaceRequestObj = (globals) => {
     // '4THLINE': formData?.companyName,
     CCAD_Relationship_number: formData?.relationshipNumber || currentFormContext?.crmLeadResponse?.relationshipNum,
   };
-
   let permanentAddress = { ...currentAddress };
   if (currentFormContext.journeyType === 'ETB') {
     if (breDemogResponse?.VDCUSTITNBR !== panNumber) {
@@ -175,7 +174,7 @@ const createExecuteInterfaceRequestObj = (globals) => {
       officeCity: employmentDetails.officeAddressCity.$value,
       officeZipCode: employmentDetails.officeAddressPincode.$value,
       officeState: employmentDetails.officeAddressState.$value,
-      productCode: '',
+      productCode: currentFormContext?.crmLeadResponse?.productCode,
       leadClosures: globals.functions.exportData().form.leadClosures || currentFormContext?.crmLeadResponse?.leadClosures,
       leadGenerater: globals.functions.exportData().form.leadGenerator || currentFormContext?.crmLeadResponse?.leadGenerator,
       applyingBranch: 'N',
