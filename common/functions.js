@@ -42,7 +42,8 @@ import documentUpload from './docuploadutils.js';
 import fetchAuthCode from './idcomutil.js';
 
 import {
-  urlPath, santizedFormDataWithContext, getTimeStamp, formUtil, clearString,
+  urlPath, santizedFormDataWithContext, formUtil, clearString,
+  getTimeStampNoSeconds,
 } from './formutils.js';
 
 import {
@@ -233,7 +234,7 @@ function getOTP(mobileNumber, pan, dob, globals) {
  * @return {PROMISE}
  */
 function otpValidation(mobileNumber, pan, dob, otpNumber) {
-  const referenceNumber = `AD${getTimeStamp(new Date())}` ?? '';
+  const referenceNumber = `AD${getTimeStampNoSeconds(new Date())}` ?? '';
   currentFormContext.referenceNumber = referenceNumber;
   const jsonObj = {
     requestString: {
