@@ -48,13 +48,13 @@ const linkToPopupToggle = (hyperLink, popupOverlay, popupContent, closeBtn = fal
       document.querySelector(popupContent).setAttribute('data-visible', 'true');
     });
   });
-  if(closeBtn) {
+  if (closeBtn) {
     document.querySelector(closeBtn).addEventListener('click', () => {
       document.querySelector(popupOverlay).setAttribute('data-visible', 'false');
       document.querySelector(popupContent).setAttribute('data-visible', 'false');
     });
   }
-  if(redirectBtn) {
+  if (redirectBtn) {
     document.querySelector(redirectBtn).addEventListener('click', () => {
       window.open(semitcRedirectURI, '_blank').focus();
     });
