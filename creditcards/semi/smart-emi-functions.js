@@ -691,14 +691,17 @@ const semiWizardSwitch = (source, target, current, globals) => {
 function selectTopTxn(globals) {
   selectTopTenFlag = !selectTopTenFlag;
   const SELECT_TOP_TXN_LIMIT = 10;
+  const resPayload = currentFormContext.EligibilityResponse;
+  const billedResData = resPayload?.ccBilledTxnResponse?.responseString;
+  const unBilledResData = resPayload?.ccUnBilledTxnResponse?.responseString;
   const billedTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
   const unBilledTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_TxnsList;
-  const billed = globals.functions.exportData().smartemi.aem_billedTxn.aem_billedTxnSelection;
-  const unBilled = globals.functions.exportData().smartemi.aem_unbilledTxn.aem_unbilledTxnSection;
-
+  const billed = billedResData?.length ? globals.functions.exportData().smartemi.aem_billedTxn.aem_billedTxnSelection : [];
+  const unBilled = unBilledResData?.length ? globals.functions.exportData().smartemi.aem_unbilledTxn.aem_unbilledTxnSection : [];
   const allTxn = billed.concat(unBilled);
   const sortedArr = sortDataByAmountSymbol(allTxn);
-  const sortedTxnList = sortedArr?.slice(0, SELECT_TOP_TXN_LIMIT);
+  const txnAvailableToSelect = (allTxn?.length >= SELECT_TOP_TXN_LIMIT) ? SELECT_TOP_TXN_LIMIT : allTxn?.length;
+  const sortedTxnList = sortedArr?.slice(0, txnAvailableToSelect);
   let billedCounter = 0;
   let unbilledCounter = 0;
   let unbilledCheckedItems = 0;
