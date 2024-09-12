@@ -17,6 +17,7 @@ const ENDPOINTS = {
   otpValFetchAssetDemog: '/content/hdfc_haf/api/otpvaldemogV4.json',
   panValNameMatch: '/content/hdfc_forms_common_v2/api/panValNameMatch.json',
   docUpload: '/content/hdfc_etb_wo_pacc/api/documentUpload.json',
+  customerOtpGen: '/content/hdfc_hafcards/api/customeridentificationotpgen.json',
 };
 
 const DEAD_PAN_STATUS = ['D', 'ED', 'X', 'F'];

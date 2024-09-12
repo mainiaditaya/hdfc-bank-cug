@@ -48,15 +48,15 @@ function getOTP(mobileNumber, pan, dob, globals) {
   const jsonObj = {
     requestString: {
       mobileNumber: mobileNumber.$value,
-      dateOfBith: dob.$value || '',
+      dateOfBirth: clearString(dob.$value) || '',
       panNumber: pan.$value || '',
       journeyID: globals.form.runtime.journeyId.$value ?? jidTemporary,
       journeyName: globals.form.runtime.journeyName.$value || currentFormContext.journeyName,
-      identifierValue: pan.$value || dob.$value,
+      identifierValue: pan.$value || clearString(dob.$value),
       identifierName: pan.$value ? 'PAN' : 'DOB',
     },
   };
-  const path = urlPath(ENDPOINTS.otpGen);
+  const path = urlPath(ENDPOINTS.customerOtpGen);
   formRuntime?.getOtpLoader();
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
