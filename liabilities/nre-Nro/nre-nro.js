@@ -1,6 +1,7 @@
 /* eslint-disable import/no-cycle */
 import {
   validateLogin,
+  getOtpNRE,
 } from './nre-nroFunctions.js';
 
 import {
@@ -17,4 +18,5 @@ export {
   invokeJourneyDropOff,
   invokeJourneyDropOffUpdate,
   getOTP,
+  getOtpNRE,
 };
