@@ -75,7 +75,6 @@ const createExecuteInterfaceRequestObj = (globals) => {
     // '4THLINE': formData?.companyName,
     CCAD_Relationship_number: formData?.relationshipNumber || currentFormContext?.crmLeadResponse?.relationshipNum,
   };
-
   let permanentAddress = { ...currentAddress };
   if (currentFormContext.journeyType === 'ETB') {
     if (breDemogResponse?.VDCUSTITNBR !== panNumber) {
