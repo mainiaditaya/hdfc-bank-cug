@@ -1,6 +1,6 @@
 import { submitSuccess, submitFailure } from '../submit.js';
 import {
-  createHelpText, createLabel, updateOrCreateInvalidMsg, getCheckboxGroupValue, removeInvalidMsg,
+  createHelpText, createLabel, updateOrCreateInvalidMsg, getCheckboxGroupValue, createRadioOrCheckboxUsingEnum,
 } from '../util.js';
 import registerCustomFunctions from './functionRegistration.js';
 import { externalize } from './functions.js';
@@ -148,6 +148,12 @@ async function fieldChanged(payload, form, generateFormRendition) {
       case 'valid':
         if (currentValue === true && field?.validity?.customError) {
           field?.setCustomValidity(''); // reset customError in validity
+        }
+        break;
+      case 'enum':
+      case 'enumNames':
+        if (fieldType === 'radio-group' || fieldType === 'checkbox-group') {
+          createRadioOrCheckboxUsingEnum(fieldModel, field);
         }
         break;
       default:
