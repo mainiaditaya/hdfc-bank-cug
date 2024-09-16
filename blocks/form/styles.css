@@ -589,6 +589,10 @@ main .form.block .field-otppanel {
   margin: 0 auto;
   text-align: center;
 
+  > legend { width: 265px;
+    p, b { width: 265px; }
+  }
+
   .field-otpnumber {
     margin-bottom: -10px;
 
@@ -669,8 +673,6 @@ main .form .field-resultpanel {
   
     .field-successresulttextlabel { margin-bottom: 12px; }
     .field-arnrefnumpanel::before { left: 24%; }
-    .field-arnrefnumpanel { margin-left: -25px; }
-    .field-newarnnumber, .field-newarnnumber p { line-height: 45px; }
     .field-arnrefnumlabel, .field-newarnnumber { left: 36%; }
     .field-ratingpanel .field-rating .rating.hover {margin-top: 0 !important;}
 
@@ -696,7 +698,12 @@ main .form .field-resultpanel {
     padding: 28px;
   }
 
-  main .form .field-otppanel {
+  main .form .field-otppanel { display: grid;
+
+    > legend { width: 265px;
+      p, b { width: 265px; }
+    }
+
     .field-otpnumber {
       input {
         padding: 0 0 0 2vw;
@@ -731,8 +738,11 @@ main .form .field-resultpanel {
     padding: 20px;
   }
 
-  main .form.block .field-otppanel {
-    display: grid;
+  main .form.block .field-otppanel { display: grid;
+    
+    > legend { width: 265px;
+      p, b { width: 265px; }
+    }
 
     .field-otpnumber {
       input {
@@ -770,7 +780,12 @@ main .form .field-resultpanel {
     margin: 0 !important;
   }
 
-  main .form.block .field-otppanel {
+  main .form.block .field-otppanel { display: grid;
+
+    > legend { width: 265px;
+      p, b { width: 265px; }
+    }
+
     .field-otpsubpanel {
       display: flex;
       flex-direction: row;
