@@ -51,6 +51,8 @@ const ID_COM = {
 
 const PIN_CODE_LENGTH = 6;
 
+const ENV = 'prod';
+
 export {
   BASEURL,
   CHANNEL,
@@ -60,4 +62,5 @@ export {
   FORM_RUNTIME,
   ID_COM,
   PIN_CODE_LENGTH,
+  ENV,
 };
