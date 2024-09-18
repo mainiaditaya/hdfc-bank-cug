@@ -40,6 +40,7 @@ const {
   MISC,
   DATA_LIMITS,
   CHANNELS,
+  FLOWS_ERROR_MESSAGES,
   // eslint-disable-next-line no-unused-vars
   RESPONSE_PAYLOAD,
 } = SEMI_CONSTANT;
@@ -503,7 +504,7 @@ const tenureDisplay = (globals) => {
   // setting data to display on whatsapp flow
   const procesFees = tenureArrayOption[0]?.procesingFee;
   globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.aem_flow_processingFees, { value: `${MISC.rupeesUnicode} ${nfObject.format(procesFees)}` });
-  globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.aem_flowDisplayTotalAmountSelected, { value: DISPLAY_TOTAL_AMT });
+  globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.aem_flowDisplayTotalAmountSelected, { value: `Rs ${nfObject.format(totalAmountSelected)}/-` });
 };
 
 /**
@@ -590,6 +591,7 @@ const enableAllTxnFields = (txnList, globals) => txnList?.forEach((list) => glob
  */
 function txnSelectHandler(checkboxVal, txnType, globals) {
   /* enable-popup once it reaches BILLED-MAX-AMT-LIMIT */
+  const currentFormContext = getCurrentFormContext(globals);
   const totalSelectBilledTxnAmt = globals.functions.exportData().smartemi.aem_billedTxn.aem_billedTxnSelection.filter((el) => el.aem_Txn_checkBox).map((el) => (Number((String(el?.aem_TxnAmt))?.replace(/[^\d]/g, '')) / 100)).reduce((prev, acc) => prev + acc, 0);
   if (totalSelectBilledTxnAmt > currentFormContext.billedMaxSelect) {
     /* popup alert hanldles */
@@ -598,8 +600,12 @@ function txnSelectHandler(checkboxVal, txnType, globals) {
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup, { visible: true });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation, { value: SELECTED_MAX_BILL });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
+
+    // display error message in whatsapp flow
+    customDispatchEvent('showErrorSnackbar', { errorMessage: SELECTED_MAX_BILL }, globals);
     return;
   }
+  customDispatchEvent('showErrorSnackbar', { errorMessage: undefined }, globals);
   // null || ON
   if (selectTopTenFlag || isUserSelection) return;
   const MAX_SELECT = 10;
@@ -1020,7 +1026,13 @@ const tAndCNavigation = () => {
  * @param {scope} globals - globals
  */
 function customDispatchEvent(eventName, payload, globals) {
-  globals.functions.dispatchEvent(globals.form, `custom:${eventName}`, payload);
+  let evtPayload = payload
+  if(isNodeEnv && payload?.errorCode) {
+    if(FLOWS_ERROR_MESSAGES[payload.errorCode]) {
+      evtPayload = { ...evtPayload, errorMsg: FLOWS_ERROR_MESSAGES[payload.errorCode] }
+    }
+  }
+  globals.functions.dispatchEvent(globals.form, `custom:${eventName}`, evtPayload);
 }
 
 export {
