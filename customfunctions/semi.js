@@ -1,3 +1,6 @@
+
+console.log('Loading custom functions');
+
 /**
  * Displays a loader with optional loading text.
  * @param {string} loadingText - The loading text to display (optional).
