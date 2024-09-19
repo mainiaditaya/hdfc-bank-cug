@@ -33,6 +33,8 @@ main .form {
   input[type='password'] {
     font-size: 31px;
   }
+  
+  a:any-link, a:hover, .link { color: var(--color-action-text-secondary-default); }
 
   .error-field {
     input[type='text'] {
