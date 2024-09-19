@@ -65,17 +65,18 @@ const bindEmployeeAssistanceField = async (globals) => {
     const dropDownSelectField = employeeAssistancePanel.channel;
     const options = [{ label: 'Website Download', value: 'Website Download' }];
     let matchedChannel = options[0].value;
-
+    const channelOptions = [];
     response.forEach((item) => {
       const channel = item.CHANNELS;
       options.push({ label: channel, value: channel });
+      channelOptions.push(channel);
       if (defaultChannel?.toLowerCase() === channel.toLowerCase()) {
         matchedChannel = channel;
       }
     });
 
     setSelectOptions(options, 'channel');
-    globals.functions.setProperty(dropDownSelectField, { enum: options, value: matchedChannel });
+    globals.functions.setProperty(dropDownSelectField, { enum: channelOptions, value: matchedChannel });
 
     const changeDataAttrObj = { attrChange: true, value: false };
     ['lc1Code', 'lgCode', 'smCode', 'lc2Code', 'dsaCode', 'branchCode'].forEach((code) => {
@@ -93,7 +94,7 @@ const bindEmployeeAssistanceField = async (globals) => {
  * @param {Object} globals - The global context object containing various information.
  */
 const bindCustomerDetails = (globals) => {
-  if (!CUSTOMER_DATA_BINDING_CHECK) return;
+  // if (!CUSTOMER_DATA_BINDING_CHECK) return;
   CURRENT_FORM_CONTEXT.customerIdentityChange = false;
   CURRENT_FORM_CONTEXT.editFlags = {
     nameOnCard: true,
