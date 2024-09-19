@@ -63,18 +63,20 @@ const bindEmployeeAssistanceField = async (globals) => {
     if (!response) return;
 
     const dropDownSelectField = employeeAssistancePanel.channel;
-    const options = [{ label: 'Website Download', value: 'Website Download' }];
+    const channelOptions = ['Website Download'];
+    const options = channelOptions.map((channel) => ({ label: channel, value: channel }));
     let matchedChannel = options[0].value;
-    const channelOptions = [];
     response.forEach((item) => {
       const channel = item.CHANNELS;
-      options.push({ label: channel, value: channel });
-      channelOptions.push(channel);
-      if (defaultChannel?.toLowerCase() === channel.toLowerCase()) {
+      const normalizedChannel = channel.toLowerCase();
+      if (!channelOptions.some((opt) => opt.toLowerCase() === normalizedChannel)) {
+        options.push({ label: channel, value: channel });
+        channelOptions.push(channel);
+      }
+      if (defaultChannel?.toLowerCase() === normalizedChannel) {
         matchedChannel = channel;
       }
     });
-
     setSelectOptions(options, 'channel');
     globals.functions.setProperty(dropDownSelectField, { enum: channelOptions, value: matchedChannel });
 
@@ -94,7 +96,7 @@ const bindEmployeeAssistanceField = async (globals) => {
  * @param {Object} globals - The global context object containing various information.
  */
 const bindCustomerDetails = (globals) => {
-  // if (!CUSTOMER_DATA_BINDING_CHECK) return;
+  if (!CUSTOMER_DATA_BINDING_CHECK) return;
   CURRENT_FORM_CONTEXT.customerIdentityChange = false;
   CURRENT_FORM_CONTEXT.editFlags = {
     nameOnCard: true,
