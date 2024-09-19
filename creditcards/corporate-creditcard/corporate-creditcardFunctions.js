@@ -30,7 +30,9 @@ import * as CONSTANT from '../../common/constants.js';
 import * as CC_CONSTANT from './constant.js';
 import { executeInterfacePostRedirect } from './executeinterfaceutils.js';
 
+
 setTimeout(() => import('./cc.js'), 1200);
+
 const {
   ENDPOINTS,
   CURRENT_FORM_CONTEXT: currentFormContext,
@@ -833,6 +835,7 @@ function checkMode(globals) {
         globals,
       );
     }
+
   } if ((idcomVisit === 'DebitCard') || (idcomVisit === 'CreditCard') || (idcomVisit === 'NetBanking')) { // debit card or credit card or net banking flow
     const resultPanel = formUtil(globals, globals.form.resultPanel);
     resultPanel.visible(false);
@@ -973,6 +976,7 @@ function getWrappedFormContext() {
   };
   return formContext;
 }
+
 
 /**
 * @name firstLastNameValidation - validate first name and last name in personal details

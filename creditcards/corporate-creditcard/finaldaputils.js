@@ -4,6 +4,7 @@ import { invokeJourneyDropOffUpdate } from './journey-utils.js';
 import { restAPICall } from '../../common/makeRestAPI.js';
 import { sendPageloadEvent } from './analytics.js';
 
+
 const getCurrentDateAndTime = (dobFormatNo) => {
   /*
       dobFormatNo: 1 (DD-MM-YYYY HH:MM:SS)
@@ -42,7 +43,9 @@ const fetchFiller4 = (mobileMatch, kycStatus, journeyType, kycFillers) => {
     switch (kycStatus) {
       case 'aadhaar':
         // eslint-disable-next-line no-nested-ternary
+
         filler4Value = `${(mobileMatch === 'y') ? 'NVKYC' : 'VKYC'}${getCurrentDateAndTime(3)}`;
+
         break;
       case 'bioKYC':
         filler4Value = 'bioKYC';

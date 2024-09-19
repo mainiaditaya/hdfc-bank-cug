@@ -294,6 +294,7 @@ const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyI
   }
 };
 
+
 /**
  * @name finalDap - constant-variables store
  */
@@ -374,6 +375,7 @@ const pageRedirected = (aadhar, idCom) => {
     }, 2000);
   }
 };
+
 pageRedirected(aadharRedirect, idComRedirect);
 
 /**
@@ -402,3 +404,4 @@ const onPageLoadAnalytics = async () => {
 };
 
 onPageLoadAnalytics();
+
