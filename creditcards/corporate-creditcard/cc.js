@@ -294,7 +294,6 @@ const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyI
   }
 };
 
-
 /**
  * @name finalDap - constant-variables store
  */
@@ -404,4 +403,3 @@ const onPageLoadAnalytics = async () => {
 };
 
 onPageLoadAnalytics();
-

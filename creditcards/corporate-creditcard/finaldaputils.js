@@ -4,7 +4,6 @@ import { invokeJourneyDropOffUpdate } from './journey-utils.js';
 import { restAPICall } from '../../common/makeRestAPI.js';
 import { sendPageloadEvent } from './analytics.js';
 
-
 const getCurrentDateAndTime = (dobFormatNo) => {
   /*
       dobFormatNo: 1 (DD-MM-YYYY HH:MM:SS)

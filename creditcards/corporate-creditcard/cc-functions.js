@@ -2,7 +2,6 @@
 import {
   formRuntime,
   journeyResponseHandler,
-  sendAnalytics,
   resendOTP,
   customSetFocus,
   validateLogin,
@@ -61,10 +60,7 @@ import {
   onWizardInit,
 } from '../../common/functions.js';
 
-
-import {
-  sendAnalytics,
-} from './analytics.js';
+import { sendAnalytics } from './analytics.js';
 
 export {
   finalDap,

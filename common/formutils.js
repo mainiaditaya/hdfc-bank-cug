@@ -295,7 +295,6 @@ const santizedFormDataWithContext = (globals, currentFormContext) => {
     }
     return formData;
   } catch (ex) {
-    console.error(ex);
     return null;
   }
 };
