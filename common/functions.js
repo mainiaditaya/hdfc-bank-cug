@@ -404,7 +404,7 @@ async function aadharInit(mobileNumber, pan, dob, globals) {
   };
 
   const path = urlPath(endpoints.aadharInit);
-  const response = fetchJsonResponse(path, jsonObj, 'POST');
+  const response = fetchJsonResponse(path, btoa(unescape(encodeURIComponent(JSON.stringify(jsonObj)))), 'POST');
   response
     .then((res) => {
       console.log(res);
