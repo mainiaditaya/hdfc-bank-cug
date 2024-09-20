@@ -2424,8 +2424,6 @@
     }
   };
 
-  // import { getContextStorage } from '../../../conversational-service/src/request-utils'
-
   const {
     CURRENT_FORM_CONTEXT: currentFormContext$1,
     JOURNEY_NAME: journeyName,
@@ -2651,31 +2649,38 @@
   const DELAY = 120;
   const DELTA_DELAY = 100;
 
+  /**
+   * sets the data for the instance of repetable panel
+   *
+   * @param {object} globals - gobal form object
+   * @param {Object} panel - The panel for unbilled transactions.
+   * @param {Object} txn - current tramsaction object
+   * @param {number} i - current instance of panel row
+   */
+  const getTranactionPanelData = (transactions) => {
+    const txnsData = transactions?.map((txn) => {
+      const paiseAppendAmt = txnInrFormat((txn?.amount || txn?.aem_TxnAmt));
+      const TXN_AMT = `${MISC.rupeesUnicode} ${paiseAppendAmt}`;
+      return {
+        aem_Txn_checkBox: txn?.checkbox || txn?.aem_Txn_checkBox,
+        aem_TxnAmt: TXN_AMT,
+        aem_TxnDate: txn?.date || txn?.aem_TxnDate,
+        aem_TxnID: txn?.id || txn?.aem_TxnID,
+        aem_TxnName: txn?.name || txn?.aem_TxnName,
+        authCode: txn?.AUTH_CODE || txn?.authCode,
+        logicMod: txn?.LOGICMOD || txn?.logicMod,
+        transactionTypeHidden: txn?.type,
+      }
+    });
+    return txnsData
+  };
+
   // Special handling for whatsapp flow, can be removed once proper fix is done
   function addTransactions(allTxn, globals) {
     const transactions = allTxn || [];
     const billedTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
-    transactions.forEach((txn, i) => {
-      const isFirst = i === 0;
-      const panel = billedTxnPanel;
-      if (!isFirst) {
-        globals.functions.dispatchEvent(panel, 'addItem');
-      }
-    });
-    // eslint-disable-next-line no-undef
-    const als = isNodeEnv ? getContextStorage('promises') : [];
-    // eslint-disable-next-line no-unused-vars
-    const promise = new Promise((resolve, reject) => {
-      setTimeout(() => {
-        transactions.forEach((txn, i) => {
-          setData(globals, billedTxnPanel, txn, i);
-        });
-        resolve();
-      }, 80);
-    });
-    if (isNodeEnv) {
-      als.push(promise);
-    }
+    const data = getTranactionPanelData(transactions);
+    globals.functions.importData(data, billedTxnPanel.$qualifiedName);
   }
 
   /**
@@ -2777,7 +2782,6 @@
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment, { visible: false });
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_TxnsList, { visible: false });
       }
-      //
       return response;
     } catch (error) {
       response.nextscreen = 'failure';
