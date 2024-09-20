@@ -130,7 +130,7 @@ const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, jo
         journeyStateInfo: [
           {
             state,
-            stateInfo: JSON.stringify(sanitizedFormData),
+            stateInfo: btoa(unescape(encodeURIComponent(JSON.stringifysanitizedFormData))),
             timeinfo: new Date().toISOString(),
           },
         ],
