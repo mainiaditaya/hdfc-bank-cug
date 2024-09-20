@@ -29,6 +29,7 @@ const corpCreditCard = {
       },
       casa_cc: 'PADC',
       only_cc: 'OYCC',
+      casa_asset_cc: 'PADC',
     },
   },
   baseUrl: 'https://hdfc-dev-04.adobecqms.net',
