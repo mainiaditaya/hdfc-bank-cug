@@ -14,6 +14,11 @@ import {
 } from '../../common/makeRestAPI.js';
 import * as CONSTANT from '../../common/constants.js';
 
+let resendOtpCount = 0;
+const MAX_OTP_RESEND_COUNT = 3;
+const OTP_TIMER = 30;
+let sec = OTP_TIMER;
+let dispSec = OTP_TIMER;
 const {
   ENDPOINTS,
   CURRENT_FORM_CONTEXT: currentFormContext,
@@ -138,8 +143,35 @@ const getOtpNRE = (mobileNumber, pan, dob, globals) => {
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 };
 
+/**
+ * Starts the Nre_Nro OTPtimer for resending OTP.
+ * @param {Object} globals - The global object containing necessary data for DAP request.
+*/
+function otpTimer(globals) {
+  if (resendOtpCount < MAX_OTP_RESEND_COUNT) {
+    globals.functions.setProperty(globals.form.otpPanel.otpFragment.otpPanel.secondsPanel, { visible: true });
+    globals.functions.setProperty(globals.form.otpPanel.otpFragment.otpPanel.otpResend, { visible: false });
+  } else {
+    globals.functions.setProperty(globals.form.otpPanel.otpFragment.otpPanel.secondsPanel, { visible: false });
+  }
+  const timer = setInterval(() => {
+    globals.functions.setProperty(globals.form.otpPanel.otpFragment.otpPanel.secondsPanel.seconds, { value: dispSec });
+    sec -= 1;
+    dispSec = sec;
+    if (sec < 10) {
+      dispSec = `0${dispSec}`;
+    }
+    if (sec < 0) {
+      clearInterval(timer);
+      globals.functions.setProperty(globals.form.otpPanel.otpFragment.otpPanel.secondsPanel, { visible: false });
+      if (resendOtpCount < MAX_OTP_RESEND_COUNT) globals.functions.setProperty(globals.form.otpPanel.otpFragment.otpPanel.otpResend, { visible: true });
+    }
+  }, 1000);
+}
+
 export {
   createJourneyId,
   validateLogin,
   getOtpNRE,
+  otpTimer,
 };
