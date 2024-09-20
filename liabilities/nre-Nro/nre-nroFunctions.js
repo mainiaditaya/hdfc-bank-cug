@@ -58,7 +58,7 @@ const validateLogin = (globals) => {
         const minAge = 18;
         const maxAge = 120;
         const dobErrorText = `Age should be between ${minAge} to ${maxAge}`;
-        const ageValid = ageValidator(minAge, maxAge, $value);
+        const ageValid = ageValidator(minAge, maxAge, dobValue);
         if (ageValid && consentFirst) {
           globals.functions.setProperty(globals.form.parentLandingPagePanel.getOTPbutton, { enabled: true });
           globals.functions.markFieldAsInvalid('$form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.dateOfBirth', '', { useQualifiedName: true });
