@@ -14,7 +14,7 @@ import {
 } from '../../common/makeRestAPI.js';
 import * as CONSTANT from '../../common/constants.js';
 
-let resendOtpCount = 0;
+const resendOtpCount = 0;
 const MAX_OTP_RESEND_COUNT = 3;
 const OTP_TIMER = 30;
 let sec = OTP_TIMER;
@@ -56,7 +56,7 @@ const validateLogin = (globals) => {
 
   const panInput = document.querySelector(`[name=${'pan'} ]`);
   const panWrapper = panInput.parentElement;
-  
+
   switch (radioSelect) {
     case 'DOB':
       if (dobValue && String(new Date(dobValue).getFullYear()).length === 4) {
@@ -89,7 +89,6 @@ const validateLogin = (globals) => {
         panWrapper.setAttribute('data-empty', false);
         const validPan = regexPan.test(panValue);
         if (validPan && consentFirst) {
-          debugger;
           globals.functions.markFieldAsInvalid('$form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.pan', '', { useQualifiedName: true });
           globals.functions.setProperty(globals.form.parentLandingPagePanel.getOTPbutton, { enabled: true });
         }
@@ -111,8 +110,7 @@ const validateLogin = (globals) => {
     default:
       globals.functions.setProperty(globals.form.parentLandingPagePanel.getOTPbutton, { enabled: false });
   }
-  if (mobileNo && 
-    ((isdCode === '91' && !isdNumberPattern.test(mobileNo))
+  if (mobileNo && ((isdCode === '91' && !isdNumberPattern.test(mobileNo))
     || (isdCode !== '91' && !nonISDNumberPattern.test(mobileNo)))) {
     globals.functions.setProperty(globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.mobilePanel.registerMobileNumberError, { visible: true });
     globals.functions.setProperty(globals.form.parentLandingPagePanel.getOTPbutton, { enabled: false });
