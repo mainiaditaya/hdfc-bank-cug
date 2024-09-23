@@ -96,6 +96,7 @@ const ANALYTICS_CLICK_OBJECT = {
     reference: '',
     isVideoKYC: '',
     documentProof: '',
+    nomineeRelation: '',
   },
   card: {
     selectedCard: '',
@@ -132,10 +133,10 @@ const PAGE_NAME = {
   ccc: {
     'otp click': 'Identify Yourself',
     'confirm otp': 'Verify with OTP',
-    'check offers': 'Confirm your details',
+    'check offers': 'Customer Details',
     'get this card': 'Choose Card',
     'kyc continue': 'Select KYC',
-    'i agree': 'Select KYC',
+    'i agree': 'Select KYC - Aadhaar Pop-Up',
     'document upload continue': 'Document Upload',
     'address continue': 'Address Details',
     'aadhaar otp': 'Select KYC - Aadhaar OTP verification',
@@ -143,7 +144,6 @@ const PAGE_NAME = {
     'submit review': 'Confirmation',
     'thank you screen': 'Confirmation',
   },
-
 };
 export {
   data,

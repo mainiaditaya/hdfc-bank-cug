@@ -767,10 +767,11 @@ const aadharConsent123 = async (globals) => {
         formRuntime.aadharConfig = config;
       }
       await openModal(formRuntime.aadharConfig);
-      aadharLangChange(formRuntime.aadharConfig?.content, DOM_ELEMENT.selectKyc.defaultLanguage);
-      config?.content?.addEventListener('modalTriggerValue', (event) => {
+      aadharLangChange(formRuntime.aadharConfig?.content, DOM_ELEMENT.selectKyc.defaultLanguage, currentFormContext);
+      config?.content?.addEventListener('modalTriggerValue', async (event) => {
         const receivedData = event.detail;
         if (receivedData?.aadharConsentAgree) {
+          await Promise.resolve(sendAnalytics('i agree', { errorCode: '0000', errorMessage: 'Success' }, 'JOURNEYSTATE', globals));
           globals.functions.setProperty(globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel.ckycDetailsContinueETBPanel.triggerAadharAPI, { value: 1 });
         }
       });
