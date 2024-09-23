@@ -261,7 +261,7 @@ const cardDisplay = (globals, response) => {
   imageEl?.childNodes[1].setAttribute('srcset', imagePath);
 };
 
-const DELAY = 150;
+const DELAY = 100;
 const DELTA_DELAY = 120;
 
 // Special handling for whatsapp flow, can be removed once proper fix is done
