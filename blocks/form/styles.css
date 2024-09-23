@@ -2,7 +2,7 @@
 /* stylelint-disable no-descending-specificity */
 /* stylelint-disable selector-class-pattern */
 @import url('../../creditcards/corporate-creditcard/creditcards.css');
-
+@import url('../../liabilities/nre-Nro/nre-nro.css');
 :root {
   --loader-image-url: url('loader.gif');
 }
@@ -34,7 +34,7 @@ main .form {
     height: var(--form-input-height);
     padding: var(--form-input-padding);
     border: 1px solid var(--color-input-border-default);
-    border-radius: var(--form-input-border-radius) !important;
+    border-radius: var(--form-input-border-radius);
     font-weight: 400;
     font-size: 14px;
   }
