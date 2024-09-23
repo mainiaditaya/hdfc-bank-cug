@@ -119,7 +119,7 @@ function sampleRUM(checkpoint, data = {}) {
       if (sampleRUM.cases[checkpoint]) {
         sampleRUM.cases[checkpoint]();
       }
-    }
+    } 
     if (sampleRUM.always[checkpoint]) {
       sampleRUM.always[checkpoint](data);
     }

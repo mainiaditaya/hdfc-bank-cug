@@ -9,23 +9,46 @@ import {
   waitForLCP,
   loadBlocks,
   loadCSS,
-} from './aem.js';
+} from "./aem.js";
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
 
-const FORM_MAIN_CLASS = ['fdlien'];
+//const FORM_MAIN_CLASS = ['fdlien'];
+
+const FORM_MAIN_CLASS = [
+  {
+    //fdlien
+    form: "fdlien",
+    class: "fdlien",
+  },
+
+  {
+    // SEMI
+    form: "semi",
+    class: "semi-form",
+  },
+  {
+    // NRE-NRO
+    form: "nre-nro",
+    class: "nre-nro",
+  },
+];
 
 /**
  * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
  */
 function buildHeroBlock(main) {
-  const h1 = main.querySelector('h1');
-  const picture = main.querySelector('picture');
+  const h1 = main.querySelector("h1");
+  const picture = main.querySelector("picture");
   // eslint-disable-next-line no-bitwise
-  if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
-    const section = document.createElement('div');
-    section.append(buildBlock('hero', { elems: [picture, h1] }));
+  if (
+    h1 &&
+    picture &&
+    h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING
+  ) {
+    const section = document.createElement("div");
+    section.append(buildBlock("hero", { elems: [picture, h1] }));
     main.prepend(section);
   }
 }
@@ -36,7 +59,8 @@ function buildHeroBlock(main) {
 async function loadFonts() {
   await loadCSS(`${window.hlx.codeBasePath}/styles/fonts.css`);
   try {
-    if (!window.location.hostname.includes('localhost')) sessionStorage.setItem('fonts-loaded', 'true');
+    if (!window.location.hostname.includes("localhost"))
+      sessionStorage.setItem("fonts-loaded", "true");
   } catch (e) {
     // do nothing
   }
@@ -51,7 +75,7 @@ function buildAutoBlocks(main) {
     buildHeroBlock(main);
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Auto Blocking failed', error);
+    console.error("Auto Blocking failed", error);
   }
 }
 
@@ -74,24 +98,24 @@ export function decorateMain(main) {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  document.documentElement.lang = 'en';
+  document.documentElement.lang = "en";
   decorateTemplateAndTheme();
-  const main = doc.querySelector('main');
+  const main = doc.querySelector("main");
   if (main) {
     decorateMain(main);
-    document.body.classList.add('appear');
+    document.body.classList.add("appear");
     await waitForLCP(LCP_BLOCKS);
   }
 
   try {
     /* if desktop (proxy for fast connection) or fonts already loaded, load fonts.css */
-    if (window.innerWidth >= 900 || sessionStorage.getItem('fonts-loaded')) {
+    if (window.innerWidth >= 900 || sessionStorage.getItem("fonts-loaded")) {
       loadFonts();
     }
     const currentUrl = window.location.href;
     FORM_MAIN_CLASS.some((item) => {
-      if (currentUrl.includes(item)) {
-        document.body.classList.add(item);
+      if (currentUrl.includes(item.form)) {
+        document.body.classList.add(item.class);
         return true;
       }
       return false;
@@ -106,7 +130,7 @@ async function loadEager(doc) {
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
-  const main = doc.querySelector('main');
+  const main = doc.querySelector("main");
   await loadBlocks(main);
 
   const { hash } = window.location;
@@ -116,9 +140,9 @@ async function loadLazy(doc) {
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
 
-  sampleRUM('lazy');
-  sampleRUM.observe(main.querySelectorAll('div[data-block-name]'));
-  sampleRUM.observe(main.querySelectorAll('picture > img'));
+  sampleRUM("lazy");
+  sampleRUM.observe(main.querySelectorAll("div[data-block-name]"));
+  sampleRUM.observe(main.querySelectorAll("picture > img"));
 }
 
 /**
@@ -127,8 +151,11 @@ async function loadLazy(doc) {
  */
 function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
-  window.setTimeout(() => import('./delayed.js'), 3000);
-  window.setTimeout(() => import('../creditcards/corporate-creditcard/cc.js'), 1000);
+  window.setTimeout(() => import("./delayed.js"), 3000);
+  window.setTimeout(
+    () => import("../creditcards/corporate-creditcard/cc.js"),
+    1000
+  );
   // load anything that can be postponed to the latest here
 }
 
