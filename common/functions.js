@@ -17,6 +17,8 @@ import {
   fetchJsonResponse, hideLoaderGif,
 } from './makeRestAPI.js';
 
+import { initRestAPIDataSecurityServiceES6 } from './apiDataSecurity.js';
+
 import * as CONSTANT from './constants.js';
 import * as CC_CONSTANT from '../creditcards/corporate-creditcard/constant.js';
 
@@ -320,4 +322,5 @@ export {
   getFullName,
   onWizardInit,
   days,
+  initRestAPIDataSecurityServiceES6,
 };

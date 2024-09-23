@@ -42,6 +42,8 @@ const ID_COM = {
   },
 };
 
+const ENV = 'stage';
+
 export {
   BASEURL,
   CHANNEL,
@@ -50,4 +52,5 @@ export {
   CURRENT_FORM_CONTEXT,
   FORM_RUNTIME,
   ID_COM,
+  ENV,
 };

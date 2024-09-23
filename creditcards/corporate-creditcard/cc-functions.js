@@ -58,6 +58,7 @@ import {
   days,
   getFullName,
   onWizardInit,
+  initRestAPIDataSecurityServiceES6,
 } from '../../common/functions.js';
 
 import { sendAnalytics } from './analytics.js';
@@ -111,5 +112,5 @@ export {
   onWizardInit,
   crmResponseHandler,
   firstLastNameValidation,
-
+  initRestAPIDataSecurityServiceES6,
 };
