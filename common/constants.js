@@ -38,6 +38,7 @@ const ID_COM = {
     },
     casa_cc: 'PADC',
     only_cc: 'OYCC',
+    casa_asset_cc: 'PADC',
   },
 };
 

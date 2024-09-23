@@ -119,7 +119,7 @@ async function loadLazy(doc) {
 function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
-  window.setTimeout(() => loadScript('https://assets.adobedtm.com/80673311e435/029b16140ccd/launch-48ec56350700-development.min.js'), 3000);
+  loadScript('https://assets.adobedtm.com/80673311e435/029b16140ccd/launch-39d52f236cd6.min.js', { async: 'true' });
   // load anything that can be postponed to the latest here
 }
 
