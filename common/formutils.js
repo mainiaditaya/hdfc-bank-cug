@@ -139,6 +139,24 @@ const getTimeStamp = (currentTime) => {
 };
 
 /**
+ * Gets a formatted timestamp from the provided current time without seconds.
+ *
+ * @param {Date} currentTime The current time to generate the timestamp from.
+ * @returns {string} The formatted timestamp in 'YYYYMMDDHHmm' format.
+ */
+const getTimeStampNoSeconds = (currentTime) => {
+  // Function to pad single digit numbers with leading zero
+  const pad = (number) => ((number < 10) ? `0${number}` : number);
+  // Format the datetime as desired
+  const formattedDatetime = currentTime.getFullYear()
+    + pad(currentTime.getMonth() + 1)
+    + pad(currentTime.getDate())
+    + pad(currentTime.getHours())
+    + pad(currentTime.getMinutes());
+  return formattedDatetime;
+};
+
+/**
  * Converts a date string from 'YYYYMMDD' format to a localized date string.
  * @param {string} date - The date string in 'YYYYMMDD' format.
  * @returns {string} The formatted date string in 'MMM DD, YYYY' format.
@@ -413,6 +431,7 @@ export {
   clearString,
   formUtil,
   getTimeStamp,
+  getTimeStampNoSeconds,
   convertDateToMmmDdYyyy,
   setDataAttributeOnClosestAncestor,
   convertDateToDdMmYyyy,

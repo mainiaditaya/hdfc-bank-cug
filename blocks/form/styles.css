@@ -33,9 +33,9 @@ main .form {
   input[type='password'] {
     font-size: 31px;
   }
-  
-  a:any-link, a:hover, .link { color: var(--color-action-text-secondary-default); }
 
+  a:any-link, a:hover, .link { color: var(--color-action-text-secondary-default); }
+  
   .error-field {
     input[type='text'] {
       border: 1px solid var(--color-input-border-error-default) !important;
@@ -572,7 +572,6 @@ main .form .field-successresultpanel {
       margin-top: -20px;
       .star { font-size: 36px; }
       .emoji { display: none; }
-
     }
 
     .field-submitfeedback button {
@@ -591,6 +590,10 @@ main .form.block .field-otppanel {
   max-width: 344px;
   margin: 0 auto;
   text-align: center;
+
+  > legend { width: 265px;
+    p, b { width: 265px; }
+  }
 
   .field-otpnumber {
     margin-bottom: -10px;
@@ -699,7 +702,12 @@ main .form .field-resultpanel {
     padding: 28px;
   }
 
-  main .form .field-otppanel {
+  main .form .field-otppanel { display: grid;
+
+    > legend { width: 265px;
+      p, b { width: 265px; }
+    }
+
     .field-otpnumber {
       input {
         padding: 0 0 0 2vw;
@@ -734,8 +742,11 @@ main .form .field-resultpanel {
     padding: 20px;
   }
 
-  main .form.block .field-otppanel {
-    display: grid;
+  main .form.block .field-otppanel { display: grid;
+    
+    > legend { width: 265px;
+      p, b { width: 265px; }
+    }
 
     .field-otpnumber {
       input {
@@ -773,7 +784,12 @@ main .form .field-resultpanel {
     margin: 0 !important;
   }
 
-  main .form.block .field-otppanel {
+  main .form.block .field-otppanel { display: grid;
+
+    > legend { width: 265px;
+      p, b { width: 265px; }
+    }
+
     .field-otpsubpanel {
       display: flex;
       flex-direction: row;

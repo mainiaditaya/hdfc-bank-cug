@@ -17,7 +17,7 @@ import {
   createLabelInElement,
   decorateStepper,
   aadharLangChange,
-  getTimeStamp,
+  getTimeStampNoSeconds,
 } from '../../common/formutils.js';
 import {
   restAPICall,
@@ -937,7 +937,7 @@ function getOTP(mobileNumber, pan, dob, globals) {
  * @return {PROMISE}
  */
 function otpValidation(mobileNumber, pan, dob, otpNumber) {
-  const referenceNumber = `AD${getTimeStamp(new Date())}` ?? '';
+  const referenceNumber = `AD${getTimeStampNoSeconds(new Date())}` ?? '';
   currentFormContext.referenceNumber = referenceNumber;
   const jsonObj = {
     requestString: {
