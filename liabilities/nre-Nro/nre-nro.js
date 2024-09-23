@@ -2,6 +2,7 @@
 import {
   validateLogin,
   getOtpNRE,
+  otpTimer,
 } from './nre-nroFunctions.js';
 
 import {
@@ -19,4 +20,5 @@ export {
   invokeJourneyDropOffUpdate,
   getOTP,
   getOtpNRE,
+  otpTimer,
 };
