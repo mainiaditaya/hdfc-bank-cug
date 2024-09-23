@@ -261,8 +261,8 @@ const cardDisplay = (globals, response) => {
   imageEl?.childNodes[1].setAttribute('srcset', imagePath);
 };
 
-const DELAY = 120;
-const DELTA_DELAY = 100;
+const DELAY = 150;
+const DELTA_DELAY = 120;
 
 // Special handling for whatsapp flow, can be removed once proper fix is done
 function addTransactions(allTxn, globals) {
@@ -300,10 +300,10 @@ function addTransactions(allTxn, globals) {
  * @param {Object} [unBilledTxnPanel] - The panel for unbilled transactions.
  * @param {Object} globals - Global variables and functions.
  */
-const setTxnPanelData = (allTxn, btxn, billedTxnPanel, unBilledTxnPanel, globals) => {
+const setTxnPanelData = async (allTxn, btxn, uBtxn, billedTxnPanel, unBilledTxnPanel, globals) => {
   if (!allTxn?.length) return;
   if (!isNodeEnv) {
-    allTxn.forEach((txn, i) => {
+    allTxn.forEach((_txn, i) => {
       const isBilled = i < btxn;
       const isFirst = i === 0;
       const isLast = i === allTxn.length - 1;
@@ -315,10 +315,19 @@ const setTxnPanelData = (allTxn, btxn, billedTxnPanel, unBilledTxnPanel, globals
       const delay = DELAY + (DELTA_DELAY * i);
       const panelIndex = isBilled ? i : i - btxn;
       setTimeout(() => {
-        if (isFirst || !isLast) {
+        if (isBilled && (btxn - 1 >= billedTxnPanel.length)) {
+          /* condition to skip the default txn list data */
           globals.functions.dispatchEvent(panel, 'addItem');
         }
-        setData(globals, panel, txn, panelIndex);
+        if (!isBilled && (uBtxn - 1) >= unBilledTxnPanel.length) {
+          /* condition to skip the default txn list data */
+          globals.functions.dispatchEvent(panel, 'addItem');
+        }
+        const txnData = {
+          ..._txn,
+          type: isBilled ? 'BILLED' : 'UNBILLED',
+        };
+        setData(globals, panel, txnData, panelIndex);
       }, delay);
     });
   } else {
@@ -368,7 +377,7 @@ function checkELigibilityHandler(resPayload1, globals) {
     const billedTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
     const unBilledTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_TxnsList;
     const allTxn = ccBilledData.concat(ccUnBilledData);
-    setTxnPanelData(allTxn, ccBilledData.length, billedTxnPanel, unBilledTxnPanel, globals);
+    setTxnPanelData(allTxn, ccBilledData.length, ccUnBilledData.length, billedTxnPanel, unBilledTxnPanel, globals);
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_eligibleTxnLabel, { value: `Eligible Transactions (${allTxn?.length})` });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_TxnAvailable, { value: `Billed Transaction (${ccBilledData?.length})` });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_TxnAvailable, { value: `Unbilled Transaction (${ccUnBilledData?.length})` });
@@ -558,7 +567,13 @@ function sortData(txnType, orderBy, globals) {
     ...item,
     aem_TxnAmt: (currencyStrToNum(item?.aem_TxnAmt)),
   }));
-  mapSortedDat?.forEach((data, i) => setData(globals, pannel, data, i));
+  mapSortedDat?.forEach((_data, i) => {
+    const data = {
+      ..._data,
+      type: txnType,
+    };
+    setData(globals, pannel, data, i);
+  });
   setTimeout(() => {
     isUserSelection = !isUserSelection;
   }, 1000);
@@ -708,41 +723,70 @@ function selectTopTxn(globals) {
   const sortedArr = sortDataByAmountSymbol(allTxn);
   const txnAvailableToSelect = (allTxn?.length >= SELECT_TOP_TXN_LIMIT) ? SELECT_TOP_TXN_LIMIT : allTxn?.length;
   const sortedTxnList = sortedArr?.slice(0, txnAvailableToSelect);
-  let billedCounter = 0;
-  let unbilledCounter = 0;
+  const billedCounter = 0;
+  const unbilledCounter = 0;
   let unbilledCheckedItems = 0;
   let billedCheckedItems = 0;
-  let value = 'on';
-  let enabled = true;
+  const value = 'on';
+  const enabled = true;
+  const topSelectByAmt = sortedArr?.slice(0, txnAvailableToSelect);
   try {
-    sortedArr?.forEach((txn, i) => {
-      if (i > 9) {
-        value = undefined;
-        enabled = false;
-      }
-      if (txn.aem_txn_type === 'UNBILLED') {
-        globals.functions.setProperty(unBilledTxnPanel[unbilledCounter].aem_Txn_checkBox, { enabled });
-        globals.functions.setProperty(unBilledTxnPanel[unbilledCounter].aem_Txn_checkBox, { value });
-        if (i <= 9) unbilledCheckedItems += 1;
-        unbilledCounter += 1;
+    [unBilledTxnPanel, billedTxnPanel]?.forEach((pannel) => {
+      pannel?.forEach((txnList) => globals.functions.setProperty(txnList.aem_Txn_checkBox, { enabled: false }));
+    });
+    topSelectByAmt?.forEach((item) => {
+      let pannel;
+      if ((item.aem_txn_type === 'BILLED')) {
+        pannel = billedTxnPanel;
+        billedCheckedItems += 1;
       } else {
-        globals.functions.setProperty(billedTxnPanel[billedCounter].aem_Txn_checkBox, { enabled });
-        globals.functions.setProperty(billedTxnPanel[billedCounter].aem_Txn_checkBox, { value });
-        if (i <= 9) billedCheckedItems += 1;
-        billedCounter += 1;
+        pannel = unBilledTxnPanel;
+        unbilledCheckedItems += 1;
       }
-      const billedTxnSelected = globals.form.aem_semiWizard.aem_chooseTransactions?.billedTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_txnSelected;
-      const unbilledTxnSelected = globals.form.aem_semiWizard.aem_chooseTransactions?.unbilledTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_txnSelected;
-      globals.functions.setProperty(billedTxnSelected, { value: `${billedCheckedItems} Selected` });
-      globals.functions.setProperty(unbilledTxnSelected, { value: `${unbilledCheckedItems} Selected` });
-      currentFormContext.totalSelect = sortedTxnList.length;
-      const TOTAL_SELECT = `Total selected ${currentFormContext.totalSelect}/${sortedTxnList.length}`;
-      globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_TotalSelectedTxt, { value: TOTAL_SELECT });
+      const findAllAmtMatch = pannel.filter((el) => (el.aem_TxnAmt.$value === item.aem_TxnAmt) && ((el.aem_TxnDate.$value === item.aem_TxnDate) && (el.aem_TxnName.$value === item.aem_TxnName) && (el.logicMod.$value === item.logicMod)));
+      findAllAmtMatch?.forEach((matchedAmt) => globals.functions.setProperty(matchedAmt.aem_Txn_checkBox, { value: 'on', enabled: true }));
     });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.log(error, 'errr');
+    console.log(error, 'error in select top ten');
   }
+
+  const billedTxnSelected = globals.form.aem_semiWizard.aem_chooseTransactions?.billedTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_txnSelected;
+  const unbilledTxnSelected = globals.form.aem_semiWizard.aem_chooseTransactions?.unbilledTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_txnSelected;
+  globals.functions.setProperty(billedTxnSelected, { value: `${billedCheckedItems} Selected` });
+  globals.functions.setProperty(unbilledTxnSelected, { value: `${unbilledCheckedItems} Selected` });
+  currentFormContext.totalSelect = sortedTxnList.length;
+  const TOTAL_SELECT = `Total selected ${currentFormContext.totalSelect}/${sortedTxnList.length}`;
+  globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_TotalSelectedTxt, { value: TOTAL_SELECT });
+  // try {
+  //   sortedArr?.forEach((txn, i) => {
+  //     if (i > 9) {
+  //       value = undefined;
+  //       enabled = false;
+  //     }
+  //     if (txn.aem_txn_type === 'UNBILLED') {
+  //       globals.functions.setProperty(unBilledTxnPanel[unbilledCounter].aem_Txn_checkBox, { enabled });
+  //       globals.functions.setProperty(unBilledTxnPanel[unbilledCounter].aem_Txn_checkBox, { value });
+  //       if (i <= 9) unbilledCheckedItems += 1;
+  //       unbilledCounter += 1;
+  //     } else {
+  //       globals.functions.setProperty(billedTxnPanel[billedCounter].aem_Txn_checkBox, { enabled });
+  //       globals.functions.setProperty(billedTxnPanel[billedCounter].aem_Txn_checkBox, { value });
+  //       if (i <= 9) billedCheckedItems += 1;
+  //       billedCounter += 1;
+  //     }
+  //     const billedTxnSelected = globals.form.aem_semiWizard.aem_chooseTransactions?.billedTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_txnSelected;
+  //     const unbilledTxnSelected = globals.form.aem_semiWizard.aem_chooseTransactions?.unbilledTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_txnSelected;
+  //     globals.functions.setProperty(billedTxnSelected, { value: `${billedCheckedItems} Selected` });
+  //     globals.functions.setProperty(unbilledTxnSelected, { value: `${unbilledCheckedItems} Selected` });
+  //     currentFormContext.totalSelect = sortedTxnList.length;
+  //     const TOTAL_SELECT = `Total selected ${currentFormContext.totalSelect}/${sortedTxnList.length}`;
+  //     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_TotalSelectedTxt, { value: TOTAL_SELECT });
+  //   });
+  // } catch (error) {
+  //   // eslint-disable-next-line no-console
+  //   console.log(error, 'errr');
+  // }
   globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: true });
   setTimeout(() => {
     selectTopTenFlag = !selectTopTenFlag;
