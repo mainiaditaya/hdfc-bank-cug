@@ -1,6 +1,8 @@
 import { displayLoader, hideLoaderGif, setArnNumberInResult } from '../domutils/domutils.js';
 import { invokeJourneyDropOffByJourneyId } from './common-journeyutil.js';
+import { ANALYTICS } from './constant.js';
 import { invokeJourneyDropOffUpdate } from './fd-journey-util.js';
+import sendAnalytics from './analytics.js';
 
 const delayedUtilState = {
   visitType: '',
@@ -87,6 +89,12 @@ const finalDapFetchRes = async () => {
 };
 
 const pageRedirected = () => {
+  if (!delayedUtilState.aadharRedirect && !delayedUtilState.idComRedirect) {
+    const { pageLoad } = ANALYTICS.event;
+    setTimeout(() => {
+      sendAnalytics(pageLoad.type, pageLoad.name, pageLoad.pageName, {}, pageLoad.journeyState, {});
+    }, 3000);
+  }
   if (delayedUtilState.idComRedirect) {
     displayLoader();
     setTimeout(() => {

@@ -76,7 +76,7 @@ const sendAnalyticsClickEvent = (eventType, payload, journeyState, formData) => 
 * @param {object} globals
 */
 const sendAnalytics = (eventType, eventName, pageName, payload, journeyState, globals) => {
-  const formData = santizedFormDataWithContext(globals);
+  const formData = santizedFormDataWithContext(globals, CURRENT_FORM_CONTEXT);
   if (eventName.toLowerCase() === 'page load') {
     sendPageloadEvent(journeyState, formData, pageName);
   } else {
