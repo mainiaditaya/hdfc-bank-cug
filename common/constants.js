@@ -42,7 +42,7 @@ const ID_COM = {
   },
 };
 
-const ENV = 'stage';
+const ENV = 'prod';
 
 export {
   BASEURL,
