@@ -63,6 +63,8 @@ import {
   sendAnalytics,
 } from './analytics.js';
 
+setTimeout(() => import('./cc.js'), 1200);
+
 export {
   finalDap,
   executeInterfaceApiFinal,
