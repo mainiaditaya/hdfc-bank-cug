@@ -1,5 +1,5 @@
 import { BASEURL, CURRENT_FORM_CONTEXT, FORM_RUNTIME } from '../../common/constants.js';
-import { urlPath } from '../../common/formutils.js';
+import { applicableCards, extractJSONFromHTMLString, urlPath } from '../../common/formutils.js';
 import {
   // fetchJsonResponse,
   fetchRecursiveResponse,
@@ -9,15 +9,24 @@ import { SELECTED_CUSTOMER_ID } from './customeridutil.js';
 
 const IPA_RESPONSE = {};
 const createIpaRequest = (payload, globals) => {
+  const employmentTypeMap = {
+    1: 'others',
+    2: 'selfEmployed',
+  };
+  const applicableCreditLimit = globals.form.fdBasedCreditCardWizard.selectFD.fdSelectionInfo.selectFDDetailsPanel.creditLimit._data.$_value;
+  const selectedEmploymentType = globals.form.fdBasedCreditCardWizard.basicDetails.reviewDetailsView.employmentDetails.employmentType._data.$_value;
+  const htmlString = globals.form.ipaNullGrid._jsonModel.value;
+  const defaultProductObj = extractJSONFromHTMLString(htmlString);
+  const applicableCardsArr = applicableCards(employmentTypeMap, selectedEmploymentType, defaultProductObj, applicableCreditLimit);
   const ipaRequest = {
     requestString: {
       mobileNumber: globals.form.loginMainPanel.loginPanel.mobilePanel.registeredMobileNumber.$value,
       applRefNumber: payload.APS_APPL_REF_NUM,
       eRefNumber: CURRENT_FORM_CONTEXT.referenceNumber,
       customerID: SELECTED_CUSTOMER_ID?.selectedCustId?.customerID,
-      // customerID: '50187305',
       journeyID: CURRENT_FORM_CONTEXT.journeyID,
       journeyName: CURRENT_FORM_CONTEXT.journeyName,
+      productCode: applicableCardsArr.join(','),
     },
   };
   return ipaRequest;
@@ -37,7 +46,7 @@ const ipa = (payload, showLoader, hideLoader, globals) => {
   const apiEndPoint = urlPath(FD_ENDPOINTS.ipa);
   if (showLoader) FORM_RUNTIME.ipa();
   const fieldName = ['IPAResponse', 'productEligibility', 'productDetails'];
-  return fetchRecursiveResponse(apiEndPoint, ipaRequest, 'POST', Number(payload.ipaDuration), Number(payload.ipaTimer), fieldName, hideLoader);
+  return fetchRecursiveResponse('ipa', apiEndPoint, ipaRequest, 'POST', Number(payload.ipaDuration), Number(payload.ipaTimer), fieldName, hideLoader);
   // return fetchJsonResponse(apiEndPoint, ipaRequest, 'POST', hideLoader);
 };
 
@@ -123,9 +132,10 @@ const bindSingleCardDetails = (panel, globals, productDetail) => {
  * @returns {Promise<object>}
  */
 const ipaSuccessHandler = (response, globals) => {
-  // CURRENT_FORM_CONTEXT.customerIdentityChange = true;
   CURRENT_FORM_CONTEXT.eRefNumber = response?.APS_E_REF_NUM;
-  const productDetails = response?.productEligibility?.productDetails;
+  const productDetails = response?.productEligibility?.productDetails?.length
+    ? response.productEligibility.productDetails
+    : response?.productEligibility?.defaultProducts ?? [];
   const { selectCard, selectFD, basicDetails } = globals.form.fdBasedCreditCardWizard;
   const {
     eligibleCreditLimitAmount,
@@ -138,32 +148,36 @@ const ipaSuccessHandler = (response, globals) => {
   const { creditLimit } = selectFD.fdSelectionInfo.selectFDDetailsPanel;
   const productCount = productDetails.length;
   IPA_RESPONSE.productDetails = productDetails;
+
   globals.functions.setProperty(eligibleCreditLimitAmount, { value: creditLimit.$value });
-  if (productCount === 1) {
-    globals.functions.setProperty(selectCardHeaderPanel.selectSuitableCardText, { visible: false });
-    globals.functions.setProperty(selectCardFaciaPanelMultiple, { visible: false });
-    globals.functions.setProperty(selectCardFaciaPanelSingle, { visible: true });
+
+  const isSingleProduct = productCount === 1;
+  const isMultipleProducts = productCount > 1;
+
+  globals.functions.setProperty(selectCardHeaderPanel.selectSuitableCardText, { visible: !isSingleProduct });
+  globals.functions.setProperty(selectCardFaciaPanelMultiple, { visible: isMultipleProducts });
+  globals.functions.setProperty(selectCardFaciaPanelSingle, { visible: isSingleProduct });
+
+  if (isSingleProduct) {
     bindSingleCardDetails(selectCardFaciaPanelSingle, globals, productDetails[0]);
-  } else if (productCount > 1) {
-    globals.functions.setProperty(selectCardFaciaPanelSingle, { visible: false });
-    globals.functions.setProperty(selectCardFaciaPanelMultiple, { visible: true });
-    productDetails.forEach((productDetail, i) => {
-      if (i < productCount - 1) {
-        globals.functions.dispatchEvent(selectCardFaciaPanelMultiple, 'addItem');
-      }
-      setTimeout(() => {
-        updateData(globals, productDetail, selectCardFaciaPanelMultiple[i], i);
-      }, i * 40);
+  } else if (isMultipleProducts) {
+    const topThreeProducts = productDetails.slice(0, 3);
+    topThreeProducts.forEach((productDetail, i) => {
+      if (i < topThreeProducts.length - 1) globals.functions.dispatchEvent(selectCardFaciaPanelMultiple, 'addItem');
+      setTimeout(() => updateData(globals, productDetail, selectCardFaciaPanelMultiple[i], i), i * 40);
     });
     globals.functions.setProperty(selectCardFaciaPanelMultiple[0].cardSelection, { value: 0 });
   }
-  if (!CURRENT_FORM_CONTEXT.customerIdentityChange && basicDetails.reviewDetailsView.addressDetails.mailingAddressToggle._data.$_value === 'on') {
-    globals.functions.setProperty(selectIdentifier, { visible: false });
-    globals.functions.setProperty(continueToIDCOM, { visible: true });
-  } else {
-    globals.functions.setProperty(selectIdentifier, { visible: true });
-    globals.functions.setProperty(continueToIDCOM, { visible: false });
+
+  if (productCount === 0) {
+    globals.functions.setProperty(selectCardFaciaPanelSingle, { visible: false });
+    globals.functions.setProperty(selectCardFaciaPanelMultiple, { visible: false });
   }
+
+  const addressToggleOn = basicDetails.reviewDetailsView.addressDetails.mailingAddressToggle._data.$_value === 'on';
+  const customerChanged = CURRENT_FORM_CONTEXT.customerIdentityChange;
+  globals.functions.setProperty(selectIdentifier, { visible: customerChanged || !addressToggleOn });
+  globals.functions.setProperty(continueToIDCOM, { visible: !customerChanged && addressToggleOn });
 };
 
 export {

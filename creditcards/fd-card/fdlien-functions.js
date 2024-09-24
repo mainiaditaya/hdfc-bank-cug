@@ -11,6 +11,9 @@ import * as FD_CONSTANT from './constant.js';
 import * as CONSTANT from '../../common/constants.js';
 import { displayLoader, fetchJsonResponse } from '../../common/makeRestAPI.js';
 import { addGaps } from './fd-dom-functions.js';
+import { executeInterfacePostRedirect } from './executeinterfaceutil.js';
+import creditCardSummary from './creditcardsumaryutil.js';
+import { invokeJourneyDropOffUpdate } from './fd-journey-util.js';
 
 const { FORM_RUNTIME: formRuntime, CURRENT_FORM_CONTEXT } = CONSTANT;
 const { JOURNEY_NAME, FD_ENDPOINTS } = FD_CONSTANT;
@@ -236,7 +239,7 @@ const otpValidation = (mobileNumber, pan, dob, otpNumber, globals) => {
   };
   const path = urlPath(FD_ENDPOINTS.otpVal);
   formRuntime?.otpValLoader();
-  return fetchJsonResponse(path, jsonObj, 'POST', true);
+  return fetchJsonResponse(path, jsonObj, 'POST', false);
 };
 
 /**
@@ -279,6 +282,80 @@ const pincodeChangeHandler = (pincode, globals) => {
   pinCodeMasterCheck(globals, newCurentAddressCity, newCurentAddressState, newCurentAddressPin, pincode);
 };
 
+/**
+ * @name checkModeFd
+ * @param {object} globals
+ */
+const checkModeFd = (globals) => {
+  const formData = globals.functions.exportData();
+  const { authmode: idcomVisit, visitType: aadhaarVisit } = formData?.queryParams || {};
+  const { addressDeclarationPanel } = globals.form;
+
+  if (!idcomVisit && !aadhaarVisit) return;
+
+  const { bannerImagePanel, loginMainPanel } = globals.form;
+  globals.functions.setProperty(bannerImagePanel, { visible: false });
+  globals.functions.setProperty(loginMainPanel, { visible: false });
+  creditCardSummary(globals);
+
+  if (idcomVisit) {
+    executeInterfacePostRedirect('idCom', true, globals);
+    return;
+  }
+
+  const aadhaarSuccess = aadhaarVisit === 'EKYC_AUTH' && formData?.aadhaar_otp_val_data?.message?.toLowerCase() === 'aadhaar otp validate success';
+
+  if (aadhaarSuccess) {
+    try {
+      const {
+        Address1, Address2, Address3, City, State, Zipcode,
+      } = formData.aadhaar_otp_val_data.result || {};
+      const {
+        communicationAddress1, communicationAddress2, communicationAddress3,
+        communicationCity, communicationState, comCityZip,
+      } = formData?.currentFormContext?.executeInterfaceRequest?.requestString || {};
+
+      const aadharAddress = [Address1, Address2, Address3, City, State, Zipcode].filter(Boolean).join(', ');
+      const communicationAddress = [communicationAddress1, communicationAddress2, communicationAddress3, communicationCity, communicationState, comCityZip].filter(Boolean).join(', ');
+
+      const {
+        aadhaarAddressDeclaration, currentResidenceAddressBiometricOVD, currentAddressDeclarationAadhar,
+        TnCAadhaarNoMobMatchLabel, TnCAadhaarNoMobMatch, proceedFromAddressDeclarationIdcom, proceedFromAddressDeclaration,
+      } = addressDeclarationPanel;
+
+      globals.functions.setProperty(aadhaarAddressDeclaration, { value: aadharAddress, visible: true });
+      globals.functions.setProperty(currentAddressDeclarationAadhar.currentResidenceAddressAadhaar, { value: communicationAddress });
+      globals.functions.setProperty(currentResidenceAddressBiometricOVD.currentResAddressBiometricOVD, { value: communicationAddress });
+      globals.functions.setProperty(addressDeclarationPanel, { visible: true });
+
+      formData.currentFormContext.mobileMatch = formData?.aadhaar_otp_val_data?.result?.mobileValid?.toLowerCase() === 'y';
+      globals.functions.setProperty(proceedFromAddressDeclarationIdcom, { visible: !formData?.currentFormContext?.customerIdentityChange });
+      globals.functions.setProperty(proceedFromAddressDeclaration, { visible: formData?.currentFormContext?.customerIdentityChange });
+
+      if (formData?.aadhaar_otp_val_data?.result?.mobileValid?.toLowerCase() === 'n') {
+        globals.functions.setProperty(TnCAadhaarNoMobMatchLabel, { visible: true });
+        globals.functions.setProperty(TnCAadhaarNoMobMatch, { visible: true });
+      }
+
+      invokeJourneyDropOffUpdate(
+        'AADHAAR_REDIRECTION_SUCCESS',
+        formData.loginPanel.mobilePanel.registeredMobileNumber,
+        formData.runtime.leadProifileId,
+        formData.runtime.leadProifileId.journeyId,
+        globals,
+      );
+    } catch (ex) {
+      invokeJourneyDropOffUpdate(
+        'AADHAAR_REDIRECTION_FAILURE',
+        formData.loginPanel.mobilePanel.registeredMobileNumber,
+        formData.runtime.leadProifileId,
+        formData.runtime.leadProifileId.journeyId,
+        globals,
+      );
+    }
+  }
+};
+
 setTimeout(() => {
   if (document && FD_CONSTANT.MODE === 'dev') {
     document.querySelector('.field-getotpbutton button').removeAttribute('disabled');
@@ -296,4 +373,5 @@ export {
   reloadPage,
   pincodeChangeHandler,
   validFDPan,
+  checkModeFd,
 };

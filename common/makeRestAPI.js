@@ -255,6 +255,7 @@ const chainedFetchAsyncCall = async (apiUrl, method, payloadArray, payloadType) 
 };
 
 const fetchRecursiveResponse = async (
+  source,
   url,
   payload,
   method,
@@ -303,9 +304,21 @@ const fetchRecursiveResponse = async (
     }
 
     const fieldValue = getFieldValue(result, fieldName);
-    if (fieldValue && fieldValue !== '' && fieldValue !== 'null' && fieldValue !== 'undefined' && fieldValue?.length !== 0) {
-      if (loader) hideLoaderGif();
-      return result;
+    switch (source) {
+      case 'ipa':
+        if ((fieldValue && fieldValue !== '' && fieldValue !== 'null' && fieldValue !== 'undefined' && fieldValue?.length !== 0)) {
+          if (loader) hideLoaderGif();
+          return result;
+        }
+        break;
+      case 'customerId':
+        if (fieldValue === 'SUCCESS') {
+          if (loader) hideLoaderGif();
+          return result;
+        }
+
+        break;
+      default:
     }
 
     const elapsedTime = (Date.now() - startTime) / 1000;
@@ -320,7 +333,7 @@ const fetchRecursiveResponse = async (
       }, timer * 1000);
     });
 
-    return await fetchRecursiveResponse(url, payload, method, duration, timer, fieldName, loader, startTime);
+    return await fetchRecursiveResponse(source, url, payload, method, duration, timer, fieldName, loader, startTime);
   } catch (error) {
     if (loader) hideLoaderGif();
     console.error('Error fetching data:', error);

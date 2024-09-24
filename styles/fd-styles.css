@@ -909,10 +909,11 @@ main {
                     height: 72px;
 
                     label {
-                        margin: 30px 0 0 80px;
+                        margin: 10px 0 0 85px;
                         text-wrap: nowrap;
                         font-size: var(--body-fd-md-font-size);
                         font-weight: var(--font-weight-regular);
+                        color: var(--color-interface-text-secondary);
                     }
 
                     input {
@@ -925,6 +926,10 @@ main {
 
                         &:hover{
                             box-shadow: none;
+                        }
+
+                        &:disabled {
+                            background: var(--color-interface-background-primary);
                         }
                     }
                 }
@@ -980,6 +985,12 @@ main {
                 }
             }
 
+            .field-tqnameoncard {
+                label {
+                    margin-left: 10px;
+                }
+            }
+
             .text-wrapper {
                 padding-top: 20px;
 
@@ -998,6 +1009,10 @@ main {
 
                     &:hover {
                         box-shadow: none;
+                    }
+
+                    &:disabled {
+                        background: var(--color-interface-background-primary);
                     }
                 }
             }
@@ -1020,6 +1035,10 @@ main {
                     &:hover {
                         box-shadow: none;
                     }
+
+                    &:disabled {
+                        background: var(--color-interface-background-primary);
+                    }
                 }
             }
 
@@ -1033,13 +1052,39 @@ main {
                     margin-left: 10px;
                 }
 
-                .plain-text-wrapper {
-                    border: 1px solid var(--color-action-border-primary-disabled);
-                    border-radius: 8px;
-                    cursor: default;
+                .field-selectedfdsrepeatable {
+                    margin-left: 10px;
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 10px;
 
-                    &:nth-child(2) {
-                        margin-left: 10px;
+                    .repeat-wrapper {
+                        display: flex;
+                        flex-wrap: nowrap;
+                        gap: 10px;
+                    }
+
+                    fieldset.panel-wrapper {                        
+                        border: 1px solid var(--color-action-border-primary-disabled);
+                        border-radius: 8px;
+                        cursor: default;
+                        flex: 0 1 auto;
+                        width: auto;
+                        max-width: calc(33.33% - 20px);
+                        box-sizing: border-box;
+
+                        .field-selectedfdnum:not(p){                            
+                            font-size: var(--body-fd-lg-font-size);
+                            font-weight: var(--font-weight-medium);
+                            color: var(--color-interface-text-primary);
+                            text-align: center;
+                        }
+
+                        .field-selectedfdnum p{                            
+                            font-size: var(--body-fd-lg-font-size);
+                            font-weight: var(--font-weight-medium);
+                            color: var(--color-interface-text-primary);
+                        }
                     }
                 }
             }
@@ -1064,17 +1109,19 @@ main {
             border-radius: 24px;
             margin: 0 60px;
             width: 70%;
+            position: relative;
 
             legend {
-                padding: 50px 0 0;
+                padding: 10px 0 0 20px;
                 color: var(--color-interface-background-quaternary);
                 font-size: var(--body-fd-xx-lg-font-size);
                 font-weight: var(--font-weight-bold);
-                background: transparent;
+                position: absolute;
             }
 
             .field-ratingbuttons {
                 display: flex;
+                margin-top: 40px;
 
                 .button-wrapper {
                     margin-left: -20px;
@@ -1476,7 +1523,7 @@ main {
                       margin-top: 2px;
                       margin-left: 0;
                       padding: 0;
-                      width: 20px;
+                      width: 25px;
                       height: 50px !important;
   
                       &:hover {
@@ -1552,7 +1599,7 @@ main {
                     padding: 0;
                     text-align: center;
                     margin: 0;
-                    height: 51px !important;
+                    height: 49px !important;
                     border-radius: 0 12px 12px 0 !important;
                     border: none;
                     background: var(--color-interface-background-quinary);
@@ -1771,9 +1818,30 @@ main {
             .field-employmenttype {
                 margin-bottom: 10px;
             }
+
+            .field-annualincome {
+                .field-description {
+                    margin-top: 20px;
+                    width: max-content;
+
+                    p {
+                        margin: 0;
+                        padding: 4px 8px;
+                        background-color: var(--color-interface-background-quinary);
+                        border-radius: 12px;
+                        font-size: var(--body-x-sm-font-size);
+                        font-weight: var(--font-weight-regular);
+                        color: var(--color-interface-text-primary);
+                    }
+                }
+            }
           }
   
           .field-reviewdetailsview {
+              .field-invalid:has(.field-description) { 
+                .field-description { margin-top: 10px; }
+              }
+
               fieldset.hdfc-accordian {
                   padding: 15px 0;
                   border: 1px solid var(--color-interface-border-primary);
@@ -1817,6 +1885,14 @@ main {
                       font-weight: var(--font-weight-regular);
                       color: var(--color-interface-text-primary);
                   }
+              }
+              
+              .field-newcurentaddresspanel {
+                input[type="text"] {
+                    &:disabled {
+                        background: var(--color-interface-background-primary);
+                    }
+                }
               }
           }
   
@@ -2101,9 +2177,38 @@ main {
   
               .field-singlecardtitle { margin-top: -20px;
   
-                  p { font-size: var(--body-fd-md-font-size); 
-                      color: var(--color-input-text-primary);
+                  p { 
+                    font-size: var(--body-fd-lg-font-size); 
+                    color: var(--color-interface-text-primary);
+                    font-weight: var(--font-weight-extra-bold);
                   }
+              }
+
+              .field-singlecardkeybenefitspanel {
+                .plain-text-wrapper p {
+                    font-size: var(--body-fd-sm-font-size);
+                    font-weight: var(--font-weight-regular);
+                    color: var(--color-interface-background-quaternary);
+                }   
+
+                .plain-text-wrapper:not(.field-singlecardfeatureslabel) {
+                    display: grid;
+                    grid-column: span 4;
+                }
+
+                .plain-text-wrapper:nth-of-type(n+2):nth-of-type(-n+4) {
+                    background: url('../icons/bank_icon.svg') no-repeat 0 8px;
+                    background-size: 15px 15px;
+                    padding: 5px 0 5px 25px;
+                }
+                
+                
+                .plain-text-wrapper:nth-of-type(n+5):nth-of-type(-n+7) {
+                    background: url('../icons/shield_icon.svg') no-repeat 0 8px;
+                    background-size: 15px 15px;
+                    padding: 5px 0 5px 25px;
+                    margin-top: -20px;
+                }
               }
   
               .field-singlecardknowmore {
@@ -2124,11 +2229,13 @@ main {
                   font-weight: var(--font-weight-bold);
                   font-size: var(--body-fd-md-font-size);
                   color: var(--color-interface-text-primary);
-              }
+              }             
+  
   
               .field-feessinglecard {
                   display: flex;
                   flex-direction: row;
+                  margin-top: -20px;
               }
   
               .field-joiningfeeamt { 
@@ -2155,6 +2262,7 @@ main {
                       font-size: var(--body-x-sm-font-size);
                       font-weight: var(--font-weight-medium);
                       color: var(--color-interface-text-primary);
+                      vertical-align: middle;
                   }
   
                   input {
@@ -2166,6 +2274,7 @@ main {
                       border: none;
                       font-size: var(--body-fd-md-font-size);
                       font-weight: var(--font-weight-extra-bold);
+                      height: 45px !important;
                   }
               }
           }
@@ -2293,6 +2402,10 @@ main {
         background-color: transparent;
         color: transparent;
         margin: 0;
+      }
+
+      .field-officiallyvaliddocumentsmethod {
+        margin-top: 30px;
       }
   }
 
@@ -3091,7 +3204,11 @@ main {
 
             .field-tqselectedfds {
                 display: flex;
-                flex-direction: row;
+
+                .repeat-wrapper {
+                    gap: 5px;
+                    flex-direction: column;
+                }
             }
         }
 
@@ -3427,7 +3544,7 @@ main {
 
                 .repeat-wrapper {
                     overflow-x: scroll !important;
-                    width: 27%;
+                    width: 95%;
 
                     .field-cardselection-display {
                         margin-top: 5px !important;
@@ -3472,6 +3589,16 @@ main {
             }
         }
     }   
+
+    .field-selectcardfaciapanelsingle {
+        .field-singlecardknowmore {
+            margin-top: -10px !important;
+        }
+
+        .field-feessinglecard {
+            margin-top: 0 !important;
+        }    
+    }
 
     
   
@@ -3629,7 +3756,7 @@ main {
         .field-tqsummarysection {
             display: grid !important;
             width: 95% !important;
-            margin: 0 10px !important;
+            margin: 0 10px 10px !important;
 
             .text-wrapper {
                 display: grid;
@@ -3638,7 +3765,12 @@ main {
 
             .field-tqselectedfds {
                 display: flex;
-                flex-direction: row;
+
+                    .repeat-wrapper {
+                        gap: 5px;
+                        flex-direction: column;
+                    }
+                
             }
         }
 
@@ -3647,9 +3779,15 @@ main {
             width: 62% !important;
             margin: 0 10px !important;
 
+            legend {
+                padding: 10px 0 0 !important;
+                width: 95%;
+            }
+
             .field-ratingbuttons {
                 display: flex;
                 flex-direction: row;
+                margin-top: 120px !important;
 
                 .button-wrapper {    
                     button {
