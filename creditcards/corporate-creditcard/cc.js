@@ -402,4 +402,6 @@ const onPageLoadAnalytics = async () => {
   if (!paramAuthMode && !paramVisitType) sendAnalytics('page load-Identify yourself', {}, 'CRM_LEAD_SUCCESS', journeyData);
 };
 
-onPageLoadAnalytics();
+setTimeout(() => {
+  onPageLoadAnalytics();
+}, 3900);
