@@ -292,7 +292,8 @@ const checkModeFd = (globals) => {
   const { addressDeclarationPanel } = globals.form;
 
   if (!idcomVisit && !aadhaarVisit) {
-    sendAnalytics();
+    const { pageLoad } = FD_CONSTANT.ANALYTICS.event.pageLoad;
+    sendAnalytics(pageLoad.type, pageLoad.name, pageLoad.pageName, pageLoad.journeyState, globals);
   } else {
     const { bannerImagePanel, loginMainPanel } = globals.form;
     globals.functions.setProperty(bannerImagePanel, { visible: false });

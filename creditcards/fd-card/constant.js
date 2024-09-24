@@ -59,6 +59,16 @@ const DOM_ELEMENT = {
     defaultLanguage: 'English',
   },
 };
+const ANALYTICS = {
+  event: {
+    pageLoad: {
+      name: 'page load',
+      type: 'Page Load',
+      pageName: 'Home page',
+      journeyState: 'Home page journey State',
+    },
+  },
+};
 
 export {
   JOURNEY_NAME,
@@ -76,4 +86,5 @@ export {
   DOM_ELEMENT,
   IDCOM,
   FORM_NAME,
+  ANALYTICS,
 };
