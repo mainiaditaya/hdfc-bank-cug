@@ -1,13 +1,13 @@
 /* eslint-disable no-underscore-dangle */
 import { CURRENT_FORM_CONTEXT } from '../../common/constants.js';
 import { FD_ENDPOINTS } from './constant.js';
-import { fetchJsonResponse } from '../../common/makeRestAPI.js';
-import { urlPath } from '../../common/formutils.js';
+import { fetchJsonResponse, fetchRecursiveResponse } from '../../common/makeRestAPI.js';
+import { replaceNullWithEmptyString, urlPath } from '../../common/formutils.js';
 
 const SELECTED_CUSTOMER_ID = {};
 let selectedCustIndex = -1;
 
-const custmerIdPayload = (mobileNumber, panNumber, dateOfBirth) => {
+const createPayload = (mobileNumber, panNumber, dateOfBirth, jwtToken) => {
   const payload = {
     requestString: {
       mobileNumber,
@@ -15,6 +15,7 @@ const custmerIdPayload = (mobileNumber, panNumber, dateOfBirth) => {
       panNumber: panNumber ? panNumber.replace(/\s+/g, '') : '',
       journeyID: CURRENT_FORM_CONTEXT.journeyID,
       journeyName: CURRENT_FORM_CONTEXT.journeyName,
+      jwtToken,
     },
   };
   return payload;
@@ -26,35 +27,65 @@ const custmerIdPayload = (mobileNumber, panNumber, dateOfBirth) => {
  * @param {string} mobileNumber
  * @param {string} pan
  * @param {string} dob
+ * @param {object} response
  * @param {Object} globals
  * @returns {Promise<Object>} A promise that resolves to the JSON response of the customer account details.
  */
-const fetchCustomerId = (mobileNumber, pan, dob, globals) => {
-  const payload = custmerIdPayload(mobileNumber, pan, dob, globals);
-  return fetchJsonResponse(urlPath(FD_ENDPOINTS.customeraccountdetailsdto), payload, 'POST');
+const fetchCustomerId = (mobileNumber, pan, dob, response) => {
+  const payload = createPayload(mobileNumber, pan, dob, response?.jwtToken);
+  payload.requestString.referenceNumber = response.referenceNo;
+  const apiEndPoint = urlPath(FD_ENDPOINTS.hdfccardsgetfdeligibilitystatus);
+  const duration = 50;
+  const timer = 10;
+  const fieldName = ['status'];
+  return fetchRecursiveResponse('customerId', apiEndPoint, payload, 'POST', duration, timer, fieldName, true);
+};
+
+/**
+ *
+ * @name fetchReferenceId
+ * @param {string} mobileNumber
+ * @param {string} pan
+ * @param {string} dob
+ * @param {string} jwtToken
+ * @returns {Promise<Object>}
+ */
+const fetchReferenceId = (mobileNumber, pan, dob, jwtToken) => {
+  const payload = createPayload(mobileNumber, pan, dob, jwtToken);
+  return fetchJsonResponse(urlPath(FD_ENDPOINTS.hdfccardsgetrefidfdcc), payload, 'POST', false);
 };
 
 const updateData = (globals, customerData, panel) => {
-  globals.functions.setProperty(panel.maskedAccNo, { value: customerData.customerId });
+  globals.functions.setProperty(panel.maskedAccNo, { value: customerData.customerID.slice(-4).padStart(customerData.customerID.length, 'X') });
+  globals.functions.setProperty(panel.customerID, { value: customerData.customerID });
   globals.functions.setProperty(panel.noofFDs, { value: customerData.eligibleFDCount });
 };
 
+/**
+ *
+ * @name customerIdSuccessHandler
+ * @param {Object} payload
+ * @param {Object} globals
+ */
 const customerIdSuccessHandler = (payload, globals) => {
-  const customerData = payload?.customerDetailsDTO;
+  const customerData = payload?.responseString?.customerDetailsDTO;
   if (!customerData?.length) return;
+  CURRENT_FORM_CONTEXT.customerInfo = replaceNullWithEmptyString(payload?.responseString);
+  if (customerData?.length === 1) {
+    const [selectedCustId] = customerData;
+    SELECTED_CUSTOMER_ID.selectedCustId = selectedCustId;
+  } else {
+    const panel = globals.form.multipleCustIDPanel.multipleCustIDSelectionPanel.multipleCustIDRepeatable;
 
-  CURRENT_FORM_CONTEXT.customerInfo = payload;
-
-  const panel = globals.form.multipleCustIDPanel.multipleCustIDSelectionPanel.multipleCustIDRepeatable;
-
-  customerData.forEach((custItem, i) => {
-    if (i < customerData.length - 1) {
-      globals.functions.dispatchEvent(panel, 'addItem');
-    }
-    setTimeout(() => {
-      updateData(globals, custItem, panel[i]);
-    }, i * 40);
-  });
+    customerData.forEach((custItem, i) => {
+      if (i < customerData.length - 1) {
+        globals.functions.dispatchEvent(panel, 'addItem');
+      }
+      setTimeout(() => {
+        updateData(globals, custItem, panel[i]);
+      }, i * 40);
+    });
+  }
 };
 
 /**
@@ -70,13 +101,13 @@ const customerIdClickHandler = (customerIds, globals) => {
     globals.functions.setProperty(customerIds[selectedCustIndex].multipleCustIDSelect, { value: undefined });
     setTimeout(() => {
       selectedCustIndex = customerIds.findIndex((item) => item.multipleCustIDSelect._data.$value === '0');
-      const selectedCustId = customerIds[selectedCustIndex].maskedAccNo._data.$_value;
-      SELECTED_CUSTOMER_ID.selectedCustId = CURRENT_FORM_CONTEXT.customerInfo.customerDetailsDTO.filter((item) => item.customerId === selectedCustId)?.[0];
+      const selectedCustId = customerIds[selectedCustIndex].customerID._data.$_value;
+      SELECTED_CUSTOMER_ID.selectedCustId = CURRENT_FORM_CONTEXT.customerInfo.customerDetailsDTO.filter((item) => item.customerID === selectedCustId)?.[0];
     }, 50);
   } else {
     selectedCustIndex = customerIds.findIndex((item) => item.multipleCustIDSelect._data.$value === '0');
-    const selectedCustId = customerIds[selectedCustIndex].maskedAccNo._data.$_value;
-    SELECTED_CUSTOMER_ID.selectedCustId = CURRENT_FORM_CONTEXT.customerInfo.customerDetailsDTO.filter((item) => item.customerId === selectedCustId)?.[0];
+    const selectedCustId = customerIds[selectedCustIndex].customerID._data.$_value;
+    SELECTED_CUSTOMER_ID.selectedCustId = CURRENT_FORM_CONTEXT.customerInfo.customerDetailsDTO.filter((item) => item.customerID === selectedCustId)?.[0];
   }
 };
 
@@ -85,4 +116,5 @@ export {
   customerIdSuccessHandler,
   customerIdClickHandler,
   SELECTED_CUSTOMER_ID,
+  fetchReferenceId,
 };

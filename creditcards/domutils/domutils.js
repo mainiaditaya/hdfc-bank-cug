@@ -369,6 +369,12 @@ export function imageClickable(selector, url, target) {
   }
 }
 
+const setArnNumberInResult = (arnNumRef, arnNumberPanel, arnNumberFieldName) => {
+  const arnRefNumPanel = document.querySelector(`[name= ${arnNumberPanel}]`);
+  const arnNumberElement = arnRefNumPanel.querySelector(`[name= ${arnNumberFieldName}]`);
+  arnNumberElement.value = arnNumRef;
+};
+
 export {
   setDataAttributeOnClosestAncestor,
   setSelectOptions,
@@ -388,4 +394,5 @@ export {
   validatePanInput,
   validateTextInput,
   validateTextInputOnPaste,
+  setArnNumberInResult,
 };
