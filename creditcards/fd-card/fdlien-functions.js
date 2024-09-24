@@ -14,6 +14,7 @@ import { addGaps } from './fd-dom-functions.js';
 import { executeInterfacePostRedirect } from './executeinterfaceutil.js';
 import creditCardSummary from './creditcardsumaryutil.js';
 import { invokeJourneyDropOffUpdate } from './fd-journey-util.js';
+import sendAnalytics from './analytics.js';
 
 const { FORM_RUNTIME: formRuntime, CURRENT_FORM_CONTEXT } = CONSTANT;
 const { JOURNEY_NAME, FD_ENDPOINTS } = FD_CONSTANT;
@@ -161,17 +162,16 @@ const getOTP = (mobileNumber, pan, dob, globals) => {
     globals.functions.setProperty(otpPanel.secondsPanel, { visible: false });
   }
   CURRENT_FORM_CONTEXT.action = 'getOTP';
-  // eslint-disable-next-line no-restricted-globals
   CURRENT_FORM_CONTEXT.journeyID = globals.form.runtime.journeyId.$value;
   CURRENT_FORM_CONTEXT.leadIdParam = globals.functions.exportData().queryParams;
   const panValue = (pan.$value)?.replace(/\s+/g, '');
   const jsonObj = {
     requestString: {
       dateOfBirth: clearString(dob.$value) || '',
-      // mobileNumber: FD_CONSTANT.MODE === 'dev' ? '7666220352' : mobileNumber.$value,
-      // panNumber: FD_CONSTANT.MODE === 'dev' ? 'AJLPA2422K' : panValue || '',
-      mobileNumber: mobileNumber.$value,
-      panNumber: panValue || '',
+      mobileNumber: FD_CONSTANT.MODE === 'dev' ? '7666220352' : mobileNumber.$value,
+      panNumber: FD_CONSTANT.MODE === 'dev' ? 'AJLPA2422K' : panValue || '',
+      // mobileNumber: mobileNumber.$value,
+      // panNumber: panValue || '',
       journeyID: globals.form.runtime.journeyId.$value,
       journeyName: globals.form.runtime.journeyName.$value || CURRENT_FORM_CONTEXT.journeyName,
       identifierValue: panValue || dob.$value,
@@ -181,10 +181,10 @@ const getOTP = (mobileNumber, pan, dob, globals) => {
   const path = urlPath(FD_ENDPOINTS.otpGen);
   formRuntime?.getOtpLoader();
 
-  // if (FD_CONSTANT.MODE === 'dev') {
-  //   globals.functions.setProperty(mobileNumber, { value: '7666220352' });
-  //   globals.functions.setProperty(pan, { value: 'AJLPA2422K' });
-  // }
+  if (FD_CONSTANT.MODE === 'dev') {
+    globals.functions.setProperty(mobileNumber, { value: '7666220352' });
+    globals.functions.setProperty(pan, { value: 'AJLPA2422K' });
+  }
 
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 };
@@ -291,76 +291,78 @@ const checkModeFd = (globals) => {
   const { authmode: idcomVisit, visitType: aadhaarVisit } = formData?.queryParams || {};
   const { addressDeclarationPanel } = globals.form;
 
-  if (!idcomVisit && !aadhaarVisit) return;
+  if (!idcomVisit && !aadhaarVisit) {
+    sendAnalytics();
+  } else {
+    const { bannerImagePanel, loginMainPanel } = globals.form;
+    globals.functions.setProperty(bannerImagePanel, { visible: false });
+    globals.functions.setProperty(loginMainPanel, { visible: false });
+    creditCardSummary(globals);
 
-  const { bannerImagePanel, loginMainPanel } = globals.form;
-  globals.functions.setProperty(bannerImagePanel, { visible: false });
-  globals.functions.setProperty(loginMainPanel, { visible: false });
-  creditCardSummary(globals);
+    if (idcomVisit) {
+      executeInterfacePostRedirect('idCom', true, globals);
+      return;
+    }
 
-  if (idcomVisit) {
-    executeInterfacePostRedirect('idCom', true, globals);
-    return;
-  }
+    const aadhaarSuccess = aadhaarVisit === 'EKYC_AUTH' && formData?.aadhaar_otp_val_data?.message?.toLowerCase() === 'aadhaar otp validate success';
 
-  const aadhaarSuccess = aadhaarVisit === 'EKYC_AUTH' && formData?.aadhaar_otp_val_data?.message?.toLowerCase() === 'aadhaar otp validate success';
+    if (aadhaarSuccess) {
+      try {
+        const {
+          Address1, Address2, Address3, City, State, Zipcode,
+        } = formData.aadhaar_otp_val_data.result || {};
+        const {
+          communicationAddress1, communicationAddress2, communicationAddress3,
+          communicationCity, communicationState, comCityZip,
+        } = formData?.currentFormContext?.executeInterfaceRequest?.requestString || {};
 
-  if (aadhaarSuccess) {
-    try {
-      const {
-        Address1, Address2, Address3, City, State, Zipcode,
-      } = formData.aadhaar_otp_val_data.result || {};
-      const {
-        communicationAddress1, communicationAddress2, communicationAddress3,
-        communicationCity, communicationState, comCityZip,
-      } = formData?.currentFormContext?.executeInterfaceRequest?.requestString || {};
+        const aadharAddress = [Address1, Address2, Address3, City, State, Zipcode].filter(Boolean).join(', ');
+        const communicationAddress = [communicationAddress1, communicationAddress2, communicationAddress3, communicationCity, communicationState, comCityZip].filter(Boolean).join(', ');
 
-      const aadharAddress = [Address1, Address2, Address3, City, State, Zipcode].filter(Boolean).join(', ');
-      const communicationAddress = [communicationAddress1, communicationAddress2, communicationAddress3, communicationCity, communicationState, comCityZip].filter(Boolean).join(', ');
+        const {
+          aadhaarAddressDeclaration, currentResidenceAddressBiometricOVD, currentAddressDeclarationAadhar,
+          TnCAadhaarNoMobMatchLabel, TnCAadhaarNoMobMatch, proceedFromAddressDeclarationIdcom, proceedFromAddressDeclaration,
+        } = addressDeclarationPanel;
 
-      const {
-        aadhaarAddressDeclaration, currentResidenceAddressBiometricOVD, currentAddressDeclarationAadhar,
-        TnCAadhaarNoMobMatchLabel, TnCAadhaarNoMobMatch, proceedFromAddressDeclarationIdcom, proceedFromAddressDeclaration,
-      } = addressDeclarationPanel;
+        globals.functions.setProperty(aadhaarAddressDeclaration, { value: aadharAddress, visible: true });
+        globals.functions.setProperty(currentAddressDeclarationAadhar.currentResidenceAddressAadhaar, { value: communicationAddress });
+        globals.functions.setProperty(currentResidenceAddressBiometricOVD.currentResAddressBiometricOVD, { value: communicationAddress });
+        globals.functions.setProperty(addressDeclarationPanel, { visible: true });
 
-      globals.functions.setProperty(aadhaarAddressDeclaration, { value: aadharAddress, visible: true });
-      globals.functions.setProperty(currentAddressDeclarationAadhar.currentResidenceAddressAadhaar, { value: communicationAddress });
-      globals.functions.setProperty(currentResidenceAddressBiometricOVD.currentResAddressBiometricOVD, { value: communicationAddress });
-      globals.functions.setProperty(addressDeclarationPanel, { visible: true });
+        formData.currentFormContext.mobileMatch = formData?.aadhaar_otp_val_data?.result?.mobileValid?.toLowerCase() === 'y';
+        globals.functions.setProperty(proceedFromAddressDeclarationIdcom, { visible: !formData?.currentFormContext?.customerIdentityChange });
+        globals.functions.setProperty(proceedFromAddressDeclaration, { visible: formData?.currentFormContext?.customerIdentityChange });
 
-      formData.currentFormContext.mobileMatch = formData?.aadhaar_otp_val_data?.result?.mobileValid?.toLowerCase() === 'y';
-      globals.functions.setProperty(proceedFromAddressDeclarationIdcom, { visible: !formData?.currentFormContext?.customerIdentityChange });
-      globals.functions.setProperty(proceedFromAddressDeclaration, { visible: formData?.currentFormContext?.customerIdentityChange });
+        if (formData?.aadhaar_otp_val_data?.result?.mobileValid?.toLowerCase() === 'n') {
+          globals.functions.setProperty(TnCAadhaarNoMobMatchLabel, { visible: true });
+          globals.functions.setProperty(TnCAadhaarNoMobMatch, { visible: true });
+        }
 
-      if (formData?.aadhaar_otp_val_data?.result?.mobileValid?.toLowerCase() === 'n') {
-        globals.functions.setProperty(TnCAadhaarNoMobMatchLabel, { visible: true });
-        globals.functions.setProperty(TnCAadhaarNoMobMatch, { visible: true });
+        invokeJourneyDropOffUpdate(
+          'AADHAAR_REDIRECTION_SUCCESS',
+          formData.loginPanel.mobilePanel.registeredMobileNumber,
+          formData.runtime.leadProifileId,
+          formData.runtime.leadProifileId.journeyId,
+          globals,
+        );
+      } catch (ex) {
+        invokeJourneyDropOffUpdate(
+          'AADHAAR_REDIRECTION_FAILURE',
+          formData.loginPanel.mobilePanel.registeredMobileNumber,
+          formData.runtime.leadProifileId,
+          formData.runtime.leadProifileId.journeyId,
+          globals,
+        );
       }
-
-      invokeJourneyDropOffUpdate(
-        'AADHAAR_REDIRECTION_SUCCESS',
-        formData.loginPanel.mobilePanel.registeredMobileNumber,
-        formData.runtime.leadProifileId,
-        formData.runtime.leadProifileId.journeyId,
-        globals,
-      );
-    } catch (ex) {
-      invokeJourneyDropOffUpdate(
-        'AADHAAR_REDIRECTION_FAILURE',
-        formData.loginPanel.mobilePanel.registeredMobileNumber,
-        formData.runtime.leadProifileId,
-        formData.runtime.leadProifileId.journeyId,
-        globals,
-      );
     }
   }
 };
 
-// setTimeout(() => {
-//   if (document && FD_CONSTANT.MODE === 'dev') {
-//     document.querySelector('.field-getotpbutton button').removeAttribute('disabled');
-//   }
-// }, 2000);
+setTimeout(() => {
+  if (document && FD_CONSTANT.MODE === 'dev') {
+    document.querySelector('.field-getotpbutton button').removeAttribute('disabled');
+  }
+}, 2000);
 
 export {
   validateLogin,
