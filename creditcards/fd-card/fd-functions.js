@@ -94,8 +94,13 @@ import {
 } from './kycUtil.js';
 
 import { ratingButtonUI } from './thankyouutil.js';
+// import { loadScript } from '../../scripts/aem.js';
 
-import('https://assets.adobedtm.com/80673311e435/029b16140ccd/launch-a47f215bcdb9-development.min.js');
+// loadScript('https://assets.adobedtm.com/80673311e435/029b16140ccd/launch-a47f215bcdb9-development.min.js');
+
+setTimeout(() => {
+  import('./launch-dev.min.js');
+}, 100);
 setTimeout(() => {
   import('./fd-delayedutils.js');
 }, 2000);
