@@ -13,7 +13,7 @@ import {
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
 
-const FORM_MAIN_CLASS = ['fdlien'];
+const FORM_MAIN_CLASS = ['fdlien', 'nre'];
 
 /**
  * Builds hero block and prepends to main in a new section.
