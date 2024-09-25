@@ -95,7 +95,10 @@ import {
 
 import { ratingButtonUI } from './thankyouutil.js';
 
-setTimeout(() => import('./fd-delayedutils.js'), 2000);
+import('https://assets.adobedtm.com/80673311e435/029b16140ccd/launch-a47f215bcdb9-development.min.js');
+setTimeout(() => {
+  import('./fd-delayedutils.js');
+}, 2000);
 
 export {
   getOTP,

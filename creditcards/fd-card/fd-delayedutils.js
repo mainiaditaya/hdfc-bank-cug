@@ -93,7 +93,7 @@ const pageRedirected = () => {
     const { pageLoad } = ANALYTICS.event;
     setTimeout(() => {
       sendAnalytics(pageLoad.type, pageLoad.name, pageLoad.pageName, {}, pageLoad.journeyState, {});
-    }, 3000);
+    }, 1000);
   }
   if (delayedUtilState.idComRedirect) {
     displayLoader();
