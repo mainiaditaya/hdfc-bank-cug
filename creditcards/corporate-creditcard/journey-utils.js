@@ -107,12 +107,17 @@ const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, jo
     };
   }
   const sanitizedFormData = santizedFormDataWithContext(globals, currentFormContext);
+
   const journeyJSONObj = {
     RequestPayload: {
       userAgent: (typeof window !== 'undefined') ? window.navigator.userAgent : '',
       leadProfile: {
         mobileNumber,
         leadProfileId: leadProfileId?.toString(),
+        profile: {
+          dob: currentFormContext.dob,
+          fullName: currentFormContext.fullName,
+        },
       },
       formData: {
         channel: CHANNEL,
