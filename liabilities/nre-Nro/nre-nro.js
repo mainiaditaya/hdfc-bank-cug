@@ -3,6 +3,7 @@ import {
   validateLogin,
   getOtpNRE,
   otpTimer,
+  getCountryCodes,
 } from './nre-nroFunctions.js';
 
 import {
@@ -21,4 +22,5 @@ export {
   getOTP,
   getOtpNRE,
   otpTimer,
+  getCountryCodes,
 };
