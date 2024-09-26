@@ -29,8 +29,6 @@ import {
   handleMdmUtmParam,
 } from './semi-mdm-utils.js';
 
-// import { getContextStorage } from '../../../conversational-service/src/request-utils'
-
 const {
   CURRENT_FORM_CONTEXT: currentFormContext,
   JOURNEY_NAME: journeyName,
@@ -229,7 +227,7 @@ const setData = (globals, panel, txn, i) => {
   globals.functions.setProperty(panel[i]?.aem_TxnName, { value: txn?.name || txn?.aem_TxnName });
   globals.functions.setProperty(panel[i]?.authCode, { value: txn?.AUTH_CODE || txn?.authCode });
   globals.functions.setProperty(panel[i]?.logicMod, { value: txn?.LOGICMOD || txn?.logicMod });
-  globals.functions.setProperty(panel[i]?.transactionTypeHidden, { value: txn?.type });
+  globals.functions.setProperty(panel[i]?.aem_txn_type, { value: txn?.type });
 };
 /*
  * Displays card details by updating the UI with response data.
@@ -256,31 +254,39 @@ const cardDisplay = (globals, response) => {
 const DELAY = 120;
 const DELTA_DELAY = 100;
 
+/**
+ * sets the data for the instance of repetable panel
+ *
+ * @param {object} globals - gobal form object
+ * @param {Object} panel - The panel for unbilled transactions.
+ * @param {Object} txn - current tramsaction object
+ * @param {number} i - current instance of panel row
+ */
+const getTranactionPanelData = (transactions) => {
+  const txnsData = transactions?.map((txn) => {
+    const paiseAppendAmt = txnInrFormat((txn?.amount || txn?.aem_TxnAmt));
+    const TXN_AMT = `${MISC.rupeesUnicode} ${paiseAppendAmt}`;
+    return {
+      aem_Txn_checkBox: txn?.checkbox || txn?.aem_Txn_checkBox,
+      aem_TxnAmt: TXN_AMT,
+      aem_TxnDate: txn?.date || txn?.aem_TxnDate,
+      aem_TxnID: txn?.id || txn?.aem_TxnID,
+      aem_TxnName: txn?.name || txn?.aem_TxnName,
+      authCode: txn?.AUTH_CODE || txn?.authCode,
+      logicMod: txn?.LOGICMOD || txn?.logicMod,
+      aem_txn_type: txn?.type,
+    }
+  })
+  console.log('txnsData: ', txnsData);
+  return txnsData
+};
+
 // Special handling for whatsapp flow, can be removed once proper fix is done
 function addTransactions(allTxn, globals) {
   const transactions = allTxn || [];
   const billedTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
-  transactions.forEach((txn, i) => {
-    const isFirst = i === 0;
-    const panel = billedTxnPanel;
-    if (!isFirst) {
-      globals.functions.dispatchEvent(panel, 'addItem');
-    }
-  });
-  // eslint-disable-next-line no-undef
-  const als = isNodeEnv ? getContextStorage('promises') : [];
-  // eslint-disable-next-line no-unused-vars
-  const promise = new Promise((resolve, reject) => {
-    setTimeout(() => {
-      transactions.forEach((txn, i) => {
-        setData(globals, billedTxnPanel, txn, i);
-      });
-      resolve();
-    }, 80);
-  });
-  if (isNodeEnv) {
-    als.push(promise);
-  }
+  const data = getTranactionPanelData(transactions);
+  globals.functions.importData(data, billedTxnPanel.$qualifiedName)
 }
 
 /**
@@ -347,14 +353,16 @@ function checkELigibilityHandler(resPayload1, globals) {
     /* continue btn disabling code added temorary, can be removed after form authoring */
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
     let ccBilledData = resPayload?.ccBilledTxnResponse?.responseString || [];
+    let ccUnBilledData = resPayload?.ccUnBilledTxnResponse?.responseString || [];
     if (isNodeEnv) {
       ccBilledData = resPayload?.ccBilledTxnResponse || [];
+    } else {
+      // Note: In whatsapp data is already sorted, format of billed and unbilled is different (rupee vs paisa) so sorting should not be done for WA.
+      // apply sort by amount here to ccBilledData
+      ccBilledData = sortDataByAmount(ccBilledData, 'amount');
+      // apply sort by amount here to ccBilledData
+      ccUnBilledData = sortDataByAmount(ccUnBilledData, 'amount');
     }
-    ccBilledData = sortDataByAmount(ccBilledData, 'amount');
-    // apply sort by amount here to ccBilledData
-    let ccUnBilledData = resPayload?.ccUnBilledTxnResponse?.responseString || [];
-    // apply sort by amount here to ccBilledData
-    ccUnBilledData = sortDataByAmount(ccUnBilledData, 'amount');
     currentFormContext.EligibilityResponse = resPayload;
     globals.functions.setProperty(globals.form.runtime.currentFormContext, { value: JSON.stringify({ ...currentFormContext }) });
     const billedTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
@@ -382,7 +390,6 @@ function checkELigibilityHandler(resPayload1, globals) {
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment, { visible: false });
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_TxnsList, { visible: false });
     }
-    //
     return response;
   } catch (error) {
     response.nextscreen = 'failure';
@@ -402,7 +409,7 @@ const getLoanOptionsInfo = (responseStringJsonObj) => {
       period: responseStringJsonObj[0][periodKey],
       interest: responseStringJsonObj[0][interestKey],
       tid: responseStringJsonObj[0][tidKey],
-      processingFee: responseStringJsonObj[0].processingFee,
+      processingFee: responseStringJsonObj[0].memoLine1
     };
   });
   return loanoptions;
@@ -441,7 +448,7 @@ const tenureOption = (loanOptions, loanAmt) => {
     const roiAnnually = currencyUtil(parseFloat(option?.interest), 2);
     const monthlyEMI = nfObject.format(calculateEMI(loanAmt, roiMonthly, parseInt(option.period, 10)));
     const period = `${parseInt(option.period, 10)} Months`;
-    const procesingFee = nfObject.format(parseInt(option.processingFee, 10));
+    const procesingFee = nfObject.format(option.processingFee);
     const emiSubStance = option;
     return ({
       ...option,
@@ -592,7 +599,13 @@ const enableAllTxnFields = (txnList, globals) => txnList?.forEach((list) => glob
 function txnSelectHandler(checkboxVal, txnType, globals) {
   /* enable-popup once it reaches BILLED-MAX-AMT-LIMIT */
   const currentFormContext = getCurrentFormContext(globals);
-  const totalSelectBilledTxnAmt = globals.functions.exportData().smartemi.aem_billedTxn.aem_billedTxnSelection.filter((el) => el.aem_Txn_checkBox).map((el) => (Number((String(el?.aem_TxnAmt))?.replace(/[^\d]/g, '')) / 100)).reduce((prev, acc) => prev + acc, 0);
+  const selectedTransaction = globals.functions.exportData().smartemi.aem_billedTxn.aem_billedTxnSelection.filter((el) => {
+    if(isNodeEnv) {
+      return el.aem_Txn_checkBox && el.aem_txn_type === "billed";
+    }
+    return aem_Txn_checkBox;
+  })
+  const totalSelectBilledTxnAmt = selectedTransaction.map((el) => (Number((String(el?.aem_TxnAmt))?.replace(/[^\d]/g, '')) / 100)).reduce((prev, acc) => prev + acc, 0);
   if (totalSelectBilledTxnAmt > currentFormContext.billedMaxSelect) {
     /* popup alert hanldles */
     const SELECTED_MAX_BILL = ` Please select Billed Transactions Amount Max up to Rs.${nfObject.format(currentFormContext.billedMaxSelect)}`;
@@ -761,7 +774,7 @@ function radioBtnValCommit(arg1, globals) {
         const rawTenureData = JSON.parse(tenureData[i].aem_tenureRawData);
         const duration = `${parseInt(rawTenureData.period, 10)} Months`;
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_reviewAmount, { value: `${MISC.rupeesUnicode} ${nfObject.format(getTotalAmount(globals))}` });
-        globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_monthlyEmi, { value: tenureData[i].aem_tenureSelectionEmi });
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_monthlyEmi, { value: tenureData[i].aem_tenureSelectionEmi + ` @ ${roiMonthly}` });
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_duration, { value: duration });
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_roi, { value: roiMonthly });
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_processingFee, { value: tenureData[i].aem_tenureSelectionProcessing });
@@ -807,7 +820,9 @@ const getFlowSuccessPayload = (responseString, globals) => {
   const loanNbr = responseString?.loanNbr;
   // TODO: repeated code, needed to avoid recomputation
   const emiConversionArray = getEmiArrayOption(globals);
-  const LOAN_AMOUNT = String(emiConversionArray?.reduce((prev, acc) => prev + acc.tranAmt, 0));
+  const loanAmount = emiConversionArray?.reduce((prev, acc) => prev + acc.tranAmt, 0);
+  const loanAmountInInr = `${nfObject.format(loanAmount/100)}`;
+  // const LOAN_AMOUNT = String(emiConversionArray?.reduce((prev, acc) => prev + acc.tranAmt, 0));
   const tenurePlan = globals.functions.exportData().aem_tenureSelectionRepeatablePanel;
   const selectedTenurePlan = tenurePlan?.find((emiPlan) => emiPlan.aem_tenureSelection === '0');
   const emiSubData = JSON.parse(selectedTenurePlan?.aem_tenureRawData);
@@ -815,7 +830,7 @@ const getFlowSuccessPayload = (responseString, globals) => {
   const TENURE = (parseInt(emiSubData?.period, 10).toString().length === 1) ? (parseInt(emiSubData?.period, 10).toString().padStart(2, '0')) : parseInt(emiSubData?.period, 10).toString(); // '003' into '03' / '18'-'18'
 
   return {
-    amount: LOAN_AMOUNT,
+    amount: loanAmountInInr,
     tenureMonths: TENURE,
     rateOfInterest: selectedTenurePlan?.aem_roi_monthly,
     annualRateOfInterest: selectedTenurePlan?.aem_roi_annually,
