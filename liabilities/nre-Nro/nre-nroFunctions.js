@@ -15,6 +15,7 @@ import {
 import * as CONSTANT from '../../common/constants.js';
 
 let prevSelectedIndex = -1;
+let defaultDropdownIndex = -1;
 const resendOtpCount = 0;
 const MAX_OTP_RESEND_COUNT = 3;
 const OTP_TIMER = 30;
@@ -149,7 +150,7 @@ const getCountryCodes = (dropdown) => {
       if (prevSelectedIndex !== -1) {
         dropdown.remove(prevSelectedIndex);
       }
-      const { selectedIndex } = dropdown.selectedIndex;
+      const selectedIndex = dropdown.selectedIndex; // eslint-disable-line prefer-destructuring
       const selectedOption = dropdown.options[selectedIndex];
       const selectedOptionText = selectedOption.text;
       const selectedOptionVal = selectedOption.value;
@@ -164,15 +165,21 @@ const getCountryCodes = (dropdown) => {
     dropdown.innerHTML = '';
     response.forEach((countryCode) => {
       if (countryCode.ISDCODE != null && countryCode.DESCRIPTION != null) {
-        const val = `(+${String(countryCode.ISDCODE)})`;
-        const key = countryCode.DESCRIPTION + val;
+        const val = ` +${String(countryCode.ISDCODE)}`;
+        const key = `${countryCode.DESCRIPTION} (${val})`;
         const newOption = document.createElement('option');
         newOption.value = val;
         newOption.textContent = key;
         dropdown.appendChild(newOption);
+        if (val === ' +91') {
+          defaultDropdownIndex = dropdown.options.length - 1;
+        }
       }
     });
-    dropdown.selectedIndex = 36;
+    dropdown.selectedIndex = 0;
+    if (defaultDropdownIndex !== -1) {
+      dropdown.selectedIndex = defaultDropdownIndex;
+    }
     const event = new Event('change', {
       bubbles: true, // Allow the event to bubble up
       cancelable: true, // Allow the event to be canceled
