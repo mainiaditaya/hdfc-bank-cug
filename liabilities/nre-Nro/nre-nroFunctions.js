@@ -13,9 +13,8 @@ import {
   fetchJsonResponse,
 } from '../../common/makeRestAPI.js';
 import * as CONSTANT from '../../common/constants.js';
-import { initAdaptiveForm } from '../../blocks/form/rules/index.js';
 
-var prevSelectedIndex = -1;
+let prevSelectedIndex = -1;
 const resendOtpCount = 0;
 const MAX_OTP_RESEND_COUNT = 3;
 const OTP_TIMER = 30;
@@ -144,22 +143,13 @@ const getOtpNRE = (mobileNumber, pan, dob, globals) => {
 };
 
 const getCountryCodes = (dropdown) => {
-  console.log("Beginning GetCountryCode");
-  var finalURL = "/content/hdfc_commonforms/api/mdm.ETB.NRI_ISD_MASTER.COUNTRYNAME-.json";
-  console.log("URL : ", finalURL);
-  
-  fetchJsonResponse(urlPath(finalURL), null, 'GET', true).then(response => {
-    console.log('Promise resolved:'); // Handle the resolved value (success case)
-
-    // Dropdown eventlistener : 
-    // Add an event listener to detect when an option is selected
-    dropdown.addEventListener('change', function() {
-      if(prevSelectedIndex != -1){
-        console.log(dropdown.options);
+  const finalURL = '/content/hdfc_commonforms/api/mdm.ETB.NRI_ISD_MASTER.COUNTRYNAME-.json';
+  fetchJsonResponse(urlPath(finalURL), null, 'GET', true).then((response) => {
+    dropdown.addEventListener('change', () => {
+      if (prevSelectedIndex !== -1) {
         dropdown.remove(prevSelectedIndex);
-        console.log(dropdown.options);
       }
-      const selectedIndex = dropdown.selectedIndex;
+      const { selectedIndex } = dropdown.selectedIndex;
       const selectedOption = dropdown.options[selectedIndex];
       const selectedOptionText = selectedOption.text;
       const selectedOptionVal = selectedOption.value;
@@ -168,33 +158,29 @@ const getCountryCodes = (dropdown) => {
       newOption.text = selectedOptionText;
       dropdown.options[selectedIndex].text = selectedOptionVal;
       dropdown.options[selectedIndex].style.display = 'none';
-      dropdown.add(newOption, selectedIndex+1);
+      dropdown.add(newOption, selectedIndex + 1);
       prevSelectedIndex = selectedIndex;
     });
-
-      dropdown.innerHTML = '';
-      response.forEach(countryCode => {
-        if(countryCode.ISDCODE != null && countryCode.DESCRIPTION != null){    
-            const val =  " (+" + countryCode.ISDCODE + ")";
-            const key = countryCode.DESCRIPTION + val;
-            const newOption = document.createElement('option');
-            newOption.value = val;
-            newOption.textContent = key;
-            dropdown.appendChild(newOption);
-          }
-      });
-      dropdown.selectedIndex = 36;
-      const event = new Event('change', {
-        bubbles: true, // Allow the event to bubble up
-        cancelable: true // Allow the event to be canceled
-      });
-      dropdown.dispatchEvent(event);
-
-    // });
-  }).catch(error => {
-    console.error('Promise rejected:', error);  // Handle any error (failure case)
+    dropdown.innerHTML = '';
+    response.forEach((countryCode) => {
+      if (countryCode.ISDCODE != null && countryCode.DESCRIPTION != null) {
+        const val = `(+${String(countryCode.ISDCODE)})`;
+        const key = countryCode.DESCRIPTION + val;
+        const newOption = document.createElement('option');
+        newOption.value = val;
+        newOption.textContent = key;
+        dropdown.appendChild(newOption);
+      }
+    });
+    dropdown.selectedIndex = 36;
+    const event = new Event('change', {
+      bubbles: true, // Allow the event to bubble up
+      cancelable: true, // Allow the event to be canceled
+    });
+    dropdown.dispatchEvent(event);
+  }).catch((error) => {
+    console.error('Promise rejected:', error); // Handle any error (failure case)
   });
-  
 };
 
 /**
@@ -223,8 +209,7 @@ function otpTimer(globals) {
   }, 1000);
 }
 
-setTimeout( async () =>  {
-  console.log("Calling getCountryCodes function");
+setTimeout(async () => {
   await getCountryCodes(document.querySelector('.field-countrycode select'));
 }, 2000);
 
