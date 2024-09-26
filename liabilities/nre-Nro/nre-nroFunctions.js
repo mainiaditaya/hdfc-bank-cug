@@ -6,6 +6,10 @@ import {
   ageValidator,
   clearString,
   urlPath,
+  getTimeStamp,
+  maskNumber,
+  maskedEmail,
+  formUtil,
 } from '../../common/formutils.js';
 import {
   displayLoader,
@@ -13,6 +17,7 @@ import {
   fetchJsonResponse,
 } from '../../common/makeRestAPI.js';
 import * as CONSTANT from '../../common/constants.js';
+import * as NRE_CONSTANT from './constant.js';
 
 const resendOtpCount = 0;
 const MAX_OTP_RESEND_COUNT = 3;
@@ -23,9 +28,10 @@ const {
   ENDPOINTS,
   CURRENT_FORM_CONTEXT: currentFormContext,
   FORM_RUNTIME: formRuntime,
-  CHANNEL,
 } = CONSTANT;
-// Initialize all Corporate Card Journey Context Variables.
+
+const { CHANNEL, JOURNEY_NAME } = NRE_CONSTANT;
+// Initialize all NRE/NRO Journey Context Variables.
 currentFormContext.journeyType = 'NTB';
 currentFormContext.errorCode = '';
 currentFormContext.errorMessage = '';
@@ -121,7 +127,7 @@ const validateLogin = (globals) => {
 
 const getOtpNRE = (mobileNumber, pan, dob, globals) => {
   /* jidTemporary  temporarily added for FD development it has to be removed completely once runtime create journey id is done with FD */
-  const jidTemporary = createJourneyId('online', globals.form.runtime.journeyName.$value, CHANNEL, globals);
+  const jidTemporary = createJourneyId('U', JOURNEY_NAME, CHANNEL, globals);
   currentFormContext.action = 'getOTP';
   currentFormContext.journeyID = globals.form.runtime.journeyId.$value || jidTemporary;
   currentFormContext.leadIdParam = globals.functions.exportData().queryParams;
@@ -134,6 +140,7 @@ const getOtpNRE = (mobileNumber, pan, dob, globals) => {
       journeyName: globals.form.runtime.journeyName.$value || currentFormContext.journeyName,
       identifierValue: pan.$value || clearString(dob.$value),
       identifierName: pan.$value ? 'PAN' : 'DOB',
+      getEmail: 'Y',
     },
   };
   const path = urlPath(ENDPOINTS.customerOtpGen);
@@ -147,13 +154,13 @@ const getOtpNRE = (mobileNumber, pan, dob, globals) => {
 */
 function otpTimer(globals) {
   if (resendOtpCount < MAX_OTP_RESEND_COUNT) {
-    globals.functions.setProperty(globals.form.otpPanel.otpFragment.otpPanel.secondsPanel, { visible: true });
-    globals.functions.setProperty(globals.form.otpPanel.otpFragment.otpPanel.otpResend, { visible: false });
+    globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: true });
+    globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: false });
   } else {
-    globals.functions.setProperty(globals.form.otpPanel.otpFragment.otpPanel.secondsPanel, { visible: false });
+    globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: false });
   }
   const timer = setInterval(() => {
-    globals.functions.setProperty(globals.form.otpPanel.otpFragment.otpPanel.secondsPanel.seconds, { value: dispSec });
+    globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel.seconds, { value: dispSec });
     sec -= 1;
     dispSec = sec;
     if (sec < 10) {
@@ -161,15 +168,79 @@ function otpTimer(globals) {
     }
     if (sec < 0) {
       clearInterval(timer);
-      globals.functions.setProperty(globals.form.otpPanel.otpFragment.otpPanel.secondsPanel, { visible: false });
-      if (resendOtpCount < MAX_OTP_RESEND_COUNT) globals.functions.setProperty(globals.form.otpPanel.otpFragment.otpPanel.otpResend, { visible: true });
+      globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: false });
+      if (resendOtpCount < MAX_OTP_RESEND_COUNT) globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: true });
     }
   }, 1000);
 }
 
+function updateOTPHelpText(mobileNo, otpHelpText, email, globals) {
+  if (!email) globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpHelpText, { value: `${otpHelpText} ${maskNumber(mobileNo, 6)}` });
+  globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpHelpText, { value: `${otpHelpText} ${maskNumber(mobileNo, 6)} & email ID ${maskedEmail(email)}.` });
+}
+
+/**
+ * validates the otp
+ * @param {object} mobileNumber
+ * @param {object} pan
+ * @param {object} dob
+ * @return {PROMISE}
+ */
+function otpValidationNRE(mobileNumber, pan, dob, otpNumber, globals) {
+  const referenceNumber = `AD${getTimeStamp(new Date())}` ?? '';
+  currentFormContext.referenceNumber = referenceNumber;
+  const jsonObj = {
+    requestString: {
+      mobileNumber: mobileNumber.$value,
+      passwordValue: otpNumber.$value,
+      dateOfBirth: clearString(dob.$value) || '',
+      panNumber: pan.$value || '',
+      channelSource: '',
+      journeyID: currentFormContext.journeyID,
+      journeyName: globals.form.runtime.journeyName.$value || currentFormContext.journeyName,
+      dedupeFlag: 'N',
+      referenceNumber: referenceNumber ?? '',
+    },
+  };
+
+  const path = urlPath(ENDPOINTS.otpValidationFatca);
+  formRuntime?.otpValLoader();
+  return fetchJsonResponse(path, jsonObj, 'POST', true);
+}
+
+function prefillCustomerDetails(response, globals) {
+  const {
+    customerName,
+    accountNumber,
+    customerID,
+  } = globals.form.wizardPanel.wizardFragment.wizardNreNro.selectAccount;
+
+  const {
+    accountType,
+    branch,
+    ifsc,
+  } = globals.form.wizardPanel.wizardFragment.wizardNreNro.selectAccount.singleAccount;
+
+  const changeDataAttrObj = { attrChange: true, value: false, disable: true };
+
+  const setFormValue = (field, value) => {
+    const fieldUtil = formUtil(globals, field);
+    fieldUtil.setValue(value, changeDataAttrObj);
+  };
+
+  setFormValue(customerName, response.customerShortName);
+  setFormValue(accountNumber, response.accountNumber);
+  setFormValue(customerID, response.customerId);
+  setFormValue(accountType, response.prodTypeDesc);
+  setFormValue(branch, response.branchName);
+  setFormValue(ifsc, response.ifscCode);
+}
+
 export {
-  createJourneyId,
   validateLogin,
   getOtpNRE,
   otpTimer,
+  otpValidationNRE,
+  updateOTPHelpText,
+  prefillCustomerDetails,
 };

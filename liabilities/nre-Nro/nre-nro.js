@@ -3,6 +3,9 @@ import {
   validateLogin,
   getOtpNRE,
   otpTimer,
+  otpValidationNRE,
+  updateOTPHelpText,
+  prefillCustomerDetails,
 } from './nre-nroFunctions.js';
 
 import {
@@ -10,15 +13,13 @@ import {
   invokeJourneyDropOffUpdate,
 } from './nre-nro-journey-utils.js';
 
-import {
-  getOTP,
-} from '../../common/functions.js';
-
 export {
   validateLogin,
   invokeJourneyDropOff,
   invokeJourneyDropOffUpdate,
-  getOTP,
   getOtpNRE,
   otpTimer,
+  otpValidationNRE,
+  updateOTPHelpText,
+  prefillCustomerDetails,
 };

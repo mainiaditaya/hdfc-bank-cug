@@ -6,10 +6,12 @@ import {
   generateUUID,
 } from '../../common/formutils.js';
 import { fetchJsonResponse } from '../../common/makeRestAPI.js';
+import * as NRE_CONSTANT from './constant.js';
 
 import * as CONSTANT from '../../common/constants.js';
 
-const { ENDPOINTS, CHANNEL, CURRENT_FORM_CONTEXT: currentFormContext } = CONSTANT;
+const { ENDPOINTS, CURRENT_FORM_CONTEXT: currentFormContext } = CONSTANT;
+const { CHANNEL, JOURNEY_NAME } = NRE_CONSTANT;
 
 /**
      * generates the journeyId
@@ -23,6 +25,7 @@ function createJourneyId(visitMode, journeyAbbreviation, channel, globals) {
   // var dispInstance = getDispatcherInstance();
   const journeyId = globals.functions.exportData().journeyId || `${dynamicUUID}_01_${journeyAbbreviation}_${visitMode}_${channel}`;
   globals.functions.setProperty(globals.form.runtime.journeyId, { value: journeyId });
+  return journeyId;
 }
 
 const getCurrentContext = () => currentFormContext;
@@ -45,7 +48,7 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
       formData: {
         channel: CHANNEL,
         journeyName: globals.form.runtime.journeyName.$value,
-        journeyID: globals.form.runtime.journeyId.$value || createJourneyId('online', globals.form.runtime.journeyName.$value, CHANNEL, globals),
+        journeyID: globals.form.runtime.journeyId.$value || createJourneyId('U', JOURNEY_NAME, CHANNEL, globals),
         journeyStateInfo: [
           {
             state,
@@ -134,46 +137,9 @@ const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, jo
   return fetchJsonResponse(url, journeyJSONObj, method);
 };
 
-/**
-     * @name printPayload
-     * @param {string} payload.
-     * @param {object} formContext.
-     * @returns {object} currentFormContext.
-     */
-function journeyResponseHandlerUtil(payload, formContext) {
-  formContext.leadProfile = {};
-  formContext.leadProfile.leadProfileId = String(payload);
-  return formContext;
-}
-
-/**
-    * @name invokeJourneyDropOffByParam
-    * @param {string} mobileNumber
-    * @param {string} leadProfileId
-    * @param {string} journeyId
-    * @return {PROMISE}
-    */
-const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyID) => {
-  const journeyJSONObj = {
-    RequestPayload: {
-      leadProfile: {
-        mobileNumber,
-      },
-      journeyInfo: {
-        journeyID,
-      },
-    },
-  };
-  const url = urlPath(ENDPOINTS.journeyDropOffParam);
-  const method = 'POST';
-  return fetchJsonResponse(url, journeyJSONObj, method);
-};
-
 export {
   invokeJourneyDropOff,
-  invokeJourneyDropOffByParam,
   invokeJourneyDropOffUpdate,
-  journeyResponseHandlerUtil,
   getCurrentContext,
   createJourneyId,
 };

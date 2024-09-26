@@ -529,6 +529,22 @@ const getUrlParamCaseInsensitive = (param) => {
   return paramEntry ? paramEntry[1] : null;
 };
 
+/**
+ * Masks a email by replacing the specified letter of word with asterisks.
+ * @param {email} email - The email to mask.
+ * @returns {string} -The masked email as a string.
+ */
+const maskedEmail = (email) => {
+  // Split the email into two parts: local part and domain
+  const [localPart, domain] = email.split('@');
+
+  // Mask part of the local part (leaving the first and last characters visible)
+  const maskedLocalPart = `${localPart[0]}****${localPart[localPart.length - 1]}`;
+
+  // Return the masked email
+  return `${maskedLocalPart}@${domain}`;
+};
+
 export {
   urlPath,
   maskNumber,
@@ -558,4 +574,5 @@ export {
   formatDateDDMMMYYY,
   pinCodeMasterCheck,
   getUrlParamCaseInsensitive,
+  maskedEmail,
 };
