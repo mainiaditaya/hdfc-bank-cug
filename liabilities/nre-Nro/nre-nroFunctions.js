@@ -8,7 +8,6 @@ import {
   urlPath,
   getTimeStamp,
   maskNumber,
-  maskedEmail,
   formUtil,
 } from '../../common/formutils.js';
 import {
@@ -30,7 +29,7 @@ const {
   FORM_RUNTIME: formRuntime,
 } = CONSTANT;
 
-const { CHANNEL, JOURNEY_NAME } = NRE_CONSTANT;
+const { CHANNEL, JOURNEY_NAME, VISIT_MODE } = NRE_CONSTANT;
 // Initialize all NRE/NRO Journey Context Variables.
 currentFormContext.journeyType = 'NTB';
 currentFormContext.errorCode = '';
@@ -40,6 +39,19 @@ currentFormContext.eligibleOffers = '';
 formRuntime.getOtpLoader = currentFormContext.getOtpLoader || (typeof window !== 'undefined') ? displayLoader : false;
 formRuntime.otpValLoader = currentFormContext.otpValLoader || (typeof window !== 'undefined') ? displayLoader : false;
 formRuntime.hideLoader = (typeof window !== 'undefined') ? hideLoaderGif : false;
+
+/**
+ * Masks a email by replacing the specified letter of word with asterisks.
+ * @param {email} email - The email to mask.
+ * @returns {string} -The masked email as a string.
+ */
+const maskedEmail = (email) => {
+  const [localPart, domain] = email.split('@');
+
+  const maskedLocalPart = `${localPart.substring(0, 2)}****${localPart[localPart.length - 1]}`;
+
+  return `${maskedLocalPart}@${domain}`;
+};
 
 /**
  * Validates the date of birth field to ensure the age is between 18 and 120.
@@ -127,7 +139,7 @@ const validateLogin = (globals) => {
 
 const getOtpNRE = (mobileNumber, pan, dob, globals) => {
   /* jidTemporary  temporarily added for FD development it has to be removed completely once runtime create journey id is done with FD */
-  const jidTemporary = createJourneyId('U', JOURNEY_NAME, CHANNEL, globals);
+  const jidTemporary = createJourneyId(VISIT_MODE, JOURNEY_NAME, CHANNEL, globals);
   currentFormContext.action = 'getOTP';
   currentFormContext.journeyID = globals.form.runtime.journeyId.$value || jidTemporary;
   currentFormContext.leadIdParam = globals.functions.exportData().queryParams;
@@ -175,8 +187,8 @@ function otpTimer(globals) {
 }
 
 function updateOTPHelpText(mobileNo, otpHelpText, email, globals) {
-  if (!email) globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpHelpText, { value: `${otpHelpText} ${maskNumber(mobileNo, 6)}` });
-  globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpHelpText, { value: `${otpHelpText} ${maskNumber(mobileNo, 6)} & email ID ${maskedEmail(email)}.` });
+  if (!email) globals.functions.setProperty(otpHelpText, { value: `${otpHelpText} ${maskNumber(mobileNo, 6)}` });
+  globals.functions.setProperty(otpHelpText, { value: `${otpHelpText} ${maskNumber(mobileNo, 6)} & email ID ${maskedEmail(email)}.` });
 }
 
 /**
@@ -195,10 +207,8 @@ function otpValidationNRE(mobileNumber, pan, dob, otpNumber, globals) {
       passwordValue: otpNumber.$value,
       dateOfBirth: clearString(dob.$value) || '',
       panNumber: pan.$value || '',
-      channelSource: '',
       journeyID: currentFormContext.journeyID,
       journeyName: globals.form.runtime.journeyName.$value || currentFormContext.journeyName,
-      dedupeFlag: 'N',
       referenceNumber: referenceNumber ?? '',
     },
   };
@@ -213,13 +223,8 @@ function prefillCustomerDetails(response, globals) {
     customerName,
     accountNumber,
     customerID,
+    singleAccount,
   } = globals.form.wizardPanel.wizardFragment.wizardNreNro.selectAccount;
-
-  const {
-    accountType,
-    branch,
-    ifsc,
-  } = globals.form.wizardPanel.wizardFragment.wizardNreNro.selectAccount.singleAccount;
 
   const changeDataAttrObj = { attrChange: true, value: false, disable: true };
 
@@ -231,9 +236,9 @@ function prefillCustomerDetails(response, globals) {
   setFormValue(customerName, response.customerShortName);
   setFormValue(accountNumber, response.accountNumber);
   setFormValue(customerID, response.customerId);
-  setFormValue(accountType, response.prodTypeDesc);
-  setFormValue(branch, response.branchName);
-  setFormValue(ifsc, response.ifscCode);
+  setFormValue(singleAccount.accountType, response.prodTypeDesc);
+  setFormValue(singleAccount.branch, response.branchName);
+  setFormValue(singleAccount.ifsc, response.ifscCode);
 }
 
 export {
