@@ -70,6 +70,16 @@ const ANALYTICS = {
   },
 };
 
+const GENDER_MAP = { Male: '1', Female: '2', Others: '3' };
+const OCCUPATION_MAP = {
+  salaried: '1',
+  'self employed': '2',
+  student: '3',
+  housewife: '4',
+  retired: '5',
+};
+const ALLOWED_CHARACTERS = '/ -,';
+
 export {
   JOURNEY_NAME,
   ERROR_MSG,
@@ -87,4 +97,7 @@ export {
   IDCOM,
   FORM_NAME,
   ANALYTICS,
+  GENDER_MAP,
+  OCCUPATION_MAP,
+  ALLOWED_CHARACTERS,
 };

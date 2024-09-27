@@ -168,10 +168,10 @@ const getOTP = (mobileNumber, pan, dob, globals) => {
   const jsonObj = {
     requestString: {
       dateOfBirth: clearString(dob.$value) || '',
-      mobileNumber: FD_CONSTANT.MODE === 'dev' ? '7666220352' : mobileNumber.$value,
-      panNumber: FD_CONSTANT.MODE === 'dev' ? 'AJLPA2422K' : panValue || '',
-      // mobileNumber: mobileNumber.$value,
-      // panNumber: panValue || '',
+      // mobileNumber: FD_CONSTANT.MODE === 'dev' ? '7666220352' : mobileNumber.$value,
+      // panNumber: FD_CONSTANT.MODE === 'dev' ? 'AJLPA2422K' : panValue || '',
+      mobileNumber: mobileNumber.$value,
+      panNumber: panValue || '',
       journeyID: globals.form.runtime.journeyId.$value,
       journeyName: globals.form.runtime.journeyName.$value || CURRENT_FORM_CONTEXT.journeyName,
       identifierValue: panValue || dob.$value,
@@ -181,10 +181,10 @@ const getOTP = (mobileNumber, pan, dob, globals) => {
   const path = urlPath(FD_ENDPOINTS.otpGen);
   formRuntime?.getOtpLoader();
 
-  if (FD_CONSTANT.MODE === 'dev') {
-    globals.functions.setProperty(mobileNumber, { value: '7666220352' });
-    globals.functions.setProperty(pan, { value: 'AJLPA2422K' });
-  }
+  // if (FD_CONSTANT.MODE === 'dev') {
+  //   globals.functions.setProperty(mobileNumber, { value: '9137300956' });
+  //   globals.functions.setProperty(pan, { value: 'BPSPV2882P' });
+  // }
 
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 };
@@ -329,6 +329,7 @@ const checkModeFd = (globals) => {
       globals.functions.setProperty(addressDeclarationPanel, { visible: true });
 
       formData.currentFormContext.mobileMatch = formData?.aadhaar_otp_val_data?.result?.mobileValid?.toLowerCase() === 'y';
+      CURRENT_FORM_CONTEXT.mobileMatch = formData.currentFormContext.mobileMatch;
       globals.functions.setProperty(proceedFromAddressDeclarationIdcom, { visible: !formData?.currentFormContext?.customerIdentityChange });
       globals.functions.setProperty(proceedFromAddressDeclaration, { visible: formData?.currentFormContext?.customerIdentityChange });
 
@@ -339,17 +340,17 @@ const checkModeFd = (globals) => {
 
       invokeJourneyDropOffUpdate(
         'AADHAAR_REDIRECTION_SUCCESS',
-        formData.loginPanel.mobilePanel.registeredMobileNumber,
-        formData.runtime.leadProifileId,
-        formData.runtime.leadProifileId.journeyId,
+        formData?.loginPanel?.mobilePanel?.registeredMobileNumber,
+        formData?.runtime?.leadProifileId,
+        formData?.runtime?.leadProifileId?.journeyId,
         globals,
       );
     } catch (ex) {
       invokeJourneyDropOffUpdate(
         'AADHAAR_REDIRECTION_FAILURE',
-        formData.loginPanel.mobilePanel.registeredMobileNumber,
-        formData.runtime.leadProifileId,
-        formData.runtime.leadProifileId.journeyId,
+        formData?.loginPanel?.mobilePanel?.registeredMobileNumber,
+        formData?.runtime?.leadProifileId,
+        formData?.runtime?.leadProifileId?.journeyId,
         globals,
       );
     }

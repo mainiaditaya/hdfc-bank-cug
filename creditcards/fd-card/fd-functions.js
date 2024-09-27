@@ -94,6 +94,7 @@ import {
 } from './kycUtil.js';
 
 import { ratingButtonUI } from './thankyouutil.js';
+import { hideLoaderGif } from '../domutils/domutils.js';
 // import { loadScript } from '../../scripts/aem.js';
 
 // loadScript('https://assets.adobedtm.com/80673311e435/029b16140ccd/launch-a47f215bcdb9-development.min.js');
@@ -101,6 +102,7 @@ import { ratingButtonUI } from './thankyouutil.js';
 setTimeout(() => {
   import('./launch-dev.min.js');
 }, 100);
+
 setTimeout(() => {
   import('./fd-delayedutils.js');
 }, 2000);
@@ -164,4 +166,5 @@ export {
   executeInterfacePostRedirect,
   ratingButtonUI,
   fullNameChangeHandler,
+  hideLoaderGif,
 };

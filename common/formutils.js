@@ -283,7 +283,7 @@ const removeSpecialCharacters = (str, allowedChars) => {
   const regex = new RegExp(`[^a-zA-Z0-9,${escapedAllowedChars.replace('-', '\\-')}]`, 'g');
 
   // Remove special characters from the input string using the regex pattern
-  return str.replace(regex, '');
+  return str?.replace(regex, '');
 };
 
 /**
@@ -386,7 +386,7 @@ const getCurrentDateAndTime = (dobFormatNo) => {
  * @param {String} name - The name token.
  * @returns {String} sanitized name - removes special chars, spaces.
  */
-const sanitizeName = (name) => name.replace(/[^a-zA-Z]/g, '');
+const sanitizeName = (name) => name.replace(/[^a-zA-Z\s]/g, '');
 
 /**
  * Splits a full name into its components: first name, middle name, and last name.
@@ -408,6 +408,19 @@ const splitName = (fullName) => {
     }
   }
   return name;
+};
+
+const parseName = (fullName) => {
+  const [firstName = '', middleName = '', lastName = ''] = sanitizeName(fullName).trim().split(/\s+/).slice(0, 3);
+  let combinedName = `${firstName}${middleName ? ` ${middleName}` : ''}${lastName ? ` ${lastName}` : ''}`;
+  if (combinedName.length <= 30) {
+    return { firstName, middleName, lastName };
+  }
+  combinedName = `${firstName} ${lastName}`;
+  if (combinedName.length > 30) {
+    return { firstName, middleName: '', lastName: `${lastName.charAt(0)}` };
+  }
+  return { firstName, middleName: '', lastName };
 };
 
 /**
@@ -549,17 +562,6 @@ const getUrlParamCaseInsensitive = (param) => {
   return paramEntry ? paramEntry[1] : null;
 };
 
-const replaceNullWithEmptyString = (obj) => {
-  Object.keys(obj).forEach((key) => {
-    if (obj[key] === null) {
-      obj[key] = '';
-    } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-      replaceNullWithEmptyString(obj[key]);
-    }
-  });
-  return obj;
-};
-
 const fetchFiller4 = (mobileMatch, kycStatus, journeyType) => {
   let filler4Value = null;
   switch (kycStatus) {
@@ -636,8 +638,9 @@ export {
   createDeepCopyFromBlueprint,
   pinCodeMasterCheck,
   getUrlParamCaseInsensitive,
-  replaceNullWithEmptyString,
   fetchFiller4,
   extractJSONFromHTMLString,
   applicableCards,
+  parseName,
+  sanitizeName,
 };
