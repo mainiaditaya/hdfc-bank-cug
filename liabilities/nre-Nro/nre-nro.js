@@ -6,6 +6,7 @@ import {
   otpValidationNRE,
   updateOTPHelpText,
   prefillCustomerDetails,
+  getCountryCodes,
 } from './nre-nroFunctions.js';
 
 import {
@@ -22,4 +23,5 @@ export {
   otpValidationNRE,
   updateOTPHelpText,
   prefillCustomerDetails,
+  getCountryCodes,
 };
