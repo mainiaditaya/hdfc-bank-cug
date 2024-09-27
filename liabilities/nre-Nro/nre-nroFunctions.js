@@ -1,7 +1,10 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 /* eslint no-console: ["error", { allow: ["warn", "error"] }] */
 import {
   createJourneyId,
 } from './nre-nro-journey-utils.js';
+import { addGaps } from './nre-nro-dom-functions.js';
 import {
   ageValidator,
   clearString,
@@ -20,7 +23,7 @@ import * as NRE_CONSTANT from './constant.js';
 
 let prevSelectedIndex = -1;
 let defaultDropdownIndex = -1;
-const resendOtpCount = 0;
+let resendOtpCount = 0;
 const MAX_OTP_RESEND_COUNT = 3;
 const OTP_TIMER = 30;
 let sec = OTP_TIMER;
@@ -55,6 +58,11 @@ const maskedEmail = (email) => {
   return `${maskedLocalPart}@${domain}`;
 };
 
+const validFDPan = (val) => {
+  if (val?.length !== 12) return false;
+  if (![...val.slice(0, 5)]?.every((c) => /[a-zA-Z]/.test(c))) return false;
+  return true;
+};
 /**
  * Validates the date of birth field to ensure the age is between 18 and 120.
  * @param {Object} globals - The global object containing necessary data for DAP request.
@@ -62,15 +70,15 @@ const maskedEmail = (email) => {
 
 const validateLogin = (globals) => {
   const mobileNo = globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.mobilePanel.registeredMobileNumber.$value;
-  const isdCode = globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.mobilePanel.countryCode.$value;
+  const isdCode = (globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.mobilePanel.countryCode.$value)?.replace(/[^a-zA-Z0-9]+/g, '');
   const dobValue = globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.identifierPanel.dateOfBirth.$value;
   const panValue = globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.identifierPanel.pan.$value;
   const panDobSelection = globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.identifierPanel.panDobSelection.$value;
   const radioSelect = (panDobSelection === '0') ? 'DOB' : 'PAN';
-  const regexPan = /^[a-zA-Z]{3}[Pp][a-zA-Z][0-9]{4}[a-zA-Z]{1}/g;
   const consentFirst = globals.form.parentLandingPagePanel.landingPanel.consentsFragmentNreNro.checkboxConsent1Label.$value;
   const panErrorText = 'Please enter a valid PAN Number';
   const isdNumberPattern = /^(?!0)([5-9]\d{9})$/;
+  const panIsValid = validFDPan(panValue);
   const nonISDNumberPattern = /^(?!0)\d{3,15}$/;
   globals.functions.setProperty(globals.form.parentLandingPagePanel.getOTPbutton, { enabled: false });
 
@@ -107,17 +115,16 @@ const validateLogin = (globals) => {
       panWrapper.setAttribute('data-empty', true);
       if (panValue) {
         panWrapper.setAttribute('data-empty', false);
-        const validPan = regexPan.test(panValue);
-        if (validPan && consentFirst) {
+        if (panIsValid && consentFirst) {
           globals.functions.markFieldAsInvalid('$form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.pan', '', { useQualifiedName: true });
           globals.functions.setProperty(globals.form.parentLandingPagePanel.getOTPbutton, { enabled: true });
         }
-        if (validPan) {
+        if (panIsValid) {
           globals.functions.markFieldAsInvalid('$form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.pan', '', { useQualifiedName: true });
           globals.functions.setProperty(globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.identifierPanel.pan, { valid: true });
           globals.functions.setProperty(globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.identifierPanel.panErrorText, { visible: false });
         }
-        if (!validPan) {
+        if (!panIsValid) {
           globals.functions.markFieldAsInvalid('$form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.pan', panErrorText, { useQualifiedName: true });
           globals.functions.setProperty(globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.identifierPanel.panErrorText, { visible: true });
           globals.functions.setProperty(globals.form.parentLandingPagePanel.getOTPbutton, { enabled: false });
@@ -217,10 +224,14 @@ function otpTimer(globals) {
   if (resendOtpCount < MAX_OTP_RESEND_COUNT) {
     globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: true });
     globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: false });
+    globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: true });
+    globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: false });
   } else {
+    globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: false });
     globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: false });
   }
   const timer = setInterval(() => {
+    globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel.seconds, { value: dispSec });
     globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel.seconds, { value: dispSec });
     sec -= 1;
     dispSec = sec;
@@ -229,6 +240,8 @@ function otpTimer(globals) {
     }
     if (sec < 0) {
       clearInterval(timer);
+      globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: false });
+      if (resendOtpCount < MAX_OTP_RESEND_COUNT) globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: true });
       globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: false });
       if (resendOtpCount < MAX_OTP_RESEND_COUNT) globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: true });
     }
@@ -289,9 +302,46 @@ function prefillCustomerDetails(response, globals) {
   setFormValue(singleAccount.branch, response.branchName);
   setFormValue(singleAccount.ifsc, response.ifscCode);
 }
+
 setTimeout(async () => {
   await getCountryCodes(document.querySelector('.field-countrycode select'));
 }, 2000);
+
+/**
+ * @name resendOTP
+ * @param {Object} globals - The global object containing necessary data for DAP request.
+ * @return {PROMISE}
+ */
+const resendOTP = async (globals) => {
+  const mobileNo = globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.mobilePanel.registeredMobileNumber;
+  const panValue = globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.identifierPanel.pan;
+  const dobValue = globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.identifierPanel.dateOfBirth;
+  if (resendOtpCount < MAX_OTP_RESEND_COUNT) {
+    resendOtpCount += 1;
+    if (resendOtpCount === MAX_OTP_RESEND_COUNT) {
+      globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: false });
+      globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: false });
+      globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.maxAttemptMessage, { visible: true });
+    }
+    return getOTP(mobileNo, panValue, dobValue, globals);
+  }
+
+  return null; // Return null if max attempts reached
+};
+
+/**
+ * does the custom show hide of panel or screens in resend otp.
+ * @param {string} errorMessage
+ * @param {number} numRetries
+ * @param {object} globals
+ */
+function customFocus(errorMessage, numRetries, globals) {
+  if (numRetries === 1) {
+    globals.functions.setProperty(globals.form.errorPanel.otpPanel, { visible: false });
+    globals.functions.setProperty(globals.form.errorPanel.errorresults.incorrectOTPPanel, { visible: true });
+    globals.functions.setProperty(globals.form.errorPanel.errorresults.itsNotYouPanel, { visible: false });
+  }
+}
 
 export {
   validateLogin,
@@ -301,4 +351,7 @@ export {
   updateOTPHelpText,
   prefillCustomerDetails,
   getCountryCodes,
+  resendOTP,
+  customFocus,
+  validFDPan,
 };
