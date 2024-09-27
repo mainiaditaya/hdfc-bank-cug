@@ -6,10 +6,12 @@ import {
   generateUUID,
 } from '../../common/formutils.js';
 import { fetchJsonResponse } from '../../common/makeRestAPI.js';
+import * as NRE_CONSTANT from './constant.js';
 
 import * as CONSTANT from '../../common/constants.js';
 
-const { ENDPOINTS, CHANNEL, CURRENT_FORM_CONTEXT: currentFormContext } = CONSTANT;
+const { ENDPOINTS, CURRENT_FORM_CONTEXT: currentFormContext } = CONSTANT;
+const { CHANNEL, JOURNEY_NAME, VISIT_MODE } = NRE_CONSTANT;
 
 /**
      * generates the journeyId
@@ -23,6 +25,7 @@ function createJourneyId(visitMode, journeyAbbreviation, channel, globals) {
   // var dispInstance = getDispatcherInstance();
   const journeyId = globals.functions.exportData().journeyId || `${dynamicUUID}_01_${journeyAbbreviation}_${visitMode}_${channel}`;
   globals.functions.setProperty(globals.form.runtime.journeyId, { value: journeyId });
+  return journeyId;
 }
 
 const getCurrentContext = () => currentFormContext;
@@ -45,7 +48,7 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
       formData: {
         channel: CHANNEL,
         journeyName: globals.form.runtime.journeyName.$value,
-        journeyID: globals.form.runtime.journeyId.$value || createJourneyId('online', globals.form.runtime.journeyName.$value, CHANNEL, globals),
+        journeyID: globals.form.runtime.journeyId.$value || createJourneyId(VISIT_MODE, JOURNEY_NAME, CHANNEL, globals),
         journeyStateInfo: [
           {
             state,
@@ -171,9 +174,9 @@ const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyI
 
 export {
   invokeJourneyDropOff,
-  invokeJourneyDropOffByParam,
   invokeJourneyDropOffUpdate,
-  journeyResponseHandlerUtil,
   getCurrentContext,
   createJourneyId,
+  journeyResponseHandlerUtil,
+  invokeJourneyDropOffByParam,
 };
