@@ -25,7 +25,7 @@ let prevSelectedIndex = -1;
 let defaultDropdownIndex = -1;
 let resendOtpCount = 0;
 const MAX_OTP_RESEND_COUNT = 3;
-const OTP_TIMER = 30;
+const OTP_TIMER = 5;
 let sec = OTP_TIMER;
 let dispSec = OTP_TIMER;
 const {
@@ -323,7 +323,7 @@ const resendOTP = async (globals) => {
       globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: false });
       globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.maxAttemptMessage, { visible: true });
     }
-    return getOTP(mobileNo, panValue, dobValue, globals);
+    return getOtpNRE(mobileNo, panValue, dobValue, globals);
   }
 
   return null; // Return null if max attempts reached
@@ -337,9 +337,7 @@ const resendOTP = async (globals) => {
  */
 function customFocus(errorMessage, numRetries, globals) {
   if (numRetries === 1) {
-    globals.functions.setProperty(globals.form.errorPanel.otpPanel, { visible: false });
-    globals.functions.setProperty(globals.form.errorPanel.errorresults.incorrectOTPPanel, { visible: true });
-    globals.functions.setProperty(globals.form.errorPanel.errorresults.itsNotYouPanel, { visible: false });
+    globals.functions.setProperty(globals.form.errorPanel.otppanelwrapper.incorrectOTPPanel, { visible: true });
   }
 }
 
