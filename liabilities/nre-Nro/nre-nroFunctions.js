@@ -25,7 +25,7 @@ let prevSelectedIndex = -1;
 let defaultDropdownIndex = -1;
 let resendOtpCount = 0;
 const MAX_OTP_RESEND_COUNT = 3;
-const OTP_TIMER = 5;
+const OTP_TIMER = 30;
 let sec = OTP_TIMER;
 let dispSec = OTP_TIMER;
 const {
