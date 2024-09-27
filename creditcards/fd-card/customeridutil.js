@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { CURRENT_FORM_CONTEXT } from '../../common/constants.js';
-import { FD_ENDPOINTS } from './constant.js';
+import { ANALYTICS, FD_ENDPOINTS } from './constant.js';
 import { fetchJsonResponse, fetchRecursiveResponse } from '../../common/makeRestAPI.js';
 import { urlPath } from '../../common/formutils.js';
 
@@ -68,6 +68,7 @@ const updateData = (globals, customerData, panel) => {
  * @param {Object} globals
  */
 const customerIdSuccessHandler = (payload, globals) => {
+  CURRENT_FORM_CONTEXT.action = ANALYTICS.event.submitOtp.name;
   const customerData = payload?.responseString?.customerDetailsDTO;
   if (!customerData?.length) return;
   CURRENT_FORM_CONTEXT.customerInfo = payload?.responseString;

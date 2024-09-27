@@ -96,10 +96,12 @@ const finalDapFetchRes = async () => {
 
 const pageRedirected = () => {
   if (!delayedUtilState.aadharRedirect && !delayedUtilState.idComRedirect) {
-    const { pageLoad } = ANALYTICS.event;
-    setTimeout(() => {
-      sendAnalytics(pageLoad.type, pageLoad.name, pageLoad.pageName, {}, pageLoad.journeyState, {});
-    }, 1000);
+    const { formLoad } = ANALYTICS.event;
+    const journeyData = {};
+    // eslint-disable-next-line no-underscore-dangle, no-undef
+    journeyData.journeyId = myForm.resolveQualifiedName('$form.runtime.journeyId')._data.$_value;
+    journeyData.journeyName = CURRENT_FORM_CONTEXT.journeyName;
+    sendAnalytics(formLoad.type, formLoad.pageName, {}, formLoad.journeyState, journeyData);
   }
   if (delayedUtilState.idComRedirect) {
     displayLoader();

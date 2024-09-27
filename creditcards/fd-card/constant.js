@@ -60,12 +60,25 @@ const DOM_ELEMENT = {
   },
 };
 const ANALYTICS = {
+  formName: 'Fixed Deposit Lien Credit Card',
   event: {
-    pageLoad: {
-      name: 'page load',
-      type: 'Page Load',
+    formLoad: {
+      type: 'page load',
+      name: 'Form Load',
       pageName: 'Home page',
-      journeyState: 'Home page journey State',
+      journeyState: 'CRM_LEAD_SUCCESS',
+    },
+    getOtp: {
+      type: 'click',
+      name: 'otp click',
+      pageName: 'Identify Yourself',
+      journeyState: '',
+    },
+    submitOtp: {
+      type: 'click',
+      name: 'Verify with OTP',
+      pageName: 'Verify with OTP',
+      journeyState: 'CUSTOMER_IDENTITY_RESOLVED',
     },
   },
 };

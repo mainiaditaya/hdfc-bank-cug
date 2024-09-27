@@ -160,7 +160,7 @@ const getOTP = (mobileNumber, pan, dob, globals) => {
   } else {
     globals.functions.setProperty(otpPanel.secondsPanel, { visible: false });
   }
-  CURRENT_FORM_CONTEXT.action = 'getOTP';
+  CURRENT_FORM_CONTEXT.action = FD_CONSTANT.ANALYTICS.event.getOtp.name;
   // eslint-disable-next-line no-restricted-globals
   CURRENT_FORM_CONTEXT.journeyID = globals.form.runtime.journeyId.$value;
   CURRENT_FORM_CONTEXT.leadIdParam = globals.functions.exportData().queryParams;
