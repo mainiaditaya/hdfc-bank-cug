@@ -609,13 +609,22 @@ function sortData(txnType, orderBy, globals) {
     ...item,
     aem_TxnAmt: (currencyStrToNum(item?.aem_TxnAmt)),
   }));
-  mapSortedDat?.forEach((_data, i) => {
-    const data = {
-      ..._data,
-      type: txnType,
-    };
-    setData(globals, pannel, data, i);
-  });
+  try {
+    mapSortedDat?.forEach((_data, i) => {
+      const data = {
+        ..._data,
+        type: txnType,
+      };
+      const delay = DELAY + (DELTA_DELAY * i);
+      setTimeout(() => {
+        setData(globals, pannel, data, i);
+      }, delay);
+    });
+    userPrevSelect.prevTxnType = 'SORT_BY';
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(error, 'sortEr');
+  }
   setTimeout(() => {
     isUserSelection = !isUserSelection;
   }, 1000);
@@ -775,7 +784,7 @@ function txnSelectHandler(checkboxVal, amount, ID, date, txnType, globals) {
     const TOTAL_SELECT = `Total selected ${currentFormContext.totalSelect}/${MAX_SELECT}`;
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_TotalSelectedTxt, { value: TOTAL_SELECT });// total no of select billed or unbilled txn list
     globals.functions.setProperty(txnSelected, { value: SELECTED }); // set number of select in billed or unbilled txn list
-    return;
+    // return;
   }
 
   /* enable alert message if the user exceed selecting the txn above 10 laksh. */
