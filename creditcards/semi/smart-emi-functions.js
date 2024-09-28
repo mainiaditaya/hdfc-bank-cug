@@ -69,7 +69,7 @@ currentFormContext.journeyID = generateJourneyId('a', 'b', 'c');
 currentFormContext.totalSelect = 0;
 currentFormContext.billed = 0;
 currentFormContext.unbilled = 0;
-currentFormContext.billedMaxSelect = 0;
+currentFormContext.tadMinusMadValue = 0;
 currentFormContext.txnSelectExceedLimit = 1000000; // ten lakhs txn's select exceeding limit
 let tnxPopupAlertOnce = 0; // flag alert for the pop to show only once on click of continue
 let resendOtpCount = 0;
@@ -360,7 +360,7 @@ function checkELigibilityHandler(resPayload1, globals) {
   const response = {};
   try {
     /* billed txn maximum amount select limt */
-    currentFormContext.billedMaxSelect = ((parseFloat(resPayload.blockCode.tad) / 100) - (parseFloat(resPayload.blockCode.mad) / 100));
+    currentFormContext.tadMinusMadValue = ((parseFloat(resPayload.blockCode.tad) / 100) - (parseFloat(resPayload.blockCode.mad) / 100));
     /* continue btn disabling code added temorary, can be removed after form authoring */
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
     let ccBilledData = resPayload?.ccBilledTxnResponse?.responseString || [];
@@ -678,7 +678,7 @@ const handleTadMadAlert = (globals) => {
     for (let i = mapBiledList.length - 1; i >= 0; i--) {
       const prev = mapBiledList[i];
       billedTotal -= prev.amtVal;
-      if (billedTotal < currentFormContext.billedMaxSelect) {
+      if (billedTotal < currentFormContext.tadMinusMadValue) {
         trackLastIndex.push(i);
         break; // Exit the loop
       } else {
@@ -694,7 +694,7 @@ const handleTadMadAlert = (globals) => {
   const TXN_FRAG = (userPrevSelect.prevTxnType === 'BILLED') ? BILLED_FRAG : UNBILLED_FRAG;
 
   const txnList = globals.form.aem_semiWizard.aem_chooseTransactions[`${TXN_FRAG}`].aem_chooseTransactions.aem_TxnsList;
-  if (currentFormContext.sumOfbilledTxnOnly > currentFormContext.billedMaxSelect) {
+  if (currentFormContext.sumOfbilledTxnOnly > currentFormContext.tadMinusMadValue) {
     const txnArrayList = txnList?.map((el) => ({ checkVal: el.aem_Txn_checkBox.$value, amtVal: el.aem_TxnAmt.$value, id: el.aem_TxnID.$value }));
     const findExactSelect = txnList?.find((el) => (prevSelectedRowData?.txnAmt === el.aem_TxnAmt.$value) && (prevSelectedRowData?.txnDate === el.aem_TxnDate.$value) && (prevSelectedRowData?.txnId === el.aem_TxnID.$value) && (prevSelectedRowData?.txnType === el.aem_txn_type.$value));
     const indexOfPrevSelect = txnArrayList.findIndex((el) => el.id === findExactSelect.aem_TxnID.$value);
@@ -749,8 +749,8 @@ function txnSelectHandler(checkboxVal, amount, ID, date, txnType, globals) {
   if (sumOfbilledTxnOnly) {
     /* popup alert hanldles */
     const selectedTotalTxn = globals.functions.exportData().smartemi.aem_billedTxn.aem_billedTxnSelection.filter((el) => el.aem_Txn_checkBox).length + globals.functions.exportData().smartemi.aem_unbilledTxn.aem_unbilledTxnSection.filter((el) => el.aem_Txn_checkBox).length;
-    if (sumOfbilledTxnOnly > currentFormContext.billedMaxSelect) {
-      const SELECTED_MAX_BILL = ` Please select Billed Transactions Amount Max up to Rs.${nfObject.format(currentFormContext.billedMaxSelect)}`;
+    if (sumOfbilledTxnOnly > currentFormContext.tadMinusMadValue) {
+      const SELECTED_MAX_BILL = ` Please select Billed Transactions Amount Max up to Rs.${nfObject.format(currentFormContext.tadMinusMadValue)}`;
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper, { visible: true });
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup, { visible: true });
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation, { value: SELECTED_MAX_BILL });
