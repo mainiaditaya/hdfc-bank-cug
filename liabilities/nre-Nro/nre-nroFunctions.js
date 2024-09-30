@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 /* eslint no-console: ["error", { allow: ["warn", "error"] }] */
@@ -115,7 +116,7 @@ const validateLogin = (globals) => {
       panWrapper.setAttribute('data-empty', true);
       if (panValue) {
         panWrapper.setAttribute('data-empty', false);
-        if (panIsValid && consentFirst) {
+        if (panIsValid && consentFirst && mobileNo) {
           globals.functions.markFieldAsInvalid('$form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.pan', '', { useQualifiedName: true });
           globals.functions.setProperty(globals.form.parentLandingPagePanel.getOTPbutton, { enabled: true });
         }
@@ -129,7 +130,7 @@ const validateLogin = (globals) => {
           globals.functions.setProperty(globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.identifierPanel.panErrorText, { visible: true });
           globals.functions.setProperty(globals.form.parentLandingPagePanel.getOTPbutton, { enabled: false });
         }
-        if (!consentFirst) {
+        if (!consentFirst && !mobileNo) {
           globals.functions.setProperty(globals.form.parentLandingPagePanel.getOTPbutton, { enabled: false });
         }
       }
@@ -224,26 +225,22 @@ function otpTimer(globals) {
   if (resendOtpCount < MAX_OTP_RESEND_COUNT) {
     globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: true });
     globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: false });
-    globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: true });
-    globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: false });
   } else {
-    globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: false });
     globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: false });
   }
   const timer = setInterval(() => {
-    globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel.seconds, { value: dispSec });
-    globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel.seconds, { value: dispSec });
     sec -= 1;
     dispSec = sec;
     if (sec < 10) {
-      dispSec = `0${dispSec}`;
+      dispSec = `0${sec}`;
     }
+    globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel.seconds, { value: dispSec });
     if (sec < 0) {
       clearInterval(timer);
       globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: false });
-      if (resendOtpCount < MAX_OTP_RESEND_COUNT) globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: true });
-      globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: false });
-      if (resendOtpCount < MAX_OTP_RESEND_COUNT) globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: true });
+      if (resendOtpCount < MAX_OTP_RESEND_COUNT) {
+        globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: true });
+      }
     }
   }, 1000);
 }
@@ -313,17 +310,32 @@ setTimeout(async () => {
  * @return {PROMISE}
  */
 const resendOTP = async (globals) => {
+  dispSec = OTP_TIMER;
   const mobileNo = globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.mobilePanel.registeredMobileNumber;
   const panValue = globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.identifierPanel.pan;
   const dobValue = globals.form.parentLandingPagePanel.landingPanel.loginFragmentNreNro.identifierPanel.dateOfBirth;
+  globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: false });
+  globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: true });
+  globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel.seconds, { value: dispSec });
   if (resendOtpCount < MAX_OTP_RESEND_COUNT) {
     resendOtpCount += 1;
+
+    const otpResult = await getOtpNRE(mobileNo, panValue, dobValue, globals);
+    globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel.seconds, { value: dispSec });
+    if (otpResult && otpResult.customerIdentificationResponse.existingCustomer === 'Y') {
+      sec = OTP_TIMER;
+      otpTimer(globals);
+    } else {
+      globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.errorMessage, { visible: true, message: otpResult.message });
+      globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: true });
+    }
+
     if (resendOtpCount === MAX_OTP_RESEND_COUNT) {
       globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.secondsPanel, { visible: false });
       globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.otpResend, { visible: false });
       globals.functions.setProperty(globals.form.otppanelwrapper.otpFragment.otpPanel.maxAttemptMessage, { visible: true });
     }
-    return getOtpNRE(mobileNo, panValue, dobValue, globals);
+    return otpResult;
   }
 
   return null; // Return null if max attempts reached
