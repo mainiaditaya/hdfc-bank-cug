@@ -5,18 +5,37 @@ import { confirmCardState } from './confirmcardutil.js';
 import { JOURNEY_NAME, FD_ENDPOINTS } from './constant.js';
 import { SELECTED_CUSTOMER_ID } from './customeridutil.js';
 import { invokeJourneyDropOffUpdate } from './fd-journey-util.js';
+import { SELECT_FD_STATE } from './fddetailsutil.js';
 import finalDap from './finaldaputils.js';
 import { IPA_RESPONSE } from './ipautil.js';
 
 const createExecuteInterfaceRequest = (source, globals) => {
   const {
-    customerInfo, journeyID, customerAddress,
+    customerInfo,
+    journeyID,
+    customerAddress,
+    permanentAddress,
   } = CURRENT_FORM_CONTEXT;
-  const { reviewDetailsView } = globals.form.fdBasedCreditCardWizard.basicDetails;
+  const { basicDetails, selectFD } = globals.form.fdBasedCreditCardWizard;
   const {
     personalDetails, addressDetails, employeeAssistance, employmentDetails,
-  } = reviewDetailsView;
+  } = basicDetails.reviewDetailsView;
   const { employeeAssistancePanel } = employeeAssistance;
+
+  const { fdNumberSelection } = selectFD.fdSelectionInfo;
+  const { fdList } = SELECT_FD_STATE;
+  const selectedFds = fdNumberSelection.reduce((acc, fd) => {
+    if (fd.fdAccSelect._data.$_value === 'on') {
+      acc.push(fd?.fdNumber?._data?.$_value?.toString());
+    }
+    return acc;
+  }, []);
+  const selectedFdDetails = fdList.filter((fd) => selectedFds.includes(fd.fdAccountNo.trim())) // Filter based on selected FD
+    .map((fd) => ({
+      fdNumber: fd.fdAccountNo.trim(),
+      fdTenure: `${fd.termMonths} months ${fd.termDays} days`,
+      fdAmt: fd.balPrincipal,
+    }));
   const addressEditFlag = addressDetails?.mailingAddressToggle?.$value !== 'on';
 
   function getAddress(addressSource) {
@@ -31,7 +50,10 @@ const createExecuteInterfaceRequest = (source, globals) => {
   }
 
   let communicationAddress = getAddress(customerAddress);
-  const permanentAddress = getAddress(customerAddress);
+  let customerPermanentAddress = getAddress(customerAddress);
+  if (CURRENT_FORM_CONTEXT?.perAddExist) {
+    customerPermanentAddress = getAddress(permanentAddress);
+  }
 
   if (addressEditFlag) {
     const newAddressPanel = addressDetails.newCurentAddressPanel;
@@ -103,7 +125,7 @@ const createExecuteInterfaceRequest = (source, globals) => {
       mobileEditFlag: 'N',
       mobileNumber: globals.form.loginMainPanel.loginPanel.mobilePanel.registeredMobileNumber.$value,
       monthlyincome: '',
-      nameEditFlag: personalDetails?.fathersFullName?.$value?.length > 0 ? 'Y' : 'N',
+      nameEditFlag: personalDetails?.fathersFullName?.$value?.length > 0 || CURRENT_FORM_CONTEXT?.nameParsed ? 'Y' : 'N',
       nameOnCard,
       occupation: employmentDetails.employmentType._data.$_value || '1',
       officialEmailId: '',
@@ -116,20 +138,22 @@ const createExecuteInterfaceRequest = (source, globals) => {
       panCheckFlag: 'Y',
       panEditFlag: customerInfo?.refCustItNum ? 'N' : 'Y',
       panNumber: personalDetails.panNumberPersonalDetails.$value.replace(/\s+/g, ''),
-      permanentAddress1: permanentAddress?.line1,
-      permanentAddress2: permanentAddress?.line2,
-      permanentAddress3: permanentAddress?.line3,
-      permanentCity: permanentAddress?.city,
-      permanentState: permanentAddress?.state,
-      permanentZipCode: permanentAddress?.zip,
+      permanentAddress1: customerPermanentAddress?.line1,
+      permanentAddress2: customerPermanentAddress?.line2,
+      permanentAddress3: customerPermanentAddress?.line3,
+      permanentCity: customerPermanentAddress?.city,
+      permanentState: customerPermanentAddress?.state,
+      permanentZipCode: customerPermanentAddress?.zip,
       perAddressType: '2',
       perfiosTxnID: '',
       personalEmailId: personalDetails?.emailID.$value,
       productCode: source === 'confirmcard' ? CURRENT_FORM_CONTEXT?.selectedProductCode : '',
       resPhoneEditFlag: 'N',
       selfConfirmation: 'Y',
+      selectedFdDetails,
       smCode: employeeAssistancePanel.smCode._data.$_value || '',
       timeInfo: new Date().toISOString(),
+      lienConsent: new Date().toISOString(),
     },
   };
   return request;

@@ -44,7 +44,8 @@ const initializeNameOnCardDdOptions = (globals, personalDetails, customerFirstNa
  * @returns {Promise<Object>} - A promise that resolves with the JSON response from the provided URL.
  */
 const bindEmployeeAssistanceField = async (globals) => {
-  const { employeeAssistancePanel, employeeAssistanceToggle, inPersonBioKYCPanel } = globals.form.fdBasedCreditCardWizard.basicDetails.reviewDetailsView.employeeAssistance;
+  const { resultPanel, fdBasedCreditCardWizard } = globals.form;
+  const { employeeAssistancePanel, employeeAssistanceToggle, inPersonBioKYCPanel } = fdBasedCreditCardWizard.basicDetails.reviewDetailsView.employeeAssistance;
   const defaultChannel = getUrlParamCaseInsensitive('channel');
   const inPersonBioKYC = getUrlParamCaseInsensitive('InpersonBioKYC');
   const codes = {
@@ -62,17 +63,22 @@ const bindEmployeeAssistanceField = async (globals) => {
     }
     if (inPersonBioKYC?.toLowerCase() === 'yes') {
       globals.functions.setProperty(inPersonBioKYCPanel, { visible: true });
+      globals.functions.setProperty(inPersonBioKYCPanel.inPersonBioKYCOptions, { value: 0 });
     }
     const response = await getJsonResponse(FD_ENDPOINTS.masterchannel, null, 'GET');
     if (!response) return;
-
+    if (response?.[0].errorCode === '500') {
+      globals.functions.setProperty(resultPanel, { visible: true });
+      globals.functions.setProperty(fdBasedCreditCardWizard, { visible: false });
+      globals.functions.setProperty(resultPanel.errorResultPanel, { visible: true });
+    }
     const dropDownSelectField = employeeAssistancePanel.channel;
     const channelOptions = ['Website Download'];
     const options = channelOptions.map((channel) => ({ label: channel, value: channel }));
     let matchedChannel = options[0].value;
     response.forEach((item) => {
-      const channel = item.CHANNELS;
-      const normalizedChannel = channel.toLowerCase();
+      const channel = item?.CHANNELS;
+      const normalizedChannel = channel?.toLowerCase();
       if (!channelOptions.some((opt) => opt.toLowerCase() === normalizedChannel)) {
         options.push({ label: channel, value: channel });
         channelOptions.push(channel);
@@ -114,6 +120,14 @@ const bindCustomerDetails = (globals) => {
     pincode: '',
     state: '',
   };
+  CURRENT_FORM_CONTEXT.permanentAddress = {
+    addressLine1: '',
+    addressLine2: '',
+    addressLine3: '',
+    city: '',
+    pincode: '',
+    state: '',
+  };
   CUSTOMER_DATA_BINDING_CHECK = false;
   formRuntime.validatePanLoader = (typeof window !== 'undefined') ? displayLoader : false;
   bindEmployeeAssistanceField(globals);
@@ -123,7 +137,9 @@ const bindCustomerDetails = (globals) => {
   customerInfo.customerFirstName = firstName;
   customerInfo.customerMiddleName = middleName;
   customerInfo.customerLastName = lastName;
-  customerInfo.customerFullName = `${firstName} ${middleName} ${lastName}`.replace(/\s+/g, ' ');
+  const parsedFullName = `${firstName} ${middleName} ${lastName}`.replace(/\s+/g, ' ');
+  CURRENT_FORM_CONTEXT.nameParsed = customerInfo.customerFullName !== parsedFullName;
+  customerInfo.customerFullName = parsedFullName;
 
   CURRENT_FORM_CONTEXT.customerIdentityChange = false;
   if (!customerInfo.datBirthCust || !customerInfo.refCustItNum || !customerInfo.genderDescription) CURRENT_FORM_CONTEXT.customerIdentityChange = true;
@@ -144,12 +160,21 @@ const bindCustomerDetails = (globals) => {
   }
 
   const [address = '', cityDetails = ''] = customerInfo.currentAddress.split('||');
+  CURRENT_FORM_CONTEXT.perAddExist = false;
+  let perAddress = ''; let perCityDetails = '';
+  if (customerInfo.permanentAddress) {
+    perAddress = customerInfo.permanentAddress.split('||')?.[0];
+    perCityDetails = customerInfo.permanentAddress.split('||')?.[1];
+    CURRENT_FORM_CONTEXT.perAddExist = true;
+  }
+  const [perCity = '', perState = '', perPincode = ''] = perCityDetails.split('|');
   const [city = '', state = '', pincode = ''] = cityDetails.split('|');
   const cleanAddress = removeSpecialCharacters(address.replace(/\|/g, ' '), ALLOWED_CHARACTERS);
+  const cleanPerAddress = removeSpecialCharacters(perAddress.replace(/\|/g, ' '), ALLOWED_CHARACTERS);
 
   let formattedCustomerAddress = '';
   let parsedAddress = [];
-
+  let parsedPerAddress = [];
   if (cleanAddress.length < MIN_ADDRESS_LENGTH) {
     const addressArray = cleanAddress.trim().split(' ');
     parsedAddress = [
@@ -158,6 +183,15 @@ const bindCustomerDetails = (globals) => {
     ];
   } else {
     parsedAddress = parseCustomerAddress(cleanAddress);
+  }
+  if (cleanPerAddress.length < MIN_ADDRESS_LENGTH) {
+    const addressArray = cleanPerAddress.trim().split(' ');
+    parsedPerAddress = [
+      addressArray.slice(0, -1).join(' '),
+      addressArray.slice(-1)[0],
+    ];
+  } else {
+    parsedPerAddress = parseCustomerAddress(cleanPerAddress);
   }
 
   if (parsedAddress.length) {
@@ -172,6 +206,16 @@ const bindCustomerDetails = (globals) => {
   }
 
   Object.assign(CURRENT_FORM_CONTEXT.customerAddress, { city, pincode, state });
+
+  if (parsedPerAddress.length) {
+    const [addressLine1 = '', addressLine2 = '', addressLine3 = ''] = parsedPerAddress;
+    Object.assign(CURRENT_FORM_CONTEXT.permanentAddress, { addressLine1, addressLine2, addressLine3 });
+  } else {
+    const [addressLine1 = '', addressLine2 = '', addressLine3 = ''] = address.split('|');
+    Object.assign(CURRENT_FORM_CONTEXT.permanentAddress, { addressLine1, addressLine2, addressLine3 });
+  }
+
+  Object.assign(CURRENT_FORM_CONTEXT.permanentAddress, { city: perCity, pincode: perPincode, state: perState });
 
   setFormValue(addressDetails.prefilledMailingAdddress, formattedCustomerAddress);
   const emailIDUtil = formUtil(globals, personalDetails.emailID);
