@@ -44,6 +44,7 @@ import {
   fetchCustomerId,
   customerIdSuccessHandler,
   customerIdClickHandler,
+  fetchReferenceId,
 } from './customeridutil.js';
 
 import {
@@ -52,6 +53,8 @@ import {
   resetFDSelection,
   selectAllFdClickHandler,
 } from './fddetailsutil.js';
+
+import confirmCardClickHandler from './confirmcardutil.js';
 
 export {
   getOTP,
@@ -87,4 +90,6 @@ export {
   branchCodeHandler,
   dobChangeHandler,
   fathersNameChangeHandler,
+  fetchReferenceId,
+  confirmCardClickHandler,
 };
