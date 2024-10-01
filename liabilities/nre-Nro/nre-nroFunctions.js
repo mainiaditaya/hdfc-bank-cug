@@ -1,11 +1,7 @@
-/* eslint-disable no-use-before-define */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-undef */
 /* eslint no-console: ["error", { allow: ["warn", "error"] }] */
 import {
   createJourneyId,
 } from './nre-nro-journey-utils.js';
-import { addGaps } from './nre-nro-dom-functions.js';
 import {
   moveWizardView,
 } from '../domutils/domutils.js';
