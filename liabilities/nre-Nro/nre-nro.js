@@ -9,6 +9,7 @@ import {
   getCountryCodes,
   resendOTP,
   customFocus,
+  switchWizard,
 } from './nre-nroFunctions.js';
 
 import {
@@ -28,4 +29,5 @@ export {
   resendOTP,
   customFocus,
   otpValidationNRE,
+  switchWizard,
 };

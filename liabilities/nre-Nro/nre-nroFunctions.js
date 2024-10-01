@@ -7,6 +7,9 @@ import {
 } from './nre-nro-journey-utils.js';
 import { addGaps } from './nre-nro-dom-functions.js';
 import {
+  moveWizardView,
+} from '../domutils/domutils.js';
+import {
   ageValidator,
   clearString,
   urlPath,
@@ -353,6 +356,7 @@ function customFocus(errorMessage, numRetries, globals) {
   }
 }
 
+const switchWizard = () => moveWizardView('wizardNreNro', 'confirmDetails');
 export {
   validateLogin,
   getOtpNRE,
@@ -364,4 +368,5 @@ export {
   resendOTP,
   customFocus,
   validFDPan,
+  switchWizard,
 };
