@@ -7,6 +7,9 @@ import {
   updateOTPHelpText,
   prefillCustomerDetails,
   getCountryCodes,
+  resendOTP,
+  customFocus,
+  switchWizard,
 } from './nre-nroFunctions.js';
 
 import {
@@ -20,8 +23,11 @@ export {
   invokeJourneyDropOffUpdate,
   getOtpNRE,
   otpTimer,
-  otpValidationNRE,
   updateOTPHelpText,
   prefillCustomerDetails,
   getCountryCodes,
+  resendOTP,
+  customFocus,
+  otpValidationNRE,
+  switchWizard,
 };
