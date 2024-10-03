@@ -598,6 +598,37 @@ function applicableCards(employmentTypeMap, employmentType, cardMap, applicableC
   return matchingCard ? matchingCard.card : [];
 }
 
+const pincodeCheck = async (pincode, city, state) => {
+  const url = urlPath(`/content/hdfc_commonforms/api/mdm.CREDIT.SIX_DIGIT_PINCODE.PINCODE-${pincode}.json`);
+  const errorMethod = async (errStack) => {
+    const { errorCode } = errStack;
+    if (errorCode === '500') {
+      return false;
+    }
+    return false;
+  };
+  const successMethod = async (value) => {
+    if (value?.CITY?.toLowerCase() === city?.toLowerCase() && value?.STATE?.toLowerCase() === state?.toLowerCase()) {
+      return true;
+    }
+
+    return false;
+  };
+  try {
+    const response = await getJsonResponse(url, null, 'GET');
+    const [{ CITY, STATE }] = response;
+    const [{ errorCode, errorMessage }] = response;
+    if (CITY && STATE) {
+      successMethod({ CITY, STATE });
+    } else if (errorCode) {
+      const errStack = { errorCode, errorMessage };
+      throw errStack;
+    }
+  } catch (error) {
+    errorMethod(error);
+  }
+};
+
 export {
   urlPath,
   maskNumber,
@@ -632,4 +663,5 @@ export {
   applicableCards,
   parseName,
   sanitizeName,
+  pincodeCheck,
 };
