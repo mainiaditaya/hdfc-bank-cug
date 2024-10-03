@@ -115,8 +115,8 @@ const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, jo
         mobileNumber,
         leadProfileId: leadProfileId?.toString(),
         profile: {
-          dob: formContextCallbackData.dob || globals.functions.exportData().form.dobPersonalDetails,
-          fullName: formContextCallbackData.fullName || globals.functions.exportData().form.firstName,
+          dob: formContextCallbackData.dob || `${globals.functions.exportData().form.dobPersonalDetails}`,
+          fullName: formContextCallbackData.fullName || `${globals.functions.exportData().form.firstName} ${globals.functions.exportData().form.lastName}`,
         },
       },
       formData: {
