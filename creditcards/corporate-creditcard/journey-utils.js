@@ -75,6 +75,7 @@ const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, jo
   const formContextCallbackData = globals.functions.exportData()?.currentFormContext || currentFormContext;
   // temporary_hotfix_radioBtnValues_undefined_issue
   /* storing the radio btn values in current form context */
+  const formData = globals.functions.exportData();
   if ((state === 'IDCOM_REDIRECTION_INITIATED') || (state === 'CUSTOMER_AADHAR_INIT')) {
     const { form } = globals.functions.exportData();
     const { selectKYCMethodOption1: { aadharEKYCVerification }, selectKYCMethodOption2: { aadharBiometricVerification }, selectKYCMethodOption3: { officiallyValidDocumentsMethod } } = globals.form.corporateCardWizardView.selectKycPanel.selectKYCOptionsPanel;
@@ -115,8 +116,8 @@ const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, jo
         mobileNumber,
         leadProfileId: leadProfileId?.toString(),
         profile: {
-          dob: formContextCallbackData.dob || `${globals.functions.exportData().form.dobPersonalDetails}`,
-          fullName: formContextCallbackData.fullName || `${globals.functions.exportData().form.firstName} ${globals.functions.exportData().form.lastName}`,
+          dob: formContextCallbackData.dob || formData.dobPersonalDetails,
+          fullName: formContextCallbackData.fullName || ((formData.firstName && formData.lastName) ? `${formData.firstName} ${formData.lastName}` : undefined),
         },
       },
       formData: {
