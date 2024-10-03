@@ -629,6 +629,19 @@ const pincodeCheck = async (pincode, city, state) => {
   }
 };
 
+const fetchFiller3 = (authMode) => {
+  if (authMode?.toLowerCase() === 'debitcard') {
+    return 'DCPINSUCCESS';
+  }
+  if (authMode?.toLowerCase() === 'netbanking') {
+    return 'NBSUCCESS';
+  }
+  if (authMode?.toLowerCase() === 'aadhaarotp') {
+    return 'AADHAARSUCCESS';
+  }
+  return '';
+};
+
 export {
   urlPath,
   maskNumber,
@@ -664,4 +677,5 @@ export {
   parseName,
   sanitizeName,
   pincodeCheck,
+  fetchFiller3,
 };
