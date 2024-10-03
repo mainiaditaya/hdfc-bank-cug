@@ -116,8 +116,8 @@ const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, jo
         mobileNumber,
         leadProfileId: leadProfileId?.toString(),
         profile: {
-          dob: formContextCallbackData.dob || formData.dobPersonalDetails,
-          fullName: formContextCallbackData.fullName || ((formData.firstName && formData.lastName) ? `${formData.firstName} ${formData.lastName}` : undefined),
+          dob: formContextCallbackData.dob || formData.form.dobPersonalDetails,
+          fullName: formContextCallbackData.fullName || ((formData.form.firstName && formData.form.lastName) ? `${formData.form.firstName} ${formData.form.lastName}` : undefined),
         },
       },
       formData: {
