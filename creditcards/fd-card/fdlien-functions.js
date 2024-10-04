@@ -288,7 +288,7 @@ const pincodeChangeHandler = (pincode, globals) => {
  * @name checkModeFd
  * @param {object} globals
  */
-const checkModeFd = (globals) => {
+const checkModeFd = async (globals) => {
   const formData = globals.functions.exportData();
   const { authmode: idcomVisit, visitType: aadhaarVisit } = formData?.queryParams || {};
   const { addressDeclarationPanel } = globals.form;
@@ -316,7 +316,7 @@ const checkModeFd = (globals) => {
         communicationAddress1, communicationAddress2, communicationAddress3,
         communicationCity, communicationState, comCityZip,
       } = formData?.currentFormContext?.executeInterfaceRequest?.requestString || {};
-      const isValidAadhaarPincode = pincodeCheck(Zipcode, City, State);
+      const isValidAadhaarPincode = await pincodeCheck(Zipcode, City, State);
       let aadhaarAddress = '';
       let parsedAadhaarAddress = '';
       let fullAadhaarAddress = [Address1, Address2, Address3, City, State, Zipcode].filter(Boolean).join(', ');
@@ -360,17 +360,17 @@ const checkModeFd = (globals) => {
 
       invokeJourneyDropOffUpdate(
         'AADHAAR_REDIRECTION_SUCCESS',
-        formData?.loginPanel?.mobilePanel?.registeredMobileNumber,
-        formData?.runtime?.leadProifileId,
-        formData?.runtime?.leadProifileId?.journeyId,
+        formData?.form?.login?.registeredMobileNumber,
+        formData?.leadProifileId,
+        formData?.journeyId,
         globals,
       );
     } catch (ex) {
       invokeJourneyDropOffUpdate(
         'AADHAAR_REDIRECTION_FAILURE',
-        formData?.loginPanel?.mobilePanel?.registeredMobileNumber,
-        formData?.runtime?.leadProifileId,
-        formData?.runtime?.leadProifileId?.journeyId,
+        formData?.form?.login?.registeredMobileNumber,
+        formData?.leadProifileId,
+        formData?.journeyId,
         globals,
       );
     }

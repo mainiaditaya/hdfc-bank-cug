@@ -600,32 +600,35 @@ function applicableCards(employmentTypeMap, employmentType, cardMap, applicableC
 
 const pincodeCheck = async (pincode, city, state) => {
   const url = urlPath(`/content/hdfc_commonforms/api/mdm.CREDIT.SIX_DIGIT_PINCODE.PINCODE-${pincode}.json`);
-  const errorMethod = async (errStack) => {
-    const { errorCode } = errStack;
-    if (errorCode === '500') {
-      return false;
-    }
-    return false;
-  };
-  const successMethod = async (value) => {
-    if (value?.CITY?.toLowerCase() === city?.toLowerCase() && value?.STATE?.toLowerCase() === state?.toLowerCase()) {
-      return true;
-    }
 
-    return false;
+  // Define the error handling method
+  const errorMethod = () => Promise.resolve(false);
+
+  // Define the success method
+  const successMethod = (value) => {
+    if (value?.CITY?.toLowerCase() === city?.toLowerCase() && value?.STATE?.toLowerCase() === state?.toLowerCase()) {
+      return Promise.resolve(true);
+    }
+    return Promise.resolve(false);
   };
+
   try {
     const response = await getJsonResponse(url, null, 'GET');
-    const [{ CITY, STATE }] = response;
-    const [{ errorCode, errorMessage }] = response;
-    if (CITY && STATE) {
-      successMethod({ CITY, STATE });
-    } else if (errorCode) {
-      const errStack = { errorCode, errorMessage };
-      throw errStack;
+
+    if (response && Array.isArray(response)) {
+      const [{
+        CITY, STATE, errorCode, errorMessage,
+      }] = response;
+
+      if (CITY && STATE) {
+        return successMethod({ CITY, STATE });
+      } if (errorCode) {
+        throw new Error(`Error ${errorCode}: ${errorMessage}`);
+      }
     }
+    return Promise.resolve(false); // Fallback in case the response structure isn't valid.
   } catch (error) {
-    errorMethod(error);
+    return errorMethod();
   }
 };
 
