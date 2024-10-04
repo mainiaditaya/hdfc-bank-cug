@@ -3,7 +3,7 @@ import { displayLoader, hideLoaderGif, setArnNumberInResult } from '../domutils/
 import { invokeJourneyDropOffByJourneyId } from './common-journeyutil.js';
 import { ANALYTICS } from './constant.js';
 import { invokeJourneyDropOffUpdate } from './fd-journey-util.js';
-import sendAnalytics from './analytics.js';
+import sendFDAnalytics from './analytics.js';
 
 const delayedUtilState = {
   visitType: '',
@@ -101,7 +101,7 @@ const pageRedirected = () => {
     // eslint-disable-next-line no-underscore-dangle, no-undef
     journeyData.journeyId = myForm.resolveQualifiedName('$form.runtime.journeyId')._data.$_value;
     journeyData.journeyName = CURRENT_FORM_CONTEXT.journeyName;
-    sendAnalytics(formLoad.type, formLoad.pageName, {}, formLoad.journeyState, journeyData);
+    sendFDAnalytics(formLoad.type, formLoad.pageName, {}, formLoad.journeyState, journeyData);
   }
   if (delayedUtilState.idComRedirect) {
     displayLoader();

@@ -43,10 +43,29 @@ const sendSubmitClickEvent = (eventType, formData, journeyState, digitalData) =>
   digitalData.page.pageInfo.pageName = PAGE_NAME.ccc[eventType];
   switch (eventType) {
     case 'getOtp':
+      digitalData.event.status = '';
+      digitalData.event.validationMethod = '';
+      digitalData.event.phone = '';
+      _satellite.track('submit');
+      sendPageloadEvent(ANALYTICS.event.submitOtp.journeyState, formData, ANALYTICS.event.submitOtp.pageName);
+      break;
+    case 'submitOtp':
+      digitalData.event.status = '';
+      _satellite.track('submit');
+      sendPageloadEvent(ANALYTICS.event.submitOtp.journeyState, formData, ANALYTICS.event.submitOtp.pageName);
+      break;
+    case 'selectCustomerId':
+      digitalData.event.status = '';
+      _satellite.track('submit');
+      sendPageloadEvent(ANALYTICS.event.submitOtp.journeyState, formData, ANALYTICS.event.submitOtp.pageName);
+      break;
+    case 'selectFd':
+      digitalData.formDetails.FDSelected = '';
+      digitalData.card.newLimit = '';
+      _satellite.track('submit');
       sendPageloadEvent(ANALYTICS.event.submitOtp.journeyState, formData, ANALYTICS.event.submitOtp.pageName);
       break;
     default:
-      // do nothing
   }
 };
 
@@ -58,7 +77,7 @@ const sendSubmitClickEvent = (eventType, formData, journeyState, digitalData) =>
  * @param {object} formData
  * @param {object} currentFormContext
  */
-const sendAnalyticsClickEvent = (eventType, payload, journeyState, formData) => {
+const sendAnalyticsFDClickEvent = (eventType, payload, journeyState, formData) => {
   const digitalData = createDeepCopyFromBlueprint(ANALYTICS_CLICK_OBJECT);
   sendSubmitClickEvent(eventType, formData, journeyState, digitalData);
 };
@@ -71,13 +90,13 @@ const sendAnalyticsClickEvent = (eventType, payload, journeyState, formData) => 
 * @param {string} journeyState
 * @param {object} globals
 */
-const sendAnalytics = (eventType, pageName, payload, journeyState, globals) => {
+const sendFDAnalytics = (eventType, pageName, payload, journeyState, globals) => {
   const formData = santizedFormDataWithContext(globals, CURRENT_FORM_CONTEXT);
   if (eventType.toLowerCase() === 'page load') {
     sendPageloadEvent(journeyState, formData, pageName);
   } else {
-    sendAnalyticsClickEvent(eventType, payload, journeyState, formData);
+    sendAnalyticsFDClickEvent(eventType, payload, journeyState, formData);
   }
 };
 
-export default sendAnalytics;
+export default sendFDAnalytics;

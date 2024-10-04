@@ -95,6 +95,8 @@ import {
 
 import { ratingButtonUI, copyToClipBoard } from './thankyouutil.js';
 
+import sendFDAnalytics from './analytics.js';
+
 import { hideLoaderGif } from '../domutils/domutils.js';
 // import { loadScript } from '../../scripts/aem.js';
 
@@ -167,6 +169,7 @@ export {
   executeInterfacePostRedirect,
   ratingButtonUI,
   copyToClipBoard,
+  sendFDAnalytics,
   fullNameChangeHandler,
   hideLoaderGif,
 };
