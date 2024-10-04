@@ -3,7 +3,7 @@ import { invokeJourneyDropOffUpdate } from './fd-journey-util.js';
 import * as FD_CONSTANT from './constant.js';
 import { CURRENT_FORM_CONTEXT } from '../../common/constants.js';
 
-const aadhaarSuccessHandler = (payload, globals) => {
+const aadhaarSuccessHandler = async (globals) => {
   const formData = globals.functions.exportData();
   try {
     const { addressDeclarationPanel } = globals.form;
@@ -15,11 +15,11 @@ const aadhaarSuccessHandler = (payload, globals) => {
       communicationCity, communicationState, comCityZip,
     } = formData?.currentFormContext?.executeInterfaceRequest?.requestString || {};
     // const isValidAadhaarPincode = await pincodeCheck(Zipcode, City, State);
-    // const isValidAadhaarPincode = { result: true };
+    const isValidAadhaarPincode = { result: true };
     let aadhaarAddress = '';
     let parsedAadhaarAddress = '';
     let fullAadhaarAddress = [Address1, Address2, Address3, City, State, Zipcode].filter(Boolean).join(', ');
-    if (payload.result === 'true') {
+    if (isValidAadhaarPincode.result === 'true') {
       aadhaarAddress = [Address1, Address2, Address3].filter(Boolean).join(' ');
       if (aadhaarAddress.length < FD_CONSTANT.MIN_ADDRESS_LENGTH) {
         aadhaarAddress.Address2 = City;

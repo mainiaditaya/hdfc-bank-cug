@@ -13,6 +13,7 @@ import { displayLoader, fetchJsonResponse } from '../../common/makeRestAPI.js';
 import { addGaps } from './fd-dom-functions.js';
 import { executeInterfacePostRedirect } from './executeinterfaceutil.js';
 import creditCardSummary from './creditcardsumaryutil.js';
+import aadhaarSuccessHandler from './aadhaarutil.js';
 
 const { FORM_RUNTIME: formRuntime, CURRENT_FORM_CONTEXT } = CONSTANT;
 const { JOURNEY_NAME, FD_ENDPOINTS } = FD_CONSTANT;
@@ -304,15 +305,18 @@ const checkModeFd = (globals) => {
   const aadhaarSuccess = aadhaarVisit === 'EKYC_AUTH' && formData?.aadhaar_otp_val_data?.message?.toLowerCase() === 'aadhaar otp validate success';
 
   if (aadhaarSuccess) {
-    const {
-      City = '',
-      State = '',
-      Zipcode = '',
-    } = formData?.aadhaar_otp_val_data?.result || {};
-    const cityDetails = `${Zipcode},${City},${State}`;
-    globals.functions.setProperty = (globals.form.loginMainPanel.aadhaarAddressCityDetails, { value: cityDetails });
-    globals.functions.setProperty = (globals.form.loginMainPanel.triggerCheckpinCode, { value: '1' });
-    // aadhaarSuccessHandler(formData, addressDeclarationPanel, globals);
+    // const {
+    //   City = '',
+    //   State = '',
+    //   Zipcode = '',
+    // } = formData?.aadhaar_otp_val_data?.result || {};
+    // const cityDetails = `${Zipcode},${City},${State}`;
+    // setTimeout(() => {
+    //   globals.functions.setProperty = (globals.form.loginMainPanel.aadhaarAddressCityDetails, { value: cityDetails });
+    //   globals.functions.setProperty = (globals.form.loginMainPanel.triggerCheckpinCode, { value: '1' });
+    // }, 1000);
+
+    aadhaarSuccessHandler(globals);
   }
 };
 
