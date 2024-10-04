@@ -97,6 +97,10 @@ import { ratingButtonUI, copyToClipBoard } from './thankyouutil.js';
 
 import { hideLoaderGif } from '../domutils/domutils.js';
 
+import { pincodeCheck } from '../../common/formutils.js';
+
+import aadhaarSuccessHandler from './aadhaarutil.js';
+
 setTimeout(() => import('./fd-delayedutils.js'), 2000);
 
 export {
@@ -160,4 +164,6 @@ export {
   copyToClipBoard,
   fullNameChangeHandler,
   hideLoaderGif,
+  pincodeCheck,
+  aadhaarSuccessHandler,
 };
