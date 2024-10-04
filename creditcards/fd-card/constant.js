@@ -95,7 +95,9 @@ const ANALYTICS = {
   },
 };
 
-const GENDER_MAP = { Male: '1', Female: '2', Others: '3' };
+const GENDER_MAP = {
+  Male: '1', Female: '2', Others: '3', 'Third Gender': '3',
+};
 const OCCUPATION_MAP = {
   salaried: '1',
   'self employed': '2',

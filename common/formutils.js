@@ -611,6 +611,19 @@ function applicableCards(employmentTypeMap, employmentType, cardMap, applicableC
   return matchingCard ? matchingCard.card : [];
 }
 
+const fetchFiller3 = (authMode) => {
+  if (authMode?.toLowerCase() === 'debitcard') {
+    return 'DCPINSUCCESS';
+  }
+  if (authMode?.toLowerCase() === 'netbanking') {
+    return 'NBSUCCESS';
+  }
+  if (authMode?.toLowerCase() === 'aadhaarotp') {
+    return 'AADHAARSUCCESS';
+  }
+  return '';
+};
+
 export {
   urlPath,
   maskNumber,
@@ -647,4 +660,5 @@ export {
   applicableCards,
   parseName,
   sanitizeName,
+  fetchFiller3,
 };
