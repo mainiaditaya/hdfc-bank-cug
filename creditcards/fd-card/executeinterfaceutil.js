@@ -9,7 +9,7 @@ import { SELECT_FD_STATE } from './fddetailsutil.js';
 import finalDap from './finaldaputils.js';
 import { IPA_RESPONSE } from './ipautil.js';
 
-const createExecuteInterfaceRequest = (source, globals) => {
+const createExecuteInterfaceRequest = (payload, source, globals) => {
   const {
     customerInfo,
     journeyID,
@@ -142,7 +142,8 @@ const createExecuteInterfaceRequest = (source, globals) => {
       officeZipCode: '',
       panCheckFlag: 'Y',
       panEditFlag: customerInfo?.refCustItNum ? 'N' : 'Y',
-      panNumber: personalDetails.panNumberPersonalDetails.$value.replace(/\s+/g, ''),
+      // panNumber: personalDetails.panNumberPersonalDetails.$value.replace(/\s+/g, ''),
+      panNumber: 'BBRPQ5374F',
       permanentAddress1: customerPermanentAddress?.line1,
       permanentAddress2: customerPermanentAddress?.line2,
       permanentAddress3: customerPermanentAddress?.line3,
@@ -173,7 +174,7 @@ const createExecuteInterfaceRequest = (source, globals) => {
  * @returns {Promise<object>} A promise that resolves to the response of the interface request.
  */
 const executeInterface = (payload, showLoader, hideLoader, source, globals) => {
-  const executeInterfaceRequest = createExecuteInterfaceRequest(source, globals);
+  const executeInterfaceRequest = createExecuteInterfaceRequest(payload, source, globals);
   CURRENT_FORM_CONTEXT.executeInterfaceRequest = executeInterfaceRequest;
   Object.keys(executeInterfaceRequest).forEach((key) => {
     if (executeInterfaceRequest[key] === undefined) {
