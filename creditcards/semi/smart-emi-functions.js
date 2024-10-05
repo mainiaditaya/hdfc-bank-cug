@@ -18,7 +18,7 @@ import {
   sortByDate,
   changeCheckboxToToggle,
   currencyStrToNum,
-  getNextMonthDate,
+  getBillingCycleDate,
 } from './semi-utils.js';
 
 import {
@@ -42,6 +42,7 @@ const {
   MISC,
   DATA_LIMITS,
   CHANNELS,
+  ERROR_MSG,
   FLOWS_ERROR_MESSAGES,
   // eslint-disable-next-line no-unused-vars
   RESPONSE_PAYLOAD,
@@ -157,6 +158,23 @@ function otpValV1(mobileNumber, cardDigits, otpNumber) {
 }
 
 /**
+ * @name handleWrongCCDetailsFlows
+ * @param {object} ccNumber 
+ * @param {object} wrongNumberCount 
+ * @param {string} errorMessage 
+ * @param {scope} globals 
+ */
+function handleWrongCCDetailsFlows(ccNumber, wrongNumberCount, errorMessage, globals) {
+  // wrong CC number retry is handled in the flow only
+  if(!isNodeEnv) return;
+  const count = wrongNumberCount.$value;
+  if(count < 2) {
+    globals.functions.markFieldAsInvalid(ccNumber.$qualifiedName, errorMessage, { useQualifiedName: true });
+    globals.functions.setProperty(wrongNumberCount, { value: count + 1 });
+  }
+}
+
+/**
  * pre  execute loan fullfilment process, generated final otp for loan booking
  * @param {string} mobileNumber
  * @param {string} cardDigits
@@ -184,7 +202,7 @@ function preExecution(mobileNumber, cardDigits, globals) {
   };
   const path = semiEndpoints.preexecution;
   if (!isNodeEnv) displayLoader();
-  return fetchJsonResponse(path, jsonObj, 'POST', true);
+  return fetchJsonResponse(path, jsonObj, 'POST', !isNodeEnv);
 }
 const nfObject = new Intl.NumberFormat('hi-IN');
 
@@ -374,6 +392,11 @@ function checkELigibilityHandler(resPayload1, globals) {
     let ccUnBilledData = resPayload?.ccUnBilledTxnResponse?.responseString || [];
     if (isNodeEnv) {
       ccBilledData = resPayload?.ccBilledTxnResponse || [];
+      if(ccBilledData.length === 0) {
+        customDispatchEvent('showErrorSnackbar', { errorMessage: ERROR_MSG.noEligibleTxnFlow }, globals);
+        response.nextscreen = 'failure';
+        return response;
+      }
     } else {
       // Note: In whatsapp data is already sorted, format of billed and unbilled is different (rupee vs paisa) so sorting should not be done for WA.
       // apply sort by amount here to ccBilledData
@@ -548,9 +571,11 @@ const tenureDisplay = (globals) => {
   /* set the total amount in hidden field - thank u scrren */
   globals.functions.setProperty(globals.form.aem_semiWizard.aem_success.aem_hiddenTotalAmt, { value: DISPLAY_TOTAL_AMT });
   /* display amount */
-  globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_customerNameLabel, { value: LABEL_AMT_SELCTED });
-  globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingLabel, { value: DISPLAY_TOTAL_AMT });
-  globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingAmt, { value: `${MISC.rupeesUnicode} ${TOTAL_AMT_IN_WORDS}` });
+  if(!isNodeEnv) {
+    globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_customerNameLabel, { value: LABEL_AMT_SELCTED });
+    globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingLabel, { value: DISPLAY_TOTAL_AMT });
+    globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingAmt, { value: `${MISC.rupeesUnicode} ${TOTAL_AMT_IN_WORDS}` });
+  }
   /* set hidden field values for report */
   setReporthiddenFields(selectedTxnList, DISPLAY_TOTAL_AMT, globals);
   /* pre-select the last tenure option (radio btn) by default */
@@ -937,7 +962,7 @@ const getFlowSuccessPayload = (responseString, globals) => {
     processingFees: PROC_FEES,
     monthlyEMI: String(currencyStrToNum(selectedTenurePlan?.aem_tenureSelectionEmi)),
     loanReferenceNumber: loanNbr,
-    billingCycle: getNextMonthDate(Number(getCurrentFormContext(globals)?.EligibilityResponse?.blockCode?.billingCycle)),
+    billingCycle: getBillingCycleDate(Number(getCurrentFormContext(globals)?.EligibilityResponse?.blockCode?.billingCycle)),
   };
 };
 
@@ -1002,6 +1027,8 @@ const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
   };
   const path = semiEndpoints.ccSmartEmi;
   if (!isNodeEnv) displayLoader();
+  // For whatsapp flow visibility controlled via custom property so need to ensure on resend/submit button click property is updated.
+  handleResendOtp2VisibilityInFlow(globals.form.aem_semiWizard.aem_selectTenure.aem_otpPanelConfirmation.aem_otpPanel2.aem_resendOtpCount2.$value, globals); 
   return fetchJsonResponse(path, jsonObj, 'POST', !isNodeEnv);
 };
 
@@ -1110,9 +1137,11 @@ const resendOTPV1 = async (pannelName, globals) => {
       globals.functions.setProperty(panelOtp.otpTimerPanel, { visible: false });
       globals.functions.setProperty(panelOtp.resendOtp, { visible: false });
       globals.functions.setProperty(panelOtp.maxLimitOtp, { visible: true });
-      // flow specific
-      const properties = panelOtp.resendOtp.$properties;
-      globals.functions.setProperty(panelOtp.resendOtp, { properties: {...properties, "flow:setVisible": false} });
+      // In web resend OTP button is visible after 30 sec, until this it is hidded. So we have usd custom property to control
+      // visibility in whatsapp Flow.
+      if(pannelName === SECOND_PANNEL_OTP) {
+        handleResendOtp2VisibilityInFlow(panelOtp.resendOtpCount, globals);
+      }
     }
     if (pannelName === FIRST_PANNEL_OTP) {
       return getOTPV1(mobileNumber, cardDigits, channel, globals);
@@ -1123,6 +1152,15 @@ const resendOTPV1 = async (pannelName, globals) => {
   }
   return null;
 };
+
+const handleResendOtp2VisibilityInFlow = (resendOtpCount, globals) => {
+  if(!isNodeEnv) return;
+  const otpPanel = globals.form.aem_semiWizard.aem_selectTenure.aem_otpPanelConfirmation.aem_otpPanel2;
+  if(resendOtpCount >= DATA_LIMITS.maxOtpResendLimit) {
+    const properties = otpPanel.aem_otpResend2.$properties;
+    globals.functions.setProperty(otpPanel.aem_otpResend2, { properties: {...properties, "flow:setVisible": false} });
+  }
+}
 
 /**
  * on click of t&c navigation, open Url in new tab
@@ -1177,4 +1215,5 @@ export {
   invokeJourneyDropOff,
   invokeJourneyDropOffByParam,
   invokeJourneyDropOffUpdate,
+  handleWrongCCDetailsFlows
 };

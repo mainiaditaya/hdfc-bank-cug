@@ -2,6 +2,7 @@ const JOURNEY_NAME = 'SMART_EMI_JOURNEY';
 const PRO_CODE = '009';
 const ERROR_MSG = {
   mobileError: 'Enter valid mobile number',
+  noEligibleTxnFlow: "There are no eligible transactions on this card. Please try a different card."
 };
 
 const FLOWS_ERROR_MESSAGES = {
