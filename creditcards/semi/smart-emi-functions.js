@@ -337,8 +337,8 @@ const addTxnInstanceWithData = (allTxn, transactionsType, globals) => {
 const setTxnPanelData = async (allTxn, btxn, uBtxn, billedTxnPanel, unBilledTxnPanel, globals) => {
   if (!allTxn?.length) return;
   if (!isNodeEnv) {
-    addTxnInstanceWithData(allTxn?.slice(0, btxn), 'BILLED', globals);
-    addTxnInstanceWithData(allTxn?.slice(btxn, allTxn), 'UNBILLED', globals);
+    if (btxn) { addTxnInstanceWithData(allTxn?.slice(0, btxn), 'BILLED', globals); }
+    if (uBtxn) { addTxnInstanceWithData(allTxn?.slice(btxn, uBtxn), 'UNBILLED', globals); }
     // allTxn.forEach((_txn, i) => {
     //   const isBilled = i < btxn;
     //   let panel = billedTxnPanel;
