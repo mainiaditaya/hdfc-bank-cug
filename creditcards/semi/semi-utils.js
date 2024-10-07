@@ -7,8 +7,11 @@ import {
   addCardFieldValidation,
   addMobileValidation,
   addOtpFieldValidation,
+  linkToPopupToggle,
   getUrlParamCaseInsensitive,
 } from './semi-dom-utils.js';
+
+const isNodeEnv = typeof process !== 'undefined' && process.versions && process.versions.node;
 
 /**
    * function sorts the billed / Unbilled Txn  array in descending order based on the amount field
@@ -83,7 +86,8 @@ const currencyUtil = (number, minimumFractionDigits) => {
 };
 
 /* */
-const numberToText = (num) => {
+const numberToText = (number) => {
+  const num = Math.trunc(Number(number));
   const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
   const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
   if ((num.toString()).length > 9) return 'overflow';
@@ -108,11 +112,30 @@ const validationField = () => {
   addMobileValidation();
   addCardFieldValidation();
   addOtpFieldValidation();
+  linkToPopupToggle('.field-aem-disclaimer-text a', '.field-landingconfirmationpopup', '.field-doyouwishtocontinue', '.field-cross-btn button', '.field-err-popup-buttonconfirm button');
+  linkToPopupToggle('.field-aem-txnssummarytext a', '.field-aem-txnssummarypopupwrapper', '.field-aem-txnssummarypopup', '.field-aem-txnssummaryok');
 };
 
-setTimeout(() => {
-  validationField();
-}, 5000);
+const getNextMonthDate = (day) => {
+  // Get the current date
+  const date = new Date();
+  // Set the provided day
+  date.setDate(day);
+  // Move to the next month
+  date.setMonth(date.getMonth() + 1);
+  // Extract the day, month, and year
+  const dayPart = date.getDate();
+  const monthPart = date.toLocaleString('en-US', { month: 'short' });
+  const yearPart = date.getFullYear();
+  // Format the date as "dd MMM yyyy"
+  return `${dayPart} ${monthPart} ${yearPart}`;
+};
+
+if (!isNodeEnv) {
+  setTimeout(() => {
+    validationField();
+  }, 1000);
+}
 
 export {
   numberToText,
@@ -126,4 +149,5 @@ export {
   validationField,
   setSelectOptions,
   getUrlParamCaseInsensitive,
+  getNextMonthDate,
 };
