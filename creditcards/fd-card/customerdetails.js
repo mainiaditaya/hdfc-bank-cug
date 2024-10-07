@@ -13,6 +13,7 @@ import {
 } from '../../common/formutils.js';
 import { getJsonResponse, displayLoader } from '../../common/makeRestAPI.js';
 import { addDisableClass, setSelectOptions } from '../domutils/domutils.js';
+import sendFDAnalytics from './analytics.js';
 import {
   FD_ENDPOINTS, NAME_ON_CARD_LENGTH, AGE_LIMIT, ERROR_MSG,
   MIN_ADDRESS_LENGTH,
@@ -258,6 +259,7 @@ const bindCustomerDetails = async (globals) => {
   setTimeout(() => {
     addDisableClass(personaldetails, ['nameOnCardDD', 'emailID', 'employmentType']);
   }, 100);
+  sendFDAnalytics('', '', [], '', globals);
 };
 
 /**

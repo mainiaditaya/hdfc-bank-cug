@@ -87,14 +87,21 @@ const ANALYTICS = {
       name: 'Select Customer ID',
       pageName: 'Select Customer ID',
       journeyState: '',
-      nextPage: '',
+      nextPage: 'selectFD',
     },
     selectFd: {
       type: 'click',
       name: 'Select FD',
       pageName: 'Select FD',
       journeyState: '',
-      nextPage: '',
+      nextPage: 'reviewDetails',
+    },
+    reviewDetails: {
+      type: 'click',
+      name: 'Select FD',
+      pageName: 'Select FD',
+      journeyState: '',
+      nextPage: 'reviewDetails',
     },
   },
 };
