@@ -319,7 +319,7 @@ const getTxnPannelData = (transactions, transactionsType) => transactions?.map((
 const addTxnInstanceWithData = (allTxn, transactionsType, globals) => {
   const transactions = allTxn || [];
   const billedTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
-  const unBilledTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
+  const unBilledTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_TxnsList;
   const data = getTxnPannelData(transactions);
   const txnPanel = (transactionsType === 'BILLED') ? billedTxnPanel : unBilledTxnPanel;
   globals.functions.importData(data, txnPanel.$qualifiedName);
