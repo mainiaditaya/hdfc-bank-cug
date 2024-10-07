@@ -1,5 +1,5 @@
 /* stylelint-disable declaration-block-no-redundant-longhand-properties */
-/* stylelint-disable no-descending-specificity */
+/* stylelint-disable no-descending-specificity  */
 .semi-form .section.form-container {
     max-width: var(--form-max-width) !important;
 }
