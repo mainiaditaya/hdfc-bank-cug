@@ -111,6 +111,14 @@ const OCCUPATION_MAP = {
 };
 const ALLOWED_CHARACTERS = '/ -,';
 
+const EMPLOYEE_MAP = {
+  1: 'Employee',
+  2: 'Proprietor',
+  3: '',
+  4: '',
+  5: '',
+};
+
 export {
   JOURNEY_NAME,
   ERROR_MSG,
@@ -131,4 +139,5 @@ export {
   GENDER_MAP,
   OCCUPATION_MAP,
   ALLOWED_CHARACTERS,
+  EMPLOYEE_MAP,
 };

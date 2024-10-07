@@ -9,6 +9,7 @@ import {
   splitName,
   parseName,
   removeSpecialCharacters,
+  pincodeCheck,
 } from '../../common/formutils.js';
 import { getJsonResponse, displayLoader } from '../../common/makeRestAPI.js';
 import { addDisableClass, setSelectOptions } from '../domutils/domutils.js';
@@ -49,7 +50,7 @@ const bindEmployeeAssistanceField = async (globals) => {
   const defaultChannel = getUrlParamCaseInsensitive('channel');
   const inPersonBioKYC = getUrlParamCaseInsensitive('InpersonBioKYC');
   const codes = {
-    lc1Code: getUrlParamCaseInsensitive('lccode'),
+    lc1Code: getUrlParamCaseInsensitive('lc1'),
     lgCode: getUrlParamCaseInsensitive('lgcode'),
     smCode: getUrlParamCaseInsensitive('smcode'),
     lc2Code: getUrlParamCaseInsensitive('lc2'),
@@ -76,6 +77,7 @@ const bindEmployeeAssistanceField = async (globals) => {
     const channelOptions = ['Website Download'];
     const options = channelOptions.map((channel) => ({ label: channel, value: channel }));
     let matchedChannel = options[0].value;
+    let disableChannelDropdown = false;
     response.forEach((item) => {
       const channel = item?.CHANNELS;
       const normalizedChannel = channel?.toLowerCase();
@@ -85,12 +87,15 @@ const bindEmployeeAssistanceField = async (globals) => {
       }
       if (defaultChannel?.toLowerCase() === normalizedChannel) {
         matchedChannel = channel;
+        disableChannelDropdown = true;
       }
     });
     setSelectOptions(options, 'channel');
     globals.functions.setProperty(dropDownSelectField, { enum: channelOptions, value: matchedChannel });
-
-    const changeDataAttrObj = { attrChange: true, value: false };
+    if (disableChannelDropdown) {
+      globals.functions.setProperty(dropDownSelectField, { enabled: false });
+    }
+    const changeDataAttrObj = { attrChange: true, value: false, disable: true };
     ['lc1Code', 'lgCode', 'smCode', 'lc2Code', 'dsaCode', 'branchCode'].forEach((code) => {
       const util = formUtil(globals, employeeAssistancePanel[code]);
       if (codes[code] !== null) util.setValue(codes[code], changeDataAttrObj);
@@ -105,7 +110,7 @@ const bindEmployeeAssistanceField = async (globals) => {
  * @name bindCustomerDetails
  * @param {Object} globals - The global context object containing various information.
  */
-const bindCustomerDetails = (globals) => {
+const bindCustomerDetails = async (globals) => {
   if (!CUSTOMER_DATA_BINDING_CHECK) return;
   CURRENT_FORM_CONTEXT.customerIdentityChange = false;
   CURRENT_FORM_CONTEXT.editFlags = {
@@ -201,6 +206,12 @@ const bindCustomerDetails = (globals) => {
     formattedCustomerAddress = `${cleanAddress}, ${city}, ${state}, ${pincode}`;
     const [addressLine1 = '', addressLine2 = '', addressLine3 = ''] = address.split('|');
     Object.assign(CURRENT_FORM_CONTEXT.customerAddress, { addressLine1, addressLine2, addressLine3 });
+  }
+
+  const validPin = await pincodeCheck(pincode, city, state);
+
+  if (validPin.result === 'false') {
+    globals.functions.setProperty(addressDetails.mailingAddressToggle, { value: 'off', enabled: false });
   }
 
   Object.assign(CURRENT_FORM_CONTEXT.customerAddress, { city, pincode, state });

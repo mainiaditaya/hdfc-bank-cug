@@ -2,7 +2,7 @@ import { CURRENT_FORM_CONTEXT, FORM_RUNTIME } from '../../common/constants.js';
 import { urlPath } from '../../common/formutils.js';
 import { fetchJsonResponse, restAPICall } from '../../common/makeRestAPI.js';
 import { confirmCardState } from './confirmcardutil.js';
-import { JOURNEY_NAME, FD_ENDPOINTS } from './constant.js';
+import { JOURNEY_NAME, FD_ENDPOINTS, EMPLOYEE_MAP } from './constant.js';
 import { SELECTED_CUSTOMER_ID } from './customeridutil.js';
 import { invokeJourneyDropOffUpdate } from './fd-journey-util.js';
 import { SELECT_FD_STATE } from './fddetailsutil.js';
@@ -38,34 +38,35 @@ const createExecuteInterfaceRequest = (source, globals) => {
     }));
   const addressEditFlag = addressDetails?.mailingAddressToggle?.$value !== 'on';
 
-  function getAddress(addressSource) {
-    return {
-      line1: addressSource?.addressLine1 || '',
-      line2: addressSource?.addressLine2 || '',
-      line3: addressSource?.addressLine3 || '',
-      city: addressSource?.city || '',
-      state: addressSource?.state || '',
-      zip: addressSource?.pincode || addressSource?.comCityZip || '',
-    };
-  }
+  const getAddress = (addressSource) => ({
+    line1: addressSource?.addressLine1 || '',
+    line2: addressSource?.addressLine2 || '',
+    line3: addressSource?.addressLine3 || '',
+    city: addressSource?.city || '',
+    state: addressSource?.state || '',
+    zip: addressSource?.pincode || addressSource?.comCityZip || '',
+  });
+
+  const getEditedAddress = (panel) => ({
+    line1: panel?.newCurrentAddressLine1?.$value || '',
+    line2: panel?.newCurrentAddressLine2?.$value || '',
+    line3: panel?.newCurrentAddressLine3?.$value || '',
+    city: panel?.newCurentAddressCity?.$value || '',
+    state: panel?.newCurentAddressState?.$value || '',
+    zip: panel?.newCurentAddressPin?.$value || '',
+  });
 
   let communicationAddress = getAddress(customerAddress);
-  let customerPermanentAddress = getAddress(customerAddress);
-  if (CURRENT_FORM_CONTEXT?.perAddExist) {
-    customerPermanentAddress = getAddress(permanentAddress);
-  }
+  let customerPermanentAddress = CURRENT_FORM_CONTEXT?.perAddExist
+    ? getAddress(permanentAddress)
+    : communicationAddress;
 
   if (addressEditFlag) {
     const newAddressPanel = addressDetails.newCurentAddressPanel;
-    communicationAddress = {
-      line1: newAddressPanel.newCurrentAddressLine1.$value || '',
-      line2: newAddressPanel.newCurrentAddressLine2.$value || '',
-      line3: newAddressPanel.newCurrentAddressLine3.$value || '',
-      city: newAddressPanel.newCurentAddressCity.$value,
-      state: newAddressPanel.newCurentAddressState.$value,
-      zip: newAddressPanel.newCurentAddressPin.$value,
-    };
+    communicationAddress = getEditedAddress(newAddressPanel);
+    customerPermanentAddress = getEditedAddress(newAddressPanel);
   }
+
   let apsEmailEditFlag = 'N';
   if (customerInfo?.refCustEmail !== personalDetails.emailID.$value) {
     apsEmailEditFlag = 'Y';
@@ -77,16 +78,19 @@ const createExecuteInterfaceRequest = (source, globals) => {
   if (source === 'confirmcard') {
     CURRENT_FORM_CONTEXT.selectedProductCode = IPA_RESPONSE?.productDetails?.[confirmCardState.selectedCardIndex]?.cardProductCode || 'FCFL';
   }
+  const annualIncome = employmentDetails?.annualIncome?._data?.$_value || '';
   const empAssistanceToggle = employeeAssistanceToggle?._data?.$_value === 'on';
+
   const request = {
     requestString: {
       addressEditFlag: addressEditFlag ? 'Y' : 'N',
-      annualIncomeOrItrAmount: String(employmentDetails?.annualIncome?._data?.$_value) || '',
+      annualIncomeOrItrAmount: String(annualIncome),
       annualItr: '',
       applyingBranch: 'N',
       apsDobEditFlag: customerInfo?.datBirthCust ? 'N' : 'Y',
       apsEmailEditFlag,
       authMode: '',
+      bankAccountNumber: SELECTED_CUSTOMER_ID?.selectedCustId?.codAcctNo,
       bankEmployee: 'N',
       branchCity: (empAssistanceToggle && employeeAssistancePanel?.branchCity?._data?.$_value) || '',
       branchName: (empAssistanceToggle && employeeAssistancePanel?.branchName?._data?.$_value) || '',
@@ -102,11 +106,11 @@ const createExecuteInterfaceRequest = (source, globals) => {
       comAddressType: '2',
       comCityZip: communicationAddress?.zip,
       comResidenceType: '2',
-      companyName: '',
+      companyName: customerInfo?.customerFullName,
       customerID: SELECTED_CUSTOMER_ID?.selectedCustId?.customerID,
       dateOfBirth: personalDetails.dateOfBirthPersonalDetails.$value,
       departmentOrEmpCode: '',
-      designation: '',
+      designation: EMPLOYEE_MAP[employmentDetails.employmentType._data.$_value],
       dsaValue: (empAssistanceToggle && employeeAssistancePanel?.dsaName?._data?.$_value) || '',
       dseCode: (empAssistanceToggle && employeeAssistancePanel?.dsaCode?._data?.$_value) || '',
       eReferenceNumber: CURRENT_FORM_CONTEXT.referenceNumber,
@@ -122,6 +126,7 @@ const createExecuteInterfaceRequest = (source, globals) => {
       leadClosures: '',
       leadGenerater: '',
       lc2: (empAssistanceToggle && employeeAssistancePanel?.lc2Code?._data?.$_value) || '',
+      lienConsent: new Date().toISOString(),
       middleName: customerInfo.customerMiddleName,
       mobileEditFlag: 'N',
       mobileNumber: globals.form.loginMainPanel.loginPanel.mobilePanel.registeredMobileNumber.$value,
@@ -150,11 +155,10 @@ const createExecuteInterfaceRequest = (source, globals) => {
       personalEmailId: personalDetails?.emailID.$value,
       productCode: source === 'confirmcard' ? CURRENT_FORM_CONTEXT?.selectedProductCode : '',
       resPhoneEditFlag: 'N',
-      selfConfirmation: 'Y',
       selectedFdDetails,
+      selfConfirmation: 'Y',
       smCode: (empAssistanceToggle && employeeAssistancePanel?.smCode?._data?.$_value) || '',
       timeInfo: new Date().toISOString(),
-      lienConsent: new Date().toISOString(),
     },
   };
   return request;
