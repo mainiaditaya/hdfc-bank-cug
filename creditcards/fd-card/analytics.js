@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { ANALYTICS_PAGE_LOAD_OBJECT } from '../../common/analyticsConstants.js';
+import { ANALYTICS_PAGE_LOAD_OBJECT, ANALYTICS_CLICK_OBJECT, PAGE_NAME } from '../../common/analyticsConstants.js';
 import { CURRENT_FORM_CONTEXT } from '../../common/constants.js';
 import { setAnalyticPageLoadProps, setAnalyticClickGenericProps } from '../../common/formanalytics.js';
 import { createDeepCopyFromBlueprint, santizedFormDataWithContext } from '../../common/formutils.js';
@@ -12,11 +12,14 @@ import { ANALYTICS } from './constant.js';
  * @param {object} formData.
  * @param {string} pageName.
  */
-function sendPageloadEvent(journeyState, formData, pageName) {
+function sendPageloadEvent(journeyState, formData, pageName, nextPage = '') {
   const digitalData = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
   digitalData.page.pageInfo.pageName = pageName;
   setAnalyticPageLoadProps(journeyState, formData, digitalData, ANALYTICS.formName);
-  switch (CURRENT_FORM_CONTEXT.action) {
+  switch (nextPage) {
+    case 'selectCustomerId':
+      digitalData.formDetails.eligibleCustomerID = '';
+      break;
     default:
       // do nothing
   }
@@ -40,17 +43,17 @@ const sendSubmitClickEvent = (eventType, formData, journeyState, digitalData) =>
   setAnalyticClickGenericProps(ANALYTICS.event[eventType].name, ANALYTICS.event[eventType].type, formData, journeyState, digitalData, ANALYTICS.formName);
   digitalData.form.name = ANALYTICS.formName;
   // const phone = formData?.login?.registeredMobileNumber;
-  digitalData.page.pageInfo.pageName = PAGE_NAME.ccc[eventType];
+  digitalData.page.pageInfo.pageName = PAGE_NAME.fd[eventType];
   switch (eventType) {
     case 'getOtp':
       digitalData.event.status = '';
-      digitalData.event.validationMethod = '';
-      digitalData.event.phone = '';
+      digitalData.event.validationMethod = (formData.form.login.panDobSelection === '0') ? 'DOB' : 'PAN';
+      digitalData.event.phone = formData.form.login.registeredMobileNumber;
       _satellite.track('submit');
-      sendPageloadEvent(ANALYTICS.event.submitOtp.journeyState, formData, ANALYTICS.event.submitOtp.pageName);
+      sendPageloadEvent(ANALYTICS.event.submitOtp.journeyState, formData, ANALYTICS.event.submitOtp.pageName, ANALYTICS.event.getOtp.nextPage);
       break;
     case 'submitOtp':
-      digitalData.event.status = '';
+      digitalData.event.status = 1;
       _satellite.track('submit');
       sendPageloadEvent(ANALYTICS.event.submitOtp.journeyState, formData, ANALYTICS.event.submitOtp.pageName);
       break;

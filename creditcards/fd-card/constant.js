@@ -73,24 +73,28 @@ const ANALYTICS = {
       name: 'otp click',
       pageName: 'Identify Yourself',
       journeyState: 'CUSTOMER_IDENTITY_RESOLVED',
+      nextPage: 'submitOtp',
     },
     submitOtp: {
       type: 'click',
       name: 'Verify with OTP',
       pageName: 'Verify with OTP',
       journeyState: 'CUSTOMER_IDENTITY_RESOLVED',
+      nextPage: 'selectCustomerId',
     },
     selectCustomerId: {
       type: 'click',
       name: 'Select Customer ID',
       pageName: 'Select Customer ID',
       journeyState: '',
+      nextPage: '',
     },
     selectFd: {
       type: 'click',
       name: 'Select FD',
       pageName: 'Select FD',
       journeyState: '',
+      nextPage: '',
     },
   },
 };

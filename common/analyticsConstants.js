@@ -143,7 +143,9 @@ const PAGE_NAME = {
     'submit review': 'Confirmation',
     'thank you screen': 'Confirmation',
   },
-
+  fd: {
+    getOtp: 'Identify Yourself',
+  },
 };
 export {
   data,
