@@ -19,6 +19,7 @@ const kycProceedClickHandler = (selectedKyc, globals) => {
       CURRENT_FORM_CONTEXT.selectedKyc = inPersonBioKYCOptions?._data.$_value === '0'
         ? 'bioinperson'
         : 'biokyc';
+      CURRENT_FORM_CONTEXT.addressDocUploadFlag = false;
       globals.functions.setProperty(addressDeclarationPanel.currentResidenceAddressBiometricOVD, { visible: true });
       break;
     case 'OVD':
@@ -42,8 +43,9 @@ const addressDeclarationProceedHandler = (globals) => {
     const { docUploadPanel, uploadAddressProof } = docUploadFlow;
     globals.functions.setProperty(addressDeclarationPanel, { visible: false });
     globals.functions.setProperty(docUploadFlow, { visible: true });
-    globals.functions.setProperty(docUploadPanel, { visible: false });
-    globals.functions.setProperty(uploadAddressProof, { visible: true });
+    globals.functions.setProperty(docUploadPanel, { visible: true });
+    globals.functions.setProperty(uploadAddressProof, { visible: false });
+    CURRENT_FORM_CONTEXT.identityDocUploadFlag = true;
     return;
   }
   if (!currentFormContext.customerIdentityChange && KYC_STATE?.selectedKyc === 'BIOMETRIC') {
