@@ -15,7 +15,7 @@
       background-color: white !important;
     }
 
-    .form form p {
+    .form p {
       font-size: 28px !important;
       line-height: 36px;
       font-weight: 600;
@@ -64,6 +64,7 @@
       position: relative;
       width: 272px;
     }
+    
     .form form .field-wrapper .button-wrapper::after {
       content: url("../../icons/Arrow.png");
       position: absolute;
@@ -120,30 +121,35 @@
       @media screen and (min-width: 768px) {
         margin-bottom: 0px;
       }
+
       &.field-step1text {
         @media screen and (min-width: 768px) {
           margin-bottom: 40px;
           margin-top: 30px;
         }
       }
+
       &.field-step2text {
         @media screen and (min-width: 768px) {
           margin-bottom: 40px;
           margin-top: 30px;
         }
       }
+
       &.field-step3text {
         @media screen and (min-width: 768px) {
           margin-bottom: 40px;
           margin-top:30px;
         }
       }
+
       &.field-step4text {
         @media screen and (min-width: 768px) {
           margin-top: 0px;
           margin-top: 30px;
         }
       }
+
       &.field-step5text {
         @media screen and (min-width: 768px) {
           margin-bottom: 42px;
@@ -233,7 +239,6 @@
         }
       }
 
-
     .form form .panel-wrapper.field-stepstofollow-additionalinfopanel p {
       font-size: 14px !important;
       line-height: 20px;
@@ -315,20 +320,25 @@
     .field-registeredmobilenumber {
       margin-left: -21px !important;
     }
+
     .form-container {
       margin: 0 !important;
     }
+
     div.date-wrapper.field-dateofbirth.field-wrapper label {
       margin-left: 6px;
     }
+
     div.checkbox-wrapper.field-checkboxconsent1label.field-wrapper p {
       margin-bottom: 0 !important;
       margin-top: 4px;
     }
+
     div.checkbox-wrapper.field-checkboxconsent2label.field-wrapper p {
       margin-bottom: 0 !important;
       margin-top: 4px;
     }
+
     div.plain-text-wrapper.field-doberrortext.field-wrapper p{
       margin-top: -33px;
       font-size: 16px !important;
@@ -336,6 +346,7 @@
       font-weight: 400;
       color:#e22853 !important;
     }
+
     div.plain-text-wrapper.field-panerrortext.field-wrapper p{
       margin-top: -33px;
       font-size: 16px !important;
@@ -344,7 +355,15 @@
       color:#e22853 !important;
       }
     }
-   
+
+    main .form.block .field-otppanel {
+      & .field-otpsubpanel {
+          .plain-text-wrapper {
+              width: max-content;
+          }
+      }
+  }
+
     div.plain-text-wrapper.field-registermobilenumbererror {
 display: block;
 width: 100%;
@@ -362,41 +381,64 @@ p {
     .field-otppanelwrapper {
       grid-template-rows: auto auto 270px;
 
-      .field-otppanel {
+      input[name='otpNnumber'] {
+        width: 100%;
         max-width: 100%;
+      }
+
+      .field-otppanel {
+        max-width: 100% !important;
         grid-template-rows: auto;
         padding: 40px 40px 0 10px;
 
         .field-otppanel {
           text-align: left;
 
-          .field-otpsubpanel .field-numretries {
-            margin: -6px -14px 0 -30px;
-
-            input {
-              font-size: var(--body-fd-sm-font-size) !important;
-              letter-spacing: normal !important;
-              color: var(--color-interface-text-secondary) !important;
+          .field-otpsubpanel {
+            width: 100%;
+            max-width: 100%;
+            margin-left: 169px;
+            margin-top: -25px;
+            .field-numretries{
+              margin: -6px -14px 0 -30px;
+              input {
+                font-size: var(--body-fd-sm-font-size) !important;
+                letter-spacing: normal !important;
+                color: var(--color-interface-text-secondary) !important;
+              }
             }
+          
           }
         }
 
         legend {
+          text-align: left;
           b {
             color: var(--color-interface-background-quaternary);
-            font-size: var(--body-fd-xx-lg-font-size);
+            font-size: 28px;
+            line-height: 36px;
+            font-weight: 600;
           }
         }
+        
+        .field-attempts p{
+            margin-top: -7px;
+            margin-left: 120px;
+            color: #6B7280 !important;
+            font-size: var(--body-sm-font-size) !important;
+        }
+
 
         .field-otphelptext {
           margin-top: -60px;
-          font-size: var(--body-fd-md-font-size);
-          font-weight: var(--font-weight-bold);
-
+          font-size: 12px !important;
+          line-height: 20px;
+          font-weight: 400;
           p {
             color: var(--color-input-text-primary);
-            font-size: var(--body-fd-md-font-size);
-            font-weight: var(--font-weight-regular);
+            font-size: 12px !important;
+            line-height: 20px;
+            font-weight: 400;
             display: inline-block;
           }
         }
@@ -405,8 +447,9 @@ p {
           margin: -28px 0 -18px;
 
           input {
-            max-width: 422px;
-            letter-spacing: 51px;
+            max-width: 100%;
+            letter-spacing: 65px !important;
+            height:  60px !important;
           }
 
           input::placeholder {
@@ -426,7 +469,8 @@ p {
           width: fit-content;
 
           p {
-            font-size: var(--body-fd-sm-font-size);
+            font-size: var(--body-sm-font-size) !important;
+            color: #6B7280 !important;
             padding: 0;
           }
         }
@@ -464,9 +508,24 @@ p {
 
     .field-submitotp {
       padding: 0 20px 40px;
+      margin-left: 100px;
       margin-top: 0 !important;
+      width: 85% !important;
+      text-align: center !important;
+
+      button {
+        width: 272px;
+      }
+    }
+
+    .field-submitotp::after{
+      right: 42% !important;
+      top: 10px;
+      height: 20px;
+      width: 20px !important;
     }
   }
+
   header {
     background: var(--color-interface-fd-background-primary);
     .cmp-container>div:nth-child(1) {
@@ -492,7 +551,7 @@ p {
     background: var(--color-interface-fd-background-primary);
     & .cmp-container {
       div > div {
-        margin-right: 241px;
+        margin-right: -25px;
         text-align: center;
       }
     }
@@ -743,49 +802,26 @@ p {
         }
       }
     }
+
+    & .field-otppanelwrapper {
+      & .field-otppanel {
+          & .field-otphelptext {
+            p {
+              margin-right: 0px;
+            }
+          }
+        }
+
+    .field-submitotp {
+      width: 100% !important;
+    }
+
+    .field-submitotp::after {
+      right: 36% !important;
+    }
   }
 }
 
-/******* Tablet *******/
-@media (768px <=width <=991px) {
-  .nre {
-    main {
-      flex-direction: column;
-      .cmp-container-container{
-        width:100%;
-      }
-      .panel-wrapper.field-mobilepanel.field-wrapper.col-6 {
-        display: grid;
-      }
-      div.drop-down-wrapper.field-countrycode.field-wrapper {
-        grid-column: span 6 !important;
-      }
-      .field-registeredmobilenumber {
-        grid-column: span 6 !important;
-        margin-left: -271px !important;
-      }
-      .form .field-registeredmobilenumber input[name="registeredMobileNumber"] {
-        width: 221px !important;
-      }
-      .cmp-container-wrapper{
-        content: url("../icons/nre-tablet-banner.png");
-      }
-    }
-    & .cmp-container {
-      div:nth-child(1) {
-        text-align: left !important;
-      }
-  }
-  .cmp-container>div:nth-child(1) {
-    left: 130px;
-    display: block;
-  }
-  .cmp-container>div:nth-child(3) {
-    right: 10px;
-    display: block;
-  }
-  }
-}
 footer {
  
   .cmp-container {
@@ -794,4 +830,59 @@ footer {
       text-align: center;
     }
   }
+}
+}
+
+
+/******* Tablet *******/
+
+@media (768px <=width <=991px) {
+.nre {
+  main {
+    flex-direction: column;
+    .cmp-container-container{
+      width:100%;
+    }
+
+    .panel-wrapper.field-mobilepanel.field-wrapper.col-6 {
+      display: grid;
+    }
+
+    div.drop-down-wrapper.field-countrycode.field-wrapper {
+      grid-column: span 6 !important;
+    }
+
+    .field-registeredmobilenumber {
+      grid-column: span 6 !important;
+      margin-left: -292px !important;
+    }
+
+    .form .field-registeredmobilenumber input[name="registeredMobileNumber"] {
+      width: 221px !important;
+    }
+
+    .cmp-container-wrapper{
+      content: url("../icons/nre-tablet-banner.png");
+    }
+  }
+
+  footer {
+    & .cmp-container {
+      div:nth-child(1) {
+        text-align: center ;
+      }
+  }
+
+}
+
+.cmp-container>div:nth-child(1) {
+  left: 130px;
+  display: block;
+}
+
+.cmp-container>div:nth-child(3) {
+  right: 10px;
+  display: block;
+}
+}
 }
