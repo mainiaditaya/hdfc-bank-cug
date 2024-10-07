@@ -20,6 +20,9 @@ function sendPageloadEvent(journeyState, formData, pageName, nextPage = '') {
     case 'selectCustomerId':
       digitalData.formDetails.eligibleCustomerID = '';
       break;
+    case 'reviewDetails':
+      digitalData.formDetails.eligibleCustomerID = '';
+      break;
     default:
       // do nothing
   }

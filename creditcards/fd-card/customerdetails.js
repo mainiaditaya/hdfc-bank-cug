@@ -259,7 +259,7 @@ const bindCustomerDetails = async (globals) => {
   setTimeout(() => {
     addDisableClass(personaldetails, ['nameOnCardDD', 'emailID', 'employmentType']);
   }, 100);
-  sendFDAnalytics('', '', [], '', globals);
+  sendFDAnalytics('selectFd', 'Select FD', {}, 'CUSTOMER_LEAD_QUALIFIED', globals);
 };
 
 /**

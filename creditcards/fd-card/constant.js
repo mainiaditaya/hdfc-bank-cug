@@ -93,7 +93,7 @@ const ANALYTICS = {
       type: 'click',
       name: 'Select FD',
       pageName: 'Select FD',
-      journeyState: '',
+      journeyState: 'CUSTOMER_LEAD_QUALIFIED',
       nextPage: 'reviewDetails',
     },
     reviewDetails: {
