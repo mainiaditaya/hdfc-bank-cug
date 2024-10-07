@@ -21,8 +21,12 @@ import {
   tAndCNavigation,
   customDispatchEvent,
   getFlowSuccessPayload,
+  reloadPage,
+  invokeJourneyDropOff,
+  invokeJourneyDropOffByParam,
+  invokeJourneyDropOffUpdate,
+  handleTadMadAlert,
 } from './smart-emi-functions.js';
-import { invokeJourneyDropOff, invokeJourneyDropOffByParam, invokeJourneyDropOffUpdate } from '../../common/journey-utils.js';
 
 export {
   getOTPV1,
@@ -50,4 +54,6 @@ export {
   tAndCNavigation,
   customDispatchEvent,
   getFlowSuccessPayload,
+  reloadPage,
+  handleTadMadAlert,
 };
