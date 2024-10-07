@@ -339,6 +339,12 @@ body.semi-form {
                         margin-right: 5px;
                     }
                 }
+
+                > legend, > b, > p {
+                    margin: 0 auto;
+                    display: flex;
+                    width: fit-content;
+                }
     
                 > legend b {
                     margin: 0 auto;
