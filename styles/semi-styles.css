@@ -239,7 +239,7 @@ body.semi-form {
                     }
                 }
 
-                legend, b, p {
+                > legend, > b, > p {
                     margin: 0 auto;
                     display: flex;
                     width: fit-content;
