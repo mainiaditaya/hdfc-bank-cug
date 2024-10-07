@@ -294,6 +294,38 @@ function addTransactions(allTxn, globals) {
 }
 
 /**
+* sets the data for the instance of repetable panel
+*
+* @param {object} globals - gobal form object
+* @param {Object} panel - The panel for unbilled transactions.
+* @param {Object} txn - current tramsaction object
+* @param {number} i - current instance of panel row
+*/
+const getTxnPannelData = (transactions, transactionsType) => transactions?.map((txn) => {
+  const paiseAppendAmt = txnInrFormat((txn?.amount || txn?.aem_TxnAmt));
+  const TXN_AMT = `${MISC.rupeesUnicode} ${paiseAppendAmt}`;
+  return ({
+    aem_Txn_checkBox: txn?.checkbox || txn?.aem_Txn_checkBox,
+    aem_TxnAmt: TXN_AMT,
+    aem_TxnDate: txn?.date || txn?.aem_TxnDate,
+    aem_TxnID: txn?.id || txn?.aem_TxnID,
+    aem_TxnName: txn?.name || txn?.aem_TxnName,
+    authCode: txn?.AUTH_CODE || txn?.authCode,
+    logicMod: txn?.LOGICMOD || txn?.logicMod,
+    transactionTypeHidden: transactionsType,
+  });
+});
+
+const addTxnInstanceWithData = (allTxn, transactionsType, globals) => {
+  const transactions = allTxn || [];
+  const billedTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
+  const unBilledTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
+  const data = getTxnPannelData(transactions);
+  const txnPanel = (transactionsType === 'BILLED') ? billedTxnPanel : unBilledTxnPanel;
+  globals.functions.importData(data, txnPanel.$qualifiedName);
+};
+
+/**
  * Combines transaction data and updates the appropriate panels.
  *
  * @param {Array} allTxn - Array of all transactions.
@@ -305,31 +337,33 @@ function addTransactions(allTxn, globals) {
 const setTxnPanelData = async (allTxn, btxn, uBtxn, billedTxnPanel, unBilledTxnPanel, globals) => {
   if (!allTxn?.length) return;
   if (!isNodeEnv) {
-    allTxn.forEach((_txn, i) => {
-      const isBilled = i < btxn;
-      let panel = billedTxnPanel;
-      if (btxn !== undefined && unBilledTxnPanel !== undefined) {
-        // Case where we have both billed and unbilled transactions
-        panel = isBilled ? billedTxnPanel : unBilledTxnPanel;
-      }
-      const delay = DELAY + (DELTA_DELAY * i);
-      const panelIndex = isBilled ? i : i - btxn;
-      setTimeout(() => {
-        if (isBilled && (btxn - 1 >= billedTxnPanel.length)) {
-          /* condition to skip the default txn list data */
-          globals.functions.dispatchEvent(panel, 'addItem');
-        }
-        if (!isBilled && (uBtxn - 1) >= unBilledTxnPanel.length) {
-          /* condition to skip the default txn list data */
-          globals.functions.dispatchEvent(panel, 'addItem');
-        }
-        const txnData = {
-          ..._txn,
-          type: isBilled ? 'BILLED' : 'UNBILLED',
-        };
-        setData(globals, panel, txnData, panelIndex);
-      }, delay);
-    });
+    addTxnInstanceWithData(allTxn?.slice(0, btxn), 'BILLED', globals);
+    addTxnInstanceWithData(allTxn?.slice(btxn, allTxn), 'UNBILLED', globals);
+    // allTxn.forEach((_txn, i) => {
+    //   const isBilled = i < btxn;
+    //   let panel = billedTxnPanel;
+    //   if (btxn !== undefined && unBilledTxnPanel !== undefined) {
+    //     // Case where we have both billed and unbilled transactions
+    //     panel = isBilled ? billedTxnPanel : unBilledTxnPanel;
+    //   }
+    //   const delay = DELAY + (DELTA_DELAY * i);
+    //   const panelIndex = isBilled ? i : i - btxn;
+    //   setTimeout(() => {
+    //     if (isBilled && (btxn - 1 >= billedTxnPanel.length)) {
+    //       /* condition to skip the default txn list data */
+    //       globals.functions.dispatchEvent(panel, 'addItem');
+    //     }
+    //     if (!isBilled && (uBtxn - 1) >= unBilledTxnPanel.length) {
+    //       /* condition to skip the default txn list data */
+    //       globals.functions.dispatchEvent(panel, 'addItem');
+    //     }
+    //     const txnData = {
+    //       ..._txn,
+    //       type: isBilled ? 'BILLED' : 'UNBILLED',
+    //     };
+    //     setData(globals, panel, txnData, panelIndex);
+    //   }, delay);
+    // });
   } else {
     // special handling for whatsapp flow
     addTransactions(allTxn, globals);
