@@ -1,6 +1,6 @@
 @import url("../../styles/color-palette.css");
 .nre {
-  main {
+main {
     display: flex;
     & .field-invalid:has(.field-description) {
       input {
@@ -15,7 +15,7 @@
       background-color: white !important;
     }
 
-    .form p {
+    .form form p {
       font-size: 28px !important;
       line-height: 36px;
       font-weight: 600;
@@ -364,6 +364,25 @@
       }
   }
 
+  main .form.block .field-otppanel {
+    & .field-otpsubpanel {
+        .field-numretries {
+          position: absolute;
+          margin-right: 105px;
+          margin-top: 7px;
+        }
+      }
+    }
+
+    main .form.block .field-otppanel {
+      & .field-otpresend {
+          .button {
+            margin-left: 15px;
+          }
+        }
+      }
+
+
     div.plain-text-wrapper.field-registermobilenumbererror {
 display: block;
 width: 100%;
@@ -378,6 +397,7 @@ p {
 
     }
     /* OTP Panel Styling */
+    
     .field-otppanelwrapper {
       grid-template-rows: auto auto 270px;
 
@@ -426,7 +446,12 @@ p {
             margin-left: 120px;
             color: #6B7280 !important;
             font-size: var(--body-sm-font-size) !important;
+            @media (320px <=width <=439px) {
+              margin-left:38px;
+              margin-top:18px !important;
+            }
         }
+
 
 
         .field-otphelptext {
@@ -434,6 +459,7 @@ p {
           font-size: 12px !important;
           line-height: 20px;
           font-weight: 400;
+          text-align: left;
           p {
             color: var(--color-input-text-primary);
             font-size: 12px !important;
@@ -447,6 +473,7 @@ p {
           margin: -28px 0 -18px;
 
           input {
+            width: 100%;
             max-width: 100%;
             letter-spacing: 65px !important;
             height:  60px !important;
@@ -462,7 +489,23 @@ p {
         .field-secondspanel {
           display: flex;
           flex-direction: row;
+          .field-seconds {
+            input{
+            border: none;
+            padding-left: 0;
+            width: 55px;
+            font-size: var(--body-sm-font-size) !important;
+            color: var(--color-interface-background-quaternary) !important;
+            font-weight: 600;
+            margin-top: 12px;
+            }
+          }
+          .field-sectext p{
+            font-size: var(--body-sm-font-size) !important;
+          }
         }
+
+
 
         .field-resendotplabel {
           margin: 17px 0 0;
@@ -784,6 +827,13 @@ p {
     }
   }
 
+  header {
+    & .cmp-container {
+        div:nth-child(1) {
+            text-align: left;
+        }
+    }
+  }
     footer {
       .cmp-container {
         height: 30px;
@@ -819,8 +869,12 @@ p {
     .field-submitotp::after {
       right: 36% !important;
     }
+
+    
   }
 }
+
+
 
 footer {
  
