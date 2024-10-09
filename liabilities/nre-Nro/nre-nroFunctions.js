@@ -21,6 +21,12 @@ import {
 import * as CONSTANT from '../../common/constants.js';
 import * as NRE_CONSTANT from './constant.js';
 
+setTimeout(() => {
+  if (typeof window !== 'undefined') {
+    import('./nre-nro-dom-functions.js');
+  }
+}, 1200);
+
 let prevSelectedIndex = -1;
 let defaultDropdownIndex = -1;
 let resendOtpCount = 0;
@@ -299,8 +305,10 @@ function prefillCustomerDetails(response, globals) {
   setFormValue(singleAccount.ifsc, response.ifscCode);
 }
 
-setTimeout(async () => {
-  await getCountryCodes(document.querySelector('.field-countrycode select'));
+setTimeout(() => {
+  if (typeof window !== 'undefined') { /* check document-undefined */
+    getCountryCodes(document.querySelector('.field-countrycode select'));
+  }
 }, 2000);
 
 /**
