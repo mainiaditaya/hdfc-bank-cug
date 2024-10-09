@@ -25,7 +25,8 @@ import {
   invokeJourneyDropOff,
   invokeJourneyDropOffByParam,
   invokeJourneyDropOffUpdate,
-  handleWrongCCDetailsFlows
+  handleWrongCCDetailsFlows,
+  handleTadMadAlert
 } from './smart-emi-functions.js';
 
 export {
@@ -55,5 +56,6 @@ export {
   customDispatchEvent,
   getFlowSuccessPayload,
   reloadPage,
-  handleWrongCCDetailsFlows
+  handleWrongCCDetailsFlows,
+  handleTadMadAlert
 };

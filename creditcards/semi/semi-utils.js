@@ -86,7 +86,8 @@ const currencyUtil = (number, minimumFractionDigits) => {
 };
 
 /* */
-const numberToText = (num) => {
+const numberToText = (number) => {
+  const num = Math.trunc(Number(number));
   const a = ['', 'One ', 'Two ', 'Three ', 'Four ', 'Five ', 'Six ', 'Seven ', 'Eight ', 'Nine ', 'Ten ', 'Eleven ', 'Twelve ', 'Thirteen ', 'Fourteen ', 'Fifteen ', 'Sixteen ', 'Seventeen ', 'Eighteen ', 'Nineteen '];
   const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
   if ((num.toString()).length > 9) return 'overflow';
@@ -111,7 +112,7 @@ const validationField = () => {
   addMobileValidation();
   addCardFieldValidation();
   addOtpFieldValidation();
-  linkToPopupToggle('.field-disclaimer-text a', '.field-landingconfirmationpopup', '.field-doyouwishtocontinue', '.field-cross-btn button', '.field-err-popup-buttonconfirm button');
+  linkToPopupToggle('.field-aem-disclaimer-text a', '.field-landingconfirmationpopup', '.field-doyouwishtocontinue', '.field-cross-btn button', '.field-err-popup-buttonconfirm button');
   linkToPopupToggle('.field-aem-txnssummarytext a', '.field-aem-txnssummarypopupwrapper', '.field-aem-txnssummarypopup', '.field-aem-txnssummaryok');
 };
 

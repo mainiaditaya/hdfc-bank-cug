@@ -72,10 +72,11 @@
       });
   }
 
-  const JOURNEY_NAME$2 = 'SMART_EMI_JOURNEY';
+  const JOURNEY_NAME = 'SMART_EMI_JOURNEY';
   const PRO_CODE$1 = '009';
-  const ERROR_MSG = {
+  const ERROR_MSG$1 = {
     mobileError: 'Enter valid mobile number',
+    noEligibleTxnFlow: "There are no eligible transactions on this card. Please try a different card."
   };
 
   const FLOWS_ERROR_MESSAGES$1 = {
@@ -99,7 +100,7 @@
     dsaCode: 'https://applyonlinedev.hdfcbank.com/content/hdfc_commonforms/api/mdm.CREDIT.POST_ISSUANCE_DSA_MASTER.DSACODE',
   };
 
-  const DOM_ELEMENT$1 = {
+  const DOM_ELEMENT = {
     semiWizard: 'aem_semiWizard',
     chooseTransaction: 'aem_chooseTransactions',
     selectTenure: 'aem_selectTenure',
@@ -1478,10 +1479,10 @@
     CHANNELS: CHANNELS$1,
     CURRENT_FORM_CONTEXT: CURRENT_FORM_CONTEXT$1,
     DATA_LIMITS: DATA_LIMITS$1,
-    DOM_ELEMENT: DOM_ELEMENT$1,
-    ERROR_MSG: ERROR_MSG,
+    DOM_ELEMENT: DOM_ELEMENT,
+    ERROR_MSG: ERROR_MSG$1,
     FLOWS_ERROR_MESSAGES: FLOWS_ERROR_MESSAGES$1,
-    JOURNEY_NAME: JOURNEY_NAME$2,
+    JOURNEY_NAME: JOURNEY_NAME,
     MAX_OTP_RESEND_COUNT: MAX_OTP_RESEND_COUNT,
     MISC: MISC$1,
     OTP_TIMER: OTP_TIMER,
@@ -1493,8 +1494,8 @@
   // declare COMMON_CONSTANTS for all forms only.
   // impoted as CONSTANT key name in all files
   const BASEURL$1 = 'https://applyonlinedev.hdfcbank.com';
-  const CHANNEL$1 = 'ADOBE_WEBFORMS';
-  const ENDPOINTS$1 = {
+  const CHANNEL$3 = 'ADOBE_WEBFORMS';
+  const ENDPOINTS$2 = {
     aadharCallback: '/content/hdfc_etb_wo_pacc/api/aadharCallback.json',
     aadharInit: '/content/hdfc_haf/api/aadhaarInit.json',
     fetchAuthCode: '/content/hdfc_commonforms/api/fetchauthcode.json',
@@ -1536,10 +1537,10 @@
   var CONSTANT = /*#__PURE__*/Object.freeze({
     __proto__: null,
     BASEURL: BASEURL$1,
-    CHANNEL: CHANNEL$1,
+    CHANNEL: CHANNEL$3,
     CURRENT_FORM_CONTEXT: CURRENT_FORM_CONTEXT,
     DEAD_PAN_STATUS: DEAD_PAN_STATUS,
-    ENDPOINTS: ENDPOINTS$1,
+    ENDPOINTS: ENDPOINTS$2,
     FORM_RUNTIME: FORM_RUNTIME,
     ID_COM: ID_COM
   });
@@ -2041,6 +2042,7 @@
    */
   const generateUUID = () => ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16));
 
+  // import semitcRedirectURI from '../../blocks/form/constant.js';
   /**
    * Function validates the Mobile Input Field
    *
@@ -2068,6 +2070,37 @@
     const inputField = document.querySelector('.field-aem-otpnumber input');
     const inputField2 = document.querySelector('.field-aem-otpnumber2 input');
     [inputField, inputField2].forEach((ip) => ip?.addEventListener('input', () => validateOTPInput(ip)));
+  };
+
+  /**
+    * Function validates the OTP Input Field
+    *
+    */
+  const linkToPopupToggle = (hyperLink, popupOverlay, popupContent, closeBtn = false, redirectBtn = false) => {
+    const links = document.querySelectorAll(hyperLink);
+    let redirectionLink = '';
+    [...links].forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        document.querySelector(popupOverlay).setAttribute('data-visible', 'true');
+        document.querySelector(popupContent).setAttribute('data-visible', 'true');
+        redirectionLink = link.getAttribute('href');
+      });
+    });
+
+    if (closeBtn) {
+      document.querySelector(closeBtn).addEventListener('click', (event) => {
+        event.preventDefault();
+        document.querySelector(popupOverlay).setAttribute('data-visible', 'false');
+        document.querySelector(popupContent).setAttribute('data-visible', 'false');
+      });
+    }
+    if (redirectBtn) {
+      document.querySelector(redirectBtn).addEventListener('click', (event) => {
+        event.preventDefault();
+        window.open(redirectionLink, '_blank').focus();
+      });
+    }
   };
 
   /**
@@ -2183,15 +2216,23 @@
     addMobileValidation();
     addCardFieldValidation();
     addOtpFieldValidation();
+    linkToPopupToggle('.field-disclaimer-text a', '.field-landingconfirmationpopup', '.field-doyouwishtocontinue', '.field-cross-btn button', '.field-err-popup-buttonconfirm button');
+    linkToPopupToggle('.field-aem-txnssummarytext a', '.field-aem-txnssummarypopupwrapper', '.field-aem-txnssummarypopup', '.field-aem-txnssummaryok');
   };
 
-  const getNextMonthDate = (day) => {
-    // Get the current date
+  const getBillingCycleDate = (day) => {
+
+    // Get the current day of the month in the Indian timezone
+    const options = { timeZone: 'Asia/Kolkata', day: 'numeric' };
+    const dayOfMonth = Number(new Intl.DateTimeFormat('en-US', options).format(new Date()));
+
     const date = new Date();
     // Set the provided day
     date.setDate(day);
-    // Move to the next month
-    date.setMonth(date.getMonth() + 1);
+    if(day <= dayOfMonth) {
+        // Move to the next month
+        date.setMonth(date.getMonth() + 1);
+    }
     // Extract the day, month, and year
     const dayPart = date.getDate();
     const monthPart = date.toLocaleString('en-US', { month: 'short' });
@@ -2424,8 +2465,138 @@
     }
   };
 
+  /* eslint no-bitwise: ["error", { "allow": ["^", ">>", "&"] }] */
+
+
+  const { ENDPOINTS: ENDPOINTS$1, CHANNEL: CHANNEL$2, CURRENT_FORM_CONTEXT: currentFormContext$3 } = CONSTANT;
+
+  /**
+    * @name invokeJourneyDropOffByParam
+    * @param {string} mobileNumber
+    * @param {string} leadProfileId
+    * @param {string} journeyId
+    * @return {PROMISE}
+    */
+  const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyID) => {
+    const journeyJSONObj = {
+      RequestPayload: {
+        leadProfile: {
+          mobileNumber,
+        },
+        journeyInfo: {
+          journeyID,
+        },
+      },
+    };
+    const url = urlPath(ENDPOINTS$1.journeyDropOffParam);
+    const method = 'POST';
+    return fetchJsonResponse(url, journeyJSONObj, method);
+  };
+
+  /* temproraily added this journey utils for SEMI , journey utils common file has to be changed to generic */
+  const CHANNEL$1 = 'ADOBE_WEBFORMS';
+
   const {
+    CURRENT_FORM_CONTEXT: currentFormContext$2,
+  } = SEMI_CONSTANT;
+  /**
+     * @name invokeJourneyDropOff to log on success and error call backs of api calls
+     * @param {state} state
+     * @param {string} mobileNumber
+     * @param {Object} globals - globals variables object containing form configurations.
+     * @return {PROMISE}
+     */
+  const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
+    const journeyJSONObj = {
+      RequestPayload: {
+        userAgent: (typeof window !== 'undefined') ? window.navigator.userAgent : 'onLoad',
+        leadProfile: {
+          mobileNumber,
+        },
+        formData: {
+          channel: CHANNEL$1,
+          journeyName: currentFormContext$2.journeyName,
+          journeyID: currentFormContext$2.journeyID,
+          journeyStateInfo: [
+            {
+              state,
+              stateInfo: JSON.stringify(santizedFormDataWithContext(globals)),
+              timeinfo: new Date().toISOString(),
+            },
+          ],
+        },
+      },
+    };
+    const url = urlPath(ENDPOINTS$2.journeyDropOff);
+    const method = 'POST';
+    return fetchJsonResponse(url, journeyJSONObj, method);
+  };
+
+  /**
+       * @name invokeJourneyDropOffUpdate
+       * @param {string} state
+       * @param {string} mobileNumber
+       * @param {string} leadProfileId
+       * @param {string} journeyId
+       * @param {Object} globals - globals variables object containing form configurations.
+       * @return {PROMISE}
+       */
+  const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, journeyId, globals) => {
+    const sanitizedFormData = santizedFormDataWithContext(globals, currentFormContext$2);
+    const journeyJSONObj = {
+      RequestPayload: {
+        userAgent: (typeof window !== 'undefined') ? window.navigator.userAgent : '',
+        leadProfile: {
+          mobileNumber,
+          leadProfileId: leadProfileId?.toString(),
+        },
+        formData: {
+          channel: CHANNEL$1,
+          journeyName: currentFormContext$2.journeyName,
+          journeyID: currentFormContext$2.journeyID,
+          journeyStateInfo: [
+            {
+              state,
+              stateInfo: JSON.stringify(sanitizedFormData),
+              timeinfo: new Date().toISOString(),
+            },
+          ],
+        },
+      },
+    };
+    const url = urlPath(ENDPOINTS$2.journeyDropOffUpdate);
+    const method = 'POST';
+    return fetchJsonResponse(url, journeyJSONObj, method);
+  };
+
+  /* eslint-disable no-console */
+
+  const {
+    ENDPOINTS,
     CURRENT_FORM_CONTEXT: currentFormContext$1,
+    FORM_RUNTIME: formRuntime,
+    CHANNEL,
+  } = CONSTANT;
+
+  /**
+   * Reloads the current page.
+   * lead idParam is been strored in current formContext after otpGen btn click
+   * @name reloadPage
+   * @param {object} globals
+   */
+  function reloadPage(globals) {
+    const leadIdParam = globals.functions.exportData()?.currentFormContext?.leadIdParam || currentFormContext$1?.leadIdParam;
+    const { origin, pathname } = window.location;
+    const homeUrl = `${origin}${pathname}?leadId=${leadIdParam?.leadId}${(leadIdParam?.mode === 'dev') ? '&mode=dev' : ''} `;
+    if (leadIdParam?.leadId) {
+      window.location.href = homeUrl;
+    } else {
+      window.location.reload();
+    }
+  }
+
+  const {
+    CURRENT_FORM_CONTEXT: currentFormContext,
     JOURNEY_NAME: journeyName,
     SEMI_ENDPOINTS: semiEndpoints,
     PRO_CODE,
@@ -2433,6 +2604,7 @@
     MISC,
     DATA_LIMITS,
     CHANNELS,
+    ERROR_MSG,
     FLOWS_ERROR_MESSAGES,
     // eslint-disable-next-line no-unused-vars
     RESPONSE_PAYLOAD,
@@ -2454,12 +2626,13 @@
   }
 
   // Initialize all SEMI Journey Context Variables & formRuntime variables.
-  currentFormContext$1.journeyName = journeyName;
-  currentFormContext$1.journeyID = generateJourneyId('a', 'b', 'c');
-  currentFormContext$1.totalSelect = 0;
-  currentFormContext$1.billed = 0;
-  currentFormContext$1.unbilled = 0;
-  currentFormContext$1.billedMaxSelect = 0;
+  currentFormContext.journeyName = journeyName;
+  currentFormContext.journeyID = generateJourneyId('a', 'b', 'c');
+  currentFormContext.totalSelect = 0;
+  currentFormContext.billed = 0;
+  currentFormContext.unbilled = 0;
+  currentFormContext.billedMaxSelect = 0;
+  currentFormContext.txnSelectExceedLimit = 1000000; // ten lakhs txn's select exceeding limit
   let tnxPopupAlertOnce = 0; // flag alert for the pop to show only once on click of continue
   let resendOtpCount = 0;
   let resendOtpCount2 = 0;
@@ -2468,7 +2641,7 @@
     if (isNodeEnv) {
       return JSON.parse(globals.form.runtime.currentFormContext.$value || '{}');
     }
-    return currentFormContext$1;
+    return currentFormContext;
   }
 
   /**
@@ -2489,8 +2662,8 @@
       } else {
         globals.functions.setProperty(otpPanel.secondsPanel, { visible: false });
       }
-      globals.functions.setProperty(globals.form.runtime.journeyId, { value: currentFormContext$1.journeyID });
-      currentFormContext$1.journeyName = JOURNEY_NAME$2;
+      globals.functions.setProperty(globals.form.runtime.journeyId, { value: currentFormContext.journeyID });
+      currentFormContext.journeyName = JOURNEY_NAME;
       displayLoader$1();
     }
     let path = semiEndpoints.otpGen;
@@ -2498,8 +2671,8 @@
       requestString: {
         mobileNo: mobileNumber,
         cardNo: cardDigits,
-        journeyID: currentFormContext$1.journeyID,
-        journeyName: currentFormContext$1.journeyName,
+        journeyID: currentFormContext.journeyID,
+        journeyName: currentFormContext.journeyName,
       },
     };
     if (channel === CHANNELS.adobeWhatsApp) {
@@ -2509,8 +2682,8 @@
           mobileNo: mobileNumber,
           cardNo: cardDigits,
           proCode: PRO_CODE,
-          journeyID: currentFormContext$1.journeyID,
-          journeyName: currentFormContext$1.journeyName,
+          journeyID: currentFormContext.journeyID,
+          journeyName: currentFormContext.journeyName,
           channel: CHANNELS.adobeWhatsApp,
         },
       };
@@ -2533,8 +2706,8 @@
         cardNo: cardDigits,
         OTP: otpNumber,
         proCode: PRO_CODE,
-        journeyID: currentFormContext$1.journeyID,
-        journeyName: currentFormContext$1.journeyName,
+        journeyID: currentFormContext.journeyID,
+        journeyName: currentFormContext.journeyName,
       },
     };
     const path = semiEndpoints.otpVal;
@@ -2544,6 +2717,23 @@
     }
     if (!isNodeEnv) displayLoader$1();
     return fetchJsonResponse(path, jsonObj, 'POST', true);
+  }
+
+  /**
+   * @name handleWrongCCDetailsFlows
+   * @param {object} ccNumber 
+   * @param {object} wrongNumberCount 
+   * @param {string} errorMessage 
+   * @param {scope} globals 
+   */
+  function handleWrongCCDetailsFlows(ccNumber, wrongNumberCount, errorMessage, globals) {
+    // wrong CC number retry is handled in the flow only
+    if(!isNodeEnv) return;
+    const count = wrongNumberCount.$value;
+    if(count < 2) {
+      globals.functions.markFieldAsInvalid(ccNumber.$qualifiedName, errorMessage, { useQualifiedName: true });
+      globals.functions.setProperty(wrongNumberCount, { value: count + 1 });
+    }
   }
 
   /**
@@ -2574,7 +2764,7 @@
     };
     const path = semiEndpoints.preexecution;
     if (!isNodeEnv) displayLoader$1();
-    return fetchJsonResponse(path, jsonObj, 'POST', true);
+    return fetchJsonResponse(path, jsonObj, 'POST', !isNodeEnv);
   }
   const nfObject = new Intl.NumberFormat('hi-IN');
 
@@ -2611,7 +2801,7 @@
    */
   const setData = (globals, panel, txn, i) => {
     let enabled = true;
-    if (currentFormContext$1.totalSelect === 10 && txn?.aem_Txn_checkBox !== 'on') enabled = false;
+    if (currentFormContext.totalSelect === 10 && txn?.aem_Txn_checkBox !== 'on') enabled = false;
     globals.functions.setProperty(panel[i]?.aem_Txn_checkBox, { value: txn?.checkbox || txn?.aem_Txn_checkBox });
     globals.functions.setProperty(panel[i]?.aem_Txn_checkBox, { enabled });// set the checbox value
     const paiseAppendAmt = txnInrFormat((txn?.amount || txn?.aem_TxnAmt));
@@ -2622,7 +2812,7 @@
     globals.functions.setProperty(panel[i]?.aem_TxnName, { value: txn?.name || txn?.aem_TxnName });
     globals.functions.setProperty(panel[i]?.authCode, { value: txn?.AUTH_CODE || txn?.authCode });
     globals.functions.setProperty(panel[i]?.logicMod, { value: txn?.LOGICMOD || txn?.logicMod });
-    globals.functions.setProperty(panel[i]?.transactionTypeHidden, { value: txn?.type });
+    globals.functions.setProperty(panel[i]?.aem_txn_type, { value: txn?.type });
   };
   /*
    * Displays card details by updating the UI with response data.
@@ -2631,12 +2821,18 @@
    */
   const cardDisplay = (globals, response) => {
     const creditCardDisplay = globals.form.aem_semicreditCardDisplay;
+    const nCardNumber = 4;
+    const cardNumberLength = Number.isNaN(response?.blockCode.cardNumber.length) ? 0 : response.blockCode.cardNumber.length;
+    const lastNDigits = (cardNumberLength % nCardNumber === 0) ? response?.blockCode.cardNumber.slice(-nCardNumber) : response?.blockCode.cardNumber.slice(-(cardNumberLength % nCardNumber));
+    const cardDigits = `${'X'.repeat(nCardNumber)}-`.repeat(Math.round(cardNumberLength / nCardNumber) - 1) + lastNDigits;
     globals.functions.setProperty(creditCardDisplay, { visible: true });
     globals.functions.setProperty(creditCardDisplay.aem_semicreditCardContent.aem_customerNameLabel, { value: `Dear ${response?.cardHolderName}` });
+    globals.functions.setProperty(creditCardDisplay.cardFaciaCardName, { value: `${response?.address.name}` });
+    globals.functions.setProperty(creditCardDisplay.cardFaciaCardNo, { value: `${cardDigits}` });
     // eslint-disable-next-line radix
     const totalAmt = nfObject.format(parseInt(response.responseString.creditLimit) - Math.round(parseInt(response?.blockCode?.bbvlogn_card_outst) / 100));
     const TOTAL_OUTSTANDING_AMT = `${MISC.rupeesUnicode} ${totalAmt}`;
-    currentFormContext$1.totalOutstandingAmount = TOTAL_OUTSTANDING_AMT;
+    currentFormContext.totalOutstandingAmount = TOTAL_OUTSTANDING_AMT;
     globals.functions.setProperty(creditCardDisplay.aem_semicreditCardContent.aem_outStandingAmt, { value: TOTAL_OUTSTANDING_AMT });
     globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_cardfacia, { value: urlPath(response.cardTypePath) });
     const imageEl = document.querySelector('.field-aem-cardfacia > picture');
@@ -2646,8 +2842,8 @@
     imageEl?.childNodes[1].setAttribute('srcset', imagePath);
   };
 
-  const DELAY = 120;
-  const DELTA_DELAY = 100;
+  const DELAY = 100;
+  const DELTA_DELAY = 120;
 
   /**
    * sets the data for the instance of repetable panel
@@ -2669,9 +2865,10 @@
         aem_TxnName: txn?.name || txn?.aem_TxnName,
         authCode: txn?.AUTH_CODE || txn?.authCode,
         logicMod: txn?.LOGICMOD || txn?.logicMod,
-        transactionTypeHidden: txn?.type,
+        aem_txn_type: txn?.type,
       }
     });
+    console.log('txnsData: ', txnsData);
     return txnsData
   };
 
@@ -2692,13 +2889,11 @@
    * @param {Object} [unBilledTxnPanel] - The panel for unbilled transactions.
    * @param {Object} globals - Global variables and functions.
    */
-  const setTxnPanelData = (allTxn, btxn, billedTxnPanel, unBilledTxnPanel, globals) => {
+  const setTxnPanelData = async (allTxn, btxn, uBtxn, billedTxnPanel, unBilledTxnPanel, globals) => {
     if (!allTxn?.length) return;
     if (!isNodeEnv) {
-      allTxn.forEach((txn, i) => {
+      allTxn.forEach((_txn, i) => {
         const isBilled = i < btxn;
-        const isFirst = i === 0;
-        const isLast = i === allTxn.length - 1;
         let panel = billedTxnPanel;
         if (btxn !== undefined && unBilledTxnPanel !== undefined) {
           // Case where we have both billed and unbilled transactions
@@ -2707,10 +2902,19 @@
         const delay = DELAY + (DELTA_DELAY * i);
         const panelIndex = isBilled ? i : i - btxn;
         setTimeout(() => {
-          if (isFirst || !isLast) {
+          if (isBilled && (btxn - 1 >= billedTxnPanel.length)) {
+            /* condition to skip the default txn list data */
             globals.functions.dispatchEvent(panel, 'addItem');
           }
-          setData(globals, panel, txn, panelIndex);
+          if (!isBilled && (uBtxn - 1) >= unBilledTxnPanel.length) {
+            /* condition to skip the default txn list data */
+            globals.functions.dispatchEvent(panel, 'addItem');
+          }
+          const txnData = {
+            ..._txn,
+            type: isBilled ? 'BILLED' : 'UNBILLED',
+          };
+          setData(globals, panel, txnData, panelIndex);
         }, delay);
       });
     } else {
@@ -2743,29 +2947,36 @@
     const response = {};
     try {
       /* billed txn maximum amount select limt */
-      currentFormContext$1.billedMaxSelect = ((parseFloat(resPayload.blockCode.tad) / 100) - (parseFloat(resPayload.blockCode.mad) / 100));
+      currentFormContext.billedMaxSelect = ((parseFloat(resPayload.blockCode.tad) / 100) - (parseFloat(resPayload.blockCode.mad) / 100));
       /* continue btn disabling code added temorary, can be removed after form authoring */
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
       let ccBilledData = resPayload?.ccBilledTxnResponse?.responseString || [];
+      let ccUnBilledData = resPayload?.ccUnBilledTxnResponse?.responseString || [];
       if (isNodeEnv) {
         ccBilledData = resPayload?.ccBilledTxnResponse || [];
+        if(ccBilledData.length === 0) {
+          customDispatchEvent('showErrorSnackbar', { errorMessage: ERROR_MSG.noEligibleTxnFlow }, globals);
+          response.nextscreen = 'failure';
+          return response;
+        }
+      } else {
+        // Note: In whatsapp data is already sorted, format of billed and unbilled is different (rupee vs paisa) so sorting should not be done for WA.
+        // apply sort by amount here to ccBilledData
+        ccBilledData = sortDataByAmount(ccBilledData, 'amount');
+        // apply sort by amount here to ccBilledData
+        ccUnBilledData = sortDataByAmount(ccUnBilledData, 'amount');
       }
-      ccBilledData = sortDataByAmount(ccBilledData, 'amount');
-      // apply sort by amount here to ccBilledData
-      let ccUnBilledData = resPayload?.ccUnBilledTxnResponse?.responseString || [];
-      // apply sort by amount here to ccBilledData
-      ccUnBilledData = sortDataByAmount(ccUnBilledData, 'amount');
-      currentFormContext$1.EligibilityResponse = resPayload;
-      globals.functions.setProperty(globals.form.runtime.currentFormContext, { value: JSON.stringify({ ...currentFormContext$1 }) });
+      currentFormContext.EligibilityResponse = resPayload;
+      globals.functions.setProperty(globals.form.runtime.currentFormContext, { value: JSON.stringify({ ...currentFormContext }) });
       const billedTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
       const unBilledTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_TxnsList;
       const allTxn = ccBilledData.concat(ccUnBilledData);
-      setTxnPanelData(allTxn, ccBilledData.length, billedTxnPanel, unBilledTxnPanel, globals);
+      setTxnPanelData(allTxn, ccBilledData.length, ccUnBilledData.length, billedTxnPanel, unBilledTxnPanel, globals);
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_eligibleTxnLabel, { value: `Eligible Transactions (${allTxn?.length})` });
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_TxnAvailable, { value: `Billed Transaction (${ccBilledData?.length})` });
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_TxnAvailable, { value: `Unbilled Transaction (${ccUnBilledData?.length})` });
       // set runtime values
-      globals.functions.setProperty(globals.form.runtime.originAcct, { value: currentFormContext$1.EligibilityResponse.responseString.aanNumber });
+      globals.functions.setProperty(globals.form.runtime.originAcct, { value: currentFormContext.EligibilityResponse.responseString.aanNumber });
       changeWizardView();
       // Display card and move wizard view
       if (!isNodeEnv) {
@@ -2773,6 +2984,10 @@
         moveWizardView(domElements.semiWizard, domElements.chooseTransaction);
       }
       response.nextscreen = 'success';
+      // show txn summery text value
+      if ((resPayload?.ccBilledTxnResponse?.responseString.length) || (resPayload?.ccUnBilledTxnResponse?.responseString.length)) {
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnsSummaryText, { visible: true });
+      }
       // hide the unbilled / unbillled accordian if the response payload of txn is not present
       if (resPayload?.ccBilledTxnResponse?.responseString.length === 0) {
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment, { visible: false });
@@ -2801,7 +3016,7 @@
         period: responseStringJsonObj[0][periodKey],
         interest: responseStringJsonObj[0][interestKey],
         tid: responseStringJsonObj[0][tidKey],
-        processingFee: responseStringJsonObj[0].processingFee,
+        processingFee: responseStringJsonObj[0].memoLine1
       };
     });
     return loanoptions;
@@ -2840,7 +3055,7 @@
       const roiAnnually = currencyUtil(parseFloat(option?.interest), 2);
       const monthlyEMI = nfObject.format(calculateEMI(loanAmt, roiMonthly, parseInt(option.period, 10)));
       const period = `${parseInt(option.period, 10)} Months`;
-      const procesingFee = nfObject.format(parseInt(option.processingFee, 10));
+      const procesingFee = nfObject.format(option.processingFee);
       const emiSubStance = option;
       return ({
         ...option,
@@ -2860,6 +3075,41 @@
     const selectedTxnList = (semiFormData?.aem_billedTxn?.aem_billedTxnSelection?.concat(semiFormData?.aem_unbilledTxn?.aem_unbilledTxnSection))?.filter((txn) => txn.aem_Txn_checkBox === 'on');
     const totalAmountOfTxn = selectedTxnList?.reduce((prev, acc) => prev + parseFloat(acc.aem_TxnAmt.replace(/[^\d.-]/g, '')), 0);
     return totalAmountOfTxn;
+  };
+
+  /**
+   * Setting essential hidden fields for reports
+   * @param {Array} selectedTxnList
+   * @param {string} dispAmt
+   * @param {Object} globals
+   */
+  const setReporthiddenFields = (selectedTxnList, dispAmt, globals) => {
+    let combinedTransactionType = '';
+    let hiddenBilledAmt = 0;
+    let hiddenUnbilledAmt = 0;
+    const allTxnTypes = selectedTxnList.map((el) => ({
+      amt: Number(String(el.aem_TxnAmt).replace(/[^\d]/g, '') / 100),
+      typ: el.aem_txn_type,
+    })) || [];
+    const mapTypes = allTxnTypes?.map((el) => el.typ);
+    const mapAmt = allTxnTypes?.map((el) => el.amt);
+    if (mapTypes.every((el) => el === 'BILLED')) {
+      combinedTransactionType = 'Billed';
+      hiddenBilledAmt = Number(mapAmt?.reduce((prev, acc) => prev + acc, 0));
+    } else if (mapTypes.every((el) => el === 'UNBILLED')) {
+      combinedTransactionType = 'Unbilled';
+      hiddenUnbilledAmt = Number(mapAmt?.reduce((prev, acc) => prev + acc, 0));
+    } else if (mapTypes.includes('BILLED') && mapTypes.includes('UNBILLED')) {
+      combinedTransactionType = 'Both';
+      hiddenBilledAmt = Number(allTxnTypes?.map((el) => (el.typ === 'BILLED') && el.amt)?.reduce((prev, acc) => prev + acc, 0));
+      hiddenUnbilledAmt = Number(allTxnTypes?.map((el) => (el.typ === 'UNBILLED') && el.amt)?.reduce((prev, acc) => prev + acc, 0));
+    } else {
+      combinedTransactionType = 'none';
+    }
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.combinedTransactionType, { value: combinedTransactionType });
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.hiddenUnBilledTotal, { value: hiddenUnbilledAmt });
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.hiddenBilledTotal, { value: hiddenBilledAmt });
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_success.smartEMIAmountHidden, { value: Number(String(dispAmt)?.replace(/[^\d]/g, '')) });
   };
 
   /**
@@ -2883,9 +3133,13 @@
     /* set the total amount in hidden field - thank u scrren */
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_success.aem_hiddenTotalAmt, { value: DISPLAY_TOTAL_AMT });
     /* display amount */
-    globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_customerNameLabel, { value: LABEL_AMT_SELCTED });
-    globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingLabel, { value: DISPLAY_TOTAL_AMT });
-    globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingAmt, { value: `${MISC.rupeesUnicode} ${TOTAL_AMT_IN_WORDS}` });
+    if(!isNodeEnv) {
+      globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_customerNameLabel, { value: LABEL_AMT_SELCTED });
+      globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingLabel, { value: DISPLAY_TOTAL_AMT });
+      globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingAmt, { value: `${MISC.rupeesUnicode} ${TOTAL_AMT_IN_WORDS}` });
+    }
+    /* set hidden field values for report */
+    setReporthiddenFields(selectedTxnList, DISPLAY_TOTAL_AMT, globals);
     /* pre-select the last tenure option (radio btn) by default */
     const DEFUALT_SELCT_TENURE = (tenureRepatablePanel.length > 0) ? (tenureRepatablePanel.length - 1) : 0;
     globals.functions.setProperty(tenureRepatablePanel[DEFUALT_SELCT_TENURE].aem_tenureSelection, { value: '0' });
@@ -2912,7 +3166,7 @@
    * @param {Object} globals - Global variables and functions.
    */
   function selectTenure(globals) {
-    if (currentFormContext$1.totalSelect < DATA_LIMITS.totalSelectLimit) {
+    if (currentFormContext.totalSelect < DATA_LIMITS.totalSelectLimit) {
       tnxPopupAlertOnce += 1;
     }
     if (!isNodeEnv && (tnxPopupAlertOnce === 1)) { // option of selecting ten txn alert should be occured only once.
@@ -2951,7 +3205,13 @@
       ...item,
       aem_TxnAmt: (currencyStrToNum(item?.aem_TxnAmt)),
     }));
-    mapSortedDat?.forEach((data, i) => setData(globals, pannel, data, i));
+    mapSortedDat?.forEach((_data, i) => {
+      const data = {
+        ..._data,
+        type: txnType,
+      };
+      setData(globals, pannel, data, i);
+    });
     setTimeout(() => {
       isUserSelection = !isUserSelection;
     }, 1000);
@@ -2980,27 +3240,68 @@
    * @param {object} globals - global object
    */
   const enableAllTxnFields = (txnList, globals) => txnList?.forEach((list) => globals.functions.setProperty(list.aem_Txn_checkBox, { enabled: true }));
+  /**
+   * disable all fields of transaction from billed or unbilled.
+   * @param {Array} txnList - array of repeatable pannel
+   * @param {object} globals - global object
+   */
+  const disableAllTxnFields = (txnList, globals) => txnList?.forEach((list) => globals.functions.setProperty(list.aem_Txn_checkBox, { enabled: (list.aem_Txn_checkBox.$value === 'on') }));
 
   /**
-   * function to update number of transaction selected.
-   * @param {string} checkboxVal - checkbox value
-   * @param {string} txnType - BILLED /  UNBILLED
-  * @param {object} globals - globals form object
-   */
-  function txnSelectHandler(checkboxVal, txnType, globals) {
+  * function to update number of transaction selected.
+  * @param {string} checkboxVal
+  * @param {number} amount
+  * @param {string} ID
+  * @param {date} date
+  * @param {string} txnType
+  * @name txnSelectHandler
+  */
+  function txnSelectHandler(checkboxVal, amount, ID, date, txnType, globals) {
     /* enable-popup once it reaches BILLED-MAX-AMT-LIMIT */
+
     const currentFormContext = getCurrentFormContext(globals);
-    const totalSelectBilledTxnAmt = globals.functions.exportData().smartemi.aem_billedTxn.aem_billedTxnSelection.filter((el) => el.aem_Txn_checkBox).map((el) => (Number((String(el?.aem_TxnAmt))?.replace(/[^\d]/g, '')) / 100)).reduce((prev, acc) => prev + acc, 0);
-    if (totalSelectBilledTxnAmt > currentFormContext.billedMaxSelect) {
+    const billedTxnList = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
+    const unbilledTxnList = globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_TxnsList;
+
+    // In case of Web only billed transaction is displayed on billedTxn panel but in whatsapp both billed and unbilled are displayed
+    const selectedTransactionsBilledPanel = globals.functions.exportData().smartemi.aem_billedTxn.aem_billedTxnSelection.filter((el) => {
+      if(isNodeEnv) {
+        return el.aem_Txn_checkBox && el.aem_txn_type === "billed";
+      }
+      return aem_Txn_checkBox;
+    });
+    const totalSelectBilledTxnAmt = selectedTransactionsBilledPanel.map((el) => (Number((String(el?.aem_TxnAmt))?.replace(/[^\d]/g, '')) / 100)).reduce((prev, acc) => prev + acc, 0);
+    if (totalSelectBilledTxnAmt) {
+
       /* popup alert hanldles */
-      const SELECTED_MAX_BILL = ` Please select Billed Transactions Amount Max up to Rs.${nfObject.format(currentFormContext.billedMaxSelect)}`;
+      if (totalSelectBilledTxnAmt > currentFormContext.billedMaxSelect) {
+        const SELECTED_MAX_BILL = ` Please select Billed Transactions Amount Max up to Rs.${nfObject.format(currentFormContext.billedMaxSelect)}`;
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper, { visible: true });
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup, { visible: true });
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation, { value: SELECTED_MAX_BILL });
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
+        /* disabling selected fields in case disabled */
+        disableAllTxnFields(unbilledTxnList, globals);
+        disableAllTxnFields(billedTxnList, globals);
+        // display error message in whatsapp flow
+        customDispatchEvent('showErrorSnackbar', { errorMessage: SELECTED_MAX_BILL }, globals);
+        return;
+      }
+      globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: true });
+    }
+
+    /* enable alert message if the user exceed selecting the txn above 10 laksh. */
+    const totalSelectTxnAmt = getTotalAmount(globals);
+    const emiProceedCheck = (totalSelectTxnAmt <= currentFormContext.txnSelectExceedLimit);
+    if (!emiProceedCheck) {
+      const alertMsg = 'You can select up to Rs 10 lacs. To proceed further please unselect some transaction.';
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper, { visible: true });
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup, { visible: true });
-      globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation, { value: SELECTED_MAX_BILL });
+      globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation, { value: alertMsg });
+      globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation1, { visible: false });
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
-
       // display error message in whatsapp flow
-      customDispatchEvent('showErrorSnackbar', { errorMessage: SELECTED_MAX_BILL }, globals);
+      customDispatchEvent('showErrorSnackbar', { errorMessage: alertMsg }, globals);
       return;
     }
     customDispatchEvent('showErrorSnackbar', { errorMessage: undefined }, globals);
@@ -3023,9 +3324,6 @@
     }
     const TOTAL_SELECT = `Total selected ${currentFormContext.totalSelect}/${MAX_SELECT}`;
 
-    const billedTxnList = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
-    const unbilledTxnList = globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_TxnsList;
-
     if ((currentFormContext.totalSelect <= MAX_SELECT)) {
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_TotalSelectedTxt, { value: TOTAL_SELECT });// total no of select billed or unbilled txn list
     }
@@ -3047,9 +3345,9 @@
       disableCheckBoxes(billedTxnList, false, globals);
     }
     /* enable disable select-tenure continue button */
-    if (currentFormContext.totalSelect === 0) {
+    if ((currentFormContext.totalSelect === 0) || (!emiProceedCheck)) {
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: false });
-    } else if (currentFormContext.totalSelect > 0) {
+    } else if ((currentFormContext.totalSelect > 0) || (emiProceedCheck)) {
       globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: true });
     }
   }
@@ -3067,8 +3365,8 @@
     /* reset the value of card display while coming back from tenure section */
     if ((target === domElements.chooseTransaction) && (current === domElements.selectTenure)) {
       const LABEL_OUTSTANDING_AMT = 'Your Total Outstanding Amount is';
-      const CUST_NAME_LABEL = `Dear ${currentFormContext$1.EligibilityResponse?.cardHolderName}`;
-      const TOTAL_OUTSTANDING_AMT = currentFormContext$1.totalOutstandingAmount;
+      const CUST_NAME_LABEL = `Dear ${currentFormContext.EligibilityResponse?.cardHolderName}`;
+      const TOTAL_OUTSTANDING_AMT = currentFormContext.totalOutstandingAmount;
       globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_customerNameLabel, { value: CUST_NAME_LABEL });
       globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingAmt, { value: TOTAL_OUTSTANDING_AMT });
       globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingLabel, { value: LABEL_OUTSTANDING_AMT });
@@ -3083,45 +3381,48 @@
   function selectTopTxn(globals) {
     selectTopTenFlag = !selectTopTenFlag;
     const SELECT_TOP_TXN_LIMIT = 10;
+    const resPayload = currentFormContext.EligibilityResponse;
+    const billedResData = resPayload?.ccBilledTxnResponse?.responseString;
+    const unBilledResData = resPayload?.ccUnBilledTxnResponse?.responseString;
     const billedTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
     const unBilledTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_TxnsList;
-    const billed = globals.functions.exportData().smartemi.aem_billedTxn.aem_billedTxnSelection;
-    const unBilled = globals.functions.exportData().smartemi.aem_unbilledTxn.aem_unbilledTxnSection;
-
+    const billed = billedResData?.length ? globals.functions.exportData().smartemi.aem_billedTxn.aem_billedTxnSelection : [];
+    const unBilled = unBilledResData?.length ? globals.functions.exportData().smartemi.aem_unbilledTxn.aem_unbilledTxnSection : [];
     const allTxn = billed.concat(unBilled);
     const sortedArr = sortDataByAmountSymbol(allTxn);
-    const sortedTxnList = sortedArr?.slice(0, SELECT_TOP_TXN_LIMIT);
-    let billedCounter = 0;
-    let unbilledCounter = 0;
+    const txnAvailableToSelect = (allTxn?.length >= SELECT_TOP_TXN_LIMIT) ? SELECT_TOP_TXN_LIMIT : allTxn?.length;
+    const sortedTxnList = sortedArr?.slice(0, txnAvailableToSelect);
     let unbilledCheckedItems = 0;
     let billedCheckedItems = 0;
-    let value = 'on';
-    let enabled = true;
+    const topSelectByAmt = sortedArr?.slice(0, txnAvailableToSelect);
+    try {
+      [unBilledTxnPanel, billedTxnPanel]?.forEach((pannel) => {
+        pannel?.forEach((txnList) => globals.functions.setProperty(txnList.aem_Txn_checkBox, { enabled: false, value: undefined }));
+      });
+      topSelectByAmt?.forEach((item) => {
+        let pannel;
+        if ((item.aem_txn_type === 'BILLED')) {
+          pannel = billedTxnPanel;
+          billedCheckedItems += 1;
+        } else {
+          pannel = unBilledTxnPanel;
+          unbilledCheckedItems += 1;
+        }
+        const findAllAmtMatch = pannel.filter((el) => (el.aem_TxnAmt.$value === item.aem_TxnAmt) && ((el.aem_TxnDate.$value === item.aem_TxnDate) && (el.aem_TxnName.$value === item.aem_TxnName) && (el.logicMod.$value === item.logicMod)));
+        findAllAmtMatch?.forEach((matchedAmt) => globals.functions.setProperty(matchedAmt.aem_Txn_checkBox, { value: 'on', enabled: true }));
+      });
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log(error, 'error in select top ten');
+    }
 
-    sortedArr?.forEach((txn, i) => {
-      if (i > 9) {
-        value = undefined;
-        enabled = false;
-      }
-      if (txn.aem_txn_type === 'UNBILLED') {
-        globals.functions.setProperty(unBilledTxnPanel[unbilledCounter].aem_Txn_checkBox, { enabled });
-        globals.functions.setProperty(unBilledTxnPanel[unbilledCounter].aem_Txn_checkBox, { value });
-        if (i <= 9) unbilledCheckedItems += 1;
-        unbilledCounter += 1;
-      } else {
-        globals.functions.setProperty(billedTxnPanel[billedCounter].aem_Txn_checkBox, { enabled });
-        globals.functions.setProperty(billedTxnPanel[billedCounter].aem_Txn_checkBox, { value });
-        if (i <= 9) billedCheckedItems += 1;
-        billedCounter += 1;
-      }
-      const billedTxnSelected = globals.form.aem_semiWizard.aem_chooseTransactions?.billedTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_txnSelected;
-      const unbilledTxnSelected = globals.form.aem_semiWizard.aem_chooseTransactions?.unbilledTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_txnSelected;
-      globals.functions.setProperty(billedTxnSelected, { value: `${billedCheckedItems} Selected` });
-      globals.functions.setProperty(unbilledTxnSelected, { value: `${unbilledCheckedItems} Selected` });
-      currentFormContext$1.totalSelect = sortedTxnList.length;
-      const TOTAL_SELECT = `Total selected ${currentFormContext$1.totalSelect}/${sortedTxnList.length}`;
-      globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_TotalSelectedTxt, { value: TOTAL_SELECT });
-    });
+    const billedTxnSelected = globals.form.aem_semiWizard.aem_chooseTransactions?.billedTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_txnSelected;
+    const unbilledTxnSelected = globals.form.aem_semiWizard.aem_chooseTransactions?.unbilledTxnFragment.aem_chooseTransactions.aem_txnHeaderPanel.aem_txnSelected;
+    globals.functions.setProperty(billedTxnSelected, { value: `${billedCheckedItems} Selected` });
+    globals.functions.setProperty(unbilledTxnSelected, { value: `${unbilledCheckedItems} Selected` });
+    currentFormContext.totalSelect = sortedTxnList.length;
+    const TOTAL_SELECT = `Total selected ${currentFormContext.totalSelect}/${sortedTxnList.length}`;
+    globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_transactionsInfoPanel.aem_TotalSelectedTxt, { value: TOTAL_SELECT });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txnSelectionContinue, { enabled: true });
     setTimeout(() => {
       selectTopTenFlag = !selectTopTenFlag;
@@ -3159,7 +3460,7 @@
           const rawTenureData = JSON.parse(tenureData[i].aem_tenureRawData);
           const duration = `${parseInt(rawTenureData.period, 10)} Months`;
           globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_reviewAmount, { value: `${MISC.rupeesUnicode} ${nfObject.format(getTotalAmount(globals))}` });
-          globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_monthlyEmi, { value: tenureData[i].aem_tenureSelectionEmi });
+          globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_monthlyEmi, { value: tenureData[i].aem_tenureSelectionEmi + ` @ ${roiMonthly}` });
           globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_duration, { value: duration });
           globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_roi, { value: roiMonthly });
           globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_processingFee, { value: tenureData[i].aem_tenureSelectionProcessing });
@@ -3205,7 +3506,9 @@
     const loanNbr = responseString?.loanNbr;
     // TODO: repeated code, needed to avoid recomputation
     const emiConversionArray = getEmiArrayOption(globals);
-    const LOAN_AMOUNT = String(emiConversionArray?.reduce((prev, acc) => prev + acc.tranAmt, 0));
+    const loanAmount = emiConversionArray?.reduce((prev, acc) => prev + acc.tranAmt, 0);
+    const loanAmountInInr = `${nfObject.format(loanAmount/100)}`;
+    // const LOAN_AMOUNT = String(emiConversionArray?.reduce((prev, acc) => prev + acc.tranAmt, 0));
     const tenurePlan = globals.functions.exportData().aem_tenureSelectionRepeatablePanel;
     const selectedTenurePlan = tenurePlan?.find((emiPlan) => emiPlan.aem_tenureSelection === '0');
     const emiSubData = JSON.parse(selectedTenurePlan?.aem_tenureRawData);
@@ -3213,14 +3516,14 @@
     const TENURE = (parseInt(emiSubData?.period, 10).toString().length === 1) ? (parseInt(emiSubData?.period, 10).toString().padStart(2, '0')) : parseInt(emiSubData?.period, 10).toString(); // '003' into '03' / '18'-'18'
 
     return {
-      amount: LOAN_AMOUNT,
+      amount: loanAmountInInr,
       tenureMonths: TENURE,
       rateOfInterest: selectedTenurePlan?.aem_roi_monthly,
       annualRateOfInterest: selectedTenurePlan?.aem_roi_annually,
       processingFees: PROC_FEES,
       monthlyEMI: String(currencyStrToNum(selectedTenurePlan?.aem_tenureSelectionEmi)),
       loanReferenceNumber: loanNbr,
-      billingCycle: getNextMonthDate(Number(getCurrentFormContext(globals)?.EligibilityResponse?.blockCode?.billingCycle)),
+      billingCycle: getBillingCycleDate(Number(getCurrentFormContext(globals)?.EligibilityResponse?.blockCode?.billingCycle)),
     };
   };
 
@@ -3278,13 +3581,15 @@
         procFeeWav: PROC_FEES,
         reqNbr: REQ_NBR,
         emiConversion: emiConversionArray,
-        journeyID: currentFormContext$1.journeyID,
-        journeyName: currentFormContext$1.journeyName,
+        journeyID: currentFormContext.journeyID,
+        journeyName: currentFormContext.journeyName,
         ...(!isNodeEnv && { userAgent: window.navigator.userAgent }),
       },
     };
     const path = semiEndpoints.ccSmartEmi;
     if (!isNodeEnv) displayLoader$1();
+    // For whatsapp flow visibility controlled via custom property so need to ensure on resend/submit button click property is updated.
+    handleResendOtp2VisibilityInFlow(globals.form.aem_semiWizard.aem_selectTenure.aem_otpPanelConfirmation.aem_otpPanel2.aem_resendOtpCount2.$value, globals); 
     return fetchJsonResponse(path, jsonObj, 'POST', !isNodeEnv);
   };
 
@@ -3393,9 +3698,11 @@
         globals.functions.setProperty(panelOtp.otpTimerPanel, { visible: false });
         globals.functions.setProperty(panelOtp.resendOtp, { visible: false });
         globals.functions.setProperty(panelOtp.maxLimitOtp, { visible: true });
-        // flow specific
-        const properties = panelOtp.resendOtp.$properties;
-        globals.functions.setProperty(panelOtp.resendOtp, { properties: {...properties, "flow:setVisible": false} });
+        // In web resend OTP button is visible after 30 sec, until this it is hidded. So we have usd custom property to control
+        // visibility in whatsapp Flow.
+        if(pannelName === SECOND_PANNEL_OTP) {
+          handleResendOtp2VisibilityInFlow(panelOtp.resendOtpCount, globals);
+        }
       }
       if (pannelName === FIRST_PANNEL_OTP) {
         return getOTPV1(mobileNumber, cardDigits, channel, globals);
@@ -3405,6 +3712,15 @@
       }
     }
     return null;
+  };
+
+  const handleResendOtp2VisibilityInFlow = (resendOtpCount, globals) => {
+    if(!isNodeEnv) return;
+    const otpPanel = globals.form.aem_semiWizard.aem_selectTenure.aem_otpPanelConfirmation.aem_otpPanel2;
+    if(resendOtpCount >= DATA_LIMITS.maxOtpResendLimit) {
+      const properties = otpPanel.aem_otpResend2.$properties;
+      globals.functions.setProperty(otpPanel.aem_otpResend2, { properties: {...properties, "flow:setVisible": false} });
+    }
   };
 
   /**
@@ -3433,172 +3749,6 @@
     globals.functions.dispatchEvent(globals.form, `custom:${eventName}`, evtPayload);
   }
 
-  // declare CONSTANTS for (cc) corporate credit card only.
-  // impoted as CC_CONSTANT key name in all files.
-
-  const JOURNEY_NAME$1 = 'CORPORATE_CARD_JOURNEY';
-
-  const DOM_ELEMENT = {
-    identifyYourself: {
-      chekbox1Label: 'checkboxConsent1Label',
-      chekbox2Label: 'checkboxConsent2Label',
-      consent1Content: 'consentPanel1',
-      consent2Content: 'consentPanel2',
-      modalBtnWrapper: 'button-wrapper',
-      checkbox1ProductLabel: '.field-checkboxconsent1label',
-      checkbox2ProductLabel: '.field-checkboxconsent2label',
-      anchorTagClass: 'link',
-      dob: 'dateOfBirth',
-      otpNumber: 'otpNumber',
-      incorrectOtp: 'field-incorrectotptext',
-    },
-    otpValidate: {
-      otpNumberField: 'otpNumber',
-      incorrectOtpField: '.field-incorrectotptext',
-    },
-    confirmCard: {
-      viewAllLink: 'viewAllCardBenefits',
-      viewAllContent: 'viewAllCardBenefitsPanel',
-      modalBtnWrapper: 'button-wrapper',
-    },
-    selectKyc: {
-      aadharModalContent: 'aadharConsentPopup',
-      modalBtnWrapper: 'button-wrapper',
-      defaultLanguage: 'English',
-    },
-    ccWizard: {
-      wizardPanel: 'corporateCardWizardView',
-      confirmAndSubmitPanel: 'confirmAndSubmitPanel',
-    },
-    yourDetails: {
-      employedDate: 'employedFrom',
-      personalDetailDob: 'dobPersonalDetails',
-      firstName: 'firstName',
-      middleName: 'middleName',
-      lastName: 'lastName',
-    },
-  };
-
-  var CC_CONSTANT = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    DOM_ELEMENT: DOM_ELEMENT,
-    JOURNEY_NAME: JOURNEY_NAME$1
-  });
-
-  /* eslint no-bitwise: ["error", { "allow": ["^", ">>", "&"] }] */
-
-
-  const { ENDPOINTS, CHANNEL, CURRENT_FORM_CONTEXT: currentFormContext } = CONSTANT;
-  const { JOURNEY_NAME } = CC_CONSTANT;
-
-  /**
-     * generates the journeyId
-     * @param {string} visitMode - The visit mode (e.g., "online", "offline").
-     * @param {string} journeyAbbreviation - The abbreviation for the journey.
-     * @param {string} channel - The channel through which the journey is initiated.
-     * @param {object} globals
-     */
-  function createJourneyId(visitMode, journeyAbbreviation, channel, globals) {
-    const dynamicUUID = generateUUID();
-    // var dispInstance = getDispatcherInstance();
-    const journeyId = globals.functions.exportData().journeyId || `${dynamicUUID}_01_${journeyAbbreviation}_${visitMode}_${channel}`;
-    globals.functions.setProperty(globals.form.runtime.journeyId, { value: journeyId });
-    return journeyId;
-  }
-
-  /**
-     * @name invokeJourneyDropOff to log on success and error call backs of api calls
-     * @param {state} state
-     * @param {string} mobileNumber
-     * @param {Object} globals - globals variables object containing form configurations.
-     * @return {PROMISE}
-     */
-  const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
-    const journeyJSONObj = {
-      RequestPayload: {
-        userAgent: (typeof window !== 'undefined') ? window.navigator.userAgent : 'onLoad',
-        leadProfile: {
-          mobileNumber,
-        },
-        formData: {
-          channel: CHANNEL,
-          journeyName: JOURNEY_NAME,
-          journeyID: globals.form.runtime.journeyId.$value || createJourneyId('online', JOURNEY_NAME, CHANNEL, globals),
-          journeyStateInfo: [
-            {
-              state,
-              stateInfo: JSON.stringify(santizedFormDataWithContext(globals)),
-              timeinfo: new Date().toISOString(),
-            },
-          ],
-        },
-      },
-    };
-    const url = urlPath(ENDPOINTS.journeyDropOff);
-    const method = 'POST';
-    return fetchJsonResponse(url, journeyJSONObj, method);
-  };
-
-  /**
-     * @name invokeJourneyDropOffUpdate
-     * @param {string} state
-     * @param {string} mobileNumber
-     * @param {string} leadProfileId
-     * @param {string} journeyId
-     * @param {Object} globals - globals variables object containing form configurations.
-     * @return {PROMISE}
-     */
-  const invokeJourneyDropOffUpdate = async (state, mobileNumber, leadProfileId, journeyId, globals) => {
-    const sanitizedFormData = santizedFormDataWithContext(globals, currentFormContext);
-    const journeyJSONObj = {
-      RequestPayload: {
-        userAgent: (typeof window !== 'undefined') ? window.navigator.userAgent : '',
-        leadProfile: {
-          mobileNumber,
-          leadProfileId: leadProfileId?.toString(),
-        },
-        formData: {
-          channel: CHANNEL,
-          journeyName: JOURNEY_NAME,
-          journeyID: journeyId,
-          journeyStateInfo: [
-            {
-              state,
-              stateInfo: JSON.stringify(sanitizedFormData),
-              timeinfo: new Date().toISOString(),
-            },
-          ],
-        },
-      },
-    };
-    const url = urlPath(ENDPOINTS.journeyDropOffUpdate);
-    const method = 'POST';
-    return fetchJsonResponse(url, journeyJSONObj, method);
-  };
-
-  /**
-    * @name invokeJourneyDropOffByParam
-    * @param {string} mobileNumber
-    * @param {string} leadProfileId
-    * @param {string} journeyId
-    * @return {PROMISE}
-    */
-  const invokeJourneyDropOffByParam = async (mobileNumber, leadProfileId, journeyID) => {
-    const journeyJSONObj = {
-      RequestPayload: {
-        leadProfile: {
-          mobileNumber,
-        },
-        journeyInfo: {
-          journeyID,
-        },
-      },
-    };
-    const url = urlPath(ENDPOINTS.journeyDropOffParam);
-    const method = 'POST';
-    return fetchJsonResponse(url, journeyJSONObj, method);
-  };
-
   exports.assistedToggleHandler = assistedToggleHandler;
   exports.branchHandler = branchHandler;
   exports.changeCheckboxToToggle = changeCheckboxToToggle;
@@ -3610,6 +3760,7 @@
   exports.getCCSmartEmi = getCCSmartEmi;
   exports.getFlowSuccessPayload = getFlowSuccessPayload;
   exports.getOTPV1 = getOTPV1;
+  exports.handleWrongCCDetailsFlows = handleWrongCCDetailsFlows;
   exports.invokeJourneyDropOff = invokeJourneyDropOff;
   exports.invokeJourneyDropOffByParam = invokeJourneyDropOffByParam;
   exports.invokeJourneyDropOffUpdate = invokeJourneyDropOffUpdate;
@@ -3617,6 +3768,7 @@
   exports.otpValV1 = otpValV1;
   exports.preExecution = preExecution;
   exports.radioBtnValCommit = radioBtnValCommit;
+  exports.reloadPage = reloadPage;
   exports.resendOTPV1 = resendOTPV1;
   exports.selectTenure = selectTenure;
   exports.selectTopTxn = selectTopTxn;
