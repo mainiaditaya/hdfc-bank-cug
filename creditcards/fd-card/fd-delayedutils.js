@@ -100,7 +100,8 @@ const pageRedirected = () => {
     const journeyData = {};
     // eslint-disable-next-line no-underscore-dangle, no-undef
     journeyData.journeyId = myForm.resolveQualifiedName('$form.runtime.journeyId')._data.$_value;
-    journeyData.journeyName = CURRENT_FORM_CONTEXT.journeyName;
+    // journeyData.journeyName = CURRENT_FORM_CONTEXT.journeyName;
+    journeyData.journeyName = ANALYTICS.JOURNEY_NAME;
     sendFDAnalytics(formLoad.type, formLoad.pageName, {}, formLoad.journeyState, journeyData);
   }
   if (delayedUtilState.idComRedirect) {

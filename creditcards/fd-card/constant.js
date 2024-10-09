@@ -63,6 +63,7 @@ const DOM_ELEMENT = {
 };
 const ANALYTICS = {
   formName: 'Fixed Deposit Lien Credit Card',
+  JOURNEY_NAME: 'FD_Lien_CC_Journey',
   event: {
     formLoad: {
       type: 'page load',
