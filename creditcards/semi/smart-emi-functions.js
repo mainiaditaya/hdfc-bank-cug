@@ -117,8 +117,6 @@ function getOTPV1(mobileNumber, cardDigits, channel, globals) {
     } else {
       globals.functions.setProperty(otpPanel.secondsPanel, { visible: false });
     }
-    globals.functions.setProperty(globals.form.runtime.journeyId, { value: currentFormContext.journeyID });
-    currentFormContext.journeyName = SEMI_CONSTANT.JOURNEY_NAME;
     displayLoader();
   }
   let path = semiEndpoints.otpGen;
@@ -126,8 +124,8 @@ function getOTPV1(mobileNumber, cardDigits, channel, globals) {
     requestString: {
       mobileNo: mobileNumber,
       cardNo: cardDigits,
-      journeyID: currentFormContext.journeyID,
-      journeyName: currentFormContext.journeyName,
+      journeyID: globals.form.runtime.journeyId.$value,
+      journeyName: globals.form.runtime.journeyName.$value,
     },
   };
   if (channel === CHANNELS.adobeWhatsApp) {
@@ -137,8 +135,8 @@ function getOTPV1(mobileNumber, cardDigits, channel, globals) {
         mobileNo: mobileNumber,
         cardNo: cardDigits,
         proCode: PRO_CODE,
-        journeyID: currentFormContext.journeyID,
-        journeyName: currentFormContext.journeyName,
+        journeyID: globals.form.runtime.journeyId.$value,
+        journeyName: globals.form.runtime.journeyName.$value,
         channel: CHANNELS.adobeWhatsApp,
       },
     };
@@ -213,8 +211,8 @@ function preExecution(mobileNumber, cardDigits, globals) {
       mobileNo: mobileNumber,
       cardNo: cardDigits,
       encryptedToken: currentFormContext.EligibilityResponse.responseString.records[0].encryptedToken,
-      journeyID: currentFormContext.journeyID,
-      journeyName: currentFormContext.journeyName,
+      journeyID: globals.form.runtime.journeyId.$value,
+      journeyName: globals.form.runtime.journeyName.$value,
     },
   };
   const path = semiEndpoints.preexecution;
@@ -1167,8 +1165,8 @@ const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
       procFeeWav: PROC_FEES,
       reqNbr: REQ_NBR,
       emiConversion: emiConversionArray,
-      journeyID: currentFormContext.journeyID,
-      journeyName: currentFormContext.journeyName,
+      journeyID: globals.form.runtime.journeyId.$value,
+      journeyName: globals.form.runtime.journeyName.$value,
       ...(!isNodeEnv && { userAgent: window.navigator.userAgent }),
     },
   };
