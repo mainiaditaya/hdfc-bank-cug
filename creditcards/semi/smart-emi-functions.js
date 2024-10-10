@@ -64,11 +64,11 @@ const userPrevSelect = {};
 /**
  * For Web returing currentFormContext as defined in variable
  * Ideally every custom function should be pure function, i.e it should not have any side effect
- * As per current implementation `currentFormContext` is a state outside of the function, 
+ * As per current implementation `currentFormContext` is a state outside of the function,
  * so for Flow we have did special handling by storing strigified value in `globals.form.runtime.currentFormContext`
- * 
- * @param {scope} globals 
- * @returns 
+ *
+ * @param {scope} globals
+ * @returns
  */
 function getCurrentFormContext(globals) {
   if (isNodeEnv) {
@@ -87,7 +87,7 @@ function getCurrentFormContext(globals) {
 function createJourneyId(visitMode, journeyAbbreviation, channel, globals) {
   const dynamicUUID = generateUUID();
   // var dispInstance = getDispatcherInstance();
-  if(isNodeEnv) {
+  if (isNodeEnv) {
     channel = CHANNELS.adobeWhatsApp;
   }
   const journeyId = globals.functions.exportData().smartemi?.journeyId || `${dynamicUUID}_01_${journeyAbbreviation}_${visitMode}_${channel}`;
@@ -174,16 +174,16 @@ function otpValV1(mobileNumber, cardDigits, otpNumber) {
 
 /**
  * @name handleWrongCCDetailsFlows
- * @param {object} ccNumber 
- * @param {object} wrongNumberCount 
- * @param {string} errorMessage 
- * @param {scope} globals 
+ * @param {object} ccNumber
+ * @param {object} wrongNumberCount
+ * @param {string} errorMessage
+ * @param {scope} globals
  */
 function handleWrongCCDetailsFlows(ccNumber, wrongNumberCount, errorMessage, globals) {
   // wrong CC number retry is handled in the flow only
-  if(!isNodeEnv) return;
+  if (!isNodeEnv) return;
   const count = wrongNumberCount.$value;
-  if(count < 2) {
+  if (count < 2) {
     globals.functions.markFieldAsInvalid(ccNumber.$qualifiedName, errorMessage, { useQualifiedName: true });
     globals.functions.setProperty(wrongNumberCount, { value: count + 1 });
   }
@@ -319,10 +319,10 @@ const getTranactionPanelData = (transactions) => {
       authCode: txn?.AUTH_CODE || txn?.authCode,
       logicMod: txn?.LOGICMOD || txn?.logicMod,
       aem_txn_type: txn?.type,
-    }
-  })
+    };
+  });
   console.log('txnsData: ', txnsData);
-  return txnsData
+  return txnsData;
 };
 
 // Special handling for whatsapp flow, can be removed once proper fix is done
@@ -330,7 +330,7 @@ function addTransactions(allTxn, globals) {
   const transactions = allTxn || [];
   const billedTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
   const data = getTranactionPanelData(transactions);
-  globals.functions.importData(data, billedTxnPanel.$qualifiedName)
+  globals.functions.importData(data, billedTxnPanel.$qualifiedName);
 }
 
 /**
@@ -408,7 +408,7 @@ function checkELigibilityHandler(resPayload1, globals) {
     let ccUnBilledData = resPayload?.ccUnBilledTxnResponse?.responseString || [];
     if (isNodeEnv) {
       ccBilledData = resPayload?.ccBilledTxnResponse || [];
-      if(ccBilledData.length === 0) {
+      if (ccBilledData.length === 0) {
         customDispatchEvent('showErrorSnackbar', { errorMessage: ERROR_MSG.noEligibleTxnFlow }, globals);
         response.nextscreen = 'failure';
         return response;
@@ -470,7 +470,7 @@ const getLoanOptionsInfo = (responseStringJsonObj) => {
       period: responseStringJsonObj[0][periodKey],
       interest: responseStringJsonObj[0][interestKey],
       tid: responseStringJsonObj[0][tidKey],
-      processingFee: responseStringJsonObj[0].memoLine1
+      processingFee: responseStringJsonObj[0].memoLine1,
     };
   });
   return loanoptions;
@@ -588,7 +588,7 @@ const tenureDisplay = (globals) => {
   globals.functions.setProperty(globals.form.aem_semiWizard.aem_success.aem_hiddenTotalAmt, { value: DISPLAY_TOTAL_AMT });
   /* hidden fields to set for reports */
   /* display amount */
-  if(!isNodeEnv) {
+  if (!isNodeEnv) {
     globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_customerNameLabel, { value: LABEL_AMT_SELCTED });
     globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingLabel, { value: DISPLAY_TOTAL_AMT });
     globals.functions.setProperty(globals.form.aem_semicreditCardDisplay.aem_semicreditCardContent.aem_outStandingAmt, { value: `${MISC.rupeesUnicode} ${TOTAL_AMT_IN_WORDS}` });
@@ -629,8 +629,8 @@ function selectTenure(globals) {
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper, { visible: true });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup, { visible: true });
     globals.functions.setProperty(globals.form.aem_semiWizard.aem_chooseTransactions.aem_txtSelectionPopupWrapper.aem_txtSelectionPopup.aem_txtSelectionConfirmation, { value: MSG });
-  } else{
-    if(!isNodeEnv) {
+  } else {
+    if (!isNodeEnv) {
       moveWizardView(domElements.semiWizard, domElements.selectTenure);
       handleMdmUtmParam(globals);
     }
@@ -835,8 +835,8 @@ function txnSelectHandler(checkboxVal, amount, ID, date, txnType, globals) {
   /* popup alert hanldles for the tad-mad values */
   const sumOfbilledTxnOnly = billedTxnList?.filter((el) => {
     // In case of Web only billed transaction is displayed on billedTxn panel but in whatsapp both billed and unbilled are displayed
-    if(isNodeEnv) {
-      return el.aem_Txn_checkBox.$value && el.aem_txn_type.$value === "billed";
+    if (isNodeEnv) {
+      return el.aem_Txn_checkBox.$value && el.aem_txn_type.$value === 'billed';
     }
     return aem_Txn_checkBox.$value;
   })?.reduce((acc, prev) => (acc + Number(String(prev.aem_TxnAmt.$value).replace(/[^\d]/g, '') / 100)), 0);
@@ -1044,7 +1044,7 @@ function radioBtnValCommit(arg1, globals) {
         const rawTenureData = JSON.parse(tenureData[i].aem_tenureRawData);
         const duration = `${parseInt(rawTenureData.period, 10)} Months`;
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_reviewAmount, { value: `${MISC.rupeesUnicode} ${nfObject.format(getTotalAmount(globals))}` });
-        globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_monthlyEmi, { value: tenureData[i].aem_tenureSelectionEmi + ` @ ${roiMonthly}` });
+        globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_monthlyEmi, { value: `${tenureData[i].aem_tenureSelectionEmi} @ ${roiMonthly}` });
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_duration, { value: duration });
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_roi, { value: roiMonthly });
         globals.functions.setProperty(globals.form.aem_semiWizard.aem_selectTenure.reviewDetailsView.aem_processingFee, { value: tenureData[i].aem_tenureSelectionProcessing });
@@ -1091,7 +1091,7 @@ const getFlowSuccessPayload = (responseString, globals) => {
   // TODO: repeated code, needed to avoid recomputation
   const emiConversionArray = getEmiArrayOption(globals);
   const loanAmount = emiConversionArray?.reduce((prev, acc) => prev + acc.tranAmt, 0);
-  const loanAmountInInr = `${nfObject.format(loanAmount/100)}`;
+  const loanAmountInInr = `${nfObject.format(loanAmount / 100)}`;
   // const LOAN_AMOUNT = String(emiConversionArray?.reduce((prev, acc) => prev + acc.tranAmt, 0));
   const tenurePlan = globals.functions.exportData().aem_tenureSelectionRepeatablePanel;
   const selectedTenurePlan = tenurePlan?.find((emiPlan) => emiPlan.aem_tenureSelection === '0');
@@ -1173,7 +1173,7 @@ const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
   const path = semiEndpoints.ccSmartEmi;
   if (!isNodeEnv) displayLoader();
   // For whatsapp flow visibility controlled via custom property so need to ensure on resend/submit button click property is updated.
-  handleResendOtp2VisibilityInFlow(globals.form.aem_semiWizard.aem_selectTenure.aem_otpPanelConfirmation.aem_otpPanel2.aem_resendOtpCount2.$value, globals); 
+  handleResendOtp2VisibilityInFlow(globals.form.aem_semiWizard.aem_selectTenure.aem_otpPanelConfirmation.aem_otpPanel2.aem_resendOtpCount2.$value, globals);
   return fetchJsonResponse(path, jsonObj, 'POST', !isNodeEnv);
 };
 
@@ -1183,7 +1183,7 @@ const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
  * @param {object} globals - global form object
  */
 const otpTimerV1 = (pannelName, globals) => {
-  if(isNodeEnv) return;
+  if (isNodeEnv) return;
   let sec = DATA_LIMITS.otpTimeLimit;
   let dispSec = DATA_LIMITS.otpTimeLimit;
   const FIRST_PANNEL_OTP = 'firstotp';
@@ -1265,15 +1265,15 @@ const resendOTPV1 = async (pannelName, globals) => {
     panelOtp.maxLimitOtp = otp2.aem_maxlimitOTP2;
     resendOtpCount2 += 1;
     panelOtp.resendOtpCount = resendOtpCount2;
-    if(isNodeEnv) {
+    if (isNodeEnv) {
       panelOtp.resendOtpCountField = otp2.aem_resendOtpCount2;
-      panelOtp.limitCheck =  otp2.aem_resendOtpCount2.$value < DATA_LIMITS.maxOtpResendLimit;
-      panelOtp.resendOtpCount = otp2.aem_resendOtpCount2.$value + 1
+      panelOtp.limitCheck = otp2.aem_resendOtpCount2.$value < DATA_LIMITS.maxOtpResendLimit;
+      panelOtp.resendOtpCount = otp2.aem_resendOtpCount2.$value + 1;
     }
   }
   const mobileNumber = globals.form.aem_semiWizard.aem_identifierPanel.aem_loginPanel.mobilePanel.aem_mobileNum.$value;
   const cardDigits = globals.form.aem_semiWizard.aem_identifierPanel.aem_loginPanel.aem_cardNo.$value;
-  if(panelOtp.resendOtpCountField) {
+  if (panelOtp.resendOtpCountField) {
     globals.functions.setProperty(panelOtp.resendOtpCountField, { value: panelOtp.resendOtpCount });
   }
   globals.functions.setProperty(panelOtp.otpTimerPanel, { visible: true });
@@ -1284,7 +1284,7 @@ const resendOTPV1 = async (pannelName, globals) => {
       globals.functions.setProperty(panelOtp.maxLimitOtp, { visible: true });
       // In web resend OTP button is visible after 30 sec, until this it is hidded. So we have usd custom property to control
       // visibility in whatsapp Flow.
-      if(pannelName === SECOND_PANNEL_OTP) {
+      if (pannelName === SECOND_PANNEL_OTP) {
         handleResendOtp2VisibilityInFlow(panelOtp.resendOtpCount, globals);
       }
     }
@@ -1299,13 +1299,13 @@ const resendOTPV1 = async (pannelName, globals) => {
 };
 
 const handleResendOtp2VisibilityInFlow = (resendOtpCount, globals) => {
-  if(!isNodeEnv) return;
+  if (!isNodeEnv) return;
   const otpPanel = globals.form.aem_semiWizard.aem_selectTenure.aem_otpPanelConfirmation.aem_otpPanel2;
-  if(resendOtpCount >= DATA_LIMITS.maxOtpResendLimit) {
+  if (resendOtpCount >= DATA_LIMITS.maxOtpResendLimit) {
     const properties = otpPanel.aem_otpResend2.$properties;
-    globals.functions.setProperty(otpPanel.aem_otpResend2, { properties: {...properties, "flow:setVisible": false} });
+    globals.functions.setProperty(otpPanel.aem_otpResend2, { properties: { ...properties, 'flow:setVisible': false } });
   }
-}
+};
 
 /**
  * on click of t&c navigation, open Url in new tab
@@ -1324,10 +1324,10 @@ const tAndCNavigation = () => {
  * @param {scope} globals - globals
  */
 function customDispatchEvent(eventName, payload, globals) {
-  let evtPayload = payload
-  if(isNodeEnv && payload?.errorCode) {
-    if(FLOWS_ERROR_MESSAGES[payload.errorCode]) {
-      evtPayload = { ...evtPayload, errorMsg: FLOWS_ERROR_MESSAGES[payload.errorCode] }
+  let evtPayload = payload;
+  if (isNodeEnv && payload?.errorCode) {
+    if (FLOWS_ERROR_MESSAGES[payload.errorCode]) {
+      evtPayload = { ...evtPayload, errorMsg: FLOWS_ERROR_MESSAGES[payload.errorCode] };
     }
   }
   globals.functions.dispatchEvent(globals.form, `custom:${eventName}`, evtPayload);
@@ -1362,5 +1362,5 @@ export {
   invokeJourneyDropOffByParam,
   invokeJourneyDropOffUpdate,
   handleWrongCCDetailsFlows,
-  handleTadMadAlert
+  handleTadMadAlert,
 };
