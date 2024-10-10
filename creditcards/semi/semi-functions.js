@@ -1,4 +1,5 @@
 import {
+  createJourneyId,
   getOTPV1,
   otpValV1,
   selectTenure,
@@ -30,6 +31,7 @@ import {
 } from './smart-emi-functions.js';
 
 export {
+  createJourneyId,
   getOTPV1,
   otpValV1,
   selectTenure,

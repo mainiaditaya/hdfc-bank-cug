@@ -50,22 +50,7 @@ const {
 
 const isNodeEnv = typeof process !== 'undefined' && process.versions && process.versions.node;
 
-/**
-   * generates the journeyId
-   * @param {string} visitMode - The visit mode (e.g., "online", "offline").
-   * @param {string} journeyAbbreviation - The abbreviation for the journey.
-   * @param {string} channel - The channel through which the journey is initiated.
-   */
-// eslint-disable-next-line no-unused-vars
-function generateJourneyId(visitMode, journeyAbbreviation, channel) {
-  const dynamicUUID = generateUUID();
-  const journeyId = `${dynamicUUID}_01_${journeyAbbreviation}_${visitMode}_${channel}`;
-  return journeyId;
-}
-
 // Initialize all SEMI Journey Context Variables & formRuntime variables.
-currentFormContext.journeyName = journeyName;
-currentFormContext.journeyID = generateJourneyId('a', 'b', 'c');
 currentFormContext.totalSelect = 0;
 currentFormContext.billed = 0;
 currentFormContext.unbilled = 0;
@@ -76,11 +61,42 @@ let resendOtpCount = 0;
 let resendOtpCount2 = 0;
 const userPrevSelect = {};
 
+/**
+ * For Web returing currentFormContext as defined in variable
+ * Ideally every custom function should be pure function, i.e it should not have any side effect
+ * As per current implementation `currentFormContext` is a state outside of the function, 
+ * so for Flow we have did special handling by storing strigified value in `globals.form.runtime.currentFormContext`
+ * 
+ * @param {scope} globals 
+ * @returns 
+ */
 function getCurrentFormContext(globals) {
   if (isNodeEnv) {
     return JSON.parse(globals.form.runtime.currentFormContext.$value || '{}');
   }
   return currentFormContext;
+}
+
+/**
+   * generates the journeyId
+   * @param {string} visitMode - The visit mode (e.g., "online", "offline").
+   * @param {string} journeyAbbreviation - The abbreviation for the journey.
+   * @param {string} channel - The channel through which the journey is initiated.
+   * @param {object} globals
+   */
+function createJourneyId(visitMode, journeyAbbreviation, channel, globals) {
+  const dynamicUUID = generateUUID();
+  // var dispInstance = getDispatcherInstance();
+  if(isNodeEnv) {
+    channel = CHANNELS.adobeWhatsApp;
+  }
+  const journeyId = globals.functions.exportData().smartemi?.journeyId || `${dynamicUUID}_01_${journeyAbbreviation}_${visitMode}_${channel}`;
+  globals.functions.setProperty(globals.form.runtime.journeyId, { value: journeyId });
+
+  // Update the form context
+  currentFormContext.journeyName = journeyName;
+  currentFormContext.journeyID = journeyId;
+  globals.functions.setProperty(globals.form.runtime.currentFormContext, { value: JSON.stringify({ ...currentFormContext }) });
 }
 
 /**
@@ -384,6 +400,7 @@ function checkELigibilityHandler(resPayload1, globals) {
   // const resPayload = RESPONSE_PAYLOAD.response;
   const resPayload = resPayload1;
   const response = {};
+  const currentFormContext = getCurrentFormContext(globals);
   try {
     /* billed txn maximum amount select limt */
     currentFormContext.tadMinusMadValue = ((parseFloat(resPayload.blockCode.tad) / 100) - (parseFloat(resPayload.blockCode.mad) / 100));
@@ -1319,6 +1336,7 @@ function customDispatchEvent(eventName, payload, globals) {
 }
 
 export {
+  createJourneyId,
   getOTPV1,
   otpValV1,
   checkELigibilityHandler,
