@@ -12,7 +12,11 @@ import {
   pincodeCheck,
 } from '../../common/formutils.js';
 import { getJsonResponse, displayLoader } from '../../common/makeRestAPI.js';
-import { addDisableClass, setSelectOptions } from '../domutils/domutils.js';
+import {
+  addDisableClass,
+  setSelectOptions,
+  addClassToElement,
+} from '../domutils/domutils.js';
 import sendFDAnalytics from './analytics.js';
 import {
   FD_ENDPOINTS, NAME_ON_CARD_LENGTH, AGE_LIMIT, ERROR_MSG,
@@ -68,6 +72,7 @@ const bindEmployeeAssistanceField = async (globals) => {
   try {
     if (defaultChannel || Object.values(codes).some(Boolean)) {
       globals.functions.setProperty(employeeAssistanceToggle, { value: 'on', enabled: false });
+      addClassToElement('.field-employeeassistancetoggle label.field-label', 'cursor-na');
     }
     if (inPersonBioKYC?.toLowerCase() === 'yes') {
       globals.functions.setProperty(inPersonBioKYCPanel, { visible: true });
@@ -187,19 +192,27 @@ const bindCustomerDetails = async (globals) => {
   let parsedPerAddress = [];
   if (cleanAddress.length < MIN_ADDRESS_LENGTH) {
     const addressArray = cleanAddress.trim().split(' ');
-    parsedAddress = [
-      addressArray.slice(0, -1).join(' '),
-      addressArray.slice(-1)[0],
-    ];
+    if (addressArray.length > 1) {
+      parsedAddress = [
+        addressArray.slice(0, -1).join(' '),
+        addressArray.slice(-1)[0],
+      ];
+    } else {
+      parsedAddress = [addressArray[0]];
+    }
   } else {
     parsedAddress = parseCustomerAddress(cleanAddress);
   }
   if (cleanPerAddress.length < MIN_ADDRESS_LENGTH) {
     const addressArray = cleanPerAddress.trim().split(' ');
-    parsedPerAddress = [
-      addressArray.slice(0, -1).join(' '),
-      addressArray.slice(-1)[0],
-    ];
+    if (addressArray.length > 1) {
+      parsedPerAddress = [
+        addressArray.slice(0, -1).join(' '),
+        addressArray.slice(-1)[0],
+      ];
+    } else {
+      parsedPerAddress = [addressArray[0]];
+    }
   } else {
     parsedPerAddress = parseCustomerAddress(cleanPerAddress);
   }
@@ -208,6 +221,11 @@ const bindCustomerDetails = async (globals) => {
     const [addressLine1 = '', addressLine2 = '', addressLine3 = ''] = parsedAddress;
     Object.assign(CURRENT_FORM_CONTEXT.customerAddress, { addressLine1, addressLine2, addressLine3 });
     formattedCustomerAddress = `${parsedAddress.join(' ')}, ${pincode}, ${city}, ${state}`;
+    if (addressLine1.length < 10 || addressLine2 === '') {
+      globals.functions.setProperty(addressDetails.pinCodeNotMatch, { value: 'Address is too short, please enter valid address', visible: true });
+      globals.functions.setProperty(addressDetails.mailingAddressToggle, { value: 'off', enabled: false });
+      addClassToElement('.field-mailingaddresstoggle label.field-label', 'cursor-na');
+    }
   } else {
     formattedCustomerAddress = `${cleanAddress}, ${city}, ${state}, ${pincode}`;
     const [addressLine1 = '', addressLine2 = '', addressLine3 = ''] = address.split('|');
@@ -219,6 +237,7 @@ const bindCustomerDetails = async (globals) => {
   if (validPin.result === 'false') {
     globals.functions.setProperty(addressDetails.mailingAddressToggle, { value: 'off', enabled: false });
     globals.functions.setProperty(addressDetails.pinCodeNotMatch, { visible: true });
+    addClassToElement('.field-mailingaddresstoggle label.field-label', 'cursor-na');
   }
 
   Object.assign(CURRENT_FORM_CONTEXT.customerAddress, { city, pincode, state });
