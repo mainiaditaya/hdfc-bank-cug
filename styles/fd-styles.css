@@ -2704,14 +2704,14 @@ body.fdlien:has(.field-selectkycoptionspanel[data-visible='true']) main {
 
     .field-confirmcardtnc2 {
       .field-description {
-        top: 85px;
+        top: 100px;
       }
     }
 
     .field-confirmcardtnc3 {
       .field-description {
-        top: 110px;
-        left: 30%;
+        top: 140px;
+        left: 28%;
       }
     }
   }
@@ -2910,6 +2910,12 @@ body.fdlien:has(.field-selectkycoptionspanel[data-visible='true']) main {
         top: 0;
         left: 50%;
         transform: translateX(-50%);
+      }
+
+      .file-size {
+        font-size: var(--body-x-sm-font-size);
+        font-weight: var(--font-weight-regular);
+        color: var(--color-interface-text-secondary);
       }
 
       .file-description {
