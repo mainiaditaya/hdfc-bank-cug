@@ -25,7 +25,7 @@ import {
   OCCUPATION_MAP,
   ALLOWED_CHARACTERS,
 } from './constant.js';
-import { validatePan } from '../../common/functions.js';
+import { fullNamePanValidation } from '../../common/panvalidation.js';
 
 let CUSTOMER_DATA_BINDING_CHECK = true;
 const CUSTOMER_DETAILS_STATE = {
@@ -222,7 +222,7 @@ const bindCustomerDetails = async (globals) => {
     Object.assign(CURRENT_FORM_CONTEXT.customerAddress, { addressLine1, addressLine2, addressLine3 });
     formattedCustomerAddress = `${parsedAddress.join(' ')}, ${pincode}, ${city}, ${state}`;
     if (addressLine1.length < 10 || addressLine2 === '') {
-      globals.functions.setProperty(addressDetails.pinCodeNotMatch, { value: 'Address is too short, please enter valid address', visible: true });
+      globals.functions.setProperty(addressDetails.invalidAddressNote, { value: ERROR_MSG.shorAddressNote, visible: true });
       globals.functions.setProperty(addressDetails.mailingAddressToggle, { value: 'off', enabled: false });
       addClassToElement('.field-mailingaddresstoggle label.field-label', 'cursor-na');
     }
@@ -236,7 +236,7 @@ const bindCustomerDetails = async (globals) => {
 
   if (validPin.result === 'false') {
     globals.functions.setProperty(addressDetails.mailingAddressToggle, { value: 'off', enabled: false });
-    globals.functions.setProperty(addressDetails.pinCodeNotMatch, { visible: true });
+    globals.functions.setProperty(addressDetails.invalidAddressNote, { value: ERROR_MSG.invalidPinNote, visible: true });
     addClassToElement('.field-mailingaddresstoggle label.field-label', 'cursor-na');
   }
 
@@ -452,7 +452,7 @@ const fathersNameChangeHandler = (globals) => {
 
   if (isSingleName) {
     Object.assign(customerInfo, {
-      customerFullName: `${customerInfo.customerFirstName} ${middleName} ${lastName}`.trim().toUpperCase(),
+      customerFullName: [customerInfo.customerFirstName, middleName, lastName].filter(Boolean).join(' ').trim().toUpperCase(),
       customerMiddleName: middleName,
       customerLastName: lastName,
     });
@@ -462,6 +462,7 @@ const fathersNameChangeHandler = (globals) => {
   const { nameOnCard, nameOnCardDD } = personalDetails;
   globals.functions.setProperty(nameOnCard, { visible: nameOnCardVisible });
   globals.functions.setProperty(nameOnCardDD, { visible: !nameOnCardVisible });
+  globals.functions.setProperty(personalDetails.fullName, { value: [customerInfo.customerFirstName, middleName, lastName].filter(Boolean).join(' ') });
 
   CURRENT_FORM_CONTEXT.editFlags.nameOnCard = nameOnCardVisible;
 
@@ -488,7 +489,7 @@ const checkPanValidation = (fullName, pan, dob, globals) => {
   if (fullName && pan && isPanValidLength && dob && isPanCheckAllowed && !CUSTOMER_DETAILS_STATE.onLoad && CURRENT_FORM_CONTEXT?.customerInfo?.refCustItNum === '' && ageValidator(AGE_LIMIT.min, AGE_LIMIT.max, personalDetails.dateOfBirthPersonalDetails.$value)) {
     CUSTOMER_DETAILS_STATE.panCheckCount += 1;
     const mobileNumber = globals?.form?.loginMainPanel?.loginPanel?.mobilePanel?.registeredMobileNumber?.$value;
-    return validatePan(mobileNumber, pan, dob, fullName, false, false);
+    return fullNamePanValidation(mobileNumber, pan, dob, fullName, false, false);
   }
 
   CUSTOMER_DETAILS_STATE.onLoad = false;
