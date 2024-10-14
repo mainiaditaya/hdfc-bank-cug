@@ -84,9 +84,10 @@ function getCurrentFormContext(globals) {
    * @param {string} channel - The channel through which the journey is initiated.
    * @param {object} globals
    */
-function createJourneyId(visitMode, journeyAbbreviation, channel, globals) {
+function createJourneyId(visitMode, journeyAbbreviation, channelValue, globals) {
   const dynamicUUID = generateUUID();
   // var dispInstance = getDispatcherInstance();
+  let channel = channelValue;
   if (isNodeEnv) {
     channel = CHANNELS.adobeWhatsApp;
   }
@@ -124,8 +125,8 @@ function getOTPV1(mobileNumber, cardDigits, channel, globals) {
     requestString: {
       mobileNo: mobileNumber,
       cardNo: cardDigits,
-      journeyID: globals.form.runtime.journeyId.$value,
-      journeyName: globals.form.runtime.journeyName.$value,
+      journeyID: globals.form.runtime.journeyId.$value || currentFormContext.journeyID,
+      journeyName: globals.form.runtime.journeyName.$value || currentFormContext.journeyName,
     },
   };
   if (channel === CHANNELS.adobeWhatsApp) {
@@ -152,15 +153,15 @@ function getOTPV1(mobileNumber, cardDigits, channel, globals) {
  * @param {object} globals
  * @return {PROMISE}
  */
-function otpValV1(mobileNumber, cardDigits, otpNumber) {
+function otpValV1(mobileNumber, cardDigits, otpNumber, globals) {
   const jsonObj = {
     requestString: {
       mobileNo: mobileNumber,
       cardNo: cardDigits,
       OTP: otpNumber,
       proCode: PRO_CODE,
-      journeyID: currentFormContext.journeyID,
-      journeyName: currentFormContext.journeyName,
+      journeyID: globals.form.runtime.journeyId.$value || currentFormContext.journeyID,
+      journeyName: globals.form.runtime.journeyName.$value || currentFormContext.journeyName,
     },
   };
   const path = semiEndpoints.otpVal;
@@ -321,7 +322,6 @@ const getTranactionPanelData = (transactions) => {
       aem_txn_type: txn?.type,
     };
   });
-  console.log('txnsData: ', txnsData);
   return txnsData;
 };
 
@@ -392,10 +392,10 @@ function customDispatchEvent(eventName, payload, globals) {
   globals.functions.dispatchEvent(globals.form, `custom:${eventName}`, evtPayload);
 }
 
-const handleResendOtp2VisibilityInFlow = (resendOtpCount, globals) => {
+const handleResendOtp2VisibilityInFlow = (countOfResendOtp, globals) => {
   if (!isNodeEnv) return;
   const otpPanel = globals.form.aem_semiWizard.aem_selectTenure.aem_otpPanelConfirmation.aem_otpPanel2;
-  if (resendOtpCount >= DATA_LIMITS.maxOtpResendLimit) {
+  if (countOfResendOtp >= DATA_LIMITS.maxOtpResendLimit) {
     const properties = otpPanel.aem_otpResend2.$properties;
     globals.functions.setProperty(otpPanel.aem_otpResend2, { properties: { ...properties, 'flow:setVisible': false } });
   }
@@ -446,7 +446,7 @@ function checkELigibilityHandler(resPayload1, globals) {
       ccUnBilledData = sortDataByAmount(ccUnBilledData, 'amount');
     }
     formContext.EligibilityResponse = resPayload;
-    globals.functions.setProperty(globals.form.runtime.formContext, { value: JSON.stringify({ ...formContext }) });
+    globals.functions.setProperty(globals.form.runtime.currentFormContext, { value: JSON.stringify({ ...formContext }) });
     const billedTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.billedTxnFragment.aem_chooseTransactions.aem_TxnsList;
     const unBilledTxnPanel = globals.form.aem_semiWizard.aem_chooseTransactions.unbilledTxnFragment.aem_chooseTransactions.aem_TxnsList;
     const allTxn = ccBilledData.concat(ccUnBilledData);
@@ -1160,7 +1160,6 @@ const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
   const eligibiltyResponse = _context.EligibilityResponse;
   const tenurePlan = globals.functions.exportData().aem_tenureSelectionRepeatablePanel;
   const selectedTenurePlan = tenurePlan?.find((emiPlan) => emiPlan.aem_tenureSelection === '0');
-  console.log('selectedTenurePlan', selectedTenurePlan);
   const emiSubData = JSON.parse(selectedTenurePlan?.aem_tenureRawData);
   const PROC_FEES = String(currencyStrToNum(selectedTenurePlan?.aem_tenureSelectionProcessing));
   const INTEREST = emiSubData?.interest; // '030888'
