@@ -32,6 +32,7 @@ import {
 import { invokeJourneyDropOffByParam } from '../../common/journey-utils.js';
 import { invokeJourneyDropOffUpdate, invokeJourneyDropOff } from './semi-journey-utils.js';
 import { reloadPage } from '../../common/functions.js';
+import sendSemiAnalytics from './semi-analytics.js';
 
 const {
   CURRENT_FORM_CONTEXT: currentFormContext,
@@ -60,6 +61,22 @@ let tnxPopupAlertOnce = 0; // flag alert for the pop to show only once on click 
 let resendOtpCount = 0;
 let resendOtpCount2 = 0;
 const userPrevSelect = {};
+
+const onPageLoadAnalytics = async () => {
+  const journeyData = {};
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line no-underscore-dangle, no-undef
+    journeyData.journeyId = myForm.resolveQualifiedName('$form.runtime.journeyId')._data.$_value;
+    journeyData.journeyName = journeyName;
+    sendSemiAnalytics('page load-Identify yourself', {}, 'CUSTOMER_IDENTITY_ACQUIRED', journeyData);
+  }
+};
+
+setTimeout(() => {
+  if (typeof window !== 'undefined') {
+    onPageLoadAnalytics();
+  }
+}, 5000);
 
 /**
  * For Web returing currentFormContext as defined in variable

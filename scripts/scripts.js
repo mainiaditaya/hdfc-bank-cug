@@ -14,13 +14,20 @@ import {
 
 const LCP_BLOCKS = []; // add your LCP blocks to the list
 
-const FORM_MAIN_CLASS = [
+const FORM_CONSTANT = [
   {
     // SEMI
     form: 'semi',
     class: 'semi-form',
+    urlKey: ['semi', 'smart-emi', 'smart emi'],
+    launchScript: {
+      dev: 'https://assets.adobedtm.com/80673311e435/029b16140ccd/launch-94203efd95a9-staging.min.js',
+      prod: 'https://assets.adobedtm.com/80673311e435/029b16140ccd/launch-94203efd95a9-staging.js',
+      loadTime: 0,
+    },
   },
 ];
+const ENV = 'dev'; // take it from common constant to denote
 /**
  * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
@@ -95,7 +102,7 @@ async function loadEager(doc) {
       loadFonts();
     }
     const currentUrl = window.location.href;
-    FORM_MAIN_CLASS.some((item) => {
+    FORM_CONSTANT.some((item) => {
       if (currentUrl.includes(item.form)) {
         document.body.classList.add(item.class);
         return true;
@@ -134,7 +141,14 @@ async function loadLazy(doc) {
 function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
-  window.setTimeout(() => loadScript('https://assets.adobedtm.com/80673311e435/029b16140ccd/launch-39d52f236cd6.min.js'), 3600);
+  const currentUrl = window.location.href;
+  FORM_CONSTANT.some((form) => {
+    if (form.urlKey.some((el) => currentUrl.includes(el))) {
+      window.setTimeout(() => loadScript(form.launchScript[ENV]), form.launchScript.loadTime);
+      return true;
+    }
+    return false;
+  });
   // load anything that can be postponed to the latest here
 }
 
