@@ -178,7 +178,7 @@ const finalDap = (userRedirected, globals) => {
           throughDomSetArnNum(response.applicationNumber, mobileNumber, journeyId, leadProfileId, globals);
           setTimeout(async (globalObj) => {
             const santizedFormData = santizedFormDataWithContext(globalObj);
-            await Promise.resolve(sendPageloadEvent('CONFIRMATION_JOURNEY_STATE', santizedFormData, 'CONFIRMATION_PAGE_NAME'));
+            await Promise.resolve(sendPageloadEvent('CUSTOMER_ONBOARDING_COMPLETE', santizedFormData, 'CONFIRMATION_PAGE_NAME'));
           }, 5000, globals);
         }
       } else {
