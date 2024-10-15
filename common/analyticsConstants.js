@@ -6,6 +6,7 @@ const data = {
   },
   'submit otp': {
     error: '',
+    linkPosition: 'Form',
   },
   'check offers': {
     linkType: 'button',
@@ -145,6 +146,7 @@ const PAGE_NAME = {
   },
   fd: {
     getOtp: 'Identify Yourself',
+    submitOtp: 'Verify with OTP',
   },
 };
 export {

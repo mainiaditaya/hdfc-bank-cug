@@ -82,7 +82,7 @@ const ANALYTICS = {
     },
     submitOtp: {
       type: 'click',
-      name: 'Verify with OTP',
+      name: 'submit otp',
       pageName: 'Verify with OTP',
       journeyState: 'CUSTOMER_IDENTITY_RESOLVED',
       nextPage: 'selectCustomerId',
