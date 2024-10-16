@@ -1,16 +1,16 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
-import {
-  data,
-  ANALYTICS_CLICK_OBJECT,
-  ANALYTICS_PAGE_LOAD_OBJECT,
-  PAGE_NAME,
-} from '../../common/analyticsConstants.js';
 import {
   createDeepCopyFromBlueprint,
   santizedFormDataWithContext,
 } from '../../common/formutils.js';
-import { JOURNEY_NAME as FORM_NAME, CURRENT_FORM_CONTEXT as currentFormContext } from './constant.js';
+import {
+  ANALYTICS_JOURNEY_STATE,
+  ANALYTICS_LINK_BTN,
+  ANALYTICS_OBJECT_SEMI,
+  ANALYTICS_PAGE_LOAD_OBJECT_SEMI,
+  ANALYTICS_PAGE_NAME, JOURNEY_NAME as FORM_NAME,
+  CURRENT_FORM_CONTEXT as currentFormContext,
+} from './constant.js';
 
 /**
    * set analytics generic props for page load
@@ -21,14 +21,16 @@ import { JOURNEY_NAME as FORM_NAME, CURRENT_FORM_CONTEXT as currentFormContext }
    * @param {object} digitalData
    */
 
-function setAnalyticPageLoadProps(journeyState, formData, digitalData) {
+const setAnalyticPageLoadProps = (journeyState, formData, digitalData) => {
   digitalData.user.pseudoID = '';// Need to check
-  digitalData.user.journeyName = formData?.journeyName;
-  digitalData.user.journeyID = formData?.journeyId;
+  digitalData.user.journeyName = formData?.journeyName || formData?.smartemi?.journeyName;
+  digitalData.user.journeyID = formData?.journeyId || formData?.smartemi?.journeyId;
   digitalData.user.journeyState = journeyState;
   digitalData.user.casa = '';
-  digitalData.form.name = FORM_NAME;
-}
+  digitalData.user.aan = '';
+  digitalData.form.name = 'SmartEMI';
+  digitalData.form.emiCategory = '';
+};
 
 /**
    * set analytics generic props for click event
@@ -39,31 +41,20 @@ function setAnalyticPageLoadProps(journeyState, formData, digitalData) {
    * @param {object} digitalData
    */
 
-function setAnalyticClickGenericProps(linkName, linkType, formData, journeyState, digitalData) {
+const setAnalyticClickGenericProps = (linkName, linkType, formData, journeyState, digitalData) => {
   digitalData.link = {
     linkName,
     linkType,
   };
-  digitalData.link.linkPosition = data[linkName].linkPosition;
+  digitalData.link.linkPosition = ANALYTICS_LINK_BTN[linkName].linkPosition;
   digitalData.user.pseudoID = '';
-  digitalData.user.journeyName = currentFormContext?.journeyName;
-  digitalData.user.journeyID = currentFormContext?.journeyID;
+  digitalData.user.journeyName = currentFormContext?.journeyName || formData?.smartemi?.journeyName;
+  digitalData.user.journeyID = currentFormContext?.journeyID || formData?.smartemi?.journeyId;
   digitalData.user.journeyState = journeyState;
   if (linkName === 'otp click') {
     digitalData.form.name = FORM_NAME;
     digitalData.user.casa = '';
-  } else {
-    digitalData.form.name = formData.etbFlowSelected === 'on' ? `${FORM_NAME}-ETB` : `${FORM_NAME}-NTB`;
-    digitalData.user.casa = formData.etbFlowSelected === 'on' ? 'Yes' : 'No';
   }
-  // window.digitalData = digitalData || {};
-}
-
-const getValidationMethod = (formContext) => {
-  if (formContext && formContext?.login && formContext.login.panDobSelection) {
-    return formContext.login.panDobSelection === '0' ? 'DOB' : 'PAN';
-  }
-  return '';
 };
 
 /**
@@ -73,32 +64,32 @@ const getValidationMethod = (formContext) => {
    * @param {object} formData.
    * @param {string} pageName.
    */
-function sendPageloadEvent(journeyState, formData, pageName) {
-  const digitalData = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
+const sendPageloadEvent = (journeyState, formData, pageName) => {
+  const digitalData = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT_SEMI);
   digitalData.page.pageInfo.pageName = pageName;
   setAnalyticPageLoadProps(journeyState, formData, digitalData);
   if (window) {
     window.digitalData = digitalData || {};
   }
   _satellite.track('pageload');
-}
+};
 
 /**
    *Creates digital data for otp click event.
-   * @param {string} phone
    * @param {string} validationType
    * @param {string} eventType
    * @param {object} formContext
    * @param {object} digitalData
    */
-function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState, digitalData) {
+const sendSubmitClickEvent = (eventType, linkType, formData, journeyState, digitalData) => {
   setAnalyticClickGenericProps(eventType, linkType, formData, journeyState, digitalData);
-  digitalData.page.pageInfo.pageName = PAGE_NAME.ccc[eventType];
+  digitalData.page.pageInfo.pageName = ANALYTICS_PAGE_NAME[eventType];
   switch (eventType) {
     case 'otp click': {
       digitalData.event = {
-        phone,
-        validationMethod: getValidationMethod(formData),
+        phone: String(formData.smartemi.aem_mobileNum), // sha-256 encrypted ?.
+        validationMethod: 'credit card',
+        status: '1',
       };
       if (window) {
         window.digitalData = digitalData || {};
@@ -106,46 +97,7 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       _satellite.track('submit');
       currentFormContext.action = 'otp click';
       setTimeout(() => {
-        sendPageloadEvent('CUSTOMER_IDENTITY_RESOLVED', formData, PAGE_NAME.ccc['confirm otp']);
-      }, 1000);
-      break;
-    }
-    case 'confirm otp': {
-      setTimeout(() => {
-        sendPageloadEvent('CUSTOMER_IDENTITY_RESOLVED', formData, PAGE_NAME.ccc['check offers']);
-      }, 1000);
-      break;
-    }
-    case 'check offers': {
-      digitalData.user.gender = formData.form.gender;
-      digitalData.user.email = formData.form.workEmailAddress;
-      if (formData.form.currentAddressToggle === 'off') {
-        digitalData.formDetails = {
-          pincode: currentFormContext?.breDemogResponse?.VDCUSTZIPCODE,
-          city: currentFormContext?.breDemogResponse?.VDCUSTCITY,
-          state: currentFormContext?.breDemogResponse?.VDCUSTSTATE,
-        };
-      } else {
-        const isETB = currentFormContext.journeyType === 'ETB';
-        digitalData.formDetails = {
-          pincode: isETB ? formData?.form?.newCurentAddressPin : formData?.form?.currentAddresPincodeNTB,
-          city: isETB ? 'hardcodedETBCity' : 'hardcodedNTBCity',
-          state: isETB ? 'hardcodedETBState' : 'hardcodedNTBState',
-        };
-      }
-      Object.assign(digitalData.formDetails, {
-        employmentType: formData?.form?.employmentType || currentFormContext?.crmLeadResponse?.employmentType,
-        companyName: formData?.form?.companyName,
-        designation: formData?.form?.designation,
-        relationshipNumber: formData?.form?.relationshipNumber || currentFormContext?.crmLeadResponse?.relationshipNumber,
-      });
-      currentFormContext.action = 'check offers';
-      if (window) {
-        window.digitalData = digitalData || {};
-      }
-      _satellite.track('submit');
-      setTimeout(() => {
-        sendPageloadEvent('CUSTOMER_BUREAU_OFFER_AVAILABLE', formData, PAGE_NAME.ccc['get this card']);
+        sendPageloadEvent(ANALYTICS_JOURNEY_STATE['otp click'], formData, ANALYTICS_PAGE_NAME['submit otp']);
       }, 1000);
       break;
     }
@@ -173,38 +125,6 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       }, 1000);
       break;
     }
-
-    case 'address continue': {
-      // formData?.queryParams?.authmode
-      // const formData = globals.functions.exportData();
-      // const idcomVisit = formData?.queryParams?.authmode; // "DebitCard"
-      digitalData.event = {
-        status: '1', // 'it will be always '1' since button getting enabled only after click decleration.'
-        validationMethod: '', // Netbanking or Debit card or creditCard - validationMethod - authmode will be getting only after idcom redirected - how to use that value
-        // validation method can't be captured as it is in different portal.
-      };
-
-      const cardDeliveryAddress = formData?.form?.cardDeliveryAddressOption2 ? 'Office Address||||' : 'Current Address||||';
-      digitalData.formDetails = {
-        nomineeRelation: cardDeliveryAddress, // Capture Card Delivery Address (Office or Current Address)
-      };
-      if (window) {
-        window.digitalData = digitalData || {};
-      }
-      _satellite.track('submit');
-      break;
-    }
-
-    case 'i agree': {
-      digitalData.formDetails = {
-        languageSelected: currentFormContext.languageSelected,
-      };
-      if (window) {
-        window.digitalData = digitalData || {};
-      }
-      _satellite.track('submit');
-      break;
-    }
     case 'kyc continue': {
       const kyc = (formData?.form?.aadharEKYCVerification && 'Ekyc') || (formData?.form?.aadharBiometricVerification && 'Biometric') || (formData?.form?.officiallyValidDocumentsMethod && 'Other Docs');
       digitalData.formDetails = {
@@ -216,60 +136,12 @@ function sendSubmitClickEvent(phone, eventType, linkType, formData, journeyState
       _satellite.track('submit');
       break;
     }
-
-    case 'aadhaar otp': {
-      // UID OR VID  how to capture the value - aadhar in different portal.
-      digitalData.event = {
-        status: '',
-      };
-      if (window) {
-        window.digitalData = digitalData || {};
-      }
-      _satellite.track('submit');
-      break;
-    }
-
-    case 'document upload continue': {
-      digitalData.formDetails = {
-        documentProof: formData?.docUploadDropdown, // documentType
-      };
-      if (window) {
-        window.digitalData = digitalData || {};
-      }
-      _satellite.track('submit');
-      break;
-    }
-
-    case 'start kyc': {
-      // ETB_ Capture clicks on Start vKYC CTA, Applicable only for ETB Address Change, Only in case of Aadhaar and Application no. mismatch
-      // NTB_ '1'(default without any condition)
-      digitalData.event = {
-        status: '1', // formData?.vkycProceedButton, //  value is '1' or '0' for -e63 capture
-      };
-      if (window) {
-        window.digitalData = digitalData || {};
-      }
-      _satellite.track('submit');
-      break;
-    }
-
-    case 'submit review': {
-      // common both ntb + etb
-      digitalData.event = {
-        rating: formData?.ratingvalue,
-      };
-      if (window) {
-        window.digitalData = digitalData || {};
-      }
-      _satellite.track('survey');
-      break;
-    }
     default:
         // do nothing
   }
-}
+};
 
-function populateResponse(payload, eventType, digitalData) {
+const populateResponse = (payload, eventType, digitalData) => {
   switch (eventType) {
     case 'otp click': {
       digitalData.page.pageInfo.errorCode = payload?.status?.errorCode;
@@ -292,7 +164,7 @@ function populateResponse(payload, eventType, digitalData) {
     default:
       // do nothing
   }
-}
+};
 
 /**
    * Send analytics events.
@@ -302,12 +174,12 @@ function populateResponse(payload, eventType, digitalData) {
    * @param {object} formData
    * @param {object} currentFormContext
    */
-function sendAnalyticsEvent(eventType, payload, journeyState, formData) {
-  const digitalData = createDeepCopyFromBlueprint(ANALYTICS_CLICK_OBJECT);
-  const attributes = data[eventType];
+const sendAnalyticsEvent = (eventType, payload, journeyState, formData) => {
+  const digitalData = createDeepCopyFromBlueprint(ANALYTICS_OBJECT_SEMI);
+  const attributes = ANALYTICS_LINK_BTN[eventType];
   populateResponse(payload, eventType, digitalData);
-  sendSubmitClickEvent(formData?.login?.registeredMobileNumber, eventType, attributes?.linkType, formData, journeyState, digitalData);
-}
+  sendSubmitClickEvent(eventType, attributes?.linkType, formData, journeyState, digitalData);
+};
 
 /**
   * sendErrorAnalytics
@@ -317,10 +189,12 @@ function sendAnalyticsEvent(eventType, payload, journeyState, formData) {
   * @param {object} globals
   */
 function sendErrorAnalytics(errorCode, errorMsg, journeyState, globals) {
-  const digitalData = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT);
+  const digitalData = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT_SEMI);
   setAnalyticPageLoadProps(journeyState, santizedFormDataWithContext(globals), digitalData);
   digitalData.page.pageInfo.errorCode = errorCode;
   digitalData.page.pageInfo.errorMessage = errorMsg;
+  digitalData.page.pageInfo.errorAPI = ''; // "OTP_Validation|EligibilityCheck"
+  digitalData.page.pageInfo.pageName = ANALYTICS_PAGE_NAME['Error Page'];
   if (window) {
     window.digitalData = digitalData || {};
   }
@@ -337,31 +211,14 @@ function sendErrorAnalytics(errorCode, errorMsg, journeyState, globals) {
 function sendSemiAnalytics(eventType, payload, journeyState, globals) {
   const formData = santizedFormDataWithContext(globals);
   if (eventType.includes('page load')) {
-    const pageName = eventType.split('-')[1];
+    const pageName = ANALYTICS_PAGE_NAME['page load'];
     sendPageloadEvent(journeyState, formData, pageName);
   } else {
     sendAnalyticsEvent(eventType, payload, journeyState, formData);
   }
 }
 
-/**
-   * Sends an analytics event and performs additional asynchronous operations.
-   *
-   * @param {string} eventType - The type of the event to be sent.
-   * @param {string} payload - The data to be sent with the event.
-   * @param {string} journeyState - The state of the current journey.
-   * @param {Object} globals - Global context or data required for the event.
-   * @returns {Promise<object>} A promise that resolves with 'Success' if the operation is successful, or rejects with an error.
-   */
-function asyncAnalytics(eventType, payload, journeyState, globals) {
-  return new Promise((resolve) => {
-    try {
-      sendAnalyticsEvent(eventType, payload, journeyState, santizedFormDataWithContext(globals));
-      setTimeout(() => resolve({ response: 'success' }), 2000);
-    } catch (ex) {
-      // no console.
-    }
-  });
-}
-
-export default sendSemiAnalytics;
+export {
+  sendSemiAnalytics,
+  sendErrorAnalytics,
+};

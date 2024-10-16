@@ -32,7 +32,10 @@ import {
 import { invokeJourneyDropOffByParam } from '../../common/journey-utils.js';
 import { invokeJourneyDropOffUpdate, invokeJourneyDropOff } from './semi-journey-utils.js';
 import { reloadPage } from '../../common/functions.js';
-import sendSemiAnalytics from './semi-analytics.js';
+import {
+  sendSemiAnalytics,
+  sendErrorAnalytics,
+} from './semi-analytics.js';
 
 const {
   CURRENT_FORM_CONTEXT: currentFormContext,
@@ -68,7 +71,12 @@ const onPageLoadAnalytics = async () => {
     // eslint-disable-next-line no-underscore-dangle, no-undef
     journeyData.journeyId = myForm.resolveQualifiedName('$form.runtime.journeyId')._data.$_value;
     journeyData.journeyName = journeyName;
-    sendSemiAnalytics('page load-Identify yourself', {}, 'CUSTOMER_IDENTITY_ACQUIRED', journeyData);
+    sendSemiAnalytics(
+      'page load',
+      {},
+      SEMI_CONSTANT.ANALYTICS_JOURNEY_STATE['page load'],
+      journeyData,
+    );
   }
 };
 
@@ -159,6 +167,21 @@ function getOTPV1(mobileNumber, cardDigits, channel, globals) {
       },
     };
   }
+  /* success */
+  Promise.resolve(sendSemiAnalytics(
+    SEMI_CONSTANT.ANALYTICS_EVENT_NAME['otp click'],
+    'otpGenResponse',
+    SEMI_CONSTANT.ANALYTICS_JOURNEY_STATE['otp click'],
+    globals,
+  ));
+
+  /* failure */
+  Promise.resolve(sendErrorAnalytics(
+    'XFACE_INQ_VP_0003',
+    'Hey, it seems like you have entered incorrect details. Request you to check & re-enter your registered mobile no. & last 4 digits of the card.',
+    'CUSTOMER_IDENTITY_UNRESOLVED',
+    globals,
+  ));
   // eslint-disable-next-line no-unneeded-ternary
   return fetchJsonResponse(path, jsonObj, 'POST', isNodeEnv ? false : true);
 }
