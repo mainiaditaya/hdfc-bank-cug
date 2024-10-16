@@ -25,8 +25,8 @@ const invokeJourneyDropOff = async (state, mobileNumber, globals) => {
       },
       formData: {
         channel: CHANNEL,
-        journeyName: currentFormContext.journeyName,
-        journeyID: currentFormContext.journeyID,
+        journeyName: globals.form.runtime.journeyName.$value,
+        journeyID: globals.form.runtime.journeyId.$value,
         journeyStateInfo: [
           {
             state,
