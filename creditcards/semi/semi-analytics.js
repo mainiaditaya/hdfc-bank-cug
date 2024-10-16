@@ -49,10 +49,9 @@ const setAnalyticPageLoadProps = (journeyState, formData, digitalData) => {
    */
 
 const setAnalyticClickGenericProps = (linkName, linkType, formData, journeyState, digitalData) => {
-  digitalData.link = {
-    linkName,
-    linkType,
-  };
+  digitalData.link = {};
+  digitalData.link.linkName = ANALYTICS_LINK_BTN[linkName].linkName;
+  digitalData.link.linkType = ANALYTICS_LINK_BTN[linkName].linkType;
   digitalData.link.linkPosition = ANALYTICS_LINK_BTN[linkName].linkPosition;
   digitalData.user.pseudoID = '';
   digitalData.user.journeyName = currentFormContext?.journeyName || formData?.smartemi?.journeyName;
@@ -212,7 +211,9 @@ const sendSubmitClickEvent = (eventType, linkType, formData, journeyState, digit
       }, 7000);
       break;
     }
-    case 'kyc continue': {
+    case 'submit rating': {
+      digitalData.event = {};
+      digitalData.event.rating = formData?.ratingvalue || formData.rating;
       if (window) {
         window.digitalData = digitalData || {};
       }

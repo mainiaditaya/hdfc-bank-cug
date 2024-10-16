@@ -31,33 +31,45 @@ const ANALYTICS_PAGE_NAME = {
 const ANALYTICS_LINK_BTN = {
   'otp click': {
     linkType: 'button',
+    linkName: 'Get OTP',
     StepName: 'Step 1 - Identify Yourself',
     linkPosition: 'Form',
     pageName: ANALYTICS_PAGE_NAME['otp click'],
   },
   'submit otp': {
     linkType: 'button',
+    linkName: 'Submit OTP',
     StepName: 'Step 2 - Verify with OTP',
     linkPosition: 'Form',
     pageName: ANALYTICS_PAGE_NAME['submit otp'],
   },
   'transaction view': {
     linkType: 'button',
+    linkName: 'View EMI Amount',
     StepName: 'Step 3 - View Spends - Select Transactions',
     linkPosition: 'Form',
     pageName: ANALYTICS_PAGE_NAME['transaction view'],
   },
   'tenure page': {
     linkType: 'button',
+    linkName: 'Confirm',
     StepName: 'Step 3 - View Spends - Select Tenure',
     linkPosition: 'Form',
     pageName: ANALYTICS_PAGE_NAME['tenure page'],
   },
   'confirm tenure': {
     linkType: 'button',
+    linkName: 'Authenticate',
     StepName: 'Step 4 - Confirm with OTP',
     linkPosition: 'Form',
     pageName: ANALYTICS_PAGE_NAME['confirm tenure'],
+  },
+  'submit rating': {
+    linkType: 'button',
+    linkName: 'Submit',
+    StepName: 'Step 5 - Confirmation',
+    linkPosition: 'Form',
+    pageName: ANALYTICS_PAGE_NAME['thank you'],
   },
 };
 
