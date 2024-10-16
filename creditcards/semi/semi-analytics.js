@@ -138,6 +138,7 @@ const sendSubmitClickEvent = (eventType, linkType, formData, journeyState, digit
       }, 1000);
       break;
     }
+
     case 'transaction view': {
       digitalData.event.status = {
         phone: String(formData.smartemi.aem_mobileNum), // sha-256 encrypted ?.
@@ -158,6 +159,35 @@ const sendSubmitClickEvent = (eventType, linkType, formData, journeyState, digit
       }, 1000);
       break;
     }
+
+    case 'tenure page': {
+      digitalData.event = {
+        phone: String(formData.smartemi.aem_mobileNum), // sha-256 encrypted ?.
+        validationMethod: 'credit card',
+        status: '1',
+      };
+      const selectedData = formData?.aem_tenureSelectionRepeatablePanel?.find((el) => el.aem_tenureSelection);
+      digitalData.formDetails = {};
+      digitalData.formDetails.installment = selectedData?.aem_tenureSelectionEmi ?? '';
+      digitalData.formDetails.tenure = selectedData?.aem_tenure_display ?? '';
+      digitalData.formDetails.roi = selectedData?.aem_roi_monthly ?? '';
+      digitalData.formDetails.amt = formData?.smartemi?.SmartEMIAmt || currentFormContext.SMART_EMI_AMOUNT; // total amount
+      digitalData.assisted = {};
+      digitalData.assisted.flag = formData?.aem_bankAssistedToggle;
+      digitalData.assisted.lg = formData?.aem_lgCode ?? '';
+      digitalData.assisted.lc = formData?.aem_lcCode ?? '';
+      const EMI_CATEGORY = (formData?.smartemi?.TransactionType === 'Both') ? 'Billed / Unbilled ' : formData?.smartemi?.TransactionType;
+      digitalData.form.emiCategory = EMI_CATEGORY;
+      if (window) {
+        window.digitalData = digitalData || {};
+      }
+      _satellite.track('submit');
+      setTimeout(() => {
+        sendPageloadEvent(ANALYTICS_JOURNEY_STATE['tenure page'], formData, ANALYTICS_PAGE_NAME['confirm tenure']);
+      }, 1000);
+      break;
+    }
+
     case 'kyc continue': {
       const kyc = (formData?.form?.aadharEKYCVerification && 'Ekyc') || (formData?.form?.aadharBiometricVerification && 'Biometric') || (formData?.form?.officiallyValidDocumentsMethod && 'Other Docs');
       digitalData.formDetails = {
@@ -178,6 +208,7 @@ const populateResponse = (payload, eventType, digitalData) => {
   switch (eventType) {
     case 'otp click':
     case 'transaction view':
+    case 'tenure page':
     case 'submit otp': {
       digitalData.page.pageInfo.errorCode = payload?.errorCode;
       digitalData.page.pageInfo.errorMessage = payload?.errorMessage;

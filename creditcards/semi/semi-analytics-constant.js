@@ -3,6 +3,7 @@ const ANALYTICS_EVENT_NAME = {
   'otp click': 'otp click',
   'submit otp': 'submit otp',
   'transaction view': 'transaction view',
+  'tenure page': 'tenure page',
 };
 
 const ANALYTICS_JOURNEY_STATE = {
@@ -10,6 +11,8 @@ const ANALYTICS_JOURNEY_STATE = {
   'otp click': 'CUSTOMER_IDENTITY_RESOLVED',
   'submit otp': 'CUSTOMER_IDENTITY_RESOLVED',
   'transaction view': '',
+  'tenure page': 'CUSTOMER_PREEXECUTION_SUCCESS',
+  'confirm tenure': '',
 };
 
 const ANALYTICS_PAGE_NAME = {
@@ -18,6 +21,7 @@ const ANALYTICS_PAGE_NAME = {
   'submit otp': 'Step 2 - Verify with OTP',
   'transaction view': 'Step 3 - View Spends - Select Transactions',
   'tenure page': 'Step 3 - View Spends - Select Tenure',
+  'confirm tenure': 'Step 4 - Confirm with OTP',
   'Error Page': 'Error Page',
 };
 
@@ -39,6 +43,12 @@ const ANALYTICS_LINK_BTN = {
     StepName: 'Step 3 - View Spends - Select Transactions',
     linkPosition: 'Form',
     pageName: ANALYTICS_PAGE_NAME['transaction view'],
+  },
+  'tenure page': {
+    linkType: 'button',
+    StepName: 'Step 3 - View Spends - Select Tenure',
+    linkPosition: 'Form',
+    pageName: ANALYTICS_PAGE_NAME['tenure page'],
   },
 };
 
@@ -82,10 +92,6 @@ const ANALYTICS_PAGE_LOAD_OBJECT_SEMI = {
       errorCode: '',
       errorMessage: '',
     },
-  },
-  card: {
-    selectedCard: '',
-    eligibleCard: '',
   },
   user: {
     pseudoID: '',

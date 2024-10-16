@@ -275,6 +275,14 @@ function preExecution(mobileNumber, cardDigits, globals) {
   };
   const path = semiEndpoints.preexecution;
   if (!isNodeEnv) displayLoader();
+  /* success */
+  Promise.resolve(sendSemiAnalytics(
+    ANALYTICS_EVENT_NAME['tenure page'],
+    'preExecutionResponse',
+    ANALYTICS_JOURNEY_STATE['tenure page'],
+    globals,
+  ));
+
   return fetchJsonResponse(path, jsonObj, 'POST', !isNodeEnv);
 }
 const nfObject = new Intl.NumberFormat('hi-IN');
