@@ -1,17 +1,23 @@
 const ANALYTICS_EVENT_NAME = {
   'page load': 'page load',
   'otp click': 'otp click',
+  'submit otp': 'submit otp',
+  'transaction view': 'transaction view',
 };
 
 const ANALYTICS_JOURNEY_STATE = {
   'page load': 'CUSTOMER_IDENTITY_ACQUIRED',
   'otp click': 'CUSTOMER_IDENTITY_RESOLVED',
+  'submit otp': 'CUSTOMER_IDENTITY_RESOLVED',
+  'transaction view': '',
 };
 
 const ANALYTICS_PAGE_NAME = {
   'page load': 'Step 1 - Identify Yourself',
   'otp click': 'Step 1 - Identify Yourself',
   'submit otp': 'Step 2 - Verify with OTP',
+  'transaction view': 'Step 3 - View Spends - Select Transactions',
+  'tenure page': 'Step 3 - View Spends - Select Tenure',
   'Error Page': 'Error Page',
 };
 
@@ -23,7 +29,16 @@ const ANALYTICS_LINK_BTN = {
     pageName: ANALYTICS_PAGE_NAME['otp click'],
   },
   'submit otp': {
+    linkType: 'button',
+    StepName: 'Step 2 - Verify with OTP',
+    linkPosition: 'Form',
     pageName: ANALYTICS_PAGE_NAME['submit otp'],
+  },
+  'transaction view': {
+    linkType: 'button',
+    StepName: 'Step 3 - View Spends - Select Transactions',
+    linkPosition: 'Form',
+    pageName: ANALYTICS_PAGE_NAME['transaction view'],
   },
 };
 

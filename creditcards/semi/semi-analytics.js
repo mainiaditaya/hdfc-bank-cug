@@ -15,6 +15,10 @@ import {
   ANALYTICS_PAGE_NAME,
 } from './semi-analytics-constant.js';
 
+const currentState = {
+  pageName: '',
+};
+
 /**
    * set analytics generic props for page load
    * @name setAnalyticPageLoadProps
@@ -71,6 +75,20 @@ const sendPageloadEvent = (journeyState, formData, pageName) => {
   const digitalData = createDeepCopyFromBlueprint(ANALYTICS_PAGE_LOAD_OBJECT_SEMI);
   digitalData.page.pageInfo.pageName = pageName;
   setAnalyticPageLoadProps(journeyState, formData, digitalData);
+  if (currentState.pageName === ANALYTICS_PAGE_NAME['transaction view']) {
+    digitalData.formDetails = {};
+    digitalData.formDetails.eligibleTransactions = ''; // eligible transaction on load of transaction page
+    currentState.pageName = null;
+  }
+  if (currentState.pageName === ANALYTICS_PAGE_NAME['tenure page']) {
+    /* default selected on load of this page */
+    const selectedData = formData?.aem_tenureSelectionRepeatablePanel?.find((el) => el.aem_tenureSelection);
+    digitalData.formDetails = {};
+    digitalData.formDetails.installment = selectedData?.aem_tenureSelectionEmi ?? '';
+    digitalData.formDetails.tenure = selectedData?.aem_tenure_display ?? '';
+    digitalData.formDetails.roi = selectedData?.aem_roi_monthly ?? '';
+    currentState.pageName = null;
+  }
   if (window) {
     window.digitalData = digitalData || {};
   }
@@ -98,33 +116,45 @@ const sendSubmitClickEvent = (eventType, linkType, formData, journeyState, digit
         window.digitalData = digitalData || {};
       }
       _satellite.track('submit');
-      currentFormContext.action = 'otp click';
       setTimeout(() => {
         sendPageloadEvent(ANALYTICS_JOURNEY_STATE['otp click'], formData, ANALYTICS_PAGE_NAME['submit otp']);
       }, 1000);
       break;
     }
 
-    case 'get this card': {
-      digitalData.card = {
-        selectedCard: formData?.form?.productCode || currentFormContext.crmLeadResponse.productCode,
-        annualFee: formData?.form?.joiningandRenewalFee,
+    case 'submit otp': {
+      digitalData.event = {
+        phone: String(formData.smartemi.aem_mobileNum), // sha-256 encrypted ?.
+        validationMethod: 'credit card',
+        status: '1',
       };
-      // digitalData.event = {
-      //   status: formData.cardBenefitsAgreeCheckbox,
-      // };
-      currentFormContext.action = 'confirmation';
       if (window) {
         window.digitalData = digitalData || {};
       }
-      currentFormContext.action = 'get this card';
       _satellite.track('submit');
       setTimeout(() => {
-        let currentPageName = 'Select KYC Method';
-        if (formData?.etbFlowSelected === 'on' && formData?.form?.currentAddressToggle === 'off') {
-          currentPageName = 'Confirm & Submit';
-        }
-        sendPageloadEvent('CUSTOMER_CARD_SELECTED', formData, currentPageName);
+        currentState.pageName = ANALYTICS_PAGE_NAME['transaction view'];
+        sendPageloadEvent(ANALYTICS_JOURNEY_STATE['submit otp'], formData, ANALYTICS_PAGE_NAME['transaction view']);
+      }, 1000);
+      break;
+    }
+    case 'transaction view': {
+      digitalData.event.status = {
+        phone: String(formData.smartemi.aem_mobileNum), // sha-256 encrypted ?.
+        validationMethod: 'credit card',
+        status: '1',
+      };
+      digitalData.formDetails = {};
+      digitalData.formDetails.amt = formData?.smartemi?.SmartEMIAmt || currentFormContext.SMART_EMI_AMOUNT; // total amount
+      digitalData.formDetails.eligibleTransactions = ''; // eligible transaction ?. no of eligible transaction available
+      digitalData.formDetails.selectedTransactions = currentFormContext?.TXN_SELECTED_COUNTS?.total; // no of selected
+      if (window) {
+        window.digitalData = digitalData || {};
+      }
+      _satellite.track('submit');
+      setTimeout(() => {
+        currentState.pageName = ANALYTICS_PAGE_NAME['tenure page'];
+        sendPageloadEvent(ANALYTICS_JOURNEY_STATE['transaction view'], formData, ANALYTICS_PAGE_NAME['tenure page']);
       }, 1000);
       break;
     }
@@ -146,20 +176,9 @@ const sendSubmitClickEvent = (eventType, linkType, formData, journeyState, digit
 
 const populateResponse = (payload, eventType, digitalData) => {
   switch (eventType) {
-    case 'otp click': {
-      digitalData.page.pageInfo.errorCode = payload?.status?.errorCode;
-      digitalData.page.pageInfo.errorMessage = payload?.status?.errorMessage;
-      break;
-    }
-    case 'check offers':
-    case 'document upload continue':
-    case 'aadhaar otp':
-    case 'kyc continue':
-    case 'get this card':
-    case 'submit review':
-    case 'address continue':
-    case 'i agree':
-    case 'start kyc': {
+    case 'otp click':
+    case 'transaction view':
+    case 'submit otp': {
       digitalData.page.pageInfo.errorCode = payload?.errorCode;
       digitalData.page.pageInfo.errorMessage = payload?.errorMessage;
       break;

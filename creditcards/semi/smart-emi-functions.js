@@ -211,6 +211,22 @@ function otpValV1(mobileNumber, cardDigits, otpNumber, globals) {
     delete jsonObj.requestString.OTP;
   }
   if (!isNodeEnv) displayLoader();
+  /* success */
+  Promise.resolve(sendSemiAnalytics(
+    ANALYTICS_EVENT_NAME['submit otp'],
+    'otpValResponse',
+    ANALYTICS_JOURNEY_STATE['submit otp'],
+    globals,
+  ));
+
+  /* failure */
+  // Promise.resolve(sendErrorAnalytics(
+  //   'XFACE_E2FA_02',
+  //   'Oops! The OTP doesn\'t match. Please re-check & retry.',
+  //   'INVALID_OTP_ON_CUSTOMER_LEAD',
+  //   globals,
+  // ));
+
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 
@@ -594,6 +610,7 @@ const getTotalAmount = (globals) => {
   const semiFormData = globals.functions.exportData().smartemi;
   const selectedTxnList = (semiFormData?.aem_billedTxn?.aem_billedTxnSelection?.concat(semiFormData?.aem_unbilledTxn?.aem_unbilledTxnSection))?.filter((txn) => txn.aem_Txn_checkBox === 'on');
   const totalAmountOfTxn = selectedTxnList?.reduce((prev, acc) => prev + parseFloat(acc.aem_TxnAmt.replace(/[^\d.-]/g, '')), 0);
+  currentFormContext.SMART_EMI_AMOUNT = totalAmountOfTxn;
   return totalAmountOfTxn;
 };
 
@@ -699,6 +716,15 @@ function selectTenure(globals) {
     if (!isNodeEnv) {
       moveWizardView(domElements.semiWizard, domElements.selectTenure);
       handleMdmUtmParam(globals);
+      /* success continue to tenure display */
+      Promise.resolve(
+        sendSemiAnalytics(
+          ANALYTICS_EVENT_NAME['transaction view'],
+          'proceedToTenure',
+          ANALYTICS_JOURNEY_STATE['transaction view'],
+          globals,
+        ),
+      );
     }
     tenureDisplay(globals);
   }
@@ -869,6 +895,11 @@ const getSelectedCount = (globals) => {
   const totalSelectCount = billedData.concat(unbilledData).filter((el) => el.aem_Txn_checkBox).length;
   const billedSelectCount = billedData.filter((el) => el.aem_Txn_checkBox)?.length;
   const unBilledSelectCount = unbilledData.filter((el) => el.aem_Txn_checkBox)?.length;
+  currentFormContext.TXN_SELECTED_COUNTS = {
+    billed: billedSelectCount,
+    unBilled: unBilledSelectCount,
+    total: totalSelectCount,
+  };
   return ({
     billed: billedSelectCount,
     unBilled: unBilledSelectCount,
