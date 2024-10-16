@@ -5,6 +5,7 @@ const ANALYTICS_EVENT_NAME = {
   'transaction view': 'transaction view',
   'tenure page': 'tenure page',
   'confirm tenure': 'confirm tenure',
+  'submit rating': 'submit rating',
 };
 
 const ANALYTICS_JOURNEY_STATE = {
@@ -15,6 +16,7 @@ const ANALYTICS_JOURNEY_STATE = {
   'tenure page': 'CUSTOMER_PREEXECUTION_SUCCESS',
   'confirm tenure': 'CUSTOMER_ONBOARDING_COMPLETE',
   'thank you': 'CUSTOMER_ONBOARDING_COMPLETE',
+  'submit rating': 'CUSTOMER_ONBOARDING_COMPLETE_FEEDBACK',
 };
 
 const ANALYTICS_PAGE_NAME = {

@@ -1285,6 +1285,13 @@ const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
     ANALYTICS_JOURNEY_STATE['confirm tenure'],
     globals,
   ));
+  /* success submit */
+  Promise.resolve(sendSemiAnalytics(
+    ANALYTICS_EVENT_NAME['submit rating'],
+    'submitFeedBack',
+    ANALYTICS_JOURNEY_STATE['submit rating'],
+    globals,
+  ));
   return fetchJsonResponse(path, jsonObj, 'POST', !isNodeEnv);
 };
 
