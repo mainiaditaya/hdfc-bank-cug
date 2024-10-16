@@ -20,6 +20,27 @@ const currentState = {
 };
 
 /**
+ * Hashes a phone number using SHA-256 algorithm.
+ *
+ * @function hashInSha256
+ * @param {string}  - The phone number to be hashed.
+ * @returns {Promise<string>} A promise that resolves to the hashed phone number in hexadecimal format.
+ */
+const hashInSha256 = async (inputString) => {
+  const encoder = new TextEncoder();
+  const rawdata = encoder.encode(inputString);
+  const hash = await crypto.subtle.digest('SHA-256', rawdata);
+  return Array.from(new Uint8Array(hash))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+};
+
+const hashPhNo = async (phoneNumber) => {
+  const hashed = await hashInSha256(String(phoneNumber));
+  return hashed;
+};
+
+/**
    * set analytics generic props for page load
    * @name setAnalyticPageLoadProps
    * @param {string} linkName - linkName
@@ -109,13 +130,13 @@ const sendPageloadEvent = (journeyState, formData, pageName) => {
    * @param {object} formContext
    * @param {object} digitalData
    */
-const sendSubmitClickEvent = (eventType, linkType, formData, journeyState, digitalData) => {
+const sendSubmitClickEvent = async (eventType, linkType, formData, journeyState, digitalData) => {
   setAnalyticClickGenericProps(eventType, linkType, formData, journeyState, digitalData);
   digitalData.page.pageInfo.pageName = ANALYTICS_PAGE_NAME[eventType];
   switch (eventType) {
     case 'otp click': {
       digitalData.event = {
-        phone: String(formData.smartemi.aem_mobileNum), // sha-256 encrypted ?.
+        phone: await hashPhNo(String(formData.smartemi.aem_mobileNum)), // sha-256 encrypted ?.
         validationMethod: 'credit card',
         status: '1',
       };
@@ -131,7 +152,7 @@ const sendSubmitClickEvent = (eventType, linkType, formData, journeyState, digit
 
     case 'submit otp': {
       digitalData.event = {
-        phone: String(formData.smartemi.aem_mobileNum), // sha-256 encrypted ?.
+        phone: await hashPhNo(String(formData.smartemi.aem_mobileNum)), // sha-256 encrypted ?.
         validationMethod: 'credit card',
         status: '1',
       };
@@ -148,7 +169,7 @@ const sendSubmitClickEvent = (eventType, linkType, formData, journeyState, digit
 
     case 'resend otp': {
       digitalData.event = {
-        phone: String(formData.smartemi.aem_mobileNum), // sha-256 encrypted ?.
+        phone: await hashPhNo(String(formData.smartemi.aem_mobileNum)), // sha-256 encrypted ?.
         validationMethod: 'credit card',
         status: '1',
       };
@@ -161,7 +182,7 @@ const sendSubmitClickEvent = (eventType, linkType, formData, journeyState, digit
 
     case 'transaction view': {
       digitalData.event.status = {
-        phone: String(formData.smartemi.aem_mobileNum), // sha-256 encrypted ?.
+        phone: await hashPhNo(String(formData.smartemi.aem_mobileNum)), // sha-256 encrypted ?.
         validationMethod: 'credit card',
         status: '1',
       };
@@ -182,7 +203,7 @@ const sendSubmitClickEvent = (eventType, linkType, formData, journeyState, digit
 
     case 'tenure page': {
       digitalData.event = {
-        phone: String(formData.smartemi.aem_mobileNum), // sha-256 encrypted ?.
+        phone: await hashPhNo(String(formData.smartemi.aem_mobileNum)), // sha-256 encrypted ?.
         validationMethod: 'credit card',
         status: '1',
       };
@@ -210,7 +231,7 @@ const sendSubmitClickEvent = (eventType, linkType, formData, journeyState, digit
 
     case 'confirm tenure': {
       digitalData.event = {
-        phone: String(formData.smartemi.aem_mobileNum), // sha-256 encrypted ?.
+        phone: await hashPhNo(String(formData.smartemi.aem_mobileNum)), // sha-256 encrypted ?.
         validationMethod: 'credit card',
         status: '1',
       };
@@ -227,7 +248,7 @@ const sendSubmitClickEvent = (eventType, linkType, formData, journeyState, digit
 
     case 'resendOtp confirmTenure': {
       digitalData.event = {
-        phone: String(formData.smartemi.aem_mobileNum), // sha-256 encrypted ?.
+        phone: await hashPhNo(String(formData.smartemi.aem_mobileNum)), // sha-256 encrypted ?.
         validationMethod: 'credit card',
         status: '1',
       };
