@@ -6,6 +6,7 @@ const ANALYTICS_EVENT_NAME = {
   'transaction view': 'transaction view',
   'tenure page': 'tenure page',
   'confirm tenure': 'confirm tenure',
+  'resendOtp confirmTenure': 'resendOtp confirmTenure',
   'submit rating': 'submit rating',
 };
 
@@ -17,6 +18,7 @@ const ANALYTICS_JOURNEY_STATE = {
   'transaction view': '',
   'tenure page': 'CUSTOMER_PREEXECUTION_SUCCESS',
   'confirm tenure': 'CUSTOMER_ONBOARDING_COMPLETE',
+  'resendOtp confirmTenure': 'RESEND_OTP_CUSTOMER_ONBOARDING',
   'thank you': 'CUSTOMER_ONBOARDING_COMPLETE',
   'submit rating': 'CUSTOMER_ONBOARDING_COMPLETE_FEEDBACK',
 };
@@ -29,6 +31,7 @@ const ANALYTICS_PAGE_NAME = {
   'transaction view': 'Step 3 - View Spends - Select Transactions',
   'tenure page': 'Step 3 - View Spends - Select Tenure',
   'confirm tenure': 'Step 4 - Confirm with OTP',
+  'resendOtp confirmTenure': 'Step 4 - Confirm with OTP',
   'thank you': 'Step 5 - Confirmation',
   'Error Page': 'Error Page',
 };
@@ -41,37 +44,44 @@ const ANALYTICS_LINK_BTN = {
     linkPosition: 'Form',
     pageName: ANALYTICS_PAGE_NAME['otp click'],
   },
-  'submit otp': {
+  'submit otp': { // otp1 typing
     linkType: 'button',
     linkName: 'Submit OTP',
     StepName: 'Step 2 - Verify with OTP',
     linkPosition: 'Form',
     pageName: ANALYTICS_PAGE_NAME['submit otp'],
   },
-  'resend otp': {
+  'resend otp': { // resendotp1 typing
     linkType: 'button',
     linkName: 'Resend OTP',
     StepName: 'Step 2 - Verify with OTP',
     linkPosition: 'Form',
     pageName: ANALYTICS_PAGE_NAME['resend otp'],
   },
-  'transaction view': {
+  'transaction view': { // continue on transaction scrren
     linkType: 'button',
     linkName: 'View EMI Amount',
     StepName: 'Step 3 - View Spends - Select Transactions',
     linkPosition: 'Form',
     pageName: ANALYTICS_PAGE_NAME['transaction view'],
   },
-  'tenure page': {
+  'tenure page': { // preExecution ok
     linkType: 'button',
     linkName: 'Confirm',
     StepName: 'Step 3 - View Spends - Select Tenure',
     linkPosition: 'Form',
     pageName: ANALYTICS_PAGE_NAME['tenure page'],
   },
-  'confirm tenure': {
+  'confirm tenure': { // otp2
     linkType: 'button',
     linkName: 'Authenticate',
+    StepName: 'Step 4 - Confirm with OTP',
+    linkPosition: 'Form',
+    pageName: ANALYTICS_PAGE_NAME['confirm tenure'],
+  },
+  'resendOtp confirmTenure': { // resendotp2 typing
+    linkType: 'button',
+    linkName: 'Resend OTP',
     StepName: 'Step 4 - Confirm with OTP',
     linkPosition: 'Form',
     pageName: ANALYTICS_PAGE_NAME['confirm tenure'],
