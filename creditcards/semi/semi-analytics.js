@@ -89,6 +89,14 @@ const sendPageloadEvent = (journeyState, formData, pageName) => {
     digitalData.formDetails.roi = selectedData?.aem_roi_monthly ?? '';
     currentState.pageName = null;
   }
+  if (currentState.pageName === ANALYTICS_PAGE_NAME['thank you']) {
+    digitalData.formDetails = {};
+    digitalData.formDetails.reference = formData?.smartemi?.originAcct ?? '';
+    digitalData.formDetails.amtCreditedDealer = formData?.smartemi?.SmartEMIAmt ?? '';
+    digitalData.user.casa = 'YES';
+    digitalData.user.aan = formData?.smartemi?.originAcct;
+    currentState.pageName = null;
+  }
   if (window) {
     window.digitalData = digitalData || {};
   }
@@ -188,11 +196,23 @@ const sendSubmitClickEvent = (eventType, linkType, formData, journeyState, digit
       break;
     }
 
-    case 'kyc continue': {
-      const kyc = (formData?.form?.aadharEKYCVerification && 'Ekyc') || (formData?.form?.aadharBiometricVerification && 'Biometric') || (formData?.form?.officiallyValidDocumentsMethod && 'Other Docs');
-      digitalData.formDetails = {
-        KYCVerificationMethod: kyc,
+    case 'confirm tenure': {
+      digitalData.event = {
+        phone: String(formData.smartemi.aem_mobileNum), // sha-256 encrypted ?.
+        validationMethod: 'credit card',
+        status: '1',
       };
+      if (window) {
+        window.digitalData = digitalData || {};
+      }
+      _satellite.track('submit');
+      setTimeout(() => {
+        currentState.pageName = ANALYTICS_PAGE_NAME['thank you'];
+        sendPageloadEvent(ANALYTICS_JOURNEY_STATE['thank you'], formData, ANALYTICS_PAGE_NAME['thank you']);
+      }, 7000);
+      break;
+    }
+    case 'kyc continue': {
       if (window) {
         window.digitalData = digitalData || {};
       }
@@ -209,6 +229,7 @@ const populateResponse = (payload, eventType, digitalData) => {
     case 'otp click':
     case 'transaction view':
     case 'tenure page':
+    case 'confirm tenure':
     case 'submit otp': {
       digitalData.page.pageInfo.errorCode = payload?.errorCode;
       digitalData.page.pageInfo.errorMessage = payload?.errorMessage;
