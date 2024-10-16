@@ -302,15 +302,12 @@ function setupBankUseSection(globals) {
     let toggle = globals.form.wizardPanel.wizardFragment.wizardNreNro.confirmDetails.needBankHelp.bankUseFragment.mainBankUsePanel.bankUseToggle;
     let resetAllBtn = globals.form.wizardPanel.wizardFragment.wizardNreNro.confirmDetails.needBankHelp.bankUseFragment.mainBankUsePanel.resetAllBtn
 
-    console.log("urlParams : " , urlParams, urlParams.size);
     if(urlParams.size > 0){
-      console.log("UTM Parameters present");
       ['lgCode', 'lcCode'].forEach(param => {
         const value = urlParams.get(param);
         if (value) {
             utmParams[param] = value;
         }
-        console.log("UTM Params : " , utmParams);
       });
 
       // Prefilling
@@ -518,18 +515,14 @@ function customFocus(errorMessage, numRetries, globals) {
 function checkForIDComRedirection(){
   const urlParams = new URLSearchParams(window.location.search);
   const utmParams = {};
-  console.log("urlParams : " , urlParams, urlParams.size);
   if(urlParams.size > 0){
-    console.log("UTM Parameters present");
     ['authmode', 'success','errorMessage','errorCode','journeyId'].forEach(param => {
       const value = urlParams.get(param);
       if (value) {
           utmParams[param] = value;
       }
-      console.log("UTM Params : " , utmParams);
     });
   }
-  console.log(Object.keys(utmParams).length);
   if(Object.keys(utmParams).length == 5){
     return true;
   }
@@ -538,13 +531,8 @@ function checkForIDComRedirection(){
 
 async function idComRedirection(globals){
   let resp = await fetchAuthCode(globals,"EGYPZ5203D","PADC");
-    console.log("Fetch Auth code response received");
-    console.log("Resp : " , resp , resp.authCode, resp.redirectUrl, resp.status.errorMessage, resp.status.errorCode);
     if(resp.status.errorMessage==="Success"){
-      console.log("Resp : " , resp , resp.authCode, resp.redirectUrl, resp.status.errorMessage, resp.status.errorCode);
       window.location.href = resp.redirectUrl;
-    }else{
-      console.log("IDComm fetch auth code failed.");
     }
 }
 
@@ -565,14 +553,11 @@ const authModeParam = searchParam.get('authmode');
 const journeyId = searchParam.get('journeyId');
 const aadharRedirect = visitTypeParam && (visitTypeParam === 'EKYC_AUTH');
 const idComRedirect = authModeParam && ((authModeParam === 'DebitCard') || (authModeParam === 'CreditCard')); // debit card or credit card flow
-console.log("UTM Parameters : " , searchParam,visitTypeParam, authModeParam, journeyId, aadharRedirect, idComRedirect);
-
 /**
  * @name nreNroFinalDapFetchRes - recursive async action call maker untill it reaches the finaldap response.
  * @returns {void} error method or succes method based on the criteria of finalDapResponse reach or max limit reach.
  */
 const nreNroFinalDapFetchRes = async () => {
-  console.log("In NRENRO Final DAP functions");
   const eventHandler = {
     successMethod: (data) => {
       const {
@@ -589,12 +574,10 @@ const nreNroFinalDapFetchRes = async () => {
       hideLoaderGif();
       nreNroErrorPannelMethod(err, lastStateData);
       // eslint-disable-next-line no-console
-      console.log(err);
     },
   };
   try {
     const data = await nreNroInvokeJourneyDropOffByParam('', '', journeyId);
-    console.log("Journey Drop Off Params : " , data , journeyId);
     const journeyDropOffParamLast = data.formData.journeyStateInfo[data.formData.journeyStateInfo.length - 1];
     finalDap.journeyParamState = journeyDropOffParamLast.state;
     finalDap.journeyParamStateInfo = journeyDropOffParamLast.stateInfo;
@@ -699,12 +682,10 @@ const nreNroSuccessPannelMethod = async (data, stateInfoData) => {
  * @returns {void}
  */
 const nreNroPageRedirected = (aadhar, idCom) => {
-  console.log("In NRENROPageRedirected");
   if (aadhar) {
     moveWizardView(ccWizard.wizardPanel, ccWizard.confirmAndSubmitPanel);
   }
   if (idCom) {
-    console.log("Idcom page redirected section");
     /**
      * finaldapResponse starts for ETB - address change scenario.
      */
@@ -729,16 +710,8 @@ const addPageNameClassInBody = (pageName) => {
 const switchWizard = () => moveWizardView('wizardNreNro', 'confirmDetails');
 
 setTimeout(async function(globals) {
-  console.log("Going to check for Idcom redirection status");
   await nreNroPageRedirected(aadharRedirect, idComRedirect);
-  // console.log("Calling getCountryCodes");
   await getCountryCodes(document.querySelector('.field-countrycode select'));
-  console.log("Calling fetchAuthCode function");
-  console.log("IDComRedirect : " , idComRedirect);
-  
-  if(idComRedirect != null){
-    console.log("Redirected");
-  }
 }, 2000);
 
 export {
