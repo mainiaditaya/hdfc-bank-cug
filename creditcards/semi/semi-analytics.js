@@ -4,13 +4,16 @@ import {
   santizedFormDataWithContext,
 } from '../../common/formutils.js';
 import {
+  JOURNEY_NAME as FORM_NAME,
+  CURRENT_FORM_CONTEXT as currentFormContext,
+} from './constant.js';
+import {
   ANALYTICS_JOURNEY_STATE,
   ANALYTICS_LINK_BTN,
   ANALYTICS_OBJECT_SEMI,
   ANALYTICS_PAGE_LOAD_OBJECT_SEMI,
-  ANALYTICS_PAGE_NAME, JOURNEY_NAME as FORM_NAME,
-  CURRENT_FORM_CONTEXT as currentFormContext,
-} from './constant.js';
+  ANALYTICS_PAGE_NAME,
+} from './semi-analytics-constant.js';
 
 /**
    * set analytics generic props for page load

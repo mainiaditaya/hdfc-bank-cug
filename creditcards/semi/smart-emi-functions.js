@@ -36,6 +36,7 @@ import {
   sendSemiAnalytics,
   sendErrorAnalytics,
 } from './semi-analytics.js';
+import { ANALYTICS_EVENT_NAME, ANALYTICS_JOURNEY_STATE } from './semi-analytics-constant.js';
 
 const {
   CURRENT_FORM_CONTEXT: currentFormContext,
@@ -74,7 +75,7 @@ const onPageLoadAnalytics = async () => {
     sendSemiAnalytics(
       'page load',
       {},
-      SEMI_CONSTANT.ANALYTICS_JOURNEY_STATE['page load'],
+      ANALYTICS_JOURNEY_STATE['page load'],
       journeyData,
     );
   }
@@ -169,9 +170,9 @@ function getOTPV1(mobileNumber, cardDigits, channel, globals) {
   }
   /* success */
   Promise.resolve(sendSemiAnalytics(
-    SEMI_CONSTANT.ANALYTICS_EVENT_NAME['otp click'],
+    ANALYTICS_EVENT_NAME['otp click'],
     'otpGenResponse',
-    SEMI_CONSTANT.ANALYTICS_JOURNEY_STATE['otp click'],
+    ANALYTICS_JOURNEY_STATE['otp click'],
     globals,
   ));
 
