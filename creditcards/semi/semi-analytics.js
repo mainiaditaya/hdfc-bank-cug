@@ -146,6 +146,19 @@ const sendSubmitClickEvent = (eventType, linkType, formData, journeyState, digit
       break;
     }
 
+    case 'resend otp': {
+      digitalData.event = {
+        phone: String(formData.smartemi.aem_mobileNum), // sha-256 encrypted ?.
+        validationMethod: 'credit card',
+        status: '1',
+      };
+      if (window) {
+        window.digitalData = digitalData || {};
+      }
+      _satellite.track('submit');
+      break;
+    }
+
     case 'transaction view': {
       digitalData.event.status = {
         phone: String(formData.smartemi.aem_mobileNum), // sha-256 encrypted ?.
@@ -231,6 +244,7 @@ const populateResponse = (payload, eventType, digitalData) => {
     case 'transaction view':
     case 'tenure page':
     case 'confirm tenure':
+    case 'resend otp':
     case 'submit otp': {
       digitalData.page.pageInfo.errorCode = payload?.errorCode;
       digitalData.page.pageInfo.errorMessage = payload?.errorMessage;

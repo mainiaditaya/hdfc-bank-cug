@@ -1407,6 +1407,21 @@ const resendOTPV1 = async (pannelName, globals) => {
       }
     }
     if (pannelName === FIRST_PANNEL_OTP) {
+      /* success resend otp */
+      Promise.resolve(sendSemiAnalytics(
+        ANALYTICS_EVENT_NAME['resend otp'],
+        'resendOtpResponse',
+        ANALYTICS_JOURNEY_STATE['resend otp'],
+        globals,
+      ));
+
+      /* failure */
+      Promise.resolve(sendErrorAnalytics(
+        'XFACE_INQ_VP_0003',
+        'Hey, it seem',
+        ANALYTICS_JOURNEY_STATE['resend otp'],
+        globals,
+      ));
       return getOTPV1(mobileNumber, cardDigits, channel, globals);
     }
     if (pannelName === SECOND_PANNEL_OTP) {
