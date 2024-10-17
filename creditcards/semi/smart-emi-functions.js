@@ -33,7 +33,7 @@ import { invokeJourneyDropOffByParam } from '../../common/journey-utils.js';
 import { invokeJourneyDropOffUpdate, invokeJourneyDropOff } from './semi-journey-utils.js';
 import { reloadPage } from '../../common/functions.js';
 import {
-  sendSemiAnalytics,
+  sendAnalytics,
   sendErrorAnalytics,
 } from './semi-analytics.js';
 import { ANALYTICS_EVENT_NAME, ANALYTICS_JOURNEY_STATE } from './semi-analytics-constant.js';
@@ -72,7 +72,7 @@ const onPageLoadAnalytics = async () => {
     // eslint-disable-next-line no-underscore-dangle, no-undef
     journeyData.journeyId = myForm.resolveQualifiedName('$form.runtime.journeyId')._data.$_value;
     journeyData.journeyName = journeyName;
-    sendSemiAnalytics(
+    sendAnalytics(
       'page load',
       {},
       ANALYTICS_JOURNEY_STATE['page load'],
@@ -169,7 +169,7 @@ function getOTPV1(mobileNumber, cardDigits, channel, globals) {
     };
   }
   /* success */
-  Promise.resolve(sendSemiAnalytics(
+  Promise.resolve(sendAnalytics(
     ANALYTICS_EVENT_NAME['otp click'],
     'otpGenResponse',
     ANALYTICS_JOURNEY_STATE['otp click'],
@@ -212,7 +212,7 @@ function otpValV1(mobileNumber, cardDigits, otpNumber, globals) {
   }
   if (!isNodeEnv) displayLoader();
   /* success */
-  Promise.resolve(sendSemiAnalytics(
+  Promise.resolve(sendAnalytics(
     ANALYTICS_EVENT_NAME['submit otp'],
     'otpValResponse',
     ANALYTICS_JOURNEY_STATE['submit otp'],
@@ -276,7 +276,7 @@ function preExecution(mobileNumber, cardDigits, globals) {
   const path = semiEndpoints.preexecution;
   if (!isNodeEnv) displayLoader();
   /* success */
-  Promise.resolve(sendSemiAnalytics(
+  Promise.resolve(sendAnalytics(
     ANALYTICS_EVENT_NAME['tenure page'],
     'preExecutionResponse',
     ANALYTICS_JOURNEY_STATE['tenure page'],
@@ -726,7 +726,7 @@ function selectTenure(globals) {
       handleMdmUtmParam(globals);
       /* success continue to tenure display */
       Promise.resolve(
-        sendSemiAnalytics(
+        sendAnalytics(
           ANALYTICS_EVENT_NAME['transaction view'],
           'proceedToTenure',
           ANALYTICS_JOURNEY_STATE['transaction view'],
@@ -1279,14 +1279,14 @@ const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
   // For whatsapp flow visibility controlled via custom property so need to ensure on resend/submit button click property is updated.
   handleResendOtp2VisibilityInFlow(globals.form.aem_semiWizard.aem_selectTenure.aem_otpPanelConfirmation.aem_otpPanel2.aem_resendOtpCount2.$value, globals);
   /* success */
-  Promise.resolve(sendSemiAnalytics(
+  Promise.resolve(sendAnalytics(
     ANALYTICS_EVENT_NAME['confirm tenure'],
     'ccSmartEmiResponse',
     ANALYTICS_JOURNEY_STATE['confirm tenure'],
     globals,
   ));
   /* success submit */
-  Promise.resolve(sendSemiAnalytics(
+  Promise.resolve(sendAnalytics(
     ANALYTICS_EVENT_NAME['submit rating'],
     'submitFeedBack',
     ANALYTICS_JOURNEY_STATE['submit rating'],
@@ -1408,7 +1408,7 @@ const resendOTPV1 = async (pannelName, globals) => {
     }
     if (pannelName === FIRST_PANNEL_OTP) {
       /* success resend otp */
-      Promise.resolve(sendSemiAnalytics(
+      Promise.resolve(sendAnalytics(
         ANALYTICS_EVENT_NAME['resend otp'],
         'resendOtpResponse',
         ANALYTICS_JOURNEY_STATE['resend otp'],
@@ -1426,7 +1426,7 @@ const resendOTPV1 = async (pannelName, globals) => {
     }
     if (pannelName === SECOND_PANNEL_OTP) {
       /* success resend otp2 */
-      Promise.resolve(sendSemiAnalytics(
+      Promise.resolve(sendAnalytics(
         ANALYTICS_EVENT_NAME['resendOtp confirmTenure'],
         'resendOtp2Response',
         ANALYTICS_JOURNEY_STATE['resendOtp confirmTenure'],
@@ -1486,4 +1486,6 @@ export {
   invokeJourneyDropOffUpdate,
   handleWrongCCDetailsFlows,
   handleTadMadAlert,
+  sendAnalytics,
+  sendErrorAnalytics,
 };

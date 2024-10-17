@@ -326,13 +326,13 @@ function sendErrorAnalytics(errorCode, errorMsg, journeyState, globals) {
 }
 
 /**
-  * sendSemiAnalytics
+  * sendAnalytics
   * @param {string} eventType
   * @param {string} payload
   * @param {string} journeyState
   * @param {object} globals
   */
-function sendSemiAnalytics(eventType, payload, journeyState, globals) {
+function sendAnalytics(eventType, payload, journeyState, globals) {
   const formData = santizedFormDataWithContext(globals);
   if (eventType.includes('page load')) {
     const pageName = ANALYTICS_PAGE_NAME['page load'];
@@ -343,6 +343,6 @@ function sendSemiAnalytics(eventType, payload, journeyState, globals) {
 }
 
 export {
-  sendSemiAnalytics,
+  sendAnalytics,
   sendErrorAnalytics,
 };
