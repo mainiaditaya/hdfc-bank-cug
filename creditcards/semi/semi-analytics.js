@@ -280,6 +280,9 @@ const populateResponse = (payload, eventType, digitalData) => {
       if (payload === 'Record successfully updated!') {
         digitalData.page.pageInfo.errorCode = '0';
         digitalData.page.pageInfo.errorMessage = 'success';
+      } else {
+        digitalData.page.pageInfo.errorCode = payload?.errorCode;
+        digitalData.page.pageInfo.errorMessage = payload?.errorMsg;
       }
       break;
     case 'confirm tenure':
