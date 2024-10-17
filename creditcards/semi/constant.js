@@ -17,13 +17,13 @@ const CHANNELS = {
 };
 
 const SEMI_ENDPOINTS = {
-  otpGen: 'https://applyonlinedev.hdfcbank.com/content/hdfc_ccforms/api/validatecardotpgen.json',
-  otpVal: 'https://applyonlineuat01.hdfcbank.com/content/hdfc_hafcards/api/eligibilitycheck.json',
-  preexecution: 'https://applyonlinedev.hdfcbank.com/content/hdfc_ccforms/api/preexecution.json',
-  masterChanel: 'https://applyonlinedev.hdfcbank.com/content/hdfc_commonforms/api/mdm.CREDIT.POST_ISSUANCE_CHANNEL_MASTER.json',
-  ccSmartEmi: 'https://applyonlinedev.hdfcbank.com/content/hdfc_ccforms/api/ccsmartemi.json',
-  branchMaster: 'https://applyonlinedev.hdfcbank.com/content/hdfc_commonforms/api/mdm.CREDIT.POST_ISSUANCE_BRANCH_MASTER.BRANCH_CODE',
-  dsaCode: 'https://applyonlinedev.hdfcbank.com/content/hdfc_commonforms/api/mdm.CREDIT.POST_ISSUANCE_DSA_MASTER.DSACODE',
+  otpGen: 'https://hdfc-dev-04.adobecqms.net/content/hdfc_ccforms/api/validatecardotpgen.json',
+  otpVal: 'https://hdfc-dev-04.adobecqms.net/content/hdfc_hafcards/api/eligibilitycheck.json',
+  preexecution: 'https://hdfc-dev-04.adobecqms.net/content/hdfc_ccforms/api/preexecution.json',
+  masterChanel: 'https://hdfc-dev-04.adobecqms.net/content/hdfc_commonforms/api/mdm.CREDIT.POST_ISSUANCE_CHANNEL_MASTER.json',
+  ccSmartEmi: 'https://hdfc-dev-04.adobecqms.net/content/hdfc_ccforms/api/ccsmartemi.json',
+  branchMaster: 'https://hdfc-dev-04.adobecqms.net/content/hdfc_commonforms/api/mdm.CREDIT.POST_ISSUANCE_BRANCH_MASTER.BRANCH_CODE',
+  dsaCode: 'https://hdfc-dev-04.adobecqms.net/content/hdfc_commonforms/api/mdm.CREDIT.POST_ISSUANCE_DSA_MASTER.DSACODE',
 };
 
 const DOM_ELEMENT = {
