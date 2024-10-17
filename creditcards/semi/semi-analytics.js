@@ -258,7 +258,7 @@ const sendSubmitClickEvent = async (eventType, linkType, formData, journeyState,
       _satellite.track('submit');
       break;
     }
-    case 'submit rating': {
+    case 'submit review': {
       digitalData.event = {};
       digitalData.event.rating = formData?.ratingvalue || formData.rating;
       if (window) {
@@ -288,6 +288,7 @@ const populateResponse = (payload, eventType, digitalData) => {
     case 'confirm tenure':
     case 'resend otp':
     case 'resendOtp confirmTenure':
+    case 'submit review':
     case 'submit otp': {
       digitalData.page.pageInfo.errorCode = payload?.errorCode;
       digitalData.page.pageInfo.errorMessage = payload?.errorMsg;

@@ -7,7 +7,7 @@ const ANALYTICS_EVENT_NAME = {
   'tenure page': 'tenure page',
   'confirm tenure': 'confirm tenure',
   'resendOtp confirmTenure': 'resendOtp confirmTenure',
-  'submit rating': 'submit rating',
+  'submit review': 'submit review',
 };
 
 const ANALYTICS_JOURNEY_STATE = {
@@ -20,7 +20,7 @@ const ANALYTICS_JOURNEY_STATE = {
   'confirm tenure': 'CUSTOMER_ONBOARDING_COMPLETE',
   'resendOtp confirmTenure': 'RESEND_OTP_CUSTOMER_ONBOARDING',
   'thank you': 'CUSTOMER_ONBOARDING_COMPLETE',
-  'submit rating': 'CUSTOMER_ONBOARDING_COMPLETE_FEEDBACK',
+  'submit review': 'CUSTOMER_FEEDBACK_SUBMITTED',
 };
 
 const ANALYTICS_PAGE_NAME = {
@@ -86,7 +86,7 @@ const ANALYTICS_LINK_BTN = {
     linkPosition: 'Form',
     pageName: ANALYTICS_PAGE_NAME['confirm tenure'],
   },
-  'submit rating': {
+  'submit review': {
     linkType: 'button',
     linkName: 'Submit',
     StepName: 'Step 5 - Confirmation',

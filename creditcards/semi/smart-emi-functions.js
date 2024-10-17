@@ -1230,20 +1230,6 @@ const getCCSmartEmi = (mobileNum, cardNum, otpNum, globals) => {
   if (!isNodeEnv) displayLoader();
   // For whatsapp flow visibility controlled via custom property so need to ensure on resend/submit button click property is updated.
   handleResendOtp2VisibilityInFlow(globals.form.aem_semiWizard.aem_selectTenure.aem_otpPanelConfirmation.aem_otpPanel2.aem_resendOtpCount2.$value, globals);
-  /* success */
-  Promise.resolve(sendAnalytics(
-    ANALYTICS_EVENT_NAME['confirm tenure'],
-    'ccSmartEmiResponse',
-    ANALYTICS_JOURNEY_STATE['confirm tenure'],
-    globals,
-  ));
-  /* success submit */
-  Promise.resolve(sendAnalytics(
-    ANALYTICS_EVENT_NAME['submit rating'],
-    'submitFeedBack',
-    ANALYTICS_JOURNEY_STATE['submit rating'],
-    globals,
-  ));
   return fetchJsonResponse(path, jsonObj, 'POST', !isNodeEnv);
 };
 
