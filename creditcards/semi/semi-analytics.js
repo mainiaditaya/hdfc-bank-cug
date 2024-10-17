@@ -282,7 +282,7 @@ const populateResponse = (payload, eventType, digitalData) => {
     case 'resendOtp confirmTenure':
     case 'submit otp': {
       digitalData.page.pageInfo.errorCode = payload?.errorCode;
-      digitalData.page.pageInfo.errorMessage = payload?.errorMessage;
+      digitalData.page.pageInfo.errorMessage = payload?.errorMsg;
       break;
     }
     default:

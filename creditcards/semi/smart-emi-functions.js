@@ -168,21 +168,6 @@ function getOTPV1(mobileNumber, cardDigits, channel, globals) {
       },
     };
   }
-  /* success */
-  Promise.resolve(sendAnalytics(
-    ANALYTICS_EVENT_NAME['otp click'],
-    'otpGenResponse',
-    ANALYTICS_JOURNEY_STATE['otp click'],
-    globals,
-  ));
-
-  /* failure */
-  Promise.resolve(sendErrorAnalytics(
-    'XFACE_INQ_VP_0003',
-    'Hey, it seems like you have entered incorrect details. Request you to check & re-enter your registered mobile no. & last 4 digits of the card.',
-    'CUSTOMER_IDENTITY_UNRESOLVED',
-    globals,
-  ));
   // eslint-disable-next-line no-unneeded-ternary
   return fetchJsonResponse(path, jsonObj, 'POST', isNodeEnv ? false : true);
 }
