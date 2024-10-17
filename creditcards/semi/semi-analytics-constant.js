@@ -13,8 +13,8 @@ const ANALYTICS_EVENT_NAME = {
 const ANALYTICS_JOURNEY_STATE = {
   'page load': 'CUSTOMER_IDENTITY_ACQUIRED',
   'otp click': 'CUSTOMER_IDENTITY_RESOLVED',
-  'submit otp': 'CUSTOMER_IDENTITY_RESOLVED',
-  'resend otp': 'CUSTOMER_IDENTITY_RESOLVED',
+  'submit otp': 'CUSTOMER_LEAD_QUALIFIED',
+  'resend otp': 'CUSTOMER_RESEND_OTP',
   'transaction view': '',
   'tenure page': 'CUSTOMER_PREEXECUTION_SUCCESS',
   'confirm tenure': 'CUSTOMER_ONBOARDING_COMPLETE',

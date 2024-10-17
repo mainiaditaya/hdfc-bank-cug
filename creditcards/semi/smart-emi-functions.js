@@ -196,22 +196,6 @@ function otpValV1(mobileNumber, cardDigits, otpNumber, globals) {
     delete jsonObj.requestString.OTP;
   }
   if (!isNodeEnv) displayLoader();
-  /* success */
-  Promise.resolve(sendAnalytics(
-    ANALYTICS_EVENT_NAME['submit otp'],
-    'otpValResponse',
-    ANALYTICS_JOURNEY_STATE['submit otp'],
-    globals,
-  ));
-
-  /* failure */
-  // Promise.resolve(sendErrorAnalytics(
-  //   'XFACE_E2FA_02',
-  //   'Oops! The OTP doesn\'t match. Please re-check & retry.',
-  //   'INVALID_OTP_ON_CUSTOMER_LEAD',
-  //   globals,
-  // ));
-
   return fetchJsonResponse(path, jsonObj, 'POST', true);
 }
 
@@ -1392,21 +1376,6 @@ const resendOTPV1 = async (pannelName, globals) => {
       }
     }
     if (pannelName === FIRST_PANNEL_OTP) {
-      /* success resend otp */
-      Promise.resolve(sendAnalytics(
-        ANALYTICS_EVENT_NAME['resend otp'],
-        'resendOtpResponse',
-        ANALYTICS_JOURNEY_STATE['resend otp'],
-        globals,
-      ));
-
-      /* failure */
-      Promise.resolve(sendErrorAnalytics(
-        'XFACE_INQ_VP_0003',
-        'Hey, it seem',
-        ANALYTICS_JOURNEY_STATE['resend otp'],
-        globals,
-      ));
       return getOTPV1(mobileNumber, cardDigits, channel, globals);
     }
     if (pannelName === SECOND_PANNEL_OTP) {
