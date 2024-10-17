@@ -693,15 +693,6 @@ function selectTenure(globals) {
     if (!isNodeEnv) {
       moveWizardView(domElements.semiWizard, domElements.selectTenure);
       handleMdmUtmParam(globals);
-      /* success continue to tenure display */
-      Promise.resolve(
-        sendAnalytics(
-          ANALYTICS_EVENT_NAME['transaction view'],
-          'proceedToTenure',
-          ANALYTICS_JOURNEY_STATE['transaction view'],
-          globals,
-        ),
-      );
     }
     tenureDisplay(globals);
   }

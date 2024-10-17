@@ -277,6 +277,11 @@ const populateResponse = (payload, eventType, digitalData) => {
     case 'otp click':
     case 'transaction view':
     case 'tenure page':
+      if (payload === 'Record successfully updated!') {
+        digitalData.page.pageInfo.errorCode = '0';
+        digitalData.page.pageInfo.errorMessage = 'success';
+      }
+      break;
     case 'confirm tenure':
     case 'resend otp':
     case 'resendOtp confirmTenure':

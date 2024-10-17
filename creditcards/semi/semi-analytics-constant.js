@@ -15,7 +15,7 @@ const ANALYTICS_JOURNEY_STATE = {
   'otp click': 'CUSTOMER_IDENTITY_RESOLVED',
   'submit otp': 'CUSTOMER_LEAD_QUALIFIED',
   'resend otp': 'CUSTOMER_RESEND_OTP',
-  'transaction view': '',
+  'transaction view': 'CUSTOMER_TXN_SELECTED',
   'tenure page': 'CUSTOMER_PREEXECUTION_SUCCESS',
   'confirm tenure': 'CUSTOMER_ONBOARDING_COMPLETE',
   'resendOtp confirmTenure': 'RESEND_OTP_CUSTOMER_ONBOARDING',
