@@ -1,4 +1,4 @@
-/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-underscore-dangle ..*/
 /* eslint no-bitwise: ["error", { "allow": ["^", ">>", "&"] }] */
 
 import * as CONSTANT from './constants.js';
