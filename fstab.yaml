@@ -1,5 +1,5 @@
 mountpoints:
   /:
-    url: "https://hdfc-dev-04.adobecqms.net/bin/franklin.delivery/mainiaditaya/hdfc-bank-cug/main"
+    url: "https://hdfc-devcdn-04.adobecqms.net/bin/franklin.delivery/mainiaditaya/hdfc-bank-cug/main"
     type: "markup"
     suffix: ".html"
