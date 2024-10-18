@@ -2,4 +2,4 @@ mountpoints:
   /:
     url: "https://hdfc-devcdn-04.adobecqms.net/bin/franklin.delivery/mainiaditaya/hdfc-bank-cug/main"
     type: "markup"
-    suffix: ".html?ifsc=123456"
+    suffix: ".html?ifsc=123sdf456"
