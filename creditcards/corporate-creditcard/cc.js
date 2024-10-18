@@ -405,4 +405,5 @@ const onPageLoadAnalytics = async () => {
 
 setTimeout(() => {
   onPageLoadAnalytics();
+  console.log('**********mainiaditaya-cug*********');
 }, 3900);
